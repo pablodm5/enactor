@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:mjstring="com.enactor.tools.core.util.JavaCodeGenUtils" xmlns:plnk="http://schemas.xmlsoap.org/ws/2003/05/partner-link/"
+	xmlns:format="http://schemas.xmlsoap.org/wsdl/formatbinding/" xmlns:java="http://schemas.xmlsoap.org/wsdl/java/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	name="ActivityFlowCompensation" targetNamespace="http://www.enactor.com/core" xmlns:service="http://www.enactor.com/core">
+	<wsdl:types>
+		<xsd:schema>
+			<xsd:import namespace="http://www.enactor.com/core" schemaLocation="Core/Core.xsd" />
+			<xsd:import namespace="http://www.enactor.com/mfc" schemaLocation="MFC/MFC-Core.xsd" />
+			<xsd:import namespace="http://www.enactor.com/core" schemaLocation="Core/ActivityFlowCompensationTypes.xsd" />
+		</xsd:schema>
+	</wsdl:types>
+	<wsdl:message name="compensateRequestMessage">
+		<wsdl:part name="parameters" element="service:compensate" />
+	</wsdl:message>
+	<wsdl:message name="compensateResponseMessage">
+		<wsdl:part name="parameters" element="service:compensateResponse" />
+	</wsdl:message>
+	<wsdl:message name="compensateFaultMessage">
+		<wsdl:part name="parameters" element="service:compensateFault" />
+	</wsdl:message>
+	<wsdl:portType name="ActivityFlowCompensationPT">
+		<wsdl:operation name="compensate">
+			<wsdl:documentation>Compensates the business process fully or partially (if a compensateToActivity is given)</wsdl:documentation>
+			<wsdl:input message="service:compensateRequestMessage" name="compensateRequestMessage" />
+			<wsdl:output message="service:compensateResponseMessage" name="compensateResponseMessage" />
+			<wsdl:fault message="service:compensateFaultMessage" name="compensateFaultMessage" />
+		</wsdl:operation>
+	</wsdl:portType>
+	<wsdl:binding name="SOAPBinding" type="service:ActivityFlowCompensationPT">
+		<soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document" />
+		<wsdl:operation name="compensate">
+			<soap:operation soapAction="http://www.enactor.com/core/ActivityFlowCompensation/soapAction" />
+			<wsdl:input name="compensateRequestMessage">
+				<soap:body parts="parameters" use="literal" />
+			</wsdl:input>
+			<wsdl:output name="compensateResponseMessage">
+				<soap:body parts="parameters" use="literal" />
+			</wsdl:output>
+			<wsdl:fault name="compensateFaultMessage">
+				<soap:body parts="parameters" use="literal" />
+			</wsdl:fault>
+		</wsdl:operation>
+	</wsdl:binding>
+	<wsdl:binding name="JavaBinding" type="service:ActivityFlowCompensationPT">
+		<java:binding />
+		<format:typeMapping style="Java" encoding="Java">
+			<format:typeMap typeName="xsd:string" formatType="java.lang.String" />
+			<format:typeMap typeName="xsd:boolean" formatType="java.lang.Boolean" />
+		</format:typeMapping>
+		<wsdl:operation name="compensate">
+			<java:operation methodType="instance" methodName="compensate" />
+			<wsdl:input />
+			<wsdl:output></wsdl:output>
+			<wsdl:fault name="compensateFaultMessage"></wsdl:fault>
+		</wsdl:operation>
+	</wsdl:binding>
+	<wsdl:service name="ActivityFlowCompensation">
+		<wsdl:documentation>BPEL to compensation for activity flow business processes</wsdl:documentation>
+		<wsdl:port name="SOAPPort" binding="service:SOAPBinding">
+			<soap:address location="http://{SERVICE_URL}/ActivityFlowCompensation" />
+		</wsdl:port>
+		<wsdl:port name="JavaPort" binding="service:JavaBinding">
+			<java:address className="com.enactor.service.myProcess.ActivityFlowCompensation" />
+		</wsdl:port>
+	</wsdl:service>
+	<plnk:partnerLinkType name="ActivityFlowCompensationPLT">
+		<plnk:role name="ActivityFlowCompensationImpl">
+			<plnk:portType name="service:ActivityFlowCompensationPT" />
+		</plnk:role>
+	</plnk:partnerLinkType>
+</wsdl:definitions>

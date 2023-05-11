@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<core:documentTemplate xmlns:core="http://www.enactor.com/core" xmlns:retail="http://www.enactor.com/retail" xmlns:ns4="http://www.enactor.com/crm" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803" xmlns:ns6="http://www.apis-it.hr/fin/2012/types/f73" xmlns:ns7="http://www.w3.org/2000/09/xmldsig#" xmlns:ns8="http://www.enactor.com/retail/storedRetailTransaction/service" xmlns:ns9="http://www.fu.gov.si/" xmlns:ns10="http://www.enactor.com/addressLookup/service" xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:ns14="http://www.enactor.com/crm/customerLoyalty/service" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" paginated="false" messageBase="Pos/Print/ReceiptMessages" title="Product Return Slip Template" url="Pos/Print/ProductReturnSlipTemplate">
+    <core:elements/>
+    <core:variables>
+        <core:variable required="true" name="enactor.mfc.Transaction">
+            <core:interfaceName>com.enactor.core.transaction.ITransaction</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="sale">
+            <core:interfaceName>com.enactor.core.transaction.IModel</core:interfaceName>
+        </core:variable>
+    </core:variables>
+    <core:formatEntry id="productReturnSlipHeader">
+        <core:elements>
+            <core:formatElement formatId="logo"/>
+            <core:formatElement formatId="separator"/>
+            <core:formatElement applicability="#{transaction.trainingDetails.trainingMode}" formatId="productReturnTrainingModeHeader"/>
+            <core:formatElement formatId="productReturnHeader"/>
+            <core:formatElement formatId="separator"/>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="productReturnSlipBody">
+        <core:elements>
+            <core:formatElement formatId="productReturnItemDetails"/>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="productReturnSlipBarcode">
+        <core:elements>
+            <core:formatElement formatId="productReturnItemBarcode"/>
+            <core:formatElement formatId="separator"/>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="productReturnSlipTrailer">
+        <core:elements>
+            <core:formatElement formatId="productReturnTrailerText"/>
+            <core:formatElement applicability="#{transaction.trainingDetails.trainingMode}" formatId="productReturnTrainingModeHeader"/>
+            <core:formatElement formatId="separator"/>
+            <core:formatElement formatId="productReturnTrailerLine"/>
+            <core:page number="0"/>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="productReturnTrainingModeHeader">
+        <core:elements>
+            <core:column maxLines="0" columnDefId="FullCentre" id="TrainingModeHeaderColumn">
+                <core:elements>
+                    <core:lineElement messageId="TRAINING_MODE_HEADER" style="BOLD;DOUBLE_HIGH;DOUBLE_WIDE" id="TrainingModeHeaderText"/>
+                </core:elements>
+            </core:column>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="productReturnTrainingModeTrailer">
+        <core:elements>
+            <core:column maxLines="0" columnDefId="FullCentre" id="TrainingModetrailerColumn">
+                <core:elements>
+                    <core:lineElement messageId="TRAINING_MODE_TRAILER" style="BOLD;DOUBLE_HIGH;DOUBLE_WIDE" id="TrainingModetrailerText"/>
+                </core:elements>
+            </core:column>
+            <core:lineElement id="EmptyLine"/>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="productReturnHeader">
+        <core:elements>
+            <core:column maxLines="0" columnDefId="FullLeft" id="ProductReturnSlipHeaderColumn1">
+                <core:elements>
+                    <core:lineElement messageId="PRODUCT_RETURN_SLIP_HEADER_LINE_1" id="ProductReturnSlipHeaderLine1"/>
+                </core:elements>
+            </core:column>
+            <core:column maxLines="0" columnDefId="FullCentre" id="ProductReturnSlipHeaderColumn2">
+                <core:elements>
+                    <core:lineElement messageId="PRODUCT_RETURN_SLIP_HEADER_LINE_2" style="BOLD;" id="ProductReturnSlipHeaderLine2"/>
+                </core:elements>
+            </core:column>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="productReturnItemDetails">
+        <core:elements>
+            <core:row id="ProductReturnItemDetailsRow">
+                <core:rowLine id="ProductReturnItemDetailsRowLine">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="FullLeft" id="ProductId">
+                            <core:elements>
+<core:text id="ProductIdText">
+    <core:text>#{item.productId}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine id="ProductIdRowLine">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="2" id="ProductId">
+                            <core:elements>
+<core:text id="DescriptionText">
+    <core:text>#{item.description}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="3" id="Price">
+                            <core:elements>
+<core:text id="PriceText">
+    <core:formatters>
+        <core:formatCurrencyAmount/>
+    </core:formatters>
+    <core:text>#{item.value}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine visibility="#{notEmpty(item.reasonKey)}" id="ReasonDescriptionRowLine">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="FullLeft" id="ReasonDescriptionColumn">
+                            <core:elements>
+<core:text id="ReasonDescriptionText">
+    <core:formatters>
+        <core:formatLocaleString/>
+    </core:formatters>
+    <core:text>#{reason.description}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+        <core:entityReferences>
+            <core:entityReference name="reason" keyValue="#{item.reasonKey}"/>
+        </core:entityReferences>
+    </core:formatEntry>
+    <core:formatEntry id="productReturnItemBarcode">
+        <core:elements>
+            <core:column maxLines="0" columnDefId="FullCentre" id="ProductIdBarcodeColumn">
+                <core:elements>
+                    <core:barcode hri="true" barcodeSize="SMALL" barcodeType="CODE_39" id="ProductIdBarcode">
+                        <core:data>#{item.productID}</core:data>
+                    </core:barcode>
+                </core:elements>
+            </core:column>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="productReturnTrailerText">
+        <core:elements>
+            <core:column maxLines="0" columnDefId="FullCentre" id="ProductReturnSlipTrailerColumn1">
+                <core:elements>
+                    <core:lineElement messageId="PRODUCT_RETURN_SLIP_TRAILER_LINE_1" style="BOLD;" id="ProductReturnSlipTrailerLine1"/>
+                </core:elements>
+            </core:column>
+            <core:column maxLines="0" columnDefId="FullCentre" id="ProductReturnSlipTrailerColumn2">
+                <core:elements>
+                    <core:lineElement messageId="PRODUCT_RETURN_SLIP_TRAILER_LINE_2" style="BOLD;" id="ProductReturnSlipTrailerLine2"/>
+                </core:elements>
+            </core:column>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="productReturnTrailerLine">
+        <core:elements>
+            <core:column maxLines="0" columnDefId="TLDate" visibility="#{notEmpty(sale.dateTimeCompleted)}" id="TLDate">
+                <core:elements>
+                    <core:text id="DateCompletedText">
+                        <core:formatters>
+                            <core:formatDate pattern="shortDate"/>
+                        </core:formatters>
+                        <core:text>#{sale.dateTimeCompleted}</core:text>
+                    </core:text>
+                </core:elements>
+            </core:column>
+            <core:column maxLines="0" columnDefId="TLTime" visibility="#{notEmpty(sale.dateTimeCompleted)}" id="TLTime">
+                <core:elements>
+                    <core:text id="TimeCompletedText">
+                        <core:formatters>
+                            <core:formatDate pattern="shortTime"/>
+                        </core:formatters>
+                        <core:text>#{sale.dateTimeCompleted}</core:text>
+                    </core:text>
+                </core:elements>
+            </core:column>
+            <core:column maxLines="0" columnDefId="TLStoreNumber" visibility="#{notEmpty(sale.completedBy.deviceKey)}" id="TLStoreNumber">
+                <core:elements>
+                    <core:text id="BranchNumberText">
+                        <core:formatters>
+                            <core:formatRightStringPadLeft pad="48" width="4"/>
+                        </core:formatters>
+                        <core:text>#{sale.completedBy.branchNumber}</core:text>
+                    </core:text>
+                </core:elements>
+            </core:column>
+            <core:column maxLines="0" columnDefId="TLTerminalNumber" visibility="#{notEmpty(sale.completedBy.deviceKey)}" id="TLTerminalNumber">
+                <core:elements>
+                    <core:text id="TerminalNumberText">
+                        <core:formatters>
+                            <core:formatRightStringPadLeft pad="48" width="4"/>
+                        </core:formatters>
+                        <core:text>#{sale.completedBy.terminalNumber}</core:text>
+                    </core:text>
+                </core:elements>
+            </core:column>
+            <core:column maxLines="0" columnDefId="TLTransactionNumber" visibility="#{notEmpty(sale.completedBy.deviceKey)}" id="TLTransactionNumber">
+                <core:elements>
+                    <core:text id="TransactionNumberText">
+                        <core:formatters>
+                            <core:formatRightStringPadLeft pad="48" width="4"/>
+                        </core:formatters>
+                        <core:text>#{sale.transactionNumber}</core:text>
+                    </core:text>
+                </core:elements>
+            </core:column>
+            <core:column maxLines="0" columnDefId="TLUserName" id="TLUserName">
+                <core:elements>
+                    <core:text id="PrintableNameText">
+                        <core:text>#{sale.completedBy.printableName}</core:text>
+                    </core:text>
+                </core:elements>
+            </core:column>
+            <core:lineElement id="EmptyLine"/>
+        </core:elements>
+    </core:formatEntry>
+</core:documentTemplate>

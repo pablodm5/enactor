@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<core:documentTemplate xmlns:core="http://www.enactor.com/core" xmlns:retail="http://www.enactor.com/retail" xmlns:ns4="http://www.enactor.com/crm" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803" xmlns:ns6="http://www.apis-it.hr/fin/2012/types/f73" xmlns:ns7="http://www.w3.org/2000/09/xmldsig#" xmlns:ns8="http://www.enactor.com/retail/storedRetailTransaction/service" xmlns:ns9="http://www.fu.gov.si/" xmlns:ns10="http://www.enactor.com/addressLookup/service" xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:ns14="http://www.enactor.com/crm/customerLoyalty/service" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" paginated="false" messageBase="Pos/Print/ReceiptMessages" title="Gift Receipt Sections" url="Pos/Print/GiftReceiptSections">
+    <core:elements/>
+    <core:formatEntry id="initialiseGiftReceipt">
+        <core:elements>
+            <core:assign to="item" type="com.enactor.mfc.basket.items.SalesItem" value="salesItem" id="InitialiseGiftReceiptSalesItem"/>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="giftTransactionReceiptHeader">
+        <core:elements>
+            <core:formatElement formatId="logo"/>
+            <core:formatElement formatId="storeAddress"/>
+            <core:formatElement applicability="#{transaction.trainingDetails.trainingMode}" formatId="trainingModeHeader"/>
+            <core:formatElement formatId="giftReceiptHeader"/>
+            <core:formatElement formatId="separator"/>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="giftTransactionReceiptBody">
+        <core:elements>
+            <core:formatElement formatId="giftReceiptItemsList"/>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="giftReceiptHeader">
+        <core:elements>
+            <core:column maxLines="0" columnDefId="FullCentre" id="GiftReceiptHeaderLabel">
+                <core:elements>
+                    <core:lineElement messageId="TRANSACTION_GIFT_RECEIPT_HEADER" colour="blue" style="BOLD;DOUBLE_HIGH;DOUBLE_WIDE" id="GiftReceiptHeaderMessageText"/>
+                </core:elements>
+            </core:column>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="giftItemReceiptBody">
+        <core:elements>
+            <core:formatElement formatId="giftReceiptItem"/>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="giftItemReceiptHeader">
+        <core:elements>
+            <core:formatElement formatId="logo"/>
+            <core:formatElement formatId="storeAddress"/>
+            <core:formatElement applicability="#{transaction.trainingDetails.trainingMode}" formatId="trainingModeHeader"/>
+            <core:formatElement formatId="giftReceiptItemHeader"/>
+            <core:formatElement formatId="separator"/>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="giftReceiptItemHeader">
+        <core:elements>
+            <core:column maxLines="0" columnDefId="FullCentre" id="GiftReceiptHeaderLabel">
+                <core:elements>
+                    <core:lineElement messageId="ITEM_GIFT_RECEIPT_HEADER" colour="blue" style="BOLD;DOUBLE_HIGH;DOUBLE_WIDE" id="GiftReceiptHeaderMessageText"/>
+                </core:elements>
+            </core:column>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="giftReceiptBarcode">
+        <core:elements>
+            <core:formatElement formatId="separator"/>
+            <core:formatElement formatId="barcode"/>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="giftReceiptTrailer">
+        <core:elements>
+            <core:formatElement applicability="#{transaction.trainingDetails.trainingMode}" formatId="trainingModeTrailer"/>
+            <core:formatElement formatId="trailerLine" colour="" id="trailerLine"/>
+            <core:formatElement formatId="trailerStoreLine" visible="false" colour="" id="trailerStoreLine"/>
+            <core:formatElement formatId="pageBreak"/>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="giftReceiptItemsList">
+        <core:elements>
+            <core:tableTemplate list="#{basket.nonTenderItemIterator}" id="GiftReceiptItems">
+                <core:formatElement applicableClassName="com.enactor.mfc.basket.items.ISalesItem" applicability="#{!item.voided &amp;&amp; !item.isReturn &amp;&amp; item.giftReceiptItem}" formatId="giftReceiptItem"/>
+                <core:formatElement id="hideGiftReceiptItem"/>
+            </core:tableTemplate>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="giftReceiptItem">
+        <core:elements>
+            <core:row id="GiftReceiptItemRow">
+                <core:rowLine id="GiftReceiptItemLine">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="2" id="GiftReceiptItemDescription">
+                            <core:elements>
+<core:text id="GiftReceiptItemIdText">
+    <core:text>#{empty(item.productID) ? '' : concat(item.productID, ' - ')}</core:text>
+</core:text>
+<core:text id="GiftReceiptItemDescriptionText">
+    <core:text>#{mfcBasket:resolveItemDescription(item, formatter)}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="3" id="GiftReceiptItemValue">
+                            <core:elements>
+<core:text id="GiftReceiptItemValueText">
+    <core:formatters>
+        <retail:formatAlphaEncodedAmount/>
+    </core:formatters>
+    <core:text>#{item.value}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+</core:documentTemplate>

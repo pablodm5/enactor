@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<retail:posPromptPage xmlns:core="http://www.enactor.com/core" xmlns:retail="http://www.enactor.com/retail" xmlns:ns4="http://www.enactor.com/crm" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803" xmlns:ns6="http://www.apis-it.hr/fin/2012/types/f73" xmlns:ns7="http://www.w3.org/2000/09/xmldsig#" xmlns:ns8="http://www.enactor.com/retail/storedRetailTransaction/service" xmlns:ns9="http://www.fu.gov.si/" xmlns:ns10="http://www.enactor.com/addressLookup/service" xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:ns14="http://www.enactor.com/crm/customerLoyalty/service" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" hasBorders="FALSE" height="800" width="480" managementBeanClassname="com.enactor.pos.menu.LoadMenuBean" managementBeanName="loadMenu" messageBase="NextGen/PosMessages" url="NextGen480x800/Pos/Product/RichProductSearch/RichProductSearch">
+    <core:elements>
+        <retail:menuPageElement menuExpression="#{loadMenu.footerMenu}" id="FooterMenu">
+            <retail:menu menuCatagory="RETAIL" menuType="TREE">
+                <retail:menuSetId></retail:menuSetId>
+                <retail:roleId>
+                    <retail:roleId></retail:roleId>
+                    <retail:regionId groupTypeId="region"/>
+                </retail:roleId>
+                <retail:menuGroupId groupTypeId="menuGroup"/>
+                <retail:menuDefaultGroupId groupTypeId="menuGroup"/>
+                <retail:localeId/>
+            </retail:menu>
+            <retail:renderElement>FOOTER_BUTTONS_PAGE_REFERENCE.FooterRefPanel.Button1</retail:renderElement>
+            <retail:renderElement>FOOTER_BUTTONS_PAGE_REFERENCE.FooterRefPanel.Button2</retail:renderElement>
+            <retail:renderElement>FOOTER_BUTTONS_PAGE_REFERENCE.FooterRefPanel.Button3</retail:renderElement>
+            <retail:renderElement>FOOTER_BUTTONS_PAGE_REFERENCE.FooterRefPanel.Button4</retail:renderElement>
+        </retail:menuPageElement>
+        <core:hidden id="Receipt"/>
+        <core:label messageId="#{notEmpty(displayState) ? (strings:compareStrings(displayState, 'SORT_BY') ? 'SORT_BY' : (strings:compareStrings(displayState, 'REFINE') ? 'REFINE' : (notEmpty(descriptionFilter) ? 'SEARCH_RESULTS' : 'BROWSE'))) : (notEmpty(descriptionFilter) ? 'SEARCH_RESULTS' : 'BROWSE')}" id="TitleLabel"/>
+        <core:button adjustImagesToSize="false" visible="true" id="BackButton">
+            <core:text>Back</core:text>
+        </core:button>
+        <core:panel renderedExpression="#{size(groupList) &gt; 0}" transparentBackground="true" id="CategoriesSelectPanel">
+            <core:boundsConstraint height="637" width="480" y="76" x="0"/>
+            <core:elements>
+                <core:label styleClass="browseSelectedParentGroupLabel" transparentBackground="true" id="SelectedParentGroup">
+                    <core:boundsConstraint height="60" width="480" y="0" x="0"/>
+                    <core:text>#{groupNamesMap[selectedParentGroup]}</core:text>
+                </core:label>
+                <core:panel verticalScrollBars="WhenNeeded" transparentBackground="true" id="CategoriesDataPanel">
+                    <core:boundsConstraint height="577" width="480" y="60" x="0"/>
+                    <core:elements>
+                        <core:dataTable rowSelection="false" var="rowGroup" data="#{groupList}" verticalScrollBars="WhenNeeded" id="CategoriesDataTable">
+                            <core:flowConstraint width="480"/>
+                            <core:cell id="CategoriesCell">
+<core:flowConstraint/>
+<core:elements>
+    <core:eventPanel styleClass="categoriesPanel" id="CategoriesPanel">
+        <core:flowConstraint width="480" height="62"/>
+        <core:elements>
+            <core:panel styleClass="browseCategoriesSeparatorPanel" id="SeperatorPanel">
+                <core:flowConstraint width="480" height="3"/>
+                <core:elements/>
+            </core:panel>
+            <core:label styleClass="browseSelectGroupLabel" id="GroupDescription">
+                <core:boundsConstraint height="59" width="480" y="3" x="0"/>
+                <core:text>#{notEmpty(rowGroup.name) ? rowGroup.name : rowGroup.groupId}</core:text>
+            </core:label>
+        </core:elements>
+        <core:clickEvent>MmgChanged</core:clickEvent>
+        <core:data>
+            <core:expression value="#{rowGroup.key}" javaInterfaceName="com.enactor.core.group.IGroupKey" name="enactor.mfc.SelectedGroup"/>
+        </core:data>
+    </core:eventPanel>
+</core:elements>
+<core:elementPadding left="0" bottom="0" right="0" top="0"/>
+                            </core:cell>
+                        </core:dataTable>
+                    </core:elements>
+                </core:panel>
+            </core:elements>
+        </core:panel>
+        <core:panel visibility="#{size(groupList) &lt;= 0 &amp;&amp; (isEmpty(displayState) || !(strings:compareStrings(displayState, 'SORT_BY') || strings:compareStrings(displayState, 'REFINE')))}" id="DialogPanel">
+            <core:elements>
+                <core:pageElementRef pageDefinitionURL="Pos/Product/RichProductSearch/RichProductSearchResults" elementIdRef="ProductSearchRefPanel" renderedExpression="#{size(groupList) &lt;= 0 &amp;&amp; (isEmpty(displayState) || !(strings:compareStrings(displayState, 'SORT_BY') || strings:compareStrings(displayState, 'REFINE')))}" transparentBackground="true" id="PRODUCT_SEARCH_RESULTS_PAGE_REFERENCE">
+                    <core:boundsConstraint height="637" width="480" y="0" x="0"/>
+                    <core:elements/>
+                    <core:parameter value="#{descriptionFilter}" name="enactor.mfc.DescriptionFilter">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                    </core:parameter>
+                    <core:parameter value="#{totalRows}" name="enactor.mfc.TotalRows">
+                        <core:interfaceName>java.lang.Integer</core:interfaceName>
+                    </core:parameter>
+                    <core:parameter value="#{noResults}" name="enactor.mfc.NoResults">
+                        <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                    </core:parameter>
+                </core:pageElementRef>
+            </core:elements>
+        </core:panel>
+        <core:panel renderedExpression="#{size(groupList) &lt;= 0 &amp;&amp; notEmpty(displayState)  &amp;&amp; strings:compareStrings(displayState, 'SORT_BY')}" transparentBackground="true" id="SortByPanel">
+            <core:boundsConstraint height="637" width="480" y="76" x="0"/>
+            <core:elements>
+                <core:tableElement id="TABLE_1">
+                    <core:flowConstraint width="100%"/>
+                    <core:row id="TABLE_ROW_1">
+                        <core:cell id="TABLE_CELL_1">
+                            <core:elements>
+<core:eventPanel value="SortTypeChanged" id="EVENT_PANEL_1">
+    <core:flowConstraint width="100%" height="100%"/>
+    <core:elements>
+        <core:label messageBase="Pos/Product/RichProductSearchMessages" messageId="SORT_PRICE_HIGH_TO_LOW" id="PRICE_DESCENDING">
+            <core:flowConstraint/>
+        </core:label>
+    </core:elements>
+    <core:data>
+        <core:expression value="#{'price'}" javaInterfaceName="java.lang.String" name="enactor.pos.SelectedSortProperty"/>
+        <core:expression value="#{true}" javaInterfaceName="java.lang.Boolean" name="enactor.pos.SelectedSortDescending"/>
+    </core:data>
+</core:eventPanel>
+                            </core:elements>
+                        </core:cell>
+                    </core:row>
+                    <core:row id="TABLE_ROW_2">
+                        <core:cell id="TABLE_CELL_1">
+                            <core:elements>
+<core:eventPanel value="SortTypeChanged" id="EVENT_PANEL_2">
+    <core:flowConstraint width="100%" height="100%"/>
+    <core:elements>
+        <core:label messageBase="Pos/Product/RichProductSearchMessages" messageId="SORT_PRICE_LOW_TO_HIGH" id="PRICE_ASCENDING">
+            <core:flowConstraint/>
+        </core:label>
+    </core:elements>
+    <core:data>
+        <core:expression value="#{'price'}" javaInterfaceName="java.lang.String" name="enactor.pos.SelectedSortProperty"/>
+        <core:expression value="#{false}" javaInterfaceName="java.lang.Boolean" name="enactor.pos.SelectedSortDescending"/>
+    </core:data>
+</core:eventPanel>
+                            </core:elements>
+                        </core:cell>
+                    </core:row>
+                </core:tableElement>
+            </core:elements>
+        </core:panel>
+        <core:panel renderedExpression="#{size(groupList) &lt;= 0 &amp;&amp; notEmpty(displayState)  &amp;&amp; strings:compareStrings(displayState, 'REFINE')}" transparentBackground="true" id="RefinePanel">
+            <core:boundsConstraint height="637" width="480" y="76" x="0"/>
+            <core:elements>
+                <core:dataTable rowSelection="false" var="row" data="#{priceRangeList}" verticalScrollBars="WhenNeeded" transparentBackground="true" id="PriceListDataTable">
+                    <core:boundsConstraint height="566" width="480" y="0" x="0"/>
+                    <core:cell id="PriceCell">
+                        <core:elements>
+                            <core:eventPanel styleClass="selectListPanel" id="PricePanel">
+<core:flowConstraint/>
+<core:elements>
+    <core:label styleClass="listElementLabel" id="PriceDescription">
+        <core:flowConstraint/>
+        <core:text>#{row.description}</core:text>
+    </core:label>
+    <core:panel styleClass="separatorPanel" id="SeparatorPanel">
+        <core:flowConstraint width="480" height="3"/>
+        <core:elements/>
+    </core:panel>
+</core:elements>
+<core:clickEvent>PriceFilterChanged</core:clickEvent>
+<core:data>
+    <core:expression value="#{row.key}" javaInterfaceName="java.lang.Object" name="enactor.pos.SelectedPriceRange"/>
+</core:data>
+                            </core:eventPanel>
+                        </core:elements>
+                    </core:cell>
+                </core:dataTable>
+                <core:button messageId="CLEAR_FILTERS" styleClass="bottomSpanInvertedButton" id="ClearFiltersButton">
+                    <core:boundsConstraint height="71" width="480" y="566" x="0"/>
+                </core:button>
+            </core:elements>
+        </core:panel>
+        <core:panel namingContainer="false" id="FooterPanel">
+            <core:elements>
+                <core:pageElementRef pageDefinitionURL="Pos/FooterButtons" elementIdRef="FooterRefPanel" transparentBackground="true" id="FOOTER_BUTTONS_PAGE_REFERENCE">
+                    <core:boundsConstraint height="87" width="480" y="0" x="0"/>
+                    <core:elements/>
+                    <core:parameter value="BROWSE" name="enactor.pos.DisplayHint">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                    </core:parameter>
+                </core:pageElementRef>
+            </core:elements>
+        </core:panel>
+    </core:elements>
+    <core:templateURL>NextGen480x800/Pos/RichProductTemplate</core:templateURL>
+    <core:variables>
+        <core:variable required="true" name="enactor.pos.SelectedPriceRange">
+            <core:interfaceName>java.lang.Object</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.pos.PriceRangeList">
+            <core:interfaceName>java.util.List</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.pos.DisplayState">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.mfc.DescriptionFilter">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.mfc.SelectedParentGroup">
+            <core:interfaceName>com.enactor.core.group.IGroupKey</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.mfc.SelectedGroup">
+            <core:interfaceName>com.enactor.core.group.IGroupKey</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.mfc.GroupList">
+            <core:interfaceName>java.util.List</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.coreUI.ProductPagedList">
+            <core:interfaceName>com.enactor.core.database.list.IPagedList</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.maintenance.GroupNamesMap">
+            <core:interfaceName>java.util.Map</core:interfaceName>
+        </core:variable>
+    </core:variables>
+</retail:posPromptPage>

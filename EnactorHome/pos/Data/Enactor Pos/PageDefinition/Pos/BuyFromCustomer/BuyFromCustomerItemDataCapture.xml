@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<retail:posPromptPage xmlns:core="http://www.enactor.com/core" xmlns:retail="http://www.enactor.com/retail" xmlns:ns4="http://www.enactor.com/crm" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803" xmlns:ns6="http://www.apis-it.hr/fin/2012/types/f73" xmlns:ns7="http://www.w3.org/2000/09/xmldsig#" xmlns:ns8="http://www.enactor.com/retail/storedRetailTransaction/service" xmlns:ns9="http://www.fu.gov.si/" xmlns:ns10="http://www.enactor.com/addressLookup/service" xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:ns14="http://www.enactor.com/crm/customerLoyalty/service" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" focusExpression="#{focusExpression}" allowResize="true" allowMove="true" allowClose="true" height="0" width="0" updateMode="UPDATE_ELEMENTS" messageBase="Pos/BuyFromCustomer/BuyFromCustomerMessages" url="Pos/BuyFromCustomer/BuyFromCustomerItemDataCapture">
+    <core:elements>
+        <core:panel id="DialogPanel">
+            <core:elements>
+                <core:label fontStyle="BOLD" messageId="PRODUCT_ID_LABEL" styleClass="fieldLabelLeft" id="PRODUCT_ID_LABEL">
+                    <core:boundsConstraint height="31" width="200" y="100" x="30"/>
+                </core:label>
+                <core:label styleClass="fieldValue" id="PRODUCT_ID">
+                    <core:boundsConstraint height="31" width="150" y="100" x="245"/>
+                    <core:text>#{sKUCode}</core:text>
+                </core:label>
+                <core:label fontStyle="BOLD" messageId="DESCRIPTION_LABEL" styleClass="fieldLabelLeft" id="DESCRIPTION_LABEL">
+                    <core:boundsConstraint height="31" width="200" y="140" x="30"/>
+                </core:label>
+                <core:label fontStyle="BOLD" messageId="MMG_LABEL" styleClass="fieldLabelLeft" id="MMG_LABEL">
+                    <core:boundsConstraint height="31" width="200" y="20" x="30"/>
+                </core:label>
+                <core:label fontStyle="BOLD" messageId="QUANTITY_LABEL" styleClass="fieldLabelLeft" id="QUANTITY_LABEL">
+                    <core:boundsConstraint height="31" width="200" y="180" x="30"/>
+                </core:label>
+                <core:inputText borderStyle="Line" focusOrder="4" styleClass="formInputText" id="QUANTITY">
+                    <core:boundsConstraint height="31" width="100" y="180" x="245"/>
+                    <core:text>#{quantity}</core:text>
+                    <core:textElementEvents enterEvent="QuantityEntered" valueChangedEvent="QuantityEntered"/>
+                    <core:validationData>
+                        <core:integerFieldValidationData>
+                            <core:type>Integer</core:type>
+                            <core:allowNulls>false</core:allowNulls>
+                            <core:inputMask></core:inputMask>
+                            <core:validationClassname></core:validationClassname>
+                            <core:maxValue>99999</core:maxValue>
+                            <core:minValue>0</core:minValue>
+                        </core:integerFieldValidationData>
+                    </core:validationData>
+                </core:inputText>
+                <core:errorLabel errorFieldId="QUANTITY" styleClass="fieldError" colour="RED" id="QUANTITY_ERROR">
+                    <core:boundsConstraint height="31" width="200" y="180" x="371"/>
+                    <core:text>#{formErrors != null ? formErrors['QUANTITY'] : null}</core:text>
+                </core:errorLabel>
+                <core:label fontStyle="BOLD" messageId="COST_PRICE_LABEL" styleClass="fieldLabelLeft" id="COST_PRICE_LABEL">
+                    <core:boundsConstraint height="31" width="199" y="220" x="30"/>
+                </core:label>
+                <core:label fontStyle="BOLD" messageId="TOTAL_COST_LABEL" styleClass="fieldLabelLeft" id="TOTAL_COST_LABEL">
+                    <core:boundsConstraint height="31" width="199" y="300" x="30"/>
+                </core:label>
+                <core:label fontStyle="BOLD" messageId="RETAIL_PRICE_LABEL" styleClass="fieldLabelLeft" id="RETAIL_PRICE_LABEL">
+                    <core:boundsConstraint height="31" width="200" y="260" x="30"/>
+                </core:label>
+                <core:label styleClass="fieldValue" id="TOTAL_COST">
+                    <core:boundsConstraint height="31" width="150" y="300" x="245"/>
+                    <core:text>#{format:formatAmount(costPrice*quantity)}</core:text>
+                </core:label>
+                <core:label styleClass="fieldValue" id="MMG_GROUP_NAME">
+                    <core:boundsConstraint height="31" width="200" y="20" x="371"/>
+                    <core:text>#{mMGroupName}</core:text>
+                </core:label>
+                <core:button messageId="MMG_SEARCH_BUTTON" styleClass="buttonLight" id="MMG_SEARCH_BUTTON">
+                    <core:boundsConstraint height="31" width="125" y="20" x="584"/>
+                    <core:text>MMGSearchPressed</core:text>
+                </core:button>
+                <core:label fontStyle="BOLD" messageId="EQUIVALENT_CORE_PRODUCT_LABEL" styleClass="fieldLabelLeft" id="EQUIVALENT_CORE_PRODUCT_LABEL">
+                    <core:boundsConstraint height="31" width="200" y="60" x="30"/>
+                </core:label>
+                <core:inputText borderStyle="Line" focusOrder="1" styleClass="formInputText" id="MMG_GROUP_ID">
+                    <core:boundsConstraint height="31" width="120" y="20" x="245"/>
+                    <core:text>#{mMGroupId}</core:text>
+                    <core:textElementEvents enterEvent="MMGEntered" valueChangedEvent="MMGEntered"/>
+                </core:inputText>
+                <core:inputText borderStyle="Line" focusOrder="2" styleClass="formInputText" visibility="#{!displayChangeButton}" id="EQUIVALENT_CORE_PRODUCT">
+                    <core:boundsConstraint height="31" width="150" y="60" x="245"/>
+                    <core:text>#{equivalentCoreProductId}</core:text>
+                    <core:textElementEvents enterEvent="ProductEntered" valueChangedEvent="ProductEntered"/>
+                </core:inputText>
+                <core:errorLabel errorFieldId="MMG_GROUP_ID" styleClass="fieldError" colour="RED" id="MMG_GROUP_ID_ERROR">
+                    <core:boundsConstraint height="31" width="200" y="20" x="379"/>
+                    <core:text>#{formErrors != null ? formErrors['MMG_GROUP_ID'] : null}</core:text>
+                </core:errorLabel>
+                <core:errorLabel errorFieldId="EQUIVALENT_CORE_PRODUCT" styleClass="fieldError" colour="RED" id="EQUIVALENT_CORE_PRODUCT_ERROR">
+                    <core:boundsConstraint height="31" width="200" y="60" x="428"/>
+                    <core:text>#{formErrors != null ? formErrors['EQUIVALENT_CORE_PRODUCT'] : null}</core:text>
+                </core:errorLabel>
+                <core:inputText borderStyle="Line" focusOrder="5" styleClass="formInputText" id="COST_PRICE">
+                    <core:boundsConstraint height="31" width="150" y="220" x="245"/>
+                    <core:text>#{costPrice}</core:text>
+                    <core:textElementEvents enterEvent="CostEntered" valueChangedEvent="CostEntered"/>
+                    <core:validationData>
+                        <core:currencyFieldValidationData>
+                            <core:type>CurrencyAmount</core:type>
+                            <core:allowNulls>true</core:allowNulls>
+                            <core:inputMask></core:inputMask>
+                            <core:validationClassname></core:validationClassname>
+                        </core:currencyFieldValidationData>
+                    </core:validationData>
+                </core:inputText>
+                <core:button messageId="CHANGE_LABEL" styleClass="buttonLight" visibility="#{displayChangeButton}" id="CHANGE_LABEL">
+                    <core:boundsConstraint height="31" width="125" y="60" x="245"/>
+                    <core:text>ChangePressed</core:text>
+                </core:button>
+                <core:label messageId="RECOMMENDED_MARKUP" styleClass="fieldLabelLeft" visibility="#{notEmpty(recommendedMarkup)}" id="RECOMMEND_MARKUP_LABEL">
+                    <core:boundsConstraint height="31" width="200" y="220" x="437"/>
+                </core:label>
+                <core:inputText borderStyle="Line" focusOrder="3" styleClass="formInputText" id="PRODUCT_DESCRIPTION">
+                    <core:boundsConstraint height="31" width="292" y="135" x="245"/>
+                    <core:text>#{equivalentCoreProductDescription}</core:text>
+                    <core:textElementEvents/>
+                </core:inputText>
+                <core:inputText borderStyle="Line" focusOrder="6" styleClass="formInputText" id="RETAIL_PRICE">
+                    <core:boundsConstraint height="31" width="150" y="260" x="245"/>
+                    <core:text>#{retailPrice}</core:text>
+                    <core:textElementEvents/>
+                    <core:validationData>
+                        <core:currencyFieldValidationData>
+                            <core:type>CurrencyAmount</core:type>
+                            <core:allowNulls>true</core:allowNulls>
+                            <core:inputMask></core:inputMask>
+                            <core:validationClassname></core:validationClassname>
+                        </core:currencyFieldValidationData>
+                    </core:validationData>
+                </core:inputText>
+            </core:elements>
+        </core:panel>
+        <core:hidden id="Receipt"/>
+        <core:button messageId="CONFIRM_BUTTON_LABEL" id="Button1">
+            <core:text>AddPressed</core:text>
+            <core:textElementEvents/>
+        </core:button>
+        <core:button messageId="CANCEL_BUTTON_LABEL" id="Button8">
+            <core:text>CancelPressed</core:text>
+        </core:button>
+        <core:hidden id="InputBox"/>
+        <core:text messageId="PLEASE_ENTER_DETAILS_FOR_THE_NEW_ORDER_ITEM" id="Prompt"/>
+        <core:button messageId="EDIT_ATTRIBUTES_BUTTON" visibility="#{notEmpty(sKUCode)}" id="Button2">
+            <core:text>EditAttributesPressed</core:text>
+            <core:textElementEvents/>
+        </core:button>
+    </core:elements>
+    <core:templateURL>Pos/FullScreenTraditionalPosTemplate</core:templateURL>
+    <core:events>
+        <core:event destination="CANCEL" event="key.KeyCode27Pressed"></core:event>
+    </core:events>
+    <core:validationEvents>
+        <core:event>AddPressed</core:event>
+    </core:validationEvents>
+    <core:preferredConstraintType>BOUNDS</core:preferredConstraintType>
+    <core:variables>
+        <core:variable name="enactor.pos.Quantity">
+            <core:interfaceName>java.lang.Integer</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.mfc.RecommendedMarkup">
+            <core:interfaceName>java.lang.Float</core:interfaceName>
+        </core:variable>
+        <core:variable name="FormErrors">
+            <core:interfaceName>com.enactor.coreUI.processes.IFormErrors</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.mfc.MMGroupId">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.mfc.MMGroupName">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.pos.SKUCode">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.mfc.FocusExpression">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.mfc.EquivalentCoreProductId">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.mfc.EquivalentCoreProductDescription">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.mfc.CostPrice">
+            <core:interfaceName>java.lang.Long</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.mfc.RetailPrice">
+            <core:interfaceName>java.lang.Long</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.mfc.TotalCost">
+            <core:interfaceName>java.lang.Long</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.mfc.DisplayChangeButton">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.mfc.BaseCurrency">
+            <core:interfaceName>com.enactor.mfc.currency.ICurrency</core:interfaceName>
+        </core:variable>
+    </core:variables>
+    <core:scannerEnabled>true</core:scannerEnabled>
+    <core:scannerDataName>#{scannerData}</core:scannerDataName>
+</retail:posPromptPage>

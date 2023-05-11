@@ -1,0 +1,482 @@
+<?xml version="1.0"?>
+<project
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+	xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>com.enactor.training</groupId>
+		<artifactId>parent-pom</artifactId>
+		<version>TRUNK-SNAPSHOT</version>
+	</parent>
+	<artifactId>training-react-pos</artifactId>
+	<name>Training - React Pos</name>
+	<properties>
+		<svn.projectRoot>true</svn.projectRoot>
+
+		<npm.registry.url>http://192.168.1.118:4873</npm.registry.url>
+		<npm.registry.username />
+		<npm.registry.password />
+		<npm.registry.email>nobody@enactor.co.uk</npm.registry.email>
+
+		<node.environment>development</node.environment>
+		<node.version>v10.16.3</node.version>
+		<npm.version>6.9.0</npm.version>
+
+		<buildNumber></buildNumber>
+		
+		<!-- Whether to skip deployment -->
+		<npm.skipDeploy>true</npm.skipDeploy>
+		
+		<!-- Whether to skip updating of the module version. -->
+		<npm.skipVersionUpdate></npm.skipVersionUpdate>
+	</properties>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.gmaven</groupId>
+				<artifactId>groovy-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>groovy-set-properties</id>
+						<phase>initialize</phase>
+						<goals>
+							<goal>execute</goal>
+						</goals>
+						<configuration>
+							
+							<source>
+							projectVersion = project.version;
+
+							// Module versions must be numeric (initially), replace TRUNK and -SNAPSHOT with
+							// suitable values
+							projectVersion = projectVersion.replace("TRUNK", "0.0");
+							projectVersion = projectVersion.replace("-SNAPSHOT", ".0");
+
+							// Module versions can only include up to three numeric versions.
+							// If the project version has more than that, replace the third period with '-p' for 'patch'
+							if (projectVersion.count(".") > 2) {
+								first = projectVersion.indexOf(".");
+								second = projectVersion.indexOf(".", first + 1);
+								third = projectVersion.indexOf(".", second + 1);
+
+								projectVersion = projectVersion.substring(0, third) + "-p" + projectVersion.substring(third + 1);
+							}
+							
+							// If the build number is not specified, then set it to the current date/time
+							def buildNumber = "${buildNumber}";
+							if (buildNumber.equals("")) {
+								buildNumber = new java.text.SimpleDateFormat("yyyyMMddHHmmss").format(new java.util.Date());
+								project.properties["buildNumber"] = buildNumber;
+							}
+							
+							// We also cannot overwrite existing versions once they have been deployed to an
+							// NPM registry. Therefore we also add a '-b' for 'build' number
+							projectSemanticVersion = projectVersion + "-b" + buildNumber;
+						
+							project.properties.projectSemanticVersion = projectSemanticVersion;
+							println("Project Semantic Version set to: " + projectSemanticVersion);
+
+							platformVersion = "${platform.version}";
+
+							// Module versions must be numeric (initially), replace TRUNK and -SNAPSHOT with
+							// suitable values
+							isSnapshot = platformVersion.contains("-SNAPSHOT");
+							platformVersion = platformVersion.replace("TRUNK", "0.0");
+							platformVersion = platformVersion.replace("-SNAPSHOT", ".0");
+
+							// Module versions can only include up to three numeric versions.
+							// If the platform version has more than that, replace the fourth period with '-p' for 'patch'
+							// We should also append the last version as a '-b' ('build') number
+							if (platformVersion.count(".") == 0) {
+								if (isSnapshot) {
+									// If platform version is 1-SNAPSHOT, platformSemanticVersion should be 1-p0-b1
+									platformSemanticVersion = platformVersion + "-p0-b" + platformVersion;
+								} else {
+									// If platform version is 1, platformSemanticVersion should be 1-b1
+									platformSemanticVersion = platformVersion + "-b" + platformVersion;
+								}
+							} else {
+								first = platformVersion.indexOf(".");
+							
+								if (platformVersion.count(".") == 1) {
+									if (isSnapshot) {
+										// If platform version is 1.2-SNAPSHOT, platformSemanticVersion should be 1.2-p0-b2
+										platformSemanticVersion = platformVersion + "-p0-b" + platformVersion.substring(first + 1);
+									} else {
+										// If platform version is 1.2, platformSemanticVersion should be 1.2-b2
+										platformSemanticVersion = platformVersion + "-b" + platformVersion.substring(first + 1);
+									}
+								} else {
+									second = platformVersion.indexOf(".", first + 1);
+								
+									if (platformVersion.count(".") == 2) {
+										if (isSnapshot) {
+											// If platform version is 1.2.3-SNAPSHOT, platformSemanticVersion should be 1.2.3-p0-b3
+											platformSemanticVersion = platformVersion + "-p0-b" + platformVersion.substring(second + 1);
+										} else {
+											// If platform version is 1.2.3, platformSemanticVersion should be 1.2.3-b3
+											platformSemanticVersion = platformVersion + "-b" + platformVersion.substring(second + 1);
+										}
+									} else {
+										third = platformVersion.indexOf(".", second + 1);
+										platformSemanticVersion = platformVersion.substring(0, third);
+										
+										if (platformVersion.count(".") == 3) {
+											if (isSnapshot) {
+												// If platform version is 1.2.3.4-SNAPSHOT, platformSemanticVersion should be 1.2.3-p0-b4
+												platformSemanticVersion = platformSemanticVersion + "-p0-b" + platformVersion.substring(third + 1);
+											} else {
+												// If platform version is 1.2.3.4, platformSemanticVersion should be 1.2.3-p4-b4
+												platformSemanticVersion = platformSemanticVersion + "-p" + platformVersion.substring(third + 1);
+												platformSemanticVersion = platformSemanticVersion + "-b" + platformVersion.substring(third + 1);
+											}
+										} else {
+											fourth = platformVersion.indexOf(".", third + 1);
+											
+											// If platform version is 1.2.3.4.5, platformSemanticVersion should be 1.2.3-p4-b5
+											// If platform version is 1.2.3.4.5.6, platformSemanticVersion should be 1.2.3-p4-b5.6
+											platformSemanticVersion = platformSemanticVersion + "-p" + platformVersion.substring(third + 1, fourth);
+											platformSemanticVersion = platformSemanticVersion + "-b" + platformVersion.substring(fourth + 1);
+										}
+									}
+								}
+							}
+
+							project.properties.platformSemanticVersion = platformSemanticVersion;
+							println("Platform Semantic Version set to: " + platformSemanticVersion + " from platform version: " + platformVersion);
+
+							username = "${npm.registry.username}"
+							password = "${npm.registry.password}"
+							auth = (username + ":" + password).bytes.encodeBase64().toString();
+
+							project.properties["npm.registry.auth"] = auth;
+							</source>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+	<profiles>
+		<profile>
+			<id>sandbox-distribution</id>
+			<distributionManagement>
+				<snapshotRepository>
+					<id>snapshots</id>
+					<url>https://dev.enactor.co.uk/artifactory/sandbox</url>
+				</snapshotRepository>
+			</distributionManagement>
+		</profile>
+		<profile>
+			<id>update-npm-project-versions</id>
+			<build>
+				<plugins>
+					<plugin>
+		                <groupId>ca.szc.maven</groupId>
+		                <artifactId>jsonpath-maven-plugin</artifactId>
+		                <version>1.2.0</version>
+		                <executions>
+		                    <execution>
+		                        <id>update-package-json</id>
+		                        <phase>process-sources</phase>
+		                        <goals>
+		                            <goal>modify</goal>
+		                        </goals>
+		                        <configuration>
+		                            <file>${basedir}/src-js/packages/training-react-pos/package.json</file>
+		                            <formatter>conventional</formatter>
+		                            <modifications>
+		                                <modification>
+		                                    <expression>$.dependencies.@enactor/react-base-components</expression>
+		                                    <value>${platformSemanticVersion}</value>
+		                                </modification>
+		                                <modification>
+		                                    <expression>$.dependencies.@enactor/react-pos</expression>
+		                                    <value>${platformSemanticVersion}</value>
+		                                </modification>
+		                                <modification>
+		                                    <expression>$.dependencies.@enactor/react-javascript-bridge</expression>
+		                                    <value>${platformSemanticVersion}</value>
+		                                </modification>
+		                                <modification>
+		                                    <expression>$.dependencies.@enactor/redux-javascript-bridge</expression>
+		                                    <value>${platformSemanticVersion}</value>
+		                                </modification>
+		                                <modification>
+		                                    <expression>$.dependencies.@enactor/javascript-bridge</expression>
+		                                    <value>${platformSemanticVersion}</value>
+		                                </modification>
+		                            </modifications>
+		                        </configuration>
+		                    </execution>
+		                    <execution>
+		                        <id>update-enactor-manifest-json</id>
+		                        <phase>process-sources</phase>
+		                        <goals>
+		                            <goal>modify</goal>
+		                        </goals>
+		                        <configuration>
+		                            <file>${basedir}/src-js/packages/training-react-pos/public/enactor-manifest.json</file>
+		                            <formatter>conventional</formatter>
+		                            <modifications>
+		                                <modification>
+		                                    <expression>$.version</expression>
+		                                    <value>${project.version}</value>
+		                                </modification>
+		                                <modification>
+		                                    <expression>$.semantic_version</expression>
+		                                    <value>${projectSemanticVersion}</value>
+		                                </modification>
+		                                <modification>
+		                                    <expression>$.platform_version</expression>
+		                                    <value>${platform.version}</value>
+		                                </modification>
+		                                <modification>
+		                                    <expression>$.platform_semantic_version</expression>
+		                                    <value>${platformSemanticVersion}</value>
+		                                </modification>
+		                            </modifications>
+		                        </configuration>
+		                    </execution>
+		                </executions>
+		            </plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<id>npm-maven-integration</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-clean-plugin</artifactId>
+						<executions>
+							<!-- Cleaning -->
+							<execution>
+								<id>maven-clean-resources</id>
+								<phase>clean</phase>
+								<goals>
+									<goal>clean</goal>
+								</goals>
+								<configuration>
+									<filesets>
+										<fileset>
+											<directory>${project.basedir}/node</directory>
+											<includes>
+												<include>**/*</include>
+											</includes>
+											<followSymlinks>false</followSymlinks>
+										</fileset>
+									</filesets>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>com.github.eirslett</groupId>
+						<artifactId>frontend-maven-plugin</artifactId>
+						<executions>
+							<!-- Building -->
+							<execution>
+								<id>npm-build-install-node</id>
+								<phase>generate-resources</phase>
+								<goals>
+									<goal>install-node-and-npm</goal>
+								</goals>
+							</execution>
+
+							<!-- set and login to the registry -->
+							<execution>
+								<id>npm-registry-set</id>
+								<phase>generate-resources</phase>
+								<goals>
+									<goal>npm</goal>
+								</goals>
+								<configuration>
+									<arguments>config set registry "${npm.registry.url}"</arguments>
+								</configuration>
+							</execution>
+							<execution>
+								<id>npm-registry-login</id>
+								<phase>generate-resources</phase>
+								<goals>
+									<goal>npm</goal>
+								</goals>
+								<configuration>
+									<arguments>set _auth "${npm.registry.auth}"</arguments>
+								</configuration>
+							</execution>
+
+							<!-- training-react-pos -->
+							<execution>
+								<id>npm-build-update-dependency-versions:training-react-pos</id>
+								<phase>compile</phase>
+								<goals>
+									<goal>npm</goal>
+								</goals>
+								<configuration>
+									<workingDirectory>${project.build.directory}/working/src-js/packages/training-react-pos</workingDirectory>
+									<arguments>install</arguments>
+								</configuration>
+							</execution>
+							<execution>
+								<id>npm-build-update-modules:training-react-pos</id>
+								<phase>compile</phase>
+								<goals>
+									<goal>npm</goal>
+								</goals>
+								<configuration>
+									<workingDirectory>${project.build.directory}/working/src-js/packages/training-react-pos</workingDirectory>
+									<arguments>install</arguments> <!-- no package.lock available? -->
+								</configuration>
+							</execution>
+							<execution>
+								<id>npm-set-version:training-react-pos</id>
+								<phase>compile</phase>
+								<goals>
+									<goal>npm</goal>
+								</goals>
+								<configuration>
+									<workingDirectory>${project.build.directory}/working/src-js/packages/training-react-pos</workingDirectory>
+									<arguments>version --allow-same-version ${moduleVersion}</arguments>
+									<skip>${npm.skipVersionUpdate}</skip>
+								</configuration>
+							</execution>
+							<execution>
+								<id>npm-build:training-react-pos-app</id>
+								<phase>compile</phase>
+								<goals>
+									<goal>npm</goal>
+								</goals>
+								<configuration>
+									<workingDirectory>${project.build.directory}/working/src-js/packages/training-react-pos</workingDirectory>
+									<arguments>run build</arguments>
+								</configuration>
+							</execution>
+							<execution>
+								<id>npm-publish:training-react-pos</id>
+								<phase>compile</phase>
+								<goals>
+									<goal>npm</goal>
+								</goals>
+								<configuration>
+									<workingDirectory>${project.build.directory}/working/src-js/packages/training-react-pos</workingDirectory>
+									<arguments>run deploy -- --registry ${npm.registry.url}</arguments>
+									<skip>${npm.skipDeploy}</skip>
+								</configuration>
+							</execution>
+
+							<!-- logout and unset registry -->
+							<execution>
+								<id>npm-registry-logout</id>
+								<phase>process-classes</phase>
+								<goals>
+									<goal>npm</goal>
+								</goals>
+								<configuration>
+									<arguments>config delete _auth</arguments>
+								</configuration>
+							</execution>
+							<execution>
+								<id>npm-registry-unset</id>
+								<phase>process-classes</phase>
+								<goals>
+									<goal>npm</goal>
+								</goals>
+								<configuration>
+									<arguments>config delete registry</arguments>
+								</configuration>
+							</execution>
+
+						</executions>
+						<configuration>
+							<nodeVersion>${node.version}</nodeVersion>
+							<npmVersion>${npm.version}</npmVersion>
+							<installDirectory>${project.basedir}</installDirectory>
+
+							<environmentVariables>
+								<NODE_ENV>${node.environment}</NODE_ENV>
+
+								<NODE_OPTIONS>--max_old_space_size=2048</NODE_OPTIONS>
+								<NPM_USER>${npm.registry.username}</NPM_USER>
+								<NPM_EMAIL>${npm.registry.email}</NPM_EMAIL>
+								<NPM_PASS>${npm.registry.password}</NPM_PASS>
+								<NPM_REGISTRY>${npm.registry.url}</NPM_REGISTRY>
+								<NPM_CONFIG_USERCONFIG>${project.basedir}/.npmrc</NPM_CONFIG_USERCONFIG>
+							</environmentVariables>
+						</configuration>
+					</plugin>
+					<plugin>
+						<artifactId>maven-resources-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>copy-src-js-folder</id>
+								<phase>generate-sources</phase>
+								<goals>
+									<goal>copy-resources</goal>
+								</goals>
+								<configuration>
+									<outputDirectory>${project.build.directory}/working/src-js</outputDirectory>
+									<overwrite>true</overwrite>
+									<resources>
+										<resource>
+											<directory>${project.basedir}/src-js/</directory>
+											<excludes>
+												<exclude>**/build/**</exclude>
+												<exclude>**/node_modules/**</exclude>
+												<exclude>**/lib/**</exclude>
+											</excludes>
+										</resource>
+									</resources>
+								</configuration>
+							</execution>
+							<execution>
+								<id>copy-build-folder</id>
+								<phase>prepare-package</phase>
+								<goals>
+									<goal>copy-resources</goal>
+								</goals>
+								<configuration>
+									<outputDirectory>${project.build.outputDirectory}/META-INF/resources/TrainingReactPos/</outputDirectory>
+									<overwrite>true</overwrite>
+									<resources>
+										<resource>
+											<directory>${project.build.directory}/working/src-js/packages/training-react-pos/build/</directory>
+										</resource>
+									</resources>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<artifactId>maven-antrun-plugin</artifactId>
+						<executions>
+							<execution>
+								<phase>prepare-package</phase>
+								<goals>
+									<goal>run</goal>
+								</goals>
+								<configuration>
+									<tasks>
+										<replace token="/static" value="static"
+											dir="${project.build.outputDirectory}/META-INF/resources/TrainingReactPos/">
+											<include name="**/*.html" />
+											<include name="**/*.js" />
+										</replace>
+									</tasks>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<id>development</id>
+			<properties>
+				<NODE_ENV>development</NODE_ENV>
+			</properties>
+		</profile>
+	</profiles>
+</project>

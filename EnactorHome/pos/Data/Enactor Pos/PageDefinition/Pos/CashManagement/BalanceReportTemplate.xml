@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<core:documentTemplate xmlns:core="http://www.enactor.com/core" xmlns:retail="http://www.enactor.com/retail" xmlns:ns4="http://www.enactor.com/crm" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803" xmlns:ns6="http://www.apis-it.hr/fin/2012/types/f73" xmlns:ns7="http://www.w3.org/2000/09/xmldsig#" xmlns:ns8="http://www.enactor.com/retail/storedRetailTransaction/service" xmlns:ns9="http://www.fu.gov.si/" xmlns:ns10="http://www.enactor.com/addressLookup/service" xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:ns14="http://www.enactor.com/crm/customerLoyalty/service" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" paginated="false" width="44" messageBase="Pos/Report/BalanceReportMessages" title="Balance Report" url="Pos/CashManagement/BalanceReportTemplate">
+    <core:elements/>
+    <core:variables>
+        <core:variable required="true" name="enactor.coreUI.CurrenciesList">
+            <core:interfaceName>java.util.List</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.coreUI.CreditCardsList">
+            <core:interfaceName>java.util.List</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.mfc.Location">
+            <core:interfaceName>com.enactor.mfc.location.ILocation</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.cashManagement.CMTransaction">
+            <core:interfaceName>com.enactor.cashManagement.entities.ICMTransaction</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="item">
+            <core:interfaceName>com.enactor.cashManagement.listElements.ITenderListElement</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.cashManagement.TrainingMode">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:variable>
+    </core:variables>
+    <core:includedTemplateUrl>Pos/CashManagement/Catalog/CashManagementFormatEntryCatalog</core:includedTemplateUrl>
+    <core:formatEntry id="lineBreak">
+        <core:elements>
+            <core:lineElement id="LineBreakLine"/>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="pageBreak">
+        <core:elements>
+            <core:page number="0" id="PageBreakPage"/>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="creditCardsList">
+        <core:elements>
+            <core:row id="CreditCardsListRow">
+                <core:rowLine id="CreditCardsListRowLine">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="FullWidth" id="CreditCardsLabel">
+                            <core:elements>
+<core:text messageBase="Pos/Report/BalanceReportMessages" messageId="CREDIT_CARDS" style="INVERSE" id="CreditCardsLabelText"/>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+            <core:tableTemplate listVariableName="creditCardItem" list="#{creditCardsList}" id="CreditCardItems">
+                <core:formatElement formatId="creditCardItem"/>
+            </core:tableTemplate>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="creditCardItem">
+        <core:elements>
+            <core:row id="CreditCardItemRow">
+                <core:rowLine id="CreditCardItemRowLine">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="Description" id="CreditCardItemDescriptionColumn">
+                            <core:elements>
+<core:text id="CreditCardItemDescriptionText">
+    <core:text>#{creditCardItem.description}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="Amount" id="CreditCardItemCurrencyIdColumn">
+                            <core:elements>
+<core:text id="CreditCardItemCurrencyId">
+    <core:formatters>
+        <core:formatCurrencyAmount currencyId="#{creditCardItem.currencyKey.currencyId}"/>
+    </core:formatters>
+    <core:text>#{creditCardItem.total}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="currenciesList">
+        <core:elements>
+            <core:row id="CurrenciesListRow">
+                <core:rowLine id="CurrenciesListRowLine">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="FullWidth" id="CurrencyLabel">
+                            <core:elements>
+<core:text messageBase="Pos/Report/BalanceReportMessages" messageId="CURRENCY" style="INVERSE" id="CurrencyLabelText"/>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+            <core:tableTemplate listVariableName="currencyItem" list="#{currenciesList}" id="CurrencyItems">
+                <core:formatElement formatId="currencyItem"/>
+            </core:tableTemplate>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="currencyItem">
+        <core:elements>
+            <core:row id="CurrencyItemRow">
+                <core:rowLine id="CurrencyItemRowLine">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="Description" id="CurrencyItemTenderId">
+                            <core:elements>
+<core:text id="CurrencyItemTenderIdText">
+    <core:uiMessage value="#{currencyItem.localisedDescriptions}" applicability="#{notEmpty(currencyItem.localisedDescriptions)}"/>
+    <core:formatters>
+        <core:formatLocaleString localeValue="#{userLocale}"/>
+    </core:formatters>
+    <core:text>#{item.tenderId}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="Amount" id="CurrencyItemTotal">
+                            <core:elements>
+<core:text id="CurrencyItemTotalText">
+    <core:formatters>
+        <core:formatCurrencyAmount currencyId="#{currencyItem.currencyKey.currencyId}"/>
+    </core:formatters>
+    <core:text>#{currencyItem.total}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="balanceReportHeader">
+        <core:elements>
+            <core:formatElement formatId="header"/>
+            <core:formatElement formatId="blankLine"/>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="balanceReportBody">
+        <core:elements>
+            <core:formatElement applicability="#{!empty creditCardsList}" formatId="creditCardsList"/>
+            <core:formatElement applicability="#{!empty currenciesList}" formatId="currenciesList"/>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="balanceReportFooter">
+        <core:elements>
+            <core:formatElement formatId="blankLine"/>
+            <core:formatElement formatId="footer"/>
+            <core:formatElement formatId="pageBreak"/>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="header">
+        <core:elements>
+            <core:formatElement formatId="headerLogo" visible="false"/>
+            <core:row id="HeaderRow">
+                <core:rowLine id="HeaderRowLine">
+                    <core:elements>
+                        <core:text messageBase="Pos/Report/BalanceReportMessages" messageId="HEADER_TEXT" style="INVERSE" id="HeaderText"/>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="footer">
+        <core:elements>
+            <core:row id="FooterRow">
+                <core:rowLine id="FooterRowLine">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="FullWidth" id="FooterTextLabel">
+                            <core:elements>
+<core:text messageBase="Pos/Report/BalanceReportMessages" messageId="FOOTER_TEXT" style="INVERSE" id="FooterText"/>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="blankSeparator">
+        <core:elements>
+            <core:row id="BlankSeparatorRow">
+                <core:rowLine id="BlankSeparatorRowLine">
+                    <core:elements/>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="headerLogo">
+        <core:elements>
+            <core:column maxLines="0" columnDefId="FullCentre" id="HeaderLogo">
+                <core:elements>
+                    <core:imageElement visibility="#{location.receiptHeaderImageKey != null}" id="HeaderImage">
+                        <core:imageKey type="#{location.receiptHeaderImageKey.type}" category="#{location.receiptHeaderImageKey.category}">#{location.receiptHeaderImageKey.imageId}</core:imageKey>
+                    </core:imageElement>
+                </core:elements>
+            </core:column>
+        </core:elements>
+    </core:formatEntry>
+</core:documentTemplate>

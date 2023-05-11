@@ -1,0 +1,1207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.23" id="1">
+    <property name="author">Rob Harot</property>
+    <property name="comments">Copyright (c) 2009 Enactor</property>
+    <property name="createdBy">Eclipse BIRT Designer Version 4.3.2.v20140211-1400 Build &lt;4.3.2.v20140218-1056></property>
+    <text-property name="title">Sales Analysis By Hour</text-property>
+    <simple-property-list name="includeResource">
+        <value>Messages/SalesSummary/SalesAnalysisByHourMessages</value>
+    </simple-property-list>
+    <property name="units">in</property>
+    <method name="initialize"><![CDATA[globalDataFormatter = Packages.com.enactor.coreUI.factories.DataFormatterFactory.getInstance().getFormatter(reportContext.getLocale()); 
+baseCurrencyId = globalDataFormatter.getBaseCurrencyId();
+
+if(params["locationId"].value == null){
+	params["locationId"].value = "";
+}
+
+if(params["deviceId"].value == null){
+	params["deviceId"].value = "";
+}
+
+startDateStr = "";
+
+if(params["startDate"].value != null){
+	startDateStr = globalDataFormatter.formatDate(params["startDate"].value);
+}
+else {
+	params["startDate"].value = Packages.com.enactor.core.utilities.DateUtils.getStartOfWeek(null);
+	startDateStr = reportContext.getMessage("BLANK", reportContext.getLocale());
+}
+
+endDateStr = "";
+
+if(params["endDate"].value != null){
+	endDateStr = globalDataFormatter.formatDate(params["endDate"].value);
+}
+else {
+	params["endDate"].value = Packages.com.enactor.core.utilities.DateUtils.getEndOfWeek(null);
+	endDateStr = reportContext.getMessage("BLANK", reportContext.getLocale());
+}
+
+params["startYear"].value = params["startDate"].value.getYear();
+if( params["startYear"].value < 1900) {
+	params["startYear"].value += 1900;
+}]]></method>
+    <property name="theme">ReportLibrary.BasicReportTheme</property>
+    <text-property name="displayName">Sales Analysis By Hour</text-property>
+    <property name="layoutPreference">auto layout</property>
+    <property name="imageDPI">96</property>
+    <list-property name="libraries">
+        <structure>
+            <property name="fileName">ReportLibrary.rptlibrary</property>
+            <property name="namespace">ReportLibrary</property>
+        </structure>
+    </list-property>
+    <parameters>
+        <scalar-parameter name="userName" id="462" extends="ReportLibrary.userName">
+            <text-property name="promptText">Displayable User Name</text-property>
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant"></value>
+            </simple-property-list>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="odaJndiName" id="367">
+            <text-property name="promptText">ODA JNDI Name</text-property>
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant"></value>
+            </simple-property-list>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="locationId" id="500">
+            <text-property name="promptText">Location Id</text-property>
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="deviceId" id="501">
+            <text-property name="promptText">Device</text-property>
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="startDate" id="518">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">dateTime</property>
+            <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="concealValue">false</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="endDate" id="519">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">dateTime</property>
+            <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="startYear" id="1232">
+            <property name="hidden">true</property>
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">integer</property>
+            <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <parameter-group name="mandatoryEntities" id="1040">
+            <text-property name="displayName">mandatoryEntities</text-property>
+            <parameters>
+                <scalar-parameter name="mandatory1" id="1041">
+                    <property name="hidden">true</property>
+                    <property name="valueType">static</property>
+                    <property name="dataType">string</property>
+                    <property name="distinct">true</property>
+                    <simple-property-list name="defaultValue">
+                        <value type="constant">{http://www.enactor.com/mfc}period</value>
+                    </simple-property-list>
+                    <property name="paramType">simple</property>
+                    <property name="controlType">text-box</property>
+                    <structure name="format">
+                        <property name="category">Unformatted</property>
+                    </structure>
+                </scalar-parameter>
+            </parameters>
+        </parameter-group>
+    </parameters>
+    <data-sources>
+        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="Data Source" id="51"
+ extends="ReportLibrary.Data Source"/>
+    </data-sources>
+    <data-sets>
+        <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="LocationDescription" id="999"
+ extends="ReportLibrary.LocationDescription"/>
+        <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="TerminalDescription" id="1001"
+ extends="ReportLibrary.TerminalDescription"/>
+        <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="MainQuery" id="1234">
+            <property name="eventHandlerClass">com.enactor.coreReporting.reportEventHandlers.DataSourceQueryTranslatorEventHandler</property>
+            <property name="newHandlerOnEachEvent">true</property>
+            <list-property name="computedColumns">
+                <structure>
+                    <property name="name">COMPLETED_DATE</property>
+                    <expression name="expression">var completedDate = new Date(row["COMPLETED_YEAR"], 0, row["COMPLETED_DAY"], 0, 0, 0);
+completedDate;</expression>
+                    <property name="dataType">date-time</property>
+                </structure>
+                <structure>
+                    <property name="name">AVERAGE_TRANSACTION_SALES_VALUE</property>
+                    <expression name="expression">salesVal = row["SALES_VALUE"] != null ? row["SALES_VALUE"]  : 0;
+countVal = row["TRANS_COUNT"] != null ? row["TRANS_COUNT"]  : 0;
+retVal = 0;
+if( countVal != 0 ) {
+	retVal = salesVal / countVal;
+}
+retVal;</expression>
+                    <property name="dataType">decimal</property>
+                </structure>
+                <structure>
+                    <property name="name">AVERAGE_TRANSACTION_SALES_QUANTITY</property>
+                    <expression name="expression">salesVal = row["SALES_QUANTITY"] != null ? row["SALES_QUANTITY"]  : 0;
+countVal = row["TRANS_COUNT"] != null ? row["TRANS_COUNT"]  : 0;
+retVal = 0;
+if( countVal != 0 ) {
+	retVal = salesVal / countVal;
+}
+retVal;</expression>
+                    <property name="dataType">decimal</property>
+                </structure>
+                <structure>
+                    <property name="name">FORMATTED_SALES_VALUE</property>
+                    <expression name="expression">longVal = row["SALES_VALUE"] != null ? row["SALES_VALUE"]  : 0;
+globalDataFormatter.formatCurrencyAmount(longVal, baseCurrencyId);</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">FORMATTED_SALES_QUANTITY</property>
+                    <expression name="expression">longVal = row["SALES_QUANTITY"] != null ? row["SALES_QUANTITY"]  : 0;
+String( longVal );</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">FORMATTED_ORDERS_VALUE</property>
+                    <expression name="expression">longVal = row["ORDERS_VALUE"] != null ? row["ORDERS_VALUE"]  : 0;
+globalDataFormatter.formatCurrencyAmount(longVal, baseCurrencyId);</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">FORMATTED_ORDERS_QUANTITY</property>
+                    <expression name="expression">longVal = row["ORDERS_QUANTITY"] != null ? row["ORDERS_QUANTITY"]  : 0;
+String( longVal );</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">FORMATTED_RETURNS_VALUE</property>
+                    <expression name="expression">longVal = row["RETURNS_VALUE"] != null ? row["RETURNS_VALUE"]  : 0;
+globalDataFormatter.formatCurrencyAmount(longVal, baseCurrencyId);</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">FORMATTED_RETURNS_QUANTITY</property>
+                    <expression name="expression">longVal = row["RETURNS_QUANTITY"] != null ? row["RETURNS_QUANTITY"]  : 0;
+String( longVal );</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">FORMATTED_AVERAGE_TRANSACTION_SALES_VALUE</property>
+                    <expression name="expression">salesVal = row["SALES_VALUE"] != null ? row["SALES_VALUE"]  : 0;
+ordersVal = row["ORDERS_VALUE"] != null ? row["ORDERS_VALUE"]  : 0;
+countVal = row["TRANS_COUNT"] != null ? row["TRANS_COUNT"]  : 0;
+retVal = 0;
+if( countVal != 0 ) {
+	retVal = (salesVal + ordersVal) / countVal;
+}
+globalDataFormatter.formatCurrencyAmount(retVal, baseCurrencyId);</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">FORMATTED_AVERAGE_TRANSATION_SALES_QUANTITY</property>
+                    <expression name="expression">salesVal = row["SALES_QUANTITY"] != null ? row["SALES_QUANTITY"]  : 0;
+ordersVal = row["ORDERS_QUANTITY"] != null ? row["ORDERS_QUANTITY"]  : 0;
+countVal = row["TRANS_COUNT"] != null ? row["TRANS_COUNT"]  : 0;
+retVal = 0;
+if( countVal != 0 ) {
+	retVal = (salesVal + ordersVal) / countVal;
+}
+retVal = retVal.toFixed(2);
+String( retVal );</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">FORMATTED_HOUR</property>
+                    <expression name="expression">var startHour = new Date(row["COMPLETED_YEAR"], 0, row["COMPLETED_DAY"], row["COMPLETED_HOUR"], 0, 0);
+var endHour = new Date(row["COMPLETED_YEAR"], 0, row["COMPLETED_DAY"], row["COMPLETED_HOUR"], 59, 0);
+globalDataFormatter.formatTime( startHour ) + '-' + globalDataFormatter.formatTime( endHour );</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">FORMATTED_COMPLETED_DATE</property>
+                    <expression name="expression">var date = row["COMPLETED_DATE"];
+globalDataFormatter.formatDate( date );</expression>
+                    <property name="dataType">string</property>
+                </structure>
+            </list-property>
+            <list-property name="parameters">
+                <structure>
+                    <property name="name">startYear</property>
+                    <property name="paramName">startYear</property>
+                    <property name="dataType">integer</property>
+                    <property name="position">1</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">startDateInner</property>
+                    <property name="paramName">startDate</property>
+                    <property name="dataType">dateTime</property>
+                    <property name="position">2</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">endDateInner</property>
+                    <property name="paramName">endDate</property>
+                    <property name="dataType">dateTime</property>
+                    <property name="position">3</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">locationId</property>
+                    <property name="paramName">locationId</property>
+                    <property name="dataType">string</property>
+                    <property name="position">4</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">locationId2</property>
+                    <property name="paramName">locationId</property>
+                    <property name="dataType">string</property>
+                    <property name="position">5</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">deviceId</property>
+                    <property name="paramName">deviceId</property>
+                    <property name="dataType">string</property>
+                    <property name="position">6</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">deviceId2</property>
+                    <property name="paramName">deviceId</property>
+                    <property name="dataType">string</property>
+                    <property name="position">7</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+            </list-property>
+            <structure name="cachedMetaData"/>
+            <property name="dataSource">Data Source</property>
+            <xml-property name="queryText"><![CDATA[select	!~P.Year~! as COMPLETED_YEAR,
+		P.Day as COMPLETED_DAY,
+		!~P.HOUR~! as COMPLETED_HOUR,
+		count( distinct T.Transaction_Key ) as TRANS_COUNT,
+		sum( T.Modified_Sales_Value ) as SALES_VALUE,
+		sum( T.Sales_Quantity ) as SALES_QUANTITY,
+		sum( T.Modified_Orders_Value ) as ORDERS_VALUE,
+		sum( T.Orders_Quantity ) as ORDERS_QUANTITY,
+		sum( -T.Modified_Returns_Value ) as RETURNS_VALUE,
+		sum( -T.Returns_Quantity ) as RETURNS_QUANTITY	
+from 	(
+	select 	!~p2.year~! as !~year~!, p2.day as day, (p1.day - 1) as !~hour~!
+	from 	periods p1, periods p2 
+	where 	!~p1.year~! = ? and p1.day < 25 and !~p2.date~! >= ? and !~p2.date~! <= ?
+) P 
+left outer join (
+	select Modified_Sales_Value, Sales_Quantity, Modified_Returns_Value, Returns_Quantity, Modified_Orders_Value, Orders_Quantity, Hour, Day, Year, Transaction_Key from NonMerchandiseTransactions NMT
+	where (NMT.Is_Void_Transaction is null or NMT.Is_Void_Transaction = 0)
+    union all
+    select Modified_Sales_Value, Sales_Quantity, Modified_Returns_Value, Returns_Quantity, Modified_Orders_Value, Orders_Quantity, Hour, Day, Year, Transaction_Key from MerchandiseTransactions MT
+    where (MT.Is_Void_Transaction is null or MT.Is_Void_Transaction = 0)
+) as T ON T.!~Hour~! = !~P.Hour~! and T.day = P.day and !~T.year~! = !~P.year~! 
+left outer join RetailTransactionIds RTI on T.Transaction_Key = RTI.Transaction_Key
+where 	(? = !~''~! or RTI.Location_Id = ?) 
+and 	(? = !~''~! or RTI.Device_Id = ?)
+group by !~P.Year~!, P.Day, !~P.Hour~! 
+order by !~P.Year~!, P.Day, !~P.Hour~!]]></xml-property>
+        </oda-data-set>
+        <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="SetBaseCurrencyId" id="1435">
+            <property name="eventHandlerClass">com.enactor.coreReporting.reportEventHandlers.DataSourceQueryTranslatorEventHandler</property>
+            <property name="newHandlerOnEachEvent">true</property>
+            <list-property name="computedColumns">
+                <structure>
+                    <property name="name">SET_BASE_CURRENCY_ID</property>
+                    <expression name="expression">baseCurrencyId = row["BASE_CURRENCY_ID"];
+'';</expression>
+                    <property name="dataType">string</property>
+                </structure>
+            </list-property>
+            <list-property name="parameters">
+                <structure>
+                    <property name="name">locationId</property>
+                    <property name="paramName">locationId</property>
+                    <property name="dataType">string</property>
+                    <property name="position">1</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">locationId2</property>
+                    <property name="paramName">locationId</property>
+                    <property name="dataType">string</property>
+                    <property name="position">2</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">deviceId</property>
+                    <property name="paramName">deviceId</property>
+                    <property name="dataType">string</property>
+                    <property name="position">3</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">deviceId2</property>
+                    <property name="paramName">deviceId</property>
+                    <property name="dataType">string</property>
+                    <property name="position">4</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">startDate</property>
+                    <property name="paramName">startDate</property>
+                    <property name="dataType">dateTime</property>
+                    <property name="position">5</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">endDate</property>
+                    <property name="paramName">endDate</property>
+                    <property name="dataType">dateTime</property>
+                    <property name="position">6</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+            </list-property>
+            <structure name="cachedMetaData"/>
+            <property name="dataSource">Data Source</property>
+            <xml-property name="queryText"><![CDATA[select DISTINCT	RTI.Base_Currency_Id as BASE_CURRENCY_ID
+from 	RetailTransactionIds RTI
+left outer join (
+	select Transaction_Key from NonMerchandiseTransactions NMT
+	where (NMT.Is_Void_Transaction is null or NMT.Is_Void_Transaction = 0)
+    union all
+    select Transaction_Key from MerchandiseTransactions MT
+    where (MT.Is_Void_Transaction is null or MT.Is_Void_Transaction = 0)
+) as T ON T.Transaction_Key = RTI.Transaction_Key
+where 	(? = !~''~! or RTI.Location_Id = ?) 
+and 	(? = !~''~! or RTI.Device_Id = ?)
+and 	(RTI.Completed_Date_Time >= ?)
+and 	(RTI.Completed_Date_Time <= ?)
+]]></xml-property>
+        </oda-data-set>
+    </data-sets>
+    <page-setup>
+        <simple-master-page name="Simple MasterPage" id="2">
+            <property name="type">a4</property>
+            <property name="orientation">landscape</property>
+            <property name="topMargin">0.75in</property>
+            <property name="leftMargin">0.75in</property>
+            <property name="bottomMargin">0.75in</property>
+            <property name="rightMargin">0.75in</property>
+            <page-header>
+                <grid name="ReportHeader" id="368" extends="ReportLibrary.ReportHeader">
+                    <overridden-values>
+                        <ref-entry baseId="316" id="316"/>
+                        <ref-entry baseId="317" id="317"/>
+                        <ref-entry baseId="318" id="318"/>
+                        <ref-entry baseId="319" id="319"/>
+                        <ref-entry baseId="327" name="CompanyLogoWide" id="327"/>
+                        <ref-entry baseId="380" name="NewImage" id="380"/>
+                        <ref-entry baseId="320" id="320"/>
+                        <ref-entry baseId="481" name="PoweredBy" id="481"/>
+                        <ref-entry baseId="328" name="CompanyTitle" id="328"/>
+                    </overridden-values>
+                </grid>
+            </page-header>
+            <page-footer>
+                <grid id="3">
+                    <property name="width">100%</property>
+                    <column id="523">
+                        <property name="width">45%</property>
+                    </column>
+                    <column id="524">
+                        <property name="width">4.3020833333in</property>
+                    </column>
+                    <column id="525">
+                        <property name="width">5%</property>
+                    </column>
+                    <row id="526">
+                        <cell id="527">
+                            <text name="GeneratedOnText" id="531" extends="ReportLibrary.GeneratedOnText">
+                                <property name="style">reportFooterLeft</property>
+                                                            <property name="contentType">html</property>
+                                <text-property name="content"><![CDATA[
+<value-of>l10nParams = new Array(1); l10nParams[0] = Packages.com.enactor.core.utilities.DateUtils.formatShortDateMediumTime(reportContext.getLocale(), new Date) ; reportContext.getMessage("GENERATED_ON", reportContext.getLocale(), l10nParams);</value-of>
+]]></text-property>
+                            </text>
+                        </cell>
+                        <cell id="528">
+                            <text name="GeneratedByText" id="530" extends="ReportLibrary.GeneratedByText">
+                                <property name="style">reportFooterLeft</property>
+                                                            <property name="contentType">html</property>
+                                <text-property name="content"><![CDATA[
+<value-of>l10nParams = new Array(1); l10nParams[0] = params["userName"] ; reportContext.getMessage("GENERATED_BY", reportContext.getLocale(), l10nParams);</value-of>
+]]></text-property>
+                            </text>
+                        </cell>
+                        <cell id="529">
+                            <grid id="532">
+                                <property name="width">100%</property>
+                                <column id="533"/>
+                                <column id="534"/>
+                                <column id="535"/>
+                                <row id="536">
+                                    <cell id="537">
+                                        <auto-text id="538">
+                                            <property name="style">reportFooterRight</property>
+                                            <property name="type">page-number</property>
+                                        </auto-text>
+                                    </cell>
+                                    <cell id="539">
+                                        <text id="540">
+                                            <property name="style">reportFooterCentre</property>
+                                            <property name="contentType">plain</property>
+                                            <text-property name="content"><![CDATA[/]]></text-property>
+                                        </text>
+                                    </cell>
+                                    <cell id="541">
+                                        <auto-text id="542">
+                                            <property name="style">reportFooterRight</property>
+                                            <property name="type">total-page</property>
+                                        </auto-text>
+                                    </cell>
+                                </row>
+                            </grid>
+                        </cell>
+                    </row>
+                </grid>
+            </page-footer>
+        </simple-master-page>
+    </page-setup>
+    <body>
+        <grid name="ReportTitleGrid" id="362">
+            <property name="width">100%</property>
+            <column id="363"/>
+            <row id="364">
+                <cell id="365">
+                    <property name="paddingTop">1pt</property>
+                    <label name="ReportTitleLabel" id="521">
+                        <property name="style">reportTitle</property>
+                        <property name="fontFamily">sans-serif</property>
+                        <property name="fontSize">larger</property>
+                        <property name="paddingTop">1pt</property>
+                        <property name="textAlign">center</property>
+                        <text-property name="text" key="TITLE"></text-property>
+                    </label>
+                </cell>
+            </row>
+        </grid>
+        <grid name="CriteriaGrid" id="502">
+            <property name="marginTop">0pt</property>
+            <property name="width">100%</property>
+            <list-property name="visibility">
+                <structure>
+                    <property name="format">all</property>
+                    <expression name="valueExpr">if (pageNumber > 1) {
+ true;
+} else {
+ false;
+}</expression>
+                </structure>
+            </list-property>
+            <column id="377">
+                <property name="width">11%</property>
+            </column>
+            <column id="567">
+                <property name="width">39%</property>
+            </column>
+            <column id="993">
+                <property name="width">11%</property>
+            </column>
+            <column id="578">
+                <property name="width">39%</property>
+            </column>
+            <row id="992">
+                <cell id="991">
+                    <property name="colSpan">4</property>
+                    <property name="rowSpan">1</property>
+                    <label id="990">
+                        <property name="style">subReportHeader</property>
+                        <property name="marginTop">0pt</property>
+                        <property name="paddingTop">1pt</property>
+                        <property name="textAlign">center</property>
+                        <text-property name="text" key="REPORT_CRITERIA">The Report Criteria</text-property>
+                    </label>
+                </cell>
+            </row>
+            <row id="989">
+                <cell id="988">
+                    <property name="paddingTop">1pt</property>
+                    <label id="568">
+                        <property name="style">criteriaLabel</property>
+                        <text-property name="text" key="CRITERIA_1"></text-property>
+                    </label>
+                </cell>
+                <cell id="562">
+                    <property name="paddingTop">1pt</property>
+                    <data id="1014">
+                        <property name="style">reportCriteria</property>
+                        <property name="fontWeight">normal</property>
+                        <list-property name="mapRules">
+                            <structure>
+                                <expression name="testExpr">row["LOCATION_DESCRIPTION"]</expression>
+                                <property name="operator">is-null</property>
+                                <text-property name="display" key="BLANK"></text-property>
+                            </structure>
+                        </list-property>
+                        <property name="dataSet">LocationDescription</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">LOCATION_DESCRIPTION</property>
+                                <expression name="expression">dataSetRow["LOCATION_DESCRIPTION"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                        </list-property>
+                        <property name="resultSetColumn">LOCATION_DESCRIPTION</property>
+                    </data>
+                </cell>
+                <cell id="985">
+                    <label id="437">
+                        <property name="style">criteriaLabel</property>
+                        <text-property name="text" key="CRITERIA_2"></text-property>
+                    </label>
+                </cell>
+                <cell id="573">
+                    <data id="584">
+                        <property name="style">criteriaLabel</property>
+                        <list-property name="mapRules">
+                            <structure>
+                                <expression name="testExpr">row["TERMINAL_DESCRIPTION"]</expression>
+                                <property name="operator">is-null</property>
+                                <text-property name="display" key="BLANK"></text-property>
+                            </structure>
+                        </list-property>
+                        <property name="dataSet">TerminalDescription</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">TERMINAL_DESCRIPTION</property>
+                                <expression name="expression">dataSetRow["TERMINAL_DESCRIPTION"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                        </list-property>
+                        <property name="resultSetColumn">TERMINAL_DESCRIPTION</property>
+                    </data>
+                </cell>
+            </row>
+            <row id="984">
+                <cell id="983">
+                    <label id="438">
+                        <property name="style">criteriaLabel</property>
+                        <text-property name="text" key="CRITERIA_3"></text-property>
+                    </label>
+                </cell>
+                <cell id="563">
+                    <text-data id="1035">
+                        <property name="style">criteriaLabel</property>
+                        <expression name="valueExpr">startDateStr;</expression>
+                        <property name="contentType">html</property>
+                    </text-data>
+                </cell>
+                <cell id="982">
+                    <label id="441">
+                        <property name="style">criteriaLabel</property>
+                        <text-property name="text" key="CRITERIA_4"></text-property>
+                    </label>
+                </cell>
+                <cell id="574">
+                    <text-data id="1036">
+                        <property name="style">criteriaLabel</property>
+                        <expression name="valueExpr">endDateStr;</expression>
+                        <property name="contentType">html</property>
+                    </text-data>
+                </cell>
+            </row>
+            <row id="981">
+                <cell id="980">
+                    <label id="440">
+                        <property name="style">criteriaLabel</property>
+                        <text-property name="text" key="CRITERIA_5"></text-property>
+                    </label>
+                </cell>
+                <cell id="564"/>
+                <cell id="979"/>
+                <cell id="575"/>
+            </row>
+            <row id="420">
+                <cell id="421"/>
+                <cell id="566"/>
+                <cell id="422"/>
+                <cell id="577"/>
+            </row>
+        </grid>
+        <grid name="ResultsGrid" id="998">
+            <property name="width">100%</property>
+            <column id="997"/>
+            <row id="996">
+                <cell id="995">
+                    <table id="1436">
+                        <property name="width">100%</property>
+                        <property name="dataSet">SetBaseCurrencyId</property>
+                        <list-property name="visibility">
+                            <structure>
+                                <property name="format">all</property>
+                                <expression name="valueExpr">true</expression>
+                            </structure>
+                        </list-property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">BASE_CURRENCY_ID</property>
+                                <text-property name="displayName">BASE_CURRENCY_ID</text-property>
+                                <expression name="expression">dataSetRow["BASE_CURRENCY_ID"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">SET_BASE_CURRENCY_ID</property>
+                                <text-property name="displayName">SET_BASE_CURRENCY_ID</text-property>
+                                <expression name="expression">dataSetRow["SET_BASE_CURRENCY_ID"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                        </list-property>
+                        <column id="1450"/>
+                        <column id="1451"/>
+                        <header>
+                            <row id="1452">
+                                <list-property name="visibility">
+                                    <structure>
+                                        <property name="format">all</property>
+                                        <expression name="valueExpr">true</expression>
+                                    </structure>
+                                </list-property>
+                                <cell id="1453">
+                                    <label id="1455">
+                                        <property name="fontStyle">italic</property>
+                                        <text-property name="text">Hidden query to set baseCurrencyId</text-property>
+                                    </label>
+                                </cell>
+                                <cell id="1454"/>
+                            </row>
+                        </header>
+                        <detail>
+                            <row id="1442">
+                                <list-property name="visibility">
+                                    <structure>
+                                        <property name="format">all</property>
+                                        <expression name="valueExpr">true</expression>
+                                    </structure>
+                                </list-property>
+                                <cell id="1443">
+                                    <data id="1444">
+                                        <property name="fontStyle">italic</property>
+                                        <property name="resultSetColumn">BASE_CURRENCY_ID</property>
+                                    </data>
+                                </cell>
+                                <cell id="1445">
+                                    <data id="1446">
+                                        <property name="fontStyle">italic</property>
+                                        <property name="resultSetColumn">SET_BASE_CURRENCY_ID</property>
+                                    </data>
+                                </cell>
+                            </row>
+                        </detail>
+                    </table>
+                </cell>
+            </row>
+            <row id="425">
+                <cell id="426">
+                    <table id="1288">
+                        <property name="width">100%</property>
+                        <property name="dataSet">MainQuery</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">COMPLETED_YEAR</property>
+                                <expression name="expression">dataSetRow["COMPLETED_YEAR"]</expression>
+                                <property name="dataType">integer</property>
+                            </structure>
+                            <structure>
+                                <property name="name">COMPLETED_DAY</property>
+                                <expression name="expression">dataSetRow["COMPLETED_DAY"]</expression>
+                                <property name="dataType">integer</property>
+                            </structure>
+                            <structure>
+                                <property name="name">COMPLETED_HOUR</property>
+                                <expression name="expression">dataSetRow["COMPLETED_HOUR"]</expression>
+                                <property name="dataType">integer</property>
+                            </structure>
+                            <structure>
+                                <property name="name">TRANS_COUNT</property>
+                                <expression name="expression">dataSetRow["TRANS_COUNT"]</expression>
+                                <property name="dataType">integer</property>
+                            </structure>
+                            <structure>
+                                <property name="name">SALES_VALUE</property>
+                                <expression name="expression">dataSetRow["SALES_VALUE"]</expression>
+                                <property name="dataType">decimal</property>
+                            </structure>
+                            <structure>
+                                <property name="name">SALES_QUANTITY</property>
+                                <expression name="expression">dataSetRow["SALES_QUANTITY"]</expression>
+                                <property name="dataType">float</property>
+                            </structure>
+                            <structure>
+                                <property name="name">ORDERS_VALUE</property>
+                                <expression name="expression">dataSetRow["ORDERS_VALUE"]</expression>
+                                <property name="dataType">decimal</property>
+                            </structure>
+                            <structure>
+                                <property name="name">ORDERS_QUANTITY</property>
+                                <expression name="expression">dataSetRow["ORDERS_QUANTITY"]</expression>
+                                <property name="dataType">float</property>
+                            </structure>
+                            <structure>
+                                <property name="name">RETURNS_VALUE</property>
+                                <expression name="expression">dataSetRow["RETURNS_VALUE"]</expression>
+                                <property name="dataType">decimal</property>
+                            </structure>
+                            <structure>
+                                <property name="name">RETURNS_QUANTITY</property>
+                                <expression name="expression">dataSetRow["RETURNS_QUANTITY"]</expression>
+                                <property name="dataType">float</property>
+                            </structure>
+                            <structure>
+                                <property name="name">COMPLETED_DATE</property>
+                                <expression name="expression">dataSetRow["COMPLETED_DATE"]</expression>
+                                <property name="dataType">date-time</property>
+                            </structure>
+                            <structure>
+                                <property name="name">FORMATTED_SALES_VALUE</property>
+                                <expression name="expression">dataSetRow["FORMATTED_SALES_VALUE"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">FORMATTED_SALES_QUANTITY</property>
+                                <expression name="expression">dataSetRow["FORMATTED_SALES_QUANTITY"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">FORMATTED_ORDERS_VALUE</property>
+                                <expression name="expression">dataSetRow["FORMATTED_ORDERS_VALUE"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">FORMATTED_ORDERS_QUANTITY</property>
+                                <expression name="expression">dataSetRow["FORMATTED_ORDERS_QUANTITY"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">FORMATTED_RETURNS_VALUE</property>
+                                <expression name="expression">dataSetRow["FORMATTED_RETURNS_VALUE"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">FORMATTED_RETURNS_QUANTITY</property>
+                                <expression name="expression">dataSetRow["FORMATTED_RETURNS_QUANTITY"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">FORMATTED_AVERAGE_TRANSACTION_SALES_VALUE</property>
+                                <expression name="expression">dataSetRow["FORMATTED_AVERAGE_TRANSACTION_SALES_VALUE"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">FORMATTED_AVERAGE_TRANSATION_SALES_QUANTITY</property>
+                                <expression name="expression">dataSetRow["FORMATTED_AVERAGE_TRANSATION_SALES_QUANTITY"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">FORMATTED_HOUR</property>
+                                <expression name="expression">dataSetRow["FORMATTED_HOUR"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">AVERAGE_TRANSACTION_SALES_VALUE</property>
+                                <text-property name="displayName">AVERAGE_TRANSACTION_SALES_VALUE</text-property>
+                                <expression name="expression">dataSetRow["AVERAGE_TRANSACTION_SALES_VALUE"]</expression>
+                                <property name="dataType">decimal</property>
+                            </structure>
+                            <structure>
+                                <property name="name">AVERAGE_TRANSACTION_SALES_QUANTITY</property>
+                                <text-property name="displayName">AVERAGE_TRANSACTION_SALES_QUANTITY</text-property>
+                                <expression name="expression">dataSetRow["AVERAGE_TRANSACTION_SALES_QUANTITY"]</expression>
+                                <property name="dataType">decimal</property>
+                            </structure>
+                            <structure>
+                                <property name="name">FORMATTED_COMPLETED_DATE</property>
+                                <text-property name="displayName">FORMATTED_COMPLETED_DATE</text-property>
+                                <expression name="expression">dataSetRow["FORMATTED_COMPLETED_DATE"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                        </list-property>
+                        <property name="pageBreakInterval">50</property>
+                        <column id="1378"/>
+                        <column id="1379"/>
+                        <column id="1380"/>
+                        <column id="1384"/>
+                        <column id="1385"/>
+                        <column id="1479"/>
+                        <column id="1473"/>
+                        <column id="1388"/>
+                        <column id="1389"/>
+                        <column id="1390"/>
+                        <column id="1391"/>
+                        <header>
+                            <row id="1289">
+                                <cell id="1292">
+                                    <label id="1293">
+                                        <property name="style">columnHeader</property>
+                                        <text-property name="text" key="DATE">COMPLETED_DATE</text-property>
+                                        <text-property name="helpText" key="TOOLTIP_DATE"></text-property>
+                                    </label>
+                                </cell>
+                                <cell id="1294">
+                                    <label id="1295">
+                                        <property name="style">columnHeader</property>
+                                        <text-property name="text" key="HOUR">HOUR</text-property>
+                                        <text-property name="helpText" key="TOOLTIP_HOUR"></text-property>
+                                    </label>
+                                </cell>
+                                <cell id="1296">
+                                    <label id="1297">
+                                        <property name="style">columnHeaderRight</property>
+                                        <text-property name="text" key="TRANSACTION_COUNT">TRANS_COUNT</text-property>
+                                        <text-property name="helpText" key="TOOLTIP_TRANSACTION_COUNT"></text-property>
+                                    </label>
+                                </cell>
+                                <cell id="1304">
+                                    <label id="1313">
+                                        <property name="style">columnHeaderRight</property>
+                                        <text-property name="text" key="SALES_VALUE">FORMATTED_SALES_VALUE</text-property>
+                                        <text-property name="helpText" key="TOOLTIP_SALES_VALUE"></text-property>
+                                    </label>
+                                </cell>
+                                <cell id="1306">
+                                    <label id="1315">
+                                        <property name="style">columnHeaderRight</property>
+                                        <text-property name="text" key="SALES_QUANTITY">FORMATTED_SALES_QUANTITY</text-property>
+                                        <text-property name="helpText" key="TOOLTIP_SALES_QUANTITY"></text-property>
+                                    </label>
+                                </cell>
+                                <cell id="1474">
+                                    <label id="1481">
+                                        <property name="style">columnHeaderRight</property>
+                                        <text-property name="text" key="ORDERS_VALUE">FORMATTED_ORDERS_VALUE</text-property>
+                                        <text-property name="helpText" key="TOOLTIP_ORDERS_VALUE"></text-property>
+                                    </label>
+                                </cell>
+                                <cell id="1468">
+                                    <label id="1480">
+                                        <property name="style">columnHeaderRight</property>
+                                        <text-property name="text" key="ORDERS_QUANTITY">FORMATTED_ORDERS_QUANTITY</text-property>
+                                        <text-property name="helpText" key="TOOLTIP_ORDERS_QUANTITY"></text-property>
+                                    </label>
+                                </cell>
+                                <cell id="1312">
+                                    <label id="1321">
+                                        <property name="style">columnHeaderRight</property>
+                                        <text-property name="text" key="AVERAGE_TRANSACTION_SALES_VALUE">FORMATTED_AVERAGE_TRANSACTION_SALES_VALUE</text-property>
+                                        <text-property name="helpText" key="TOOLTIP_AVERAGE_TRANSACTION_SALES_VALUE"></text-property>
+                                    </label>
+                                </cell>
+                                <cell id="1314">
+                                    <label id="1323">
+                                        <property name="style">columnHeaderRight</property>
+                                        <text-property name="text" key="AVERAGE_TRANSACTION_SALES_QUANTITY">FORMATTED_AVERAGE_TRANSATION_SALES_QUANTITY</text-property>
+                                        <text-property name="helpText" key="TOOLTIP_AVERAGE_TRANSACTION_SALES_QUANTITY"></text-property>
+                                    </label>
+                                </cell>
+                                <cell id="1316">
+                                    <label id="1317">
+                                        <property name="style">columnHeaderRight</property>
+                                        <text-property name="text" key="RETURNS_VALUE">FORMATTED_RETURNS_VALUE</text-property>
+                                        <text-property name="helpText" key="TOOLTIP_RETURNS_VALUE"></text-property>
+                                    </label>
+                                </cell>
+                                <cell id="1318">
+                                    <label id="1319">
+                                        <property name="style">columnHeaderRight</property>
+                                        <text-property name="text" key="RETURNS_QUANTITY">FORMATTED_RETURNS_QUANTITY</text-property>
+                                        <text-property name="helpText" key="TOOLTIP_RETURNS_QUANTITY"></text-property>
+                                    </label>
+                                </cell>
+                            </row>
+                        </header>
+                        <group id="1394">
+                            <property name="groupName">dateGroup</property>
+                            <property name="interval">none</property>
+                            <property name="sortDirection">asc</property>
+                            <expression name="keyExpr">row["COMPLETED_DATE"]</expression>
+                            <structure name="toc">
+                                <expression name="expressionValue">row["COMPLETED_DATE"]</expression>
+                            </structure>
+                            <property name="repeatHeader">true</property>
+                            <property name="hideDetail">false</property>
+                            <property name="pageBreakAfter">auto</property>
+                            <property name="pageBreakBefore">auto</property>
+                            <property name="pageBreakInside">auto</property>
+                            <header>
+                                <row id="1395">
+                                    <cell id="1396">
+                                        <data id="1434">
+                                            <property name="style">sectionHeader</property>
+                                            <property name="resultSetColumn">FORMATTED_COMPLETED_DATE</property>
+                                            <text-property name="helpText" key="TOOLTIP_DATE"></text-property>
+                                        </data>
+                                    </cell>
+                                    <cell id="1397"/>
+                                    <cell id="1398"/>
+                                    <cell id="1402"/>
+                                    <cell id="1403"/>
+                                    <cell id="1475"/>
+                                    <cell id="1469"/>
+                                    <cell id="1404"/>
+                                    <cell id="1405"/>
+                                    <cell id="1406"/>
+                                    <cell id="1407"/>
+                                </row>
+                            </header>
+                            <footer>
+                                <row id="1410">
+                                    <cell id="1411"/>
+                                    <cell id="1412"/>
+                                    <cell id="1413">
+                                        <text-data id="1382">
+                                            <property name="style">reportColumnTotal</property>
+                                            <expression name="valueExpr">longVal = Total.sum(row["TRANS_COUNT"], null, 1) != null ? Total.sum(row["TRANS_COUNT"], null, 1) : 0;
+String( longVal );</expression>
+                                            <property name="contentType">html</property>
+                                        </text-data>
+                                    </cell>
+                                    <cell id="1417">
+                                        <text-data id="1428">
+                                            <property name="style">reportColumnTotal</property>
+                                            <expression name="valueExpr">longVal = Total.sum(row["SALES_VALUE"], null, 1) != null ? Total.sum(row["SALES_VALUE"], null, 1) : 0;
+globalDataFormatter.formatCurrencyAmount(longVal, baseCurrencyId);</expression>
+                                            <property name="contentType">html</property>
+                                        </text-data>
+                                    </cell>
+                                    <cell id="1418">
+                                        <text-data id="1431">
+                                            <property name="style">reportColumnTotal</property>
+                                            <expression name="valueExpr">longVal = Total.sum(row["SALES_QUANTITY"], null, 1) != null ? Total.sum(row["SALES_QUANTITY"], null, 1) : 0;
+String( longVal );</expression>
+                                            <property name="contentType">html</property>
+                                        </text-data>
+                                    </cell>
+                                    <cell id="1477">
+                                        <text-data id="1485">
+                                            <property name="style">reportColumnTotal</property>
+                                            <expression name="valueExpr" type="javascript">longVal = Total.sum(row["ORDERS_VALUE"], null, 1) != null ? Total.sum(row["ORDERS_VALUE"], null, 1) : 0;&#13;
+globalDataFormatter.formatCurrencyAmount(longVal, baseCurrencyId);</expression>
+                                            <property name="contentType">html</property>
+                                        </text-data>
+                                    </cell>
+                                    <cell id="1471">
+                                        <text-data id="1486">
+                                            <property name="style">reportColumnTotal</property>
+                                            <expression name="valueExpr" type="javascript">longVal = Total.sum(row["ORDERS_QUANTITY"], null, 1) != null ? Total.sum(row["ORDERS_QUANTITY"], null, 1) : 0;&#13;
+String( longVal );</expression>
+                                            <property name="contentType">html</property>
+                                        </text-data>
+                                    </cell>
+                                    <cell id="1419">
+                                        <text-data id="1429">
+                                            <property name="style">reportColumnTotal</property>
+                                            <expression name="valueExpr">salesVal = Total.sum(row["SALES_VALUE"], null, 1) != null ? Total.sum(row["SALES_VALUE"], null, 1) : 0;
+countVal = Total.sum(row["TRANS_COUNT"], null, 1) != null ? Total.sum(row["TRANS_COUNT"], null, 1) : 0;
+retVal = salesVal;
+if( countVal != 0 ) {
+	retVal = salesVal / countVal;
+}
+globalDataFormatter.formatCurrencyAmount(retVal, baseCurrencyId);</expression>
+                                            <property name="contentType">html</property>
+                                        </text-data>
+                                    </cell>
+                                    <cell id="1420">
+                                        <text-data id="1432">
+                                            <property name="style">reportColumnTotal</property>
+                                            <expression name="valueExpr">salesQuant = Total.sum(row["SALES_QUANTITY"], null, 1) != null ? Total.sum(row["SALES_QUANTITY"], null, 1) : 0;
+countVal = Total.sum(row["TRANS_COUNT"], null, 1) != null ? Total.sum(row["TRANS_COUNT"], null, 1) : 0;
+floatVal = salesQuant;
+if( countVal != 0 ) {
+	floatVal = salesQuant / countVal;
+}
+floatVal = floatVal.toFixed(2);
+String( floatVal );</expression>
+                                            <property name="contentType">html</property>
+                                        </text-data>
+                                    </cell>
+                                    <cell id="1421">
+                                        <text-data id="1430">
+                                            <property name="style">reportColumnTotal</property>
+                                            <expression name="valueExpr">longVal = Total.sum(row["RETURNS_VALUE"], null, 1) != null ? Total.sum(row["RETURNS_VALUE"], null, 1) : 0;
+globalDataFormatter.formatCurrencyAmount(longVal, baseCurrencyId);</expression>
+                                            <property name="contentType">html</property>
+                                        </text-data>
+                                    </cell>
+                                    <cell id="1422">
+                                        <text-data id="1433">
+                                            <property name="style">reportColumnTotal</property>
+                                            <expression name="valueExpr">longVal = Total.sum(row["RETURNS_QUANTITY"], null, 1) != null ? Total.sum(row["RETURNS_QUANTITY"], null, 1) : 0;
+String( longVal );</expression>
+                                            <property name="contentType">html</property>
+                                        </text-data>
+                                    </cell>
+                                </row>
+                            </footer>
+                        </group>
+                        <detail>
+                            <row id="1324">
+                                <cell id="1327"/>
+                                <cell id="1329">
+                                    <data id="1427">
+                                        <property name="style">reportColumn</property>
+                                        <property name="resultSetColumn">FORMATTED_HOUR</property>
+                                        <text-property name="helpText" key="TOOLTIP_HOUR"></text-property>
+                                    </data>
+                                </cell>
+                                <cell id="1331">
+                                    <data id="1332">
+                                        <property name="style">reportColumnRight</property>
+                                        <property name="resultSetColumn">TRANS_COUNT</property>
+                                        <text-property name="helpText" key="TOOLTIP_TRANSACTION_COUNT"></text-property>
+                                    </data>
+                                </cell>
+                                <cell id="1339">
+                                    <data id="1348">
+                                        <property name="style">reportColumnRight</property>
+                                        <property name="resultSetColumn">FORMATTED_SALES_VALUE</property>
+                                        <text-property name="helpText" key="TOOLTIP_SALES_VALUE"></text-property>
+                                    </data>
+                                </cell>
+                                <cell id="1341">
+                                    <data id="1350">
+                                        <property name="style">reportColumnRight</property>
+                                        <property name="resultSetColumn">FORMATTED_SALES_QUANTITY</property>
+                                        <text-property name="helpText" key="TOOLTIP_SALES_QUANTITY"></text-property>
+                                    </data>
+                                </cell>
+                                <cell id="1476">
+                                    <data id="1484">
+                                        <property name="style">reportColumnRight</property>
+                                        <property name="resultSetColumn">FORMATTED_ORDERS_VALUE</property>
+                                        <text-property name="helpText" key="TOOLTIP_ORDERS_VALUE"></text-property>
+                                    </data>
+                                </cell>
+                                <cell id="1470">
+                                    <data id="1483">
+                                        <property name="style">reportColumnRight</property>
+                                        <property name="resultSetColumn">FORMATTED_ORDERS_QUANTITY</property>
+                                        <text-property name="helpText" key="TOOLTIP_ORDERS_QUANTITY"></text-property>
+                                    </data>
+                                </cell>
+                                <cell id="1347">
+                                    <data id="1356">
+                                        <property name="style">reportColumnRight</property>
+                                        <property name="resultSetColumn">FORMATTED_AVERAGE_TRANSACTION_SALES_VALUE</property>
+                                        <text-property name="helpText" key="TOOLTIP_AVERAGE_TRANSACTION_SALES_VALUE"></text-property>
+                                    </data>
+                                </cell>
+                                <cell id="1349">
+                                    <data id="1358">
+                                        <property name="style">reportColumnRight</property>
+                                        <property name="resultSetColumn">FORMATTED_AVERAGE_TRANSATION_SALES_QUANTITY</property>
+                                        <text-property name="helpText" key="TOOLTIP_AVERAGE_TRANSACTION_SALES_QUANTITY"></text-property>
+                                    </data>
+                                </cell>
+                                <cell id="1351">
+                                    <data id="1352">
+                                        <property name="style">reportColumnRight</property>
+                                        <property name="resultSetColumn">FORMATTED_RETURNS_VALUE</property>
+                                        <text-property name="helpText" key="TOOLTIP_RETURNS_VALUE"></text-property>
+                                    </data>
+                                </cell>
+                                <cell id="1353">
+                                    <data id="1354">
+                                        <property name="style">reportColumnRight</property>
+                                        <property name="resultSetColumn">FORMATTED_RETURNS_QUANTITY</property>
+                                        <text-property name="helpText" key="TOOLTIP_RETURNS_QUANTITY"></text-property>
+                                    </data>
+                                </cell>
+                            </row>
+                        </detail>
+                        <footer>
+                            <row id="1359">
+                                <cell id="1361"/>
+                                <cell id="1362"/>
+                                <cell id="1363"/>
+                                <cell id="1367"/>
+                                <cell id="1368"/>
+                                <cell id="1478"/>
+                                <cell id="1472"/>
+                                <cell id="1371"/>
+                                <cell id="1372"/>
+                                <cell id="1373"/>
+                                <cell id="1374"/>
+                            </row>
+                        </footer>
+                    </table>
+                </cell>
+            </row>
+        </grid>
+    </body>
+</report>

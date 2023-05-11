@@ -1,0 +1,2114 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<core:process xmlns:core="http://www.enactor.com/core" xmlns:retail="http://www.enactor.com/retail" xmlns:ns4="http://www.enactor.com/crm" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803" xmlns:ns6="http://www.apis-it.hr/fin/2012/types/f73" xmlns:ns7="http://www.w3.org/2000/09/xmldsig#" xmlns:ns8="http://www.enactor.com/retail/storedRetailTransaction/service" xmlns:ns9="http://www.fu.gov.si/" xmlns:ns10="http://www.enactor.com/addressLookup/service" xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:ns14="http://www.enactor.com/crm/customerLoyalty/service" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <core:processID>Pos/PayPal/CompletePayPalItems</core:processID>
+    <core:version>1.0</core:version>
+    <core:name></core:name>
+    <core:defaultMessageBaseName></core:defaultMessageBaseName>
+    <core:firstStateID>Start</core:firstStateID>
+    <core:className></core:className>
+    <core:uiHints>
+        <entry>
+            <key>com.enactor.tools.editor.process.style</key>
+            <value>1023</value>
+        </entry>
+        <entry>
+            <key>com.enactor.tools.editor.process.xloc</key>
+            <value>8</value>
+        </entry>
+        <entry>
+            <key>com.enactor.tools.editor.process.yloc</key>
+            <value>8</value>
+        </entry>
+    </core:uiHints>
+    <core:metaData>
+        <core:inputs>
+            <core:input name="enactor.pos.IsTrainingMode">
+                <core:interfaceName>java.lang.Boolean</core:interfaceName>
+            </core:input>
+            <core:input required="true" name="enactor.coreUI.User">
+                <core:interfaceName>com.enactor.core.signOn.ISignedOnUser</core:interfaceName>
+            </core:input>
+            <core:input required="true" name="enactor.mfc.Location">
+                <core:interfaceName>com.enactor.mfc.location.ILocation</core:interfaceName>
+            </core:input>
+            <core:input name="enactor.pos.TransactionReversal">
+                <core:interfaceName>java.lang.Boolean</core:interfaceName>
+            </core:input>
+            <core:input required="true" name="enactor.mfc.TransactionHandler">
+                <core:interfaceName>com.enactor.mfc.retail.transaction.IRetailTransactionHandler</core:interfaceName>
+            </core:input>
+        </core:inputs>
+        <stateDataTypes>
+            <stateDataType required="true" name="enactor.mfc.BasketItem">
+                <core:interfaceName>com.enactor.mfc.basket.items.IBasketItem</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.mfc.BasketItemIterator">
+                <core:interfaceName>java.util.Iterator</core:interfaceName>
+            </stateDataType>
+            <stateDataType name="enactor.pos.IsTrainingMode">
+                <core:interfaceName>java.lang.Boolean</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.coreUI.User">
+                <core:interfaceName>com.enactor.core.signOn.ISignedOnUser</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.pos.Failed">
+                <core:interfaceName>java.lang.Boolean</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.mfc.Location">
+                <core:interfaceName>com.enactor.mfc.location.ILocation</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.mfc.TransactionHandler">
+                <core:interfaceName>com.enactor.mfc.retail.transaction.IRetailTransactionHandler</core:interfaceName>
+            </stateDataType>
+            <stateDataType name="enactor.pos.TransactionReversal">
+                <core:interfaceName>java.lang.Boolean</core:interfaceName>
+            </stateDataType>
+        </stateDataTypes>
+    </core:metaData>
+    <core:assignAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>Initialise</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIAssignAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>281</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>482</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input name="enactor.pos.TransactionReversal">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="true" name="enactor.pos.Failed">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.Assign</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID>ItemsLoop</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>EndProcessFail</core:toActionID>
+            <core:condition>notEmpty(process.transactionReversal) &amp;&amp; process.transactionReversal</core:condition>
+            <core:comment>Transaction reversal not supported</core:comment>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:dataAssignment toExpression="failed" fromExpression="false"/>
+    </core:assignAction>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>BasketItemLoop</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.pos.packages.basket.processes.BasketItemLoopAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1023</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>652</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>281</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="true" name="enactor.mfc.IncludeReturnItems">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:param>
+        <core:param value="false" name="enactor.mfc.IncludeVoidedItems">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:param>
+        <core:param value="true" name="enactor.mfc.UseTransactionBasket">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:param>
+        <core:param value="com.enactor.mfc.basket.items.IPayPalTenderItem" name="enactor.mfc.BasketItemClassName">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.TransactionHandler">
+                    <core:interfaceName>com.enactor.mfc.retail.transaction.IRetailTransactionHandler</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.BasketItemIterator">
+                    <core:interfaceName>java.util.Iterator</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.mfc.UseTransactionBasket">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.mfc.IncludeVoidedItems">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.mfc.IncludeReturnItems">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.mfc.BasketItemClassName">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output name="enactor.mfc.BasketItemIterator">
+                    <core:interfaceName>java.util.Iterator</core:interfaceName>
+                </core:output>
+                <core:output name="enactor.mfc.BasketItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.IBasketItem</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Completed"/>
+                <core:outcome name="Next"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>EndProcessSuccess</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Completed</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>BasketItemLoop</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Next</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>4</core:linkID>
+            <core:toStateID>PayPalTender</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition>instanceOf(process.basketItem, 'com.enactor.mfc.basket.items.IPayPalTenderItem')</core:condition>
+            <core:outcome>Next</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>5</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>EndProcessFail</core:toActionID>
+            <core:condition>process.failed</core:condition>
+            <core:outcome>Completed</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:endProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>EndProcessSuccess</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIEndProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>712</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>42</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData/>
+        <core:typeId>enactor.types.EndProcess</core:typeId>
+        <core:outcome>Success</core:outcome>
+        <core:defaultProcessId></core:defaultProcessId>
+    </core:endProcessAction>
+    <core:endProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>EndProcessFail</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIEndProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>985</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>43</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData/>
+        <core:typeId>enactor.types.EndProcess</core:typeId>
+        <core:outcome>Fail</core:outcome>
+        <core:defaultProcessId></core:defaultProcessId>
+    </core:endProcessAction>
+    <core:executeProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>DoCapture</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UICallProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1023</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1914</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>484</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.coreUI.User">
+                    <core:interfaceName>com.enactor.core.signOn.ISignedOnUser</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.MerchantAccountCredentials">
+                    <core:interfaceName>com.enactor.mfc.accountCredentials.IAccountCredentials</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.PayPalTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.IPayPalTenderItem</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.Location">
+                    <core:interfaceName>com.enactor.mfc.location.ILocation</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.TransactionHandler">
+                    <core:interfaceName>com.enactor.mfc.retail.transaction.IRetailTransactionHandler</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="true" name="enactor.mfc.PayPalTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.IPayPalTenderItem</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="ResponseFault"/>
+                <core:outcome name="Cancel"/>
+                <core:outcome name="Success"/>
+                <core:outcome name="Fail"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.CallProcess</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>TestDoCaptureErrorId</core:toActionID>
+            <core:condition>notEmpty(state.payPalTenderItem.error)</core:condition>
+            <core:outcome>ResponseFault</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID>CaptureFault</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>ResponseFault</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>3</core:linkID>
+            <core:toStateID>CaptureServiceError</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Fail</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>4</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>DoVoidAfterTimeout</core:toActionID>
+            <core:condition></core:condition>
+            <core:comment>Cancel == Timeout in this case</core:comment>
+            <core:outcome>Cancel</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>5</core:linkID>
+            <core:toStateID>ItemsLoop</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:executeProcessId>Pos/PayPal/DoCapture</core:executeProcessId>
+    </core:executeProcessAction>
+    <core:executeProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>Fail:VoidPayPalTender</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UICallProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1023</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1311</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>59</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.PayPalTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.IPayPalTenderItem</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.TransactionHandler">
+                    <core:interfaceName>com.enactor.mfc.retail.transaction.IRetailTransactionHandler</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+                <core:outcome name="Fail"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.CallProcess</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>SetFailed</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>SetFailed</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Fail</core:outcome>
+        </core:outcomeLink>
+        <core:executeProcessId>Pos/PayPal/CancelPayPalTender</core:executeProcessId>
+    </core:executeProcessAction>
+    <core:assignAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>SetFailed</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIAssignAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1066</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>190</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:outputs>
+                <core:output required="true" name="enactor.pos.Failed">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.Assign</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID>ItemsLoop</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:dataAssignment toExpression="failed" fromExpression="true"/>
+    </core:assignAction>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>LoadTender</core:actionID>
+        <core:name>Load Tender</core:name>
+        <core:className>com.enactor.commonUI.entities.processes.LoadEntityAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>63</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1297</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>484</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.coreUI.Key">
+                    <core:interfaceName>com.enactor.core.entities.IEntityKey</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output name="enactor.coreUI.Entity">
+                    <core:interfaceName>com.enactor.core.entities.IEntity</core:interfaceName>
+                </core:output>
+                <core:output name="enactor.coreUI.Key">
+                    <core:interfaceName>com.enactor.core.entities.IEntityKey</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>LoadMerchantAccountCredentials</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>LogException</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Exception</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>LoadMerchantAccountCredentials</core:actionID>
+        <core:name>LoadEntityLenientAction</core:name>
+        <core:className>com.enactor.commonUI.entities.processes.LoadEntityAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1023</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1535</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>484</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.coreUI.Key">
+                    <core:interfaceName>com.enactor.core.entities.IEntityKey</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output name="enactor.coreUI.Key">
+                    <core:interfaceName>com.enactor.core.entities.IEntityKey</core:interfaceName>
+                </core:output>
+                <core:output name="enactor.coreUI.Entity">
+                    <core:interfaceName>com.enactor.core.entities.IEntity</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>TestRefund</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>LogException</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Exception</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>3</core:linkID>
+            <core:toStateID>TrainingModeLiveAccount</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition>notEmpty(process.isTrainingMode) &amp;&amp; process.isTrainingMode</core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>LogException</core:actionID>
+        <core:name>UILogMessageAction</core:name>
+        <core:className>com.enactor.coreUI.actions.UILogMessageAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1430</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>368</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="Error in PayPal Tender" name="enactor.coreUI.LogMessage">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input name="enactor.coreUI.LogMessage">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID>CaptureServiceError</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID>CaptureServiceError</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Exception</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:executeProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>DoVoid</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UICallProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1023</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1914</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>59</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.coreUI.User">
+                    <core:interfaceName>com.enactor.core.signOn.ISignedOnUser</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.MerchantAccountCredentials">
+                    <core:interfaceName>com.enactor.mfc.accountCredentials.IAccountCredentials</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.PayPalTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.IPayPalTenderItem</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.Location">
+                    <core:interfaceName>com.enactor.mfc.location.ILocation</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.TransactionHandler">
+                    <core:interfaceName>com.enactor.mfc.retail.transaction.IRetailTransactionHandler</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="true" name="enactor.mfc.PayPalTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.IPayPalTenderItem</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="ResponseFault"/>
+                <core:outcome name="Cancel"/>
+                <core:outcome name="Success"/>
+                <core:outcome name="Fail"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:comment>Prepare request and invoke DoVoid service.  Used after an authroisation has been obtained.
+Same outcomes are possible as DoCapture etc.</core:comment>
+        <core:typeId>enactor.types.CallProcess</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID>VoidSuccess</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID>VoidFail</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>ResponseFault</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>3</core:linkID>
+            <core:toStateID>VoidFail</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Fail</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>4</core:linkID>
+            <core:toStateID>VoidFail</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Cancel</core:outcome>
+        </core:outcomeLink>
+        <core:executeProcessId>Pos/PayPal/DoVoid</core:executeProcessId>
+    </core:executeProcessAction>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>TestRefund</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UINullAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1701</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>729</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.NullAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>DoCapture</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>DoRefund</core:toActionID>
+            <core:condition>state.payPalTenderItem.isRefund</core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>TestOnlineVoidRequired</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UINullAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2114</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>394</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.NullAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>DoVoid</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>Fail:VoidPayPalTender</core:toActionID>
+            <core:condition>state.payPalTenderItem.isRefund</core:condition>
+            <core:comment>No authorisation step for Refund Transaction</core:comment>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:executeProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>DoRefund</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UICallProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1023</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1914</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>819</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.coreUI.User">
+                    <core:interfaceName>com.enactor.core.signOn.ISignedOnUser</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.MerchantAccountCredentials">
+                    <core:interfaceName>com.enactor.mfc.accountCredentials.IAccountCredentials</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.PayPalTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.IPayPalTenderItem</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.Location">
+                    <core:interfaceName>com.enactor.mfc.location.ILocation</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.TransactionHandler">
+                    <core:interfaceName>com.enactor.mfc.retail.transaction.IRetailTransactionHandler</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="true" name="enactor.mfc.PayPalTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.IPayPalTenderItem</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="ResponseFault"/>
+                <core:outcome name="Cancel"/>
+                <core:outcome name="Success"/>
+                <core:outcome name="Fail"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.CallProcess</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID>RefundServiceTimeout</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Cancel</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID>CaptureServiceError</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Fail</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>3</core:linkID>
+            <core:toStateID>RefundFault</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>ResponseFault</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>4</core:linkID>
+            <core:toStateID>RefundFaultMessage</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition>notEmpty(state.payPalTenderItem.error)</core:condition>
+            <core:outcome>ResponseFault</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>5</core:linkID>
+            <core:toStateID>ItemsLoop</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:executeProcessId>Pos/PayPal/DoRefund</core:executeProcessId>
+    </core:executeProcessAction>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>TestDoCaptureErrorId</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UINullAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2623</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>478</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.NullAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID>CaptureFaultMessage</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID>CaptureFaultMessageFull</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition>state.payPalTenderItem.error.errorId == '579063' || 
+state.payPalTenderItem.error.errorId == '580034' || 
+state.payPalTenderItem.error.errorId == '580036' || 
+state.payPalTenderItem.error.errorId == '589009' || 
+state.payPalTenderItem.error.errorId == '580035' || 
+state.payPalTenderItem.error.errorId == '529010' || 
+state.payPalTenderItem.error.errorId == '579065' || 
+state.payPalTenderItem.error.errorId == '580033'</core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:executeProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>DoVoidAfterTimeout</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UICallProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1023</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>3053</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>71</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.coreUI.User">
+                    <core:interfaceName>com.enactor.core.signOn.ISignedOnUser</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.MerchantAccountCredentials">
+                    <core:interfaceName>com.enactor.mfc.accountCredentials.IAccountCredentials</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.PayPalTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.IPayPalTenderItem</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.Location">
+                    <core:interfaceName>com.enactor.mfc.location.ILocation</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.TransactionHandler">
+                    <core:interfaceName>com.enactor.mfc.retail.transaction.IRetailTransactionHandler</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="true" name="enactor.mfc.PayPalTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.IPayPalTenderItem</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="ResponseFault"/>
+                <core:outcome name="Cancel"/>
+                <core:outcome name="Success"/>
+                <core:outcome name="Fail"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:comment>Invoke DoVoid service after timeout in case the request was successfully processed.  If void fails with Already Processed error, must warn the operator.</core:comment>
+        <core:typeId>enactor.types.CallProcess</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID>VoidAfterTimeoutSuccess</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID>VoidAfterTimeoutFail</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Cancel</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>3</core:linkID>
+            <core:toStateID>VoidAfterTimeoutFail</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Fail</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>4</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>TestAlreadyCapturedError</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>ResponseFault</core:outcome>
+        </core:outcomeLink>
+        <core:executeProcessId>Pos/PayPal/DoVoid</core:executeProcessId>
+    </core:executeProcessAction>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>TestAlreadyCapturedError</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.pos.packages.paypal.processes.TestPayPalErrorAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2831</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>146</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="10602" name="enactor.paypal.ErrorId">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.PayPalTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.IPayPalTenderItem</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.paypal.ErrorId">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outcomes>
+                <core:outcome name="True"/>
+                <core:outcome name="False"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID>VoidFailAlreadyCaptured</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>True</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID>VoidAfterTimeoutFail</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>False</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:state>
+        <core:url></core:url>
+        <core:stateID>Start</core:stateID>
+        <core:name></core:name>
+        <core:className></core:className>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>19</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>484</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <handledEvents>
+                <handledEvent name="StateEntered"/>
+            </handledEvents>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicState</core:typeId>
+        <core:singleInstance>false</core:singleInstance>
+        <core:respondToViewEvents>false</core:respondToViewEvents>
+        <core:actionInputMappings/>
+        <core:actionOutputMappings/>
+        <core:eventLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>Initialise</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>StateEntered</core:event>
+        </core:eventLink>
+    </core:state>
+    <core:state>
+        <core:url></core:url>
+        <core:stateID>PayPalTender</core:stateID>
+        <core:name></core:name>
+        <core:className></core:className>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1023</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1048</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>484</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.PayPalTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.IPayPalTenderItem</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="true" name="enactor.mfc.PayPalTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.IPayPalTenderItem</core:interfaceName>
+                </core:output>
+                <core:output required="true" name="enactor.mfc.MerchantAccountCredentials">
+                    <core:interfaceName>com.enactor.mfc.accountCredentials.IAccountCredentials</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <handledEvents>
+                <handledEvent name="StateEntered"/>
+            </handledEvents>
+            <stateDataTypes>
+                <stateDataType required="true" name="enactor.mfc.PayPalTender">
+                    <core:interfaceName>com.enactor.mfc.tender.IPayPalTender</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="true" name="enactor.mfc.PayPalTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.IPayPalTenderItem</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="true" name="enactor.mfc.MerchantAccountCredentials">
+                    <core:interfaceName>com.enactor.mfc.accountCredentials.IAccountCredentials</core:interfaceName>
+                </stateDataType>
+            </stateDataTypes>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicState</core:typeId>
+        <core:singleInstance>false</core:singleInstance>
+        <core:respondToViewEvents>false</core:respondToViewEvents>
+        <core:stateInputMappings>
+            <core:mappings>
+                <core:sourceDataType required="true" name="enactor.mfc.BasketItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.IBasketItem</core:interfaceName>
+                </core:sourceDataType>
+                <core:targetDataType required="true" name="enactor.mfc.PayPalTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.IPayPalTenderItem</core:interfaceName>
+                </core:targetDataType>
+            </core:mappings>
+        </core:stateInputMappings>
+        <core:actionInputMappings>
+            <core:actionMapping>
+                <core:actionID>LoadTender</core:actionID>
+                <core:mappings>
+                    <core:processMappings/>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.PayPalTenderItem">
+<core:interfaceName>com.enactor.mfc.basket.items.IPayPalTenderItem</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.coreUI.Key">
+<core:interfaceName>com.enactor.core.entities.IEntityKey</core:interfaceName>
+                            </core:targetDataType>
+                            <core:expression>payPalTenderItem.tenderKey</core:expression>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>LoadMerchantAccountCredentials</core:actionID>
+                <core:mappings>
+                    <core:processMappings/>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.PayPalTender">
+<core:interfaceName>com.enactor.mfc.tender.IPayPalTender</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.coreUI.Key">
+<core:interfaceName>com.enactor.core.entities.IEntityKey</core:interfaceName>
+                            </core:targetDataType>
+                            <core:expression>payPalTender.accountCredentialsKey</core:expression>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+        </core:actionInputMappings>
+        <core:actionOutputMappings>
+            <core:actionMapping>
+                <core:actionID>LoadTender</core:actionID>
+                <core:mappings>
+                    <core:processMappings/>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:sourceDataType name="enactor.coreUI.Key">
+<core:interfaceName>com.enactor.core.entities.IEntityKey</core:interfaceName>
+                            </core:sourceDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType name="enactor.coreUI.Entity">
+<core:interfaceName>com.enactor.core.entities.IEntity</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.PayPalTender">
+<core:interfaceName>com.enactor.mfc.tender.IPayPalTender</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>LoadMerchantAccountCredentials</core:actionID>
+                <core:mappings>
+                    <core:processMappings/>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:sourceDataType name="enactor.coreUI.Entity">
+<core:interfaceName>com.enactor.core.entities.IEntity</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.MerchantAccountCredentials">
+<core:interfaceName>com.enactor.mfc.accountCredentials.IAccountCredentials</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType name="enactor.coreUI.Key">
+<core:interfaceName>com.enactor.core.entities.IEntityKey</core:interfaceName>
+                            </core:sourceDataType>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+        </core:actionOutputMappings>
+        <core:eventLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID>ItemsLoop</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:event>StateEntered</core:event>
+        </core:eventLink>
+        <core:eventLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>LoadTender</core:toActionID>
+            <core:condition>(!state.payPalTenderItem.isRefund &amp;&amp; state.payPalTenderItem.paymentDate == null) || (state.payPalTenderItem.isRefund &amp;&amp; !notEmpty(state.payPalTenderItem.transactionId))</core:condition>
+            <core:event>StateEntered</core:event>
+        </core:eventLink>
+    </core:state>
+    <core:messageState>
+        <core:url>/ErrorMessage/ModalOK</core:url>
+        <core:stateID>CaptureFault</core:stateID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.states.UIMessageState</core:className>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2373</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>355</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.PayPalTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.IPayPalTenderItem</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.MerchantAccountCredentials">
+                    <core:interfaceName>com.enactor.mfc.accountCredentials.IAccountCredentials</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="true" name="enactor.mfc.PayPalTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.IPayPalTenderItem</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <handledEvents>
+                <handledEvent name="OKPressed"/>
+            </handledEvents>
+            <stateDataTypes>
+                <stateDataType name="enactor.commonUI.WebService.Exception">
+                    <core:interfaceName>java.lang.Throwable</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="true" name="enactor.mfc.PayPalTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.IPayPalTenderItem</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="true" name="enactor.mfc.MerchantAccountCredentials">
+                    <core:interfaceName>com.enactor.mfc.accountCredentials.IAccountCredentials</core:interfaceName>
+                </stateDataType>
+            </stateDataTypes>
+        </core:metaData>
+        <core:typeId>enactor.types.MessageState</core:typeId>
+        <core:singleInstance>false</core:singleInstance>
+        <core:respondToViewEvents>false</core:respondToViewEvents>
+        <core:actionInputMappings/>
+        <core:actionOutputMappings/>
+        <core:eventLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>TestOnlineVoidRequired</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>OKPressed</core:event>
+        </core:eventLink>
+        <core:keepPromptOpen>false</core:keepPromptOpen>
+        <core:keepPreviousPromptOpen>false</core:keepPreviousPromptOpen>
+        <core:promptTimeout>0</core:promptTimeout>
+        <core:hideOpenPrompt>false</core:hideOpenPrompt>
+        <core:allowDatabasePromptLookup>false</core:allowDatabasePromptLookup>
+        <core:messageBase>Pos/PayPal/PayPalMessages</core:messageBase>
+        <core:messageId>CAPTURE_FAULT</core:messageId>
+        <core:messageText></core:messageText>
+    </core:messageState>
+    <core:messageState>
+        <core:url>/ErrorMessage/ModalOK</core:url>
+        <core:stateID>CaptureFaultMessage</core:stateID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.states.UIMessageState</core:className>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2373</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>442</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.PayPalTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.IPayPalTenderItem</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.MerchantAccountCredentials">
+                    <core:interfaceName>com.enactor.mfc.accountCredentials.IAccountCredentials</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="true" name="enactor.mfc.PayPalTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.IPayPalTenderItem</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <handledEvents>
+                <handledEvent name="OKPressed"/>
+            </handledEvents>
+            <stateDataTypes>
+                <stateDataType name="enactor.commonUI.WebService.Exception">
+                    <core:interfaceName>java.lang.Throwable</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="true" name="enactor.mfc.PayPalTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.IPayPalTenderItem</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="true" name="enactor.mfc.MerchantAccountCredentials">
+                    <core:interfaceName>com.enactor.mfc.accountCredentials.IAccountCredentials</core:interfaceName>
+                </stateDataType>
+            </stateDataTypes>
+        </core:metaData>
+        <core:typeId>enactor.types.MessageState</core:typeId>
+        <core:singleInstance>false</core:singleInstance>
+        <core:respondToViewEvents>false</core:respondToViewEvents>
+        <core:actionInputMappings/>
+        <core:actionOutputMappings/>
+        <core:eventLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>TestOnlineVoidRequired</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>OKPressed</core:event>
+        </core:eventLink>
+        <core:keepPromptOpen>false</core:keepPromptOpen>
+        <core:keepPreviousPromptOpen>false</core:keepPreviousPromptOpen>
+        <core:promptTimeout>0</core:promptTimeout>
+        <core:hideOpenPrompt>false</core:hideOpenPrompt>
+        <core:allowDatabasePromptLookup>false</core:allowDatabasePromptLookup>
+        <core:messageBase>Pos/PayPal/PayPalMessages</core:messageBase>
+        <core:messageId>CAPTURE_FAULT_MESSAGE</core:messageId>
+        <core:messageText></core:messageText>
+    </core:messageState>
+    <core:state>
+        <core:url></core:url>
+        <core:stateID>ItemsLoop</core:stateID>
+        <core:name></core:name>
+        <core:className></core:className>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>652</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>693</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <handledEvents>
+                <handledEvent name="StateEntered"/>
+            </handledEvents>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicState</core:typeId>
+        <core:singleInstance>false</core:singleInstance>
+        <core:respondToViewEvents>false</core:respondToViewEvents>
+        <core:actionInputMappings/>
+        <core:actionOutputMappings/>
+        <core:eventLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>BasketItemLoop</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>StateEntered</core:event>
+        </core:eventLink>
+    </core:state>
+    <core:messageState>
+        <core:url>/ErrorMessage/ModalOK</core:url>
+        <core:stateID>TrainingModeLiveAccount</core:stateID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.states.UIMessageState</core:className>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2373</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>169</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.MerchantAccountCredentials">
+                    <core:interfaceName>com.enactor.mfc.accountCredentials.IAccountCredentials</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.PayPalTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.IPayPalTenderItem</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="true" name="enactor.mfc.PayPalTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.IPayPalTenderItem</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <handledEvents>
+                <handledEvent name="OKPressed"/>
+            </handledEvents>
+            <stateDataTypes>
+                <stateDataType required="true" name="enactor.mfc.MerchantAccountCredentials">
+                    <core:interfaceName>com.enactor.mfc.accountCredentials.IAccountCredentials</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="true" name="enactor.mfc.PayPalTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.IPayPalTenderItem</core:interfaceName>
+                </stateDataType>
+            </stateDataTypes>
+        </core:metaData>
+        <core:typeId>ErrorMessage</core:typeId>
+        <core:singleInstance>false</core:singleInstance>
+        <core:respondToViewEvents>false</core:respondToViewEvents>
+        <core:actionInputMappings/>
+        <core:actionOutputMappings/>
+        <core:eventLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>TestOnlineVoidRequired</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>OKPressed</core:event>
+        </core:eventLink>
+        <core:keepPromptOpen>false</core:keepPromptOpen>
+        <core:keepPreviousPromptOpen>false</core:keepPreviousPromptOpen>
+        <core:promptTimeout>0</core:promptTimeout>
+        <core:hideOpenPrompt>false</core:hideOpenPrompt>
+        <core:allowDatabasePromptLookup>false</core:allowDatabasePromptLookup>
+        <core:messageBase>Pos/PayPal/PayPalMessages</core:messageBase>
+        <core:messageId>TRAINING_MODE_LIVE_ACCOUNT</core:messageId>
+        <core:messageText></core:messageText>
+    </core:messageState>
+    <core:messageState>
+        <core:url>/ErrorMessage/ModalOK</core:url>
+        <core:stateID>CaptureServiceError</core:stateID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.states.UIMessageState</core:className>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2373</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>618</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.PayPalTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.IPayPalTenderItem</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.MerchantAccountCredentials">
+                    <core:interfaceName>com.enactor.mfc.accountCredentials.IAccountCredentials</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="true" name="enactor.mfc.PayPalTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.IPayPalTenderItem</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <handledEvents>
+                <handledEvent name="OKPressed"/>
+            </handledEvents>
+            <stateDataTypes>
+                <stateDataType name="enactor.commonUI.WebService.Exception">
+                    <core:interfaceName>java.lang.Throwable</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="true" name="enactor.mfc.PayPalTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.IPayPalTenderItem</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="true" name="enactor.mfc.MerchantAccountCredentials">
+                    <core:interfaceName>com.enactor.mfc.accountCredentials.IAccountCredentials</core:interfaceName>
+                </stateDataType>
+            </stateDataTypes>
+        </core:metaData>
+        <core:typeId>enactor.types.MessageState</core:typeId>
+        <core:singleInstance>false</core:singleInstance>
+        <core:respondToViewEvents>false</core:respondToViewEvents>
+        <core:actionInputMappings/>
+        <core:actionOutputMappings/>
+        <core:eventLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>TestOnlineVoidRequired</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>OKPressed</core:event>
+        </core:eventLink>
+        <core:keepPromptOpen>false</core:keepPromptOpen>
+        <core:keepPreviousPromptOpen>false</core:keepPreviousPromptOpen>
+        <core:promptTimeout>0</core:promptTimeout>
+        <core:hideOpenPrompt>false</core:hideOpenPrompt>
+        <core:allowDatabasePromptLookup>false</core:allowDatabasePromptLookup>
+        <core:messageBase>Pos/PayPal/PayPalMessages</core:messageBase>
+        <core:messageId>CAPTURE_SERVICE_ERROR</core:messageId>
+        <core:messageText></core:messageText>
+    </core:messageState>
+    <core:messageState>
+        <core:url>/ErrorMessage/ModalOK</core:url>
+        <core:stateID>VoidSuccess</core:stateID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.states.UIMessageState</core:className>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1613</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>151</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.PayPalTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.IPayPalTenderItem</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <handledEvents>
+                <handledEvent name="OKPressed"/>
+            </handledEvents>
+            <stateDataTypes>
+                <stateDataType name="enactor.commonUI.WebService.Exception">
+                    <core:interfaceName>java.lang.Throwable</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="true" name="enactor.mfc.PayPalTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.IPayPalTenderItem</core:interfaceName>
+                </stateDataType>
+            </stateDataTypes>
+        </core:metaData>
+        <core:typeId>enactor.types.MessageState</core:typeId>
+        <core:singleInstance>false</core:singleInstance>
+        <core:respondToViewEvents>false</core:respondToViewEvents>
+        <core:actionInputMappings/>
+        <core:actionOutputMappings/>
+        <core:eventLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>Fail:VoidPayPalTender</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>OKPressed</core:event>
+        </core:eventLink>
+        <core:keepPromptOpen>false</core:keepPromptOpen>
+        <core:keepPreviousPromptOpen>false</core:keepPreviousPromptOpen>
+        <core:promptTimeout>0</core:promptTimeout>
+        <core:hideOpenPrompt>false</core:hideOpenPrompt>
+        <core:allowDatabasePromptLookup>false</core:allowDatabasePromptLookup>
+        <core:messageBase>Pos/PayPal/PayPalMessages</core:messageBase>
+        <core:messageId>VOID_CAPTURE_SUCCESS</core:messageId>
+        <core:messageText></core:messageText>
+    </core:messageState>
+    <core:messageState>
+        <core:url>/ErrorMessage/ModalOK</core:url>
+        <core:stateID>VoidFail</core:stateID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.states.UIMessageState</core:className>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1613</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>71</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.PayPalTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.IPayPalTenderItem</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <handledEvents>
+                <handledEvent name="OKPressed"/>
+            </handledEvents>
+            <stateDataTypes>
+                <stateDataType name="enactor.commonUI.WebService.Exception">
+                    <core:interfaceName>java.lang.Throwable</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="true" name="enactor.mfc.PayPalTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.IPayPalTenderItem</core:interfaceName>
+                </stateDataType>
+            </stateDataTypes>
+        </core:metaData>
+        <core:typeId>enactor.types.MessageState</core:typeId>
+        <core:singleInstance>false</core:singleInstance>
+        <core:respondToViewEvents>false</core:respondToViewEvents>
+        <core:actionInputMappings/>
+        <core:actionOutputMappings/>
+        <core:eventLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>Fail:VoidPayPalTender</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>OKPressed</core:event>
+        </core:eventLink>
+        <core:keepPromptOpen>false</core:keepPromptOpen>
+        <core:keepPreviousPromptOpen>false</core:keepPreviousPromptOpen>
+        <core:promptTimeout>0</core:promptTimeout>
+        <core:hideOpenPrompt>false</core:hideOpenPrompt>
+        <core:allowDatabasePromptLookup>false</core:allowDatabasePromptLookup>
+        <core:messageBase>Pos/PayPal/PayPalMessages</core:messageBase>
+        <core:messageId>VOID_CAPTURE_FAIL</core:messageId>
+        <core:messageText></core:messageText>
+    </core:messageState>
+    <core:messageState>
+        <core:url>/ErrorMessage/ModalOK</core:url>
+        <core:stateID>RefundFaultMessage</core:stateID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.states.UIMessageState</core:className>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2373</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>794</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.PayPalTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.IPayPalTenderItem</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.MerchantAccountCredentials">
+                    <core:interfaceName>com.enactor.mfc.accountCredentials.IAccountCredentials</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="true" name="enactor.mfc.PayPalTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.IPayPalTenderItem</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <handledEvents>
+                <handledEvent name="OKPressed"/>
+            </handledEvents>
+            <stateDataTypes>
+                <stateDataType name="enactor.commonUI.WebService.Exception">
+                    <core:interfaceName>java.lang.Throwable</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="true" name="enactor.mfc.PayPalTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.IPayPalTenderItem</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="true" name="enactor.mfc.MerchantAccountCredentials">
+                    <core:interfaceName>com.enactor.mfc.accountCredentials.IAccountCredentials</core:interfaceName>
+                </stateDataType>
+            </stateDataTypes>
+        </core:metaData>
+        <core:typeId>enactor.types.MessageState</core:typeId>
+        <core:singleInstance>false</core:singleInstance>
+        <core:respondToViewEvents>false</core:respondToViewEvents>
+        <core:actionInputMappings/>
+        <core:actionOutputMappings/>
+        <core:eventLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>TestOnlineVoidRequired</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>OKPressed</core:event>
+        </core:eventLink>
+        <core:keepPromptOpen>false</core:keepPromptOpen>
+        <core:keepPreviousPromptOpen>false</core:keepPreviousPromptOpen>
+        <core:promptTimeout>0</core:promptTimeout>
+        <core:hideOpenPrompt>false</core:hideOpenPrompt>
+        <core:allowDatabasePromptLookup>false</core:allowDatabasePromptLookup>
+        <core:messageBase>Pos/PayPal/PayPalMessages</core:messageBase>
+        <core:messageId>REFUND_FAULT_MESSAGE</core:messageId>
+        <core:messageText></core:messageText>
+    </core:messageState>
+    <core:messageState>
+        <core:url>/ErrorMessage/ModalOK</core:url>
+        <core:stateID>RefundFault</core:stateID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.states.UIMessageState</core:className>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2373</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>704</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.PayPalTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.IPayPalTenderItem</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.MerchantAccountCredentials">
+                    <core:interfaceName>com.enactor.mfc.accountCredentials.IAccountCredentials</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="true" name="enactor.mfc.PayPalTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.IPayPalTenderItem</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <handledEvents>
+                <handledEvent name="OKPressed"/>
+            </handledEvents>
+            <stateDataTypes>
+                <stateDataType name="enactor.commonUI.WebService.Exception">
+                    <core:interfaceName>java.lang.Throwable</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="true" name="enactor.mfc.PayPalTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.IPayPalTenderItem</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="true" name="enactor.mfc.MerchantAccountCredentials">
+                    <core:interfaceName>com.enactor.mfc.accountCredentials.IAccountCredentials</core:interfaceName>
+                </stateDataType>
+            </stateDataTypes>
+        </core:metaData>
+        <core:typeId>enactor.types.MessageState</core:typeId>
+        <core:singleInstance>false</core:singleInstance>
+        <core:respondToViewEvents>false</core:respondToViewEvents>
+        <core:actionInputMappings/>
+        <core:actionOutputMappings/>
+        <core:eventLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>TestOnlineVoidRequired</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>OKPressed</core:event>
+        </core:eventLink>
+        <core:keepPromptOpen>false</core:keepPromptOpen>
+        <core:keepPreviousPromptOpen>false</core:keepPreviousPromptOpen>
+        <core:promptTimeout>0</core:promptTimeout>
+        <core:hideOpenPrompt>false</core:hideOpenPrompt>
+        <core:allowDatabasePromptLookup>false</core:allowDatabasePromptLookup>
+        <core:messageBase>Pos/PayPal/PayPalMessages</core:messageBase>
+        <core:messageId>REFUND_FAULT</core:messageId>
+        <core:messageText></core:messageText>
+    </core:messageState>
+    <core:messageState>
+        <core:url>/ErrorMessage/ModalOK</core:url>
+        <core:stateID>CaptureFaultMessageFull</core:stateID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.states.UIMessageState</core:className>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2373</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>530</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.PayPalTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.IPayPalTenderItem</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.MerchantAccountCredentials">
+                    <core:interfaceName>com.enactor.mfc.accountCredentials.IAccountCredentials</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="true" name="enactor.mfc.PayPalTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.IPayPalTenderItem</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <handledEvents>
+                <handledEvent name="OKPressed"/>
+            </handledEvents>
+            <stateDataTypes>
+                <stateDataType name="enactor.commonUI.WebService.Exception">
+                    <core:interfaceName>java.lang.Throwable</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="true" name="enactor.mfc.PayPalTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.IPayPalTenderItem</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="true" name="enactor.mfc.MerchantAccountCredentials">
+                    <core:interfaceName>com.enactor.mfc.accountCredentials.IAccountCredentials</core:interfaceName>
+                </stateDataType>
+            </stateDataTypes>
+        </core:metaData>
+        <core:typeId>enactor.types.MessageState</core:typeId>
+        <core:singleInstance>false</core:singleInstance>
+        <core:respondToViewEvents>false</core:respondToViewEvents>
+        <core:actionInputMappings/>
+        <core:actionOutputMappings/>
+        <core:eventLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>TestOnlineVoidRequired</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>OKPressed</core:event>
+        </core:eventLink>
+        <core:keepPromptOpen>false</core:keepPromptOpen>
+        <core:keepPreviousPromptOpen>false</core:keepPreviousPromptOpen>
+        <core:promptTimeout>0</core:promptTimeout>
+        <core:hideOpenPrompt>false</core:hideOpenPrompt>
+        <core:allowDatabasePromptLookup>false</core:allowDatabasePromptLookup>
+        <core:messageBase>Pos/PayPal/PayPalMessages</core:messageBase>
+        <core:messageId>CAPTURE_FAULT_MESSAGE_FULL</core:messageId>
+        <core:messageText></core:messageText>
+    </core:messageState>
+    <core:messageState>
+        <core:url>/ErrorMessage/ModalOK</core:url>
+        <core:stateID>RefundServiceTimeout</core:stateID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.states.UIMessageState</core:className>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2373</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>885</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.PayPalTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.IPayPalTenderItem</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.MerchantAccountCredentials">
+                    <core:interfaceName>com.enactor.mfc.accountCredentials.IAccountCredentials</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="true" name="enactor.mfc.PayPalTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.IPayPalTenderItem</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <handledEvents>
+                <handledEvent name="OKPressed"/>
+            </handledEvents>
+            <stateDataTypes>
+                <stateDataType name="enactor.commonUI.WebService.Exception">
+                    <core:interfaceName>java.lang.Throwable</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="true" name="enactor.mfc.PayPalTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.IPayPalTenderItem</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="true" name="enactor.mfc.MerchantAccountCredentials">
+                    <core:interfaceName>com.enactor.mfc.accountCredentials.IAccountCredentials</core:interfaceName>
+                </stateDataType>
+            </stateDataTypes>
+        </core:metaData>
+        <core:typeId>enactor.types.MessageState</core:typeId>
+        <core:singleInstance>false</core:singleInstance>
+        <core:respondToViewEvents>false</core:respondToViewEvents>
+        <core:actionInputMappings/>
+        <core:actionOutputMappings/>
+        <core:eventLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>TestOnlineVoidRequired</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>OKPressed</core:event>
+        </core:eventLink>
+        <core:keepPromptOpen>false</core:keepPromptOpen>
+        <core:keepPreviousPromptOpen>false</core:keepPreviousPromptOpen>
+        <core:promptTimeout>0</core:promptTimeout>
+        <core:hideOpenPrompt>false</core:hideOpenPrompt>
+        <core:allowDatabasePromptLookup>false</core:allowDatabasePromptLookup>
+        <core:messageBase>Pos/PayPal/PayPalMessages</core:messageBase>
+        <core:messageId>REFUND_SERVICE_TIMEOUT</core:messageId>
+        <core:messageText></core:messageText>
+    </core:messageState>
+    <core:messageState>
+        <core:url>/ErrorMessage/ModalOK</core:url>
+        <core:stateID>VoidAfterTimeoutSuccess</core:stateID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.states.UIMessageState</core:className>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2595</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>49</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.PayPalTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.IPayPalTenderItem</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <handledEvents>
+                <handledEvent name="OKPressed"/>
+            </handledEvents>
+            <stateDataTypes>
+                <stateDataType name="enactor.commonUI.WebService.Exception">
+                    <core:interfaceName>java.lang.Throwable</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="true" name="enactor.mfc.PayPalTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.IPayPalTenderItem</core:interfaceName>
+                </stateDataType>
+            </stateDataTypes>
+        </core:metaData>
+        <core:typeId>enactor.types.MessageState</core:typeId>
+        <core:singleInstance>false</core:singleInstance>
+        <core:respondToViewEvents>false</core:respondToViewEvents>
+        <core:actionInputMappings/>
+        <core:actionOutputMappings/>
+        <core:eventLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>Fail:VoidPayPalTender</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>OKPressed</core:event>
+        </core:eventLink>
+        <core:keepPromptOpen>false</core:keepPromptOpen>
+        <core:keepPreviousPromptOpen>false</core:keepPreviousPromptOpen>
+        <core:promptTimeout>0</core:promptTimeout>
+        <core:hideOpenPrompt>false</core:hideOpenPrompt>
+        <core:allowDatabasePromptLookup>false</core:allowDatabasePromptLookup>
+        <core:messageBase>Pos/PayPal/PayPalMessages</core:messageBase>
+        <core:messageId>VOID_CAPTURE_AFTER_TIMEOUT_SUCCESS</core:messageId>
+        <core:messageText></core:messageText>
+    </core:messageState>
+    <core:messageState>
+        <core:url>/ErrorMessage/ModalOK</core:url>
+        <core:stateID>VoidAfterTimeoutFail</core:stateID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.states.UIMessageState</core:className>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2595</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>248</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.PayPalTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.IPayPalTenderItem</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <handledEvents>
+                <handledEvent name="OKPressed"/>
+            </handledEvents>
+            <stateDataTypes>
+                <stateDataType name="enactor.commonUI.WebService.Exception">
+                    <core:interfaceName>java.lang.Throwable</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="true" name="enactor.mfc.PayPalTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.IPayPalTenderItem</core:interfaceName>
+                </stateDataType>
+            </stateDataTypes>
+        </core:metaData>
+        <core:typeId>enactor.types.MessageState</core:typeId>
+        <core:singleInstance>false</core:singleInstance>
+        <core:respondToViewEvents>false</core:respondToViewEvents>
+        <core:actionInputMappings/>
+        <core:actionOutputMappings/>
+        <core:eventLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>Fail:VoidPayPalTender</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>OKPressed</core:event>
+        </core:eventLink>
+        <core:keepPromptOpen>false</core:keepPromptOpen>
+        <core:keepPreviousPromptOpen>false</core:keepPreviousPromptOpen>
+        <core:promptTimeout>0</core:promptTimeout>
+        <core:hideOpenPrompt>false</core:hideOpenPrompt>
+        <core:allowDatabasePromptLookup>false</core:allowDatabasePromptLookup>
+        <core:messageBase>Pos/PayPal/PayPalMessages</core:messageBase>
+        <core:messageId>VOID_CAPTURE_FAIL</core:messageId>
+        <core:messageText></core:messageText>
+    </core:messageState>
+    <core:messageState>
+        <core:url>/ErrorMessage/ModalOK</core:url>
+        <core:stateID>VoidFailAlreadyCaptured</core:stateID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.states.UIMessageState</core:className>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2595</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>146</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.PayPalTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.IPayPalTenderItem</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <handledEvents>
+                <handledEvent name="OKPressed"/>
+            </handledEvents>
+            <stateDataTypes>
+                <stateDataType name="enactor.commonUI.WebService.Exception">
+                    <core:interfaceName>java.lang.Throwable</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="true" name="enactor.mfc.PayPalTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.IPayPalTenderItem</core:interfaceName>
+                </stateDataType>
+            </stateDataTypes>
+        </core:metaData>
+        <core:typeId>enactor.types.MessageState</core:typeId>
+        <core:singleInstance>false</core:singleInstance>
+        <core:respondToViewEvents>false</core:respondToViewEvents>
+        <core:actionInputMappings/>
+        <core:actionOutputMappings/>
+        <core:eventLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>Fail:VoidPayPalTender</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>OKPressed</core:event>
+        </core:eventLink>
+        <core:keepPromptOpen>false</core:keepPromptOpen>
+        <core:keepPreviousPromptOpen>false</core:keepPreviousPromptOpen>
+        <core:promptTimeout>0</core:promptTimeout>
+        <core:hideOpenPrompt>false</core:hideOpenPrompt>
+        <core:allowDatabasePromptLookup>false</core:allowDatabasePromptLookup>
+        <core:messageBase>Pos/PayPal/PayPalMessages</core:messageBase>
+        <core:messageId>VOID_CAPTURE_FAIL_ALREADY_CAPTURED</core:messageId>
+        <core:messageText></core:messageText>
+    </core:messageState>
+    <core:stateTransitions/>
+</core:process>

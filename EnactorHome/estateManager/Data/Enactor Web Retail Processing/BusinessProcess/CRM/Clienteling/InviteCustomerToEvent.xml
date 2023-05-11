@@ -1,0 +1,1379 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<core:simpleActivityFlowBusinessProcess xmlns:core="http://www.enactor.com/core" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803" xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:ns10="tools" xmlns:ns8="http://maven.apache.org/POM/4.0.0" xmlns:retail="http://www.enactor.com/retail" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:tools="http://www.enactor.com/tools">
+    <core:processId>CRM/Clienteling/InviteCustomerToEvent</core:processId>
+    <core:name>Invite Customer to Event Process</core:name>
+    <core:description>Invite Customer to an Event</core:description>
+    <core:businessProcessTypeId>CRM/Clienteling/InviteCustomerToEventType</core:businessProcessTypeId>
+    <core:startPrivilege>enactor.crm.inviteCustomer.Run</core:startPrivilege>
+    <core:administerPrivilege>enactor.crm.inviteCustomer.Admin</core:administerPrivilege>
+    <core:deprecated>false</core:deprecated>
+    <core:metaData>
+        <core:inputs>
+            <core:input required="true" name="enactor.mfc.CustomerNumber">
+                <core:interfaceName>java.lang.String</core:interfaceName>
+            </core:input>
+            <core:input required="true" name="enactor.mfc.CampaignId">
+                <core:interfaceName>java.lang.String</core:interfaceName>
+            </core:input>
+            <core:input required="true" name="enactor.mfc.CampaignItemId">
+                <core:interfaceName>java.lang.String</core:interfaceName>
+            </core:input>
+            <core:input required="true" name="enactor.mfc.CommunicationScriptId">
+                <core:interfaceName>java.lang.String</core:interfaceName>
+            </core:input>
+        </core:inputs>
+    </core:metaData>
+    <core:uiSettings xsi:type="tools:BusinessProcessSettings" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <core:constraint xsi:type="core:UIPositionConstraint">
+            <core:x>26</core:x>
+            <core:y>33</core:y>
+        </core:constraint>
+        <tools:swimLanes>
+            <tools:lane label="System" height="353" id="Lane 1"/>
+            <tools:lane label="Initiator or Admin" height="56" id="Lane 2"/>
+            <tools:lane label="Salesperson" height="732" id="Lane 3"/>
+            <tools:lane label="Campaign Service" height="400" id="Lane 4"/>
+        </tools:swimLanes>
+        <tools:notes xsi:type="core:WrappedList">
+            <core:listElement>
+                <core:value xsi:type="tools:BPNote">
+                    <tools:noteId>Note1</tools:noteId>
+                    <tools:swimLaneId>Lane 3</tools:swimLaneId>
+                    <tools:description>Need to wait for email here. HT used in the absence of a server wait</tools:description>
+                    <tools:constraint>
+                        <core:x>1364</core:x>
+                        <core:y>324</core:y>
+                        <core:height>107</core:height>
+                        <core:width>152</core:width>
+                    </tools:constraint>
+                </core:value>
+                <core:index>0</core:index>
+            </core:listElement>
+            <core:listElement>
+                <core:value xsi:type="tools:BPNote">
+                    <tools:noteId>Note0</tools:noteId>
+                    <tools:swimLaneId>Lane 4</tools:swimLaneId>
+                    <tools:description>The outcome here is used as the 'status' for updating the campaign item</tools:description>
+                    <tools:constraint>
+                        <core:x>2431</core:x>
+                        <core:y>54</core:y>
+                        <core:height>67</core:height>
+                        <core:width>160</core:width>
+                    </tools:constraint>
+                </core:value>
+                <core:index>1</core:index>
+            </core:listElement>
+        </tools:notes>
+    </core:uiSettings>
+    <core:activities xsi:type="core:WrappedList" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <core:listElement>
+            <core:value xsi:type="core:EndProcessActivity">
+                <core:activityId>CompletedNoCampaign</core:activityId>
+                <core:name>Completed</core:name>
+                <core:activityTypeId>Generic/EndProcessActivityType</core:activityTypeId>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>2423</core:x>
+                        <core:y>40</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 3</tools:swimLaneId>
+                    <tools:style>1</tools:style>
+                </core:uiSettings>
+                <core:discard>false</core:discard>
+            </core:value>
+            <core:index>0</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:HTActivity">
+                <core:activityId>SetUpCustomerInvitation</core:activityId>
+                <core:name>Set up Customer Invitation</core:name>
+                <core:activityTypeId>CRM/SetUpCustomerInvitationActivityType</core:activityTypeId>
+                <core:suspendActivityOutcome name="Suspend">
+                    <core:toActivity>SetUpCustomerInvitation</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:suspendActivityOutcome>
+                <core:activityOutcome name="Cancel">
+                    <core:toActivity>Discard</core:toActivity>
+                    <core:proceedImmediately>false</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:activityOutcome name="Success">
+                    <core:toActivity>EvaluateSenderEmail</core:toActivity>
+                    <core:proceedImmediately>false</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>410</core:x>
+                        <core:y>12</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 2</tools:swimLaneId>
+                </core:uiSettings>
+                <core:metaData>
+                    <core:outputs>
+                        <core:output required="true" name="enactor.mfc.CustomerNumber">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:output>
+                        <core:output required="true" name="enactor.mfc.LoyaltyAccountId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:output>
+                        <core:output required="true" name="enactor.mfc.CommunicationScriptId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:output>
+                        <core:output required="true" name="enactor.mfc.CustomerName">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:output>
+                    </core:outputs>
+                </core:metaData>
+                <core:jobType>Customer Event Invitation</core:jobType>
+                <core:jobHeader>Invite Customer to Event</core:jobHeader>
+                <core:jobDescription>Invite Customer to Event</core:jobDescription>
+                <core:displayDescriptionMessageBase>CRM/CustomerRegistrationMessages</core:displayDescriptionMessageBase>
+                <core:displayDescriptionMessageId>SETUP_EVENT_INVITATION_SUBTITLE</core:displayDescriptionMessageId>
+                <core:displayTitleMessageBase>CRM/CustomerRegistrationMessages</core:displayTitleMessageBase>
+                <core:displayTitleMessageId>SETUP_EVENT_INVITATION_TITLE</core:displayTitleMessageId>
+                <core:priority>5</core:priority>
+                <core:peopleGroupEvaluator>{http://www.enactor.com/task}SimpleUserEvaluator</core:peopleGroupEvaluator>
+            </core:value>
+            <core:index>1</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:StartActivity">
+                <core:activityId>StartCustomerEventInvitation</core:activityId>
+                <core:name>Start</core:name>
+                <core:activityTypeId>Generic/StartProcessActivityType</core:activityTypeId>
+                <core:activityOutcome name="Success">
+                    <core:toActivity>SetUpCustomerInvitation</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>299</core:x>
+                        <core:y>78</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 2</tools:swimLaneId>
+                </core:uiSettings>
+            </core:value>
+            <core:index>2</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:EndProcessActivity">
+                <core:activityId>Discard</core:activityId>
+                <core:activityTypeId>Generic/EndProcessActivityType</core:activityTypeId>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>413</core:x>
+                        <core:y>273</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 2</tools:swimLaneId>
+                </core:uiSettings>
+                <core:discard>true</core:discard>
+            </core:value>
+            <core:index>3</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:HTActivity">
+                <core:activityId>WaitForResponse</core:activityId>
+                <core:name>Wait For Response</core:name>
+                <core:activityTypeId>CRM/Clienteling/Email/WaitForResponse</core:activityTypeId>
+                <core:activityOutcome name="ResponseReceived">
+                    <core:toActivity>SetStatusPotRespRecd</core:toActivity>
+                    <core:proceedImmediately>false</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:activityOutcome name="PotentialResponse">
+                    <core:toActivity>SetStatusToPotRespRecd2</core:toActivity>
+                    <core:proceedImmediately>false</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:activityOutcome name="Timeout">
+                    <core:toActivity>NoResponse</core:toActivity>
+                    <core:proceedImmediately>false</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:activityOutcome name="Attending">
+                    <core:toActivity>SetStatusAttending</core:toActivity>
+                    <core:proceedImmediately>false</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:activityOutcome name="NotAttending">
+                    <core:toActivity>CheckCampaign</core:toActivity>
+                    <core:proceedImmediately>false</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:suspendActivityOutcome name="Suspend">
+                    <core:toActivity>WaitForResponse</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:suspendActivityOutcome>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>1371</core:x>
+                        <core:y>13</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 3</tools:swimLaneId>
+                    <tools:noteReference name="Note Link">
+                        <core:toActivity>Note1</core:toActivity>
+                        <core:proceedImmediately>true</core:proceedImmediately>
+                    </tools:noteReference>
+                </core:uiSettings>
+                <core:metaData>
+                    <core:inputs>
+                        <core:input name="enactor.core.email.InboundMessageId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.core.email.OutboundMessageId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.mfc.CustomerName">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.mfc.CampaignItemId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.mfc.CustomerNumber">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                    </core:inputs>
+                    <core:outputs>
+                        <core:output required="true" name="enactor.core.email.InboundMessageId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:output>
+                    </core:outputs>
+                </core:metaData>
+                <core:jobType>Customer Event Invitation</core:jobType>
+                <core:jobHeader>Await response from #{customerName}</core:jobHeader>
+                <core:jobDescription>Waiting for response for event invitation sent to #{customerName}</core:jobDescription>
+                <core:displayDescriptionMessageBase>CRM/Clienteling/ClientelingMessages</core:displayDescriptionMessageBase>
+                <core:displayDescriptionMessageId>WAIT_FOR_RESPONSE_DESCRIPTION</core:displayDescriptionMessageId>
+                <core:displayTitleMessageBase>CRM/Clienteling/ClientelingMessages</core:displayTitleMessageBase>
+                <core:displayTitleMessageId>WAIT_FOR_RESPONSE_TITLE</core:displayTitleMessageId>
+                <core:peopleGroupEvaluator>{http://www.enactor.com/task}SimpleUserEvaluator</core:peopleGroupEvaluator>
+                <core:peopleGroupParameters>
+                    <core:parameter name="userId">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>#{mailBoxName},BPEL_RT_SYSTEM</core:value>
+                    </core:parameter>
+                </core:peopleGroupParameters>
+            </core:value>
+            <core:index>4</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:HTActivity">
+                <core:activityId>ClassifyResponse</core:activityId>
+                <core:name>Classify Customer Response</core:name>
+                <core:activityTypeId>CRM/Clienteling/Email/ClassifyResponse</core:activityTypeId>
+                <core:activityOutcome name="Attending">
+                    <core:toActivity>SetStatusAttending</core:toActivity>
+                    <core:proceedImmediately>false</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:activityOutcome name="NotAttending">
+                    <core:toActivity>CheckCampaign</core:toActivity>
+                    <core:proceedImmediately>false</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:suspendActivityOutcome name="Suspend">
+                    <core:toActivity>ClassifyResponse</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:suspendActivityOutcome>
+                <core:activityOutcome name="IrrelevantResponse">
+                    <core:toActivity>SetStatusAwaitResponse</core:toActivity>
+                    <core:proceedImmediately>false</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>1947</core:x>
+                        <core:y>99</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 3</tools:swimLaneId>
+                </core:uiSettings>
+                <core:metaData>
+                    <core:inputs>
+                        <core:input required="true" name="enactor.core.email.InboundMessageId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.mfc.CampaignItemId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.mfc.CustomerName">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.mfc.CustomerNumber">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                    </core:inputs>
+                </core:metaData>
+                <core:jobType>Customer Event Invitation</core:jobType>
+                <core:jobHeader>Classify response from #{customerName}</core:jobHeader>
+                <core:jobDescription>Classify response from #{customerName}</core:jobDescription>
+                <core:displayDescriptionMessageBase>CRM/Clienteling/ClientelingMessages</core:displayDescriptionMessageBase>
+                <core:displayDescriptionMessageId>CLASSIFY_RESPONSE_DESCRIPTION</core:displayDescriptionMessageId>
+                <core:displayTitleMessageBase>CRM/Clienteling/ClientelingMessages</core:displayTitleMessageBase>
+                <core:displayTitleMessageId>CLASSIFY_RESPONSE_TITILE</core:displayTitleMessageId>
+                <core:peopleGroupEvaluator>{http://www.enactor.com/task}SimpleUserEvaluator</core:peopleGroupEvaluator>
+                <core:peopleGroupParameters>
+                    <core:parameter name="userId">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>#{mailBoxName}</core:value>
+                    </core:parameter>
+                </core:peopleGroupParameters>
+            </core:value>
+            <core:index>5</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:HTActivity">
+                <core:activityId>CheckResponse</core:activityId>
+                <core:name>Check Potential Customer Response</core:name>
+                <core:activityTypeId>CRM/Clienteling/Email/ClassifyPotentialResponse</core:activityTypeId>
+                <core:activityOutcome name="NotAttending">
+                    <core:toActivity>CheckCampaign</core:toActivity>
+                    <core:proceedImmediately>false</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:activityOutcome name="IrrelevantResponse">
+                    <core:toActivity>SetStatusAwaitResponse</core:toActivity>
+                    <core:proceedImmediately>false</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:activityOutcome name="Attending">
+                    <core:toActivity>SetStatusAttending</core:toActivity>
+                    <core:proceedImmediately>false</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:suspendActivityOutcome name="Suspend">
+                    <core:toActivity>CheckResponse</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:suspendActivityOutcome>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>1952</core:x>
+                        <core:y>398</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 3</tools:swimLaneId>
+                </core:uiSettings>
+                <core:metaData>
+                    <core:inputs>
+                        <core:input required="true" name="enactor.core.email.InboundMessageId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.mfc.CampaignItemId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.mfc.CustomerName">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.mfc.CustomerNumber">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                    </core:inputs>
+                </core:metaData>
+                <core:jobType>Customer Event Invitation</core:jobType>
+                <core:jobHeader>Review potential response from #{customerName}</core:jobHeader>
+                <core:jobDescription>Review potential response from #{customerName}</core:jobDescription>
+                <core:displayDescriptionMessageBase>CRM/Clienteling/ClientelingMessages</core:displayDescriptionMessageBase>
+                <core:displayDescriptionMessageId>REVIEW_POTENTIAL_RESPONSE_DESCRIPTION</core:displayDescriptionMessageId>
+                <core:displayTitleMessageBase>CRM/Clienteling/ClientelingMessages</core:displayTitleMessageBase>
+                <core:displayTitleMessageId>REVIEW_POTENTIAL_RESPONSE_TITLE</core:displayTitleMessageId>
+                <core:peopleGroupEvaluator>{http://www.enactor.com/task}SimpleUserEvaluator</core:peopleGroupEvaluator>
+                <core:peopleGroupParameters>
+                    <core:parameter name="userId">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>#{mailBoxName}</core:value>
+                    </core:parameter>
+                </core:peopleGroupParameters>
+            </core:value>
+            <core:index>6</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:HTActivity">
+                <core:activityId>NoResponse</core:activityId>
+                <core:name>No Response</core:name>
+                <core:activityTypeId>CRM/Clienteling/Email/HandleNoResponse</core:activityTypeId>
+                <core:activityOutcome name="NotAttending">
+                    <core:toActivity>CheckCampaign</core:toActivity>
+                    <core:proceedImmediately>false</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:activityOutcome name="Attending">
+                    <core:toActivity>CheckCampaignPostEvent</core:toActivity>
+                    <core:proceedImmediately>false</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:activityOutcome name="ResponseReceived">
+                    <core:toActivity>SetStatusPotRespRecd</core:toActivity>
+                    <core:proceedImmediately>false</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:suspendActivityOutcome name="Suspend">
+                    <core:toActivity>NoResponse</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:suspendActivityOutcome>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>1955</core:x>
+                        <core:y>694</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 3</tools:swimLaneId>
+                </core:uiSettings>
+                <core:metaData>
+                    <core:inputs>
+                        <core:input required="true" name="enactor.mfc.CustomerName">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.core.email.OutboundMessageId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.mfc.CampaignItemId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.mfc.CustomerNumber">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                    </core:inputs>
+                    <core:outputs/>
+                </core:metaData>
+                <core:jobType>Customer Event Invitation</core:jobType>
+                <core:jobHeader>No response from #{customerName}</core:jobHeader>
+                <core:jobDescription>No response from #{customerName}</core:jobDescription>
+                <core:displayDescriptionMessageBase>CRM/Clienteling/ClientelingMessages</core:displayDescriptionMessageBase>
+                <core:displayDescriptionMessageId>NO_RESPONSE_DESCRIPTION</core:displayDescriptionMessageId>
+                <core:displayTitleMessageBase>CRM/Clienteling/ClientelingMessages</core:displayTitleMessageBase>
+                <core:displayTitleMessageId>NO_RESPONSE_TITLE</core:displayTitleMessageId>
+                <core:peopleGroupEvaluator>{http://www.enactor.com/task}SimpleUserEvaluator</core:peopleGroupEvaluator>
+                <core:peopleGroupParameters>
+                    <core:parameter name="userId">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>#{mailBoxName}</core:value>
+                    </core:parameter>
+                </core:peopleGroupParameters>
+            </core:value>
+            <core:index>7</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:HTActivity">
+                <core:activityId>RecordCustomerAttendance</core:activityId>
+                <core:name>Record Customer Attendance</core:name>
+                <core:activityTypeId>CRM/Clienteling/RecordCustomerAttendance</core:activityTypeId>
+                <core:activityOutcome name="NotAttended">
+                    <core:toActivity>UpdateCampaignStatus</core:toActivity>
+                    <core:proceedImmediately>false</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:activityOutcome name="Attended">
+                    <core:toActivity>UpdateCampaignStatus</core:toActivity>
+                    <core:proceedImmediately>false</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:suspendActivityOutcome name="Suspend">
+                    <core:toActivity>RecordCustomerAttendance</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:suspendActivityOutcome>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>2484</core:x>
+                        <core:y>256</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 3</tools:swimLaneId>
+                    <tools:noteReference name="Note Link">
+                        <core:toActivity>Note0</core:toActivity>
+                        <core:proceedImmediately>true</core:proceedImmediately>
+                    </tools:noteReference>
+                </core:uiSettings>
+                <core:metaData>
+                    <core:inputs>
+                        <core:input required="true" name="enactor.mfc.CustomerName">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.mfc.CampaignItemId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.mfc.CustomerNumber">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                    </core:inputs>
+                    <core:outputs>
+                        <core:output required="true" name="enactor.mfc.AttendanceNotes">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:output>
+                        <core:output required="true" name="enactor.mfc.ManualFollowUp">
+                            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                        </core:output>
+                    </core:outputs>
+                </core:metaData>
+                <core:jobType>Customer Event Invitation</core:jobType>
+                <core:jobHeader>Record event attendance - #{customerName}</core:jobHeader>
+                <core:jobDescription>Record event attendance - #{customerName}</core:jobDescription>
+                <core:displayDescriptionMessageBase>CRM/Clienteling/ClientelingMessages</core:displayDescriptionMessageBase>
+                <core:displayDescriptionMessageId>RECORD_ATTENDANCE_DESCRIPTION</core:displayDescriptionMessageId>
+                <core:displayTitleMessageBase>CRM/Clienteling/ClientelingMessages</core:displayTitleMessageBase>
+                <core:displayTitleMessageId>RECORD_ATTENDANCE_TITLE</core:displayTitleMessageId>
+                <core:peopleGroupEvaluator>{http://www.enactor.com/task}SimpleUserEvaluator</core:peopleGroupEvaluator>
+                <core:peopleGroupParameters>
+                    <core:parameter name="userId">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>#{mailBoxName}</core:value>
+                    </core:parameter>
+                </core:peopleGroupParameters>
+            </core:value>
+            <core:index>8</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:CallProcessActivity">
+                <core:activityId>SetStatusNotAttending</core:activityId>
+                <core:name>Update Campaign Status</core:name>
+                <core:activityTypeId>CRM/Clienteling/UpdateCampaignItemStatus</core:activityTypeId>
+                <core:activityOutcome name="Success">
+                    <core:toActivity>Completed</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:activityOutcome name="Fail">
+                    <core:toActivity>NotifyFailureToUpdateCampaignItem</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:parameters>
+                    <core:parameter name="enactor.mfc.CampaignItemStatus">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>NotAttending</core:value>
+                    </core:parameter>
+                </core:parameters>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>3108</core:x>
+                        <core:y>17</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 4</tools:swimLaneId>
+                </core:uiSettings>
+                <core:metaData>
+                    <core:inputs>
+                        <core:input required="true" name="enactor.mfc.CampaignItemId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.mfc.CampaignItemStatus">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.mfc.CampaignItemStatusDetail">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                    </core:inputs>
+                </core:metaData>
+            </core:value>
+            <core:index>9</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:StartActivity">
+                <core:activityId>Start</core:activityId>
+                <core:activityTypeId>Generic/StartProcessActivityType</core:activityTypeId>
+                <core:activityOutcome name="Success">
+                    <core:toActivity>IfActionActivity-1</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>244</core:x>
+                        <core:y>57</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 1</tools:swimLaneId>
+                </core:uiSettings>
+            </core:value>
+            <core:index>10</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:CallProcessActivity">
+                <core:activityId>EvaluateSenderEmail</core:activityId>
+                <core:name>Evaluate Sender</core:name>
+                <core:activityTypeId>CRM/Clienteling/Email/EvaluateSenderAndTrackingReference</core:activityTypeId>
+                <core:activityOutcome name="Success">
+                    <core:toActivity>SendCustomerEmail</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:activityOutcome name="FailedToEvaluateSender">
+                    <core:toActivity>NotifyFailedEvaluateSender</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:catchAllOutcome xsi:type="core:ActivityOutcome" name="Error">
+                    <core:toActivity>NotifyFailedEvaluateSender</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:catchAllOutcome>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>665</core:x>
+                        <core:y>3</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 1</tools:swimLaneId>
+                </core:uiSettings>
+                <core:metaData>
+                    <core:inputs>
+                        <core:input name="enactor.mfc.CampaignItemId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input name="enactor.mfc.CampaignId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.mfc.CustomerNumber">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                    </core:inputs>
+                    <core:outputs>
+                        <core:output required="true" name="enactor.core.email.SenderAddress">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:output>
+                        <core:output required="true" name="enactor.core.email.TrackingReference">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:output>
+                        <core:output required="true" name="enactor.core.email.MailBoxName">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:output>
+                    </core:outputs>
+                </core:metaData>
+            </core:value>
+            <core:index>11</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:CallProcessActivity">
+                <core:activityId>SendCustomerEmail</core:activityId>
+                <core:name>Send Customer Email</core:name>
+                <core:activityTypeId>CRM/Email/SendCustomerEmailWithTrackingReferenceActivityType</core:activityTypeId>
+                <core:activityOutcome name="Success">
+                    <core:toActivity>SetStatusAwaitResponse</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:activityOutcome name="NoSuchCustomer">
+                    <core:toActivity></core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:activityOutcome name="NoSuchScript">
+                    <core:toActivity></core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:activityOutcome name="NoEmailForCustomer">
+                    <core:toActivity>SetStatusFailedToEmail</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:activityOutcome name="Fail">
+                    <core:toActivity>SetStatusFailedToEmail</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:catchAllOutcome xsi:type="core:ActivityOutcome" name="Error">
+                    <core:toActivity>NotifyFailureToSendEmail</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:catchAllOutcome>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>1030</core:x>
+                        <core:y>-3</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 1</tools:swimLaneId>
+                </core:uiSettings>
+                <core:metaData>
+                    <core:inputs>
+                        <core:input required="true" name="enactor.mfc.CampaignItemId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.mfc.CommunicationScriptId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.mfc.CustomerNumber">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.core.email.MailBoxName">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.core.email.SenderAddress">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.core.email.TrackingReference">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                    </core:inputs>
+                    <core:outputs>
+                        <core:output required="true" name="enactor.core.email.OutboundMessageId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:output>
+                    </core:outputs>
+                </core:metaData>
+            </core:value>
+            <core:index>12</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:HTActivity">
+                <core:activityId>NotifyFailureToSendEmail</core:activityId>
+                <core:name>Notify failure to email</core:name>
+                <core:activityTypeId>CRM/Clienteling/Error/ErrorSendingEmail</core:activityTypeId>
+                <core:suspendActivityOutcome name="Suspend">
+                    <core:toActivity>NotifyFailureToSendEmail</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:suspendActivityOutcome>
+                <core:activityOutcome name="Retry">
+                    <core:toActivity>SendCustomerEmail</core:toActivity>
+                    <core:proceedImmediately>false</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:activityOutcome name="Complete">
+                    <core:toActivity>Cancel</core:toActivity>
+                    <core:proceedImmediately>false</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>1048</core:x>
+                        <core:y>12</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 3</tools:swimLaneId>
+                    <tools:style>15</tools:style>
+                </core:uiSettings>
+                <core:metaData>
+                    <core:inputs>
+                        <core:input required="true" name="enactor.mfc.CampaignId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.core.ErrorDetails">
+                            <core:interfaceName>com.enactor.core.application.process.ErrorDetails</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.mfc.CampaignItemId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.mfc.CustomerName">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.mfc.CustomerNumber">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                    </core:inputs>
+                </core:metaData>
+                <core:jobType>Customer Event Invitation</core:jobType>
+                <core:jobHeader>Failed to Send Email to #{customerName}</core:jobHeader>
+                <core:jobDescription>Failed to Send Email</core:jobDescription>
+                <core:displayDescriptionMessageBase>CRM/Clienteling/ClientelingMessages</core:displayDescriptionMessageBase>
+                <core:displayDescriptionMessageId>FAILED_TO_SEND_EMAIL_DESCRIPTION</core:displayDescriptionMessageId>
+                <core:displayTitleMessageBase>CRM/Clienteling/ClientelingMessages</core:displayTitleMessageBase>
+                <core:displayTitleMessageId>FAILED_TO_SEND_EMAIL_TITLE</core:displayTitleMessageId>
+                <core:priority>5</core:priority>
+                <core:peopleGroupEvaluator>{http://www.enactor.com/task}SimpleUserEvaluator</core:peopleGroupEvaluator>
+                <core:peopleGroupParameters>
+                    <core:parameter name="userId">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>#{mailBoxName}</core:value>
+                    </core:parameter>
+                </core:peopleGroupParameters>
+            </core:value>
+            <core:index>13</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:HTActivity">
+                <core:activityId>NotifyFailedEvaluateSender</core:activityId>
+                <core:name>Notify failure to evaluate sender</core:name>
+                <core:activityTypeId>CRM/Clienteling/Error/FailureEvaluatingSender</core:activityTypeId>
+                <core:suspendActivityOutcome name="Suspend">
+                    <core:toActivity>NotifyFailedEvaluateSender</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:suspendActivityOutcome>
+                <core:activityOutcome name="Retry">
+                    <core:toActivity>EvaluateSenderEmail</core:toActivity>
+                    <core:proceedImmediately>false</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:activityOutcome name="Complete">
+                    <core:toActivity>Cancel</core:toActivity>
+                    <core:proceedImmediately>false</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>663</core:x>
+                        <core:y>12</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 2</tools:swimLaneId>
+                    <tools:style>15</tools:style>
+                </core:uiSettings>
+                <core:metaData>
+                    <core:inputs>
+                        <core:input required="true" name="enactor.mfc.CampaignId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.mfc.CampaignItemId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.mfc.CustomerName">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.mfc.CustomerNumber">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                    </core:inputs>
+                </core:metaData>
+                <core:jobType>Customer Event Invitation</core:jobType>
+                <core:jobHeader>Error Setting Up Email for #{customerName}</core:jobHeader>
+                <core:jobDescription>Error Setting Up Email</core:jobDescription>
+                <core:displayDescriptionMessageBase>CRM/Clienteling/ClientelingMessages</core:displayDescriptionMessageBase>
+                <core:displayDescriptionMessageId>ERROR_SETTING_UP_EMAIL_DESCRIPTION</core:displayDescriptionMessageId>
+                <core:displayTitleMessageBase>CRM/Clienteling/ClientelingMessages</core:displayTitleMessageBase>
+                <core:displayTitleMessageId>ERROR_SETTING_UP_EMAIL_TITLE</core:displayTitleMessageId>
+                <core:priority>5</core:priority>
+                <core:peopleGroupEvaluator>{http://www.enactor.com/task}SimpleUserEvaluator</core:peopleGroupEvaluator>
+                <core:peopleGroupParameters>
+                    <core:parameter name="userId">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>#{mailBoxName}</core:value>
+                    </core:parameter>
+                </core:peopleGroupParameters>
+            </core:value>
+            <core:index>14</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:CallProcessActivity">
+                <core:activityId>UpdateCampaignStatus</core:activityId>
+                <core:name>Update Campaign Status</core:name>
+                <core:activityTypeId>CRM/Clienteling/UpdateCampaignItemStatus</core:activityTypeId>
+                <core:activityOutcome name="Fail">
+                    <core:toActivity>Copy of NotifyFailureToUpdateCampaignItem</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:activityOutcome name="Success">
+                    <core:toActivity>Completed</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:parameters>
+                    <core:parameter name="enactor.mfc.CampaignItemStatus">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>#{bp.outcome['RecordCustomerAttendance']}</core:value>
+                    </core:parameter>
+                </core:parameters>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>2745</core:x>
+                        <core:y>18</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 4</tools:swimLaneId>
+                    <tools:noteReference name="Note Link">
+                        <core:toActivity>Note0</core:toActivity>
+                        <core:proceedImmediately>true</core:proceedImmediately>
+                    </tools:noteReference>
+                </core:uiSettings>
+                <core:metaData>
+                    <core:inputs>
+                        <core:input required="true" name="enactor.mfc.CampaignItemId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.mfc.CampaignItemStatus">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.mfc.CampaignItemStatusDetail">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                    </core:inputs>
+                    <core:outputs/>
+                </core:metaData>
+            </core:value>
+            <core:index>15</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:IfActionActivity">
+                <core:activityId>CheckCampaignPostEvent</core:activityId>
+                <core:name>Is Campaign</core:name>
+                <core:activityTypeId>Generic/IfActionActivityType</core:activityTypeId>
+                <core:activityOutcome name="Unspecified">
+                    <core:toActivity></core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:activityOutcome name="Yes">
+                    <core:toActivity>RecordCustomerAttendance</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:activityOutcome name="No">
+                    <core:toActivity>CompletedNoCampaign</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>2232</core:x>
+                        <core:y>27</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 3</tools:swimLaneId>
+                </core:uiSettings>
+                <core:conditionalExpression>notEmpty(campaignItemId)</core:conditionalExpression>
+            </core:value>
+            <core:index>16</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:IfActionActivity">
+                <core:activityId>CheckCampaign</core:activityId>
+                <core:name>Is Campaign</core:name>
+                <core:description></core:description>
+                <core:activityTypeId>Generic/IfActionActivityType</core:activityTypeId>
+                <core:activityOutcome name="Yes">
+                    <core:toActivity>SetStatusNotAttending</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:activityOutcome name="No">
+                    <core:toActivity>CompletedNoCampaign</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>2230</core:x>
+                        <core:y>477</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 3</tools:swimLaneId>
+                </core:uiSettings>
+                <core:conditionalExpression>notEmpty(campaignItemId)</core:conditionalExpression>
+            </core:value>
+            <core:index>17</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:HTActivity">
+                <core:activityId>NotifyFailureToUpdateCampaignItem</core:activityId>
+                <core:name>Failed to Update Campaign Item</core:name>
+                <core:activityTypeId>CRM/Clienteling/Error/FailureUpdatingCampaignItem</core:activityTypeId>
+                <core:suspendActivityOutcome name="Suspend">
+                    <core:toActivity>NotifyFailureToUpdateCampaignItem</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:suspendActivityOutcome>
+                <core:activityOutcome name="Retry">
+                    <core:toActivity>SetStatusNotAttending</core:toActivity>
+                    <core:proceedImmediately>false</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:activityOutcome name="Complete">
+                    <core:toActivity>Completed</core:toActivity>
+                    <core:proceedImmediately>false</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>3088</core:x>
+                        <core:y>603</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 3</tools:swimLaneId>
+                    <tools:style>15</tools:style>
+                </core:uiSettings>
+                <core:metaData>
+                    <core:inputs>
+                        <core:input required="true" name="enactor.mfc.CampaignId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.core.ErrorDetails">
+                            <core:interfaceName>com.enactor.core.application.process.ErrorDetails</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.mfc.CampaignItemId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.mfc.CustomerName">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.mfc.CustomerNumber">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                    </core:inputs>
+                </core:metaData>
+                <core:jobType>Customer Event Invitation</core:jobType>
+                <core:jobHeader>Failed to Update Campaign Status - #{customerName}</core:jobHeader>
+                <core:jobDescription>Failed to update campaign item status</core:jobDescription>
+                <core:displayDescriptionMessageBase>CRM/Clienteling/ClientelingMessages</core:displayDescriptionMessageBase>
+                <core:displayDescriptionMessageId>FAILED_TO_UPDATE_CAMPAIGN_DESCRIPTION</core:displayDescriptionMessageId>
+                <core:displayTitleMessageBase>CRM/Clienteling/ClientelingMessages</core:displayTitleMessageBase>
+                <core:displayTitleMessageId>FAILED_TO_UPDATE_CAMPAIGN_TITLE</core:displayTitleMessageId>
+                <core:priority>5</core:priority>
+                <core:peopleGroupEvaluator>{http://www.enactor.com/task}SimpleUserEvaluator</core:peopleGroupEvaluator>
+                <core:peopleGroupParameters>
+                    <core:parameter name="userId">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>#{mailBoxName}</core:value>
+                    </core:parameter>
+                </core:peopleGroupParameters>
+            </core:value>
+            <core:index>18</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:HTActivity">
+                <core:activityId>Copy of NotifyFailureToUpdateCampaignItem</core:activityId>
+                <core:name>Failed to Update Campaign Item</core:name>
+                <core:activityTypeId>CRM/Clienteling/Error/FailureUpdatingCampaignItem</core:activityTypeId>
+                <core:suspendActivityOutcome name="Suspend">
+                    <core:toActivity>Copy of NotifyFailureToUpdateCampaignItem</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:suspendActivityOutcome>
+                <core:activityOutcome name="Retry">
+                    <core:toActivity>UpdateCampaignStatus</core:toActivity>
+                    <core:proceedImmediately>false</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:activityOutcome name="Complete">
+                    <core:toActivity>Completed</core:toActivity>
+                    <core:proceedImmediately>false</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>2741</core:x>
+                        <core:y>609</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 3</tools:swimLaneId>
+                    <tools:style>15</tools:style>
+                </core:uiSettings>
+                <core:metaData>
+                    <core:inputs>
+                        <core:input required="true" name="enactor.mfc.CampaignId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.core.ErrorDetails">
+                            <core:interfaceName>com.enactor.core.application.process.ErrorDetails</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.mfc.CampaignItemId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.mfc.CustomerName">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.mfc.CustomerNumber">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                    </core:inputs>
+                </core:metaData>
+                <core:jobType>Customer Event Invitation</core:jobType>
+                <core:jobHeader>Failed to Update Campaign Status - #{customerName}</core:jobHeader>
+                <core:jobDescription>Failed to update campaign item status</core:jobDescription>
+                <core:displayDescriptionMessageBase>CRM/Clienteling/ClientelingMessages</core:displayDescriptionMessageBase>
+                <core:displayDescriptionMessageId>FAILED_TO_UPDATE_CAMPAIGN_DESCRIPTION</core:displayDescriptionMessageId>
+                <core:displayTitleMessageBase>CRM/Clienteling/ClientelingMessages</core:displayTitleMessageBase>
+                <core:displayTitleMessageId>FAILED_TO_UPDATE_CAMPAIGN_TITLE</core:displayTitleMessageId>
+                <core:priority>5</core:priority>
+                <core:peopleGroupEvaluator>{http://www.enactor.com/task}SimpleUserEvaluator</core:peopleGroupEvaluator>
+                <core:peopleGroupParameters>
+                    <core:parameter name="userId">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>#{mailBoxName}</core:value>
+                    </core:parameter>
+                </core:peopleGroupParameters>
+            </core:value>
+            <core:index>19</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:EndProcessInErrorActivity">
+                <core:activityId>End in Error</core:activityId>
+                <core:name>End in Error</core:name>
+                <core:activityTypeId>Generic/EndProcessInErrorActivityType</core:activityTypeId>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>70</core:x>
+                        <core:y>273</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 2</tools:swimLaneId>
+                </core:uiSettings>
+                <core:discard>false</core:discard>
+            </core:value>
+            <core:index>20</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:HTActivity">
+                <core:activityId>UnexpectedError</core:activityId>
+                <core:name>Unexpected Error Sending Customer Invitation</core:name>
+                <core:activityTypeId>CRM/Clienteling/Error/ErrorSendingCustomerInvitation</core:activityTypeId>
+                <core:suspendActivityOutcome name="Suspend">
+                    <core:toActivity>UnexpectedError</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:suspendActivityOutcome>
+                <core:activityOutcome name="Complete">
+                    <core:toActivity>End in Error</core:toActivity>
+                    <core:proceedImmediately>false</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>70</core:x>
+                        <core:y>12</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 2</tools:swimLaneId>
+                    <tools:style>15</tools:style>
+                </core:uiSettings>
+                <core:metaData>
+                    <core:inputs>
+                        <core:input required="true" name="enactor.mfc.CampaignId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.core.ErrorDetails">
+                            <core:interfaceName>com.enactor.core.application.process.ErrorDetails</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.mfc.CampaignItemId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.mfc.CustomerName">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.mfc.CustomerNumber">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                    </core:inputs>
+                    <core:outputs/>
+                </core:metaData>
+                <core:jobType>Customer Event Invitation</core:jobType>
+                <core:jobHeader>Error Setting Up Email for #{customerName}</core:jobHeader>
+                <core:jobDescription>Error Setting Up Email</core:jobDescription>
+                <core:displayDescriptionMessageBase>CRM/Clienteling/ClientelingMessages</core:displayDescriptionMessageBase>
+                <core:displayDescriptionMessageId>ERROR_SETTING_UP_EMAIL_DESCRIPTION</core:displayDescriptionMessageId>
+                <core:displayTitleMessageBase>CRM/Clienteling/ClientelingMessages</core:displayTitleMessageBase>
+                <core:displayTitleMessageId>ERROR_SETTING_UP_EMAIL_TITLE</core:displayTitleMessageId>
+                <core:priority>5</core:priority>
+                <core:peopleGroupEvaluator>{http://www.enactor.com/core}SimpleUserEvaluator</core:peopleGroupEvaluator>
+                <core:peopleGroupParameters/>
+            </core:value>
+            <core:index>21</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:EndProcessActivity">
+                <core:activityId>Cancel</core:activityId>
+                <core:activityTypeId>Generic/EndProcessActivityType</core:activityTypeId>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>670</core:x>
+                        <core:y>272</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 2</tools:swimLaneId>
+                </core:uiSettings>
+                <core:discard>false</core:discard>
+            </core:value>
+            <core:index>22</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:IfActionActivity">
+                <core:activityId>IfActionActivity-1</core:activityId>
+                <core:name>First If</core:name>
+                <core:activityTypeId>Generic/IfActionActivityType</core:activityTypeId>
+                <core:activityOutcome name="Yes">
+                    <core:toActivity>SetUpCustomerInvitation</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:activityOutcome name="No">
+                    <core:toActivity>EvaluateSenderEmail</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>404</core:x>
+                        <core:y>84</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 1</tools:swimLaneId>
+                </core:uiSettings>
+                <core:conditionalExpression>isEmpty(customerNumber) || isEmpty(communicationScriptId)</core:conditionalExpression>
+            </core:value>
+            <core:index>23</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:CallProcessActivity">
+                <core:activityId>SetStatusAwaitResponse</core:activityId>
+                <core:name>Status=Await Email Response</core:name>
+                <core:activityTypeId>CRM/Clienteling/UpdateCampaignItemStatus</core:activityTypeId>
+                <core:activityOutcome name="Success">
+                    <core:toActivity>WaitForResponse</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:activityOutcome name="Fail">
+                    <core:toActivity>WaitForResponse</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:parameters>
+                    <core:parameter name="enactor.mfc.CampaignItemStatus">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>Await Email Response</core:value>
+                    </core:parameter>
+                </core:parameters>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>1616</core:x>
+                        <core:y>57</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 1</tools:swimLaneId>
+                </core:uiSettings>
+                <core:metaData>
+                    <core:inputs>
+                        <core:input required="true" name="enactor.mfc.CampaignItemId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.mfc.CampaignItemStatus">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.mfc.CampaignItemStatusDetail">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                    </core:inputs>
+                    <core:outputs/>
+                </core:metaData>
+            </core:value>
+            <core:index>24</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:CallProcessActivity">
+                <core:activityId>SetStatusFailedToEmail</core:activityId>
+                <core:name>Status=Failed to Send Email</core:name>
+                <core:activityTypeId>CRM/Clienteling/UpdateCampaignItemStatus</core:activityTypeId>
+                <core:activityOutcome name="Success">
+                    <core:toActivity>NotifyFailureToSendEmail</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:activityOutcome name="Fail">
+                    <core:toActivity>NotifyFailureToSendEmail</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:parameters>
+                    <core:parameter name="enactor.mfc.CampaignItemStatus">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>Failed to Send Email</core:value>
+                    </core:parameter>
+                </core:parameters>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>1300</core:x>
+                        <core:y>59</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 1</tools:swimLaneId>
+                </core:uiSettings>
+                <core:metaData>
+                    <core:inputs>
+                        <core:input required="true" name="enactor.mfc.CampaignItemId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.mfc.CampaignItemStatus">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.mfc.CampaignItemStatusDetail">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                    </core:inputs>
+                    <core:outputs/>
+                </core:metaData>
+            </core:value>
+            <core:index>25</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:CallProcessActivity">
+                <core:activityId>SetStatusAttending</core:activityId>
+                <core:name>Status=Attending</core:name>
+                <core:activityTypeId>CRM/Clienteling/UpdateCampaignItemStatus</core:activityTypeId>
+                <core:activityOutcome name="Success">
+                    <core:toActivity>CheckCampaignPostEvent</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:activityOutcome name="Fail">
+                    <core:toActivity>CheckCampaignPostEvent</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:parameters>
+                    <core:parameter name="enactor.mfc.CampaignItemStatus">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>Attending</core:value>
+                    </core:parameter>
+                </core:parameters>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>1623</core:x>
+                        <core:y>9</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 3</tools:swimLaneId>
+                </core:uiSettings>
+                <core:metaData>
+                    <core:inputs>
+                        <core:input required="true" name="enactor.mfc.CampaignItemId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.mfc.CampaignItemStatus">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.mfc.CampaignItemStatusDetail">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                    </core:inputs>
+                    <core:outputs/>
+                </core:metaData>
+            </core:value>
+            <core:index>26</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:CallProcessActivity">
+                <core:activityId>SetStatusPotRespRecd</core:activityId>
+                <core:name>Status=Potential Response Received</core:name>
+                <core:activityTypeId>CRM/Clienteling/UpdateCampaignItemStatus</core:activityTypeId>
+                <core:activityOutcome name="Fail">
+                    <core:toActivity></core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:activityOutcome name="Success">
+                    <core:toActivity>ClassifyResponse</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:parameters>
+                    <core:parameter name="enactor.mfc.CampaignItemStatus">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>Potential Response Received</core:value>
+                    </core:parameter>
+                </core:parameters>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>1635</core:x>
+                        <core:y>259</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 3</tools:swimLaneId>
+                </core:uiSettings>
+                <core:metaData>
+                    <core:inputs>
+                        <core:input required="true" name="enactor.mfc.CampaignItemId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.mfc.CampaignItemStatus">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.mfc.CampaignItemStatusDetail">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                    </core:inputs>
+                    <core:outputs/>
+                </core:metaData>
+            </core:value>
+            <core:index>27</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:CallProcessActivity">
+                <core:activityId>SetStatusToPotRespRecd2</core:activityId>
+                <core:name>Status=Potential Response Received</core:name>
+                <core:activityTypeId>CRM/Clienteling/UpdateCampaignItemStatus</core:activityTypeId>
+                <core:activityOutcome name="Fail">
+                    <core:toActivity></core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:activityOutcome name="Success">
+                    <core:toActivity>CheckResponse</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:parameters>
+                    <core:parameter name="enactor.mfc.CampaignItemStatus">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>Potential Response Received</core:value>
+                    </core:parameter>
+                </core:parameters>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>1632</core:x>
+                        <core:y>524</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 3</tools:swimLaneId>
+                </core:uiSettings>
+                <core:metaData>
+                    <core:inputs>
+                        <core:input required="true" name="enactor.mfc.CampaignItemId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.mfc.CampaignItemStatus">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.mfc.CampaignItemStatusDetail">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                    </core:inputs>
+                    <core:outputs/>
+                </core:metaData>
+            </core:value>
+            <core:index>28</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:EndProcessActivity">
+                <core:activityId>Completed</core:activityId>
+                <core:name>Completed</core:name>
+                <core:activityTypeId>Generic/EndProcessActivityType</core:activityTypeId>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>3407</core:x>
+                        <core:y>600</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 3</tools:swimLaneId>
+                    <tools:style>1</tools:style>
+                </core:uiSettings>
+                <core:discard>false</core:discard>
+            </core:value>
+            <core:index>29</core:index>
+        </core:listElement>
+        <core:listImplClass>java.util.LinkedList</core:listImplClass>
+    </core:activities>
+    <core:defaultStartActivityId>Start</core:defaultStartActivityId>
+    <core:defaultOutcomes>
+        <core:activityOutcome name="Unspecified">
+            <core:toActivity></core:toActivity>
+            <core:proceedImmediately>true</core:proceedImmediately>
+        </core:activityOutcome>
+    </core:defaultOutcomes>
+    <core:activityOutcome name="Error">
+        <core:toActivity>UnexpectedError</core:toActivity>
+        <core:proceedImmediately>true</core:proceedImmediately>
+    </core:activityOutcome>
+</core:simpleActivityFlowBusinessProcess>

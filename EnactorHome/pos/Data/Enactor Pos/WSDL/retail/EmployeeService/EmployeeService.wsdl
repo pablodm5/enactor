@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:plnk="http://schemas.xmlsoap.org/ws/2003/05/partner-link/" xmlns:java="http://schemas.xmlsoap.org/wsdl/java/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:format="http://schemas.xmlsoap.org/wsdl/formatbinding/" xmlns:mjstring="com.enactor.tools.core.util.JavaCodeGenUtils" name="EmployeeService" targetNamespace="http://www.enactor.com/retail/EmployeeService" xmlns:service="http://www.enactor.com/retail/EmployeeService" xmlns:serviceTypes="http://www.enactor.com/retail/EmployeeService/Types" xmlns:mfc="http://www.enactor.com/mfc">
+   <wsdl:types>
+      <xsd:schema>
+         <xsd:import namespace="http://www.enactor.com/retail/EmployeeService/Types" schemaLocation="retail/EmployeeService/Types/EmployeeServiceTypes.xsd"/>
+      </xsd:schema>
+   </wsdl:types>
+   <wsdl:message name="lookupEmployeeRequestMessage">
+      <wsdl:part name="parameters" element="serviceTypes:lookupEmployee"/>
+   </wsdl:message>
+   <wsdl:message name="lookupEmployeeResponseMessage">
+      <wsdl:part name="parameters" element="serviceTypes:lookupEmployeeResponse"/>
+   </wsdl:message>
+   <wsdl:portType name="EmployeeServicePT">      <wsdl:operation name="lookupEmployee">
+         <wsdl:documentation>Lookup an Employee given its card number or employee id.</wsdl:documentation>
+         <wsdl:input message="service:lookupEmployeeRequestMessage" name="lookupEmployeeRequestMessage"/>
+         <wsdl:output message="service:lookupEmployeeResponseMessage" name="lookupEmployeeResponseMessage"/>
+	 	 <wsdl:fault name="noSuchRecordException" message="service:noSuchRecordException"/>
+      </wsdl:operation>
+   </wsdl:portType>
+   <wsdl:binding name="SOAPBinding" type="service:EmployeeServicePT">
+      <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+      <wsdl:operation name="lookupEmployee">
+         <soap:operation soapAction="http://www.enactor.com/retail/EmployeeService/lookupEmployee/soapAction"/>
+         <wsdl:input name="lookupEmployeeRequestMessage">
+            <soap:body parts="parameters" use="literal"/>
+         </wsdl:input>
+         <wsdl:output name="lookupEmployeeResponseMessage">
+            <soap:body parts="parameters" use="literal"/>
+         </wsdl:output>
+      </wsdl:operation>
+   </wsdl:binding>
+   <wsdl:binding name="JavaBinding" type="service:EmployeeServicePT">
+      <java:binding/>
+      <format:typeMapping encoding="Java" style="Java">
+         <format:typeMap elementName="mfc:employee" formatType="com.enactor.mfc.employee.IEmployee" xmlns:mfc="http://www.enactor.com/retail"/>
+         <format:typeMap elementName="core:applicationProcessOutcome" formatType="com.enactor.core.application.process.IApplicationProcessOutcome" xmlns:core="http://www.enactor.com/core"/>
+      </format:typeMapping>
+      <wsdl:operation name="lookupEmployee">
+         <java:operation methodType="instance" methodName="lookupEmployee"/>
+         <wsdl:input/>
+         <wsdl:output/>
+      </wsdl:operation>
+   </wsdl:binding>
+   <wsdl:service name="EmployeeService">
+      <wsdl:port name="SOAPPort" binding="service:SOAPBinding">
+         <soap:address location="http://localhost:8080/axis2/EmployeeService"/>
+      </wsdl:port>
+      <wsdl:port name="JavaPort" binding="service:JavaBinding">
+         <java:address className="com.enactor.mfc.employee.service.EmployeeService"/>
+      </wsdl:port>
+   </wsdl:service>
+   <plnk:partnerLinkType name="EmployeeServicePLT">
+      <plnk:role name="EmployeeServiceImpl">
+         <plnk:portType name="service:EmployeeServicePT"/>
+      </plnk:role>
+   </plnk:partnerLinkType>
+</wsdl:definitions>

@@ -1,0 +1,903 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<core:process xmlns:core="http://www.enactor.com/core" xmlns:retail="http://www.enactor.com/retail" xmlns:ns4="http://www.enactor.com/crm" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803" xmlns:ns6="http://www.apis-it.hr/fin/2012/types/f73" xmlns:ns7="http://www.w3.org/2000/09/xmldsig#" xmlns:ns8="http://www.enactor.com/retail/storedRetailTransaction/service" xmlns:ns9="http://www.fu.gov.si/" xmlns:ns10="http://www.enactor.com/addressLookup/service" xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:ns14="http://www.enactor.com/crm/customerLoyalty/service" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <core:processID>CardPayment/TestContactlessFallForward</core:processID>
+    <core:version>1.0</core:version>
+    <core:name>Update ICC Transaction</core:name>
+    <core:defaultMessageBaseName></core:defaultMessageBaseName>
+    <core:firstStateID>Start</core:firstStateID>
+    <core:className></core:className>
+    <core:uiHints>
+        <entry>
+            <key>com.enactor.tools.editor.process.style</key>
+            <value>127</value>
+        </entry>
+        <entry>
+            <key>com.enactor.tools.editor.process.xloc</key>
+            <value>8</value>
+        </entry>
+        <entry>
+            <key>com.enactor.tools.editor.process.yloc</key>
+            <value>8</value>
+        </entry>
+    </core:uiHints>
+    <core:metaData>
+        <core:inputs>
+            <core:input required="true" name="enactor.mfc.CardTenderItem">
+                <core:interfaceName>com.enactor.mfc.basket.items.ICardTenderItem</core:interfaceName>
+            </core:input>
+            <core:input required="true" name="enactor.mfc.PaymentCardType">
+                <core:interfaceName>com.enactor.mfc.cardType.IPaymentCardType</core:interfaceName>
+            </core:input>
+        </core:inputs>
+        <core:outputs>
+            <core:output required="true" name="enactor.mfc.CardTenderItem">
+                <core:interfaceName>com.enactor.mfc.basket.items.ICardTenderItem</core:interfaceName>
+            </core:output>
+        </core:outputs>
+        <stateDataTypes>
+            <stateDataType required="true" name="enactor.mfc.CardTenderItem">
+                <core:interfaceName>com.enactor.mfc.basket.items.ICardTenderItem</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.mfc.PaymentCardType">
+                <core:interfaceName>com.enactor.mfc.cardType.IPaymentCardType</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="message">
+                <core:interfaceName>java.lang.String</core:interfaceName>
+            </stateDataType>
+        </stateDataTypes>
+    </core:metaData>
+    <core:notes>
+        <core:processNote>
+            <core:noteId>Note0</core:noteId>
+            <core:description>This process is used on a Decline outcome from a Contactless card transaction to determine if the user should be prompted to 'Fall Forward' to a contact transaction.  
+
+This initially applied to Mastercard card schemes only: Mastercard Contactless EMV and MSD should fall forward on any Decline (AAC), both offline and online.  However, if online auth was requested but not available, then decline. Worldpay guide to contactless implementation, v2.5
+
+Now PSD2 SCA requires this explicitly on receiving an Apacs70 decline with Response Code 65. PLAT-9329
+
+PLAT-12663.  For Visa passcode or biometric capable devices may need to present card again woth Forced CVM. Return Retap outcome if so.
+</core:description>
+            <core:constraint>
+                <core:x>222</core:x>
+                <core:y>11</core:y>
+                <core:height>296</core:height>
+                <core:width>387</core:width>
+            </core:constraint>
+        </core:processNote>
+        <core:processNote>
+            <core:noteId>Note1</core:noteId>
+            <core:description>If this is not a card then decline since we cannot perform fallforward to contact interface. 
+
+At present only implemented for Visa as we only know for sure this behaviour is required in this case. </core:description>
+            <core:constraint>
+                <core:x>245</core:x>
+                <core:y>611</core:y>
+                <core:height>173</core:height>
+                <core:width>251</core:width>
+            </core:constraint>
+        </core:processNote>
+        <core:processNote>
+            <core:noteId>Note2</core:noteId>
+            <core:description>Test for Force CVM and force contactless retap if so. 
+
+Test FallForwardReason to ensure we don't go around again.</core:description>
+            <core:constraint>
+                <core:x>711</core:x>
+                <core:y>871</core:y>
+                <core:height>127</core:height>
+                <core:width>202</core:width>
+            </core:constraint>
+        </core:processNote>
+        <core:processNote>
+            <core:noteId>Note3</core:noteId>
+            <core:description>This prompt appears to be necessary  to get the Visa VpTT Tests to pass successfully. 
+
+However used a fairly short timeout for operator convenience.</core:description>
+            <core:constraint>
+                <core:x>1946</core:x>
+                <core:y>873</core:y>
+                <core:height>120</core:height>
+                <core:width>212</core:width>
+            </core:constraint>
+        </core:processNote>
+        <core:processNote>
+            <core:noteId>Note4</core:noteId>
+            <core:description>Don't prompt in this case for smoother flow.  
+
+The insert card prompt will have a suitable message indicating card insertion is required. </core:description>
+            <core:constraint>
+                <core:x>1942</core:x>
+                <core:y>593</core:y>
+                <core:height>129</core:height>
+                <core:width>210</core:width>
+            </core:constraint>
+        </core:processNote>
+        <core:processNote>
+            <core:noteId>Note5</core:noteId>
+            <core:description>On any declined for Mastercard we Fall Forward to Contact ICC (providing the form factor is a card). 
+
+For others, we only Fall Forward if online auth was required, but failed. </core:description>
+            <core:constraint>
+                <core:x>963</core:x>
+                <core:y>575</core:y>
+                <core:height>132</core:height>
+                <core:width>248</core:width>
+            </core:constraint>
+        </core:processNote>
+    </core:notes>
+    <core:endProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>EndProcessCancel</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIEndProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1499</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>28</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData/>
+        <core:typeId>enactor.types.EndProcess</core:typeId>
+        <core:outcome>Cancel</core:outcome>
+        <core:defaultProcessId></core:defaultProcessId>
+    </core:endProcessAction>
+    <core:endProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>EndProcessFallForward</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIEndProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1788</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>28</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData/>
+        <core:typeId>enactor.types.EndProcess</core:typeId>
+        <core:outcome>FallForward</core:outcome>
+        <core:defaultProcessId></core:defaultProcessId>
+    </core:endProcessAction>
+    <core:endProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>EndProcessDecline</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIEndProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1073</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>28</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData/>
+        <core:typeId>enactor.types.EndProcess</core:typeId>
+        <core:outcome>Decline</core:outcome>
+        <core:defaultProcessId></core:defaultProcessId>
+    </core:endProcessAction>
+    <core:assignAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>SetFallForwardMastercard</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIAssignAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>27</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1382</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>311</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.CardTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.ICardTenderItem</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.mfc.PaymentCardType">
+                    <core:interfaceName>com.enactor.mfc.cardType.IPaymentCardType</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="true" name="enactor.mfc.CardTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.ICardTenderItem</core:interfaceName>
+                </core:output>
+                <core:output required="true" name="message">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.Assign</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID>ContactlessFallForwardPrompt</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:dataAssignment toExpression="cardTenderItem.cardDetails.ICCFallForward" fromExpression="true"/>
+        <core:dataAssignment toExpression="cardTenderItem.cardDetails.ICCFallForwardReason" fromExpression="cardTenderItem.hostDeclined ? enumValue('com.enactor.mfc.basket.items.ICardDetails$FallForwardReason', 'HOST_DECLINED') : enumValue('com.enactor.mfc.basket.items.ICardDetails$FallForwardReason', 'CARD_DECLINED')"/>
+        <core:dataAssignment toExpression="message" fromExpression="resolveMessage('Pos/Tender/TenderMessages', (cardTenderItem.hostDeclined &amp;&amp; notEmpty(cardTenderItem.hostMessage)) ? 'CTLS_FF_CARD_DECLINED_HOST' : 'CTLS_FF_CARD_DECLINED')"/>
+    </core:assignAction>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>TestSCAIndicator</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UINullAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>492</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>526</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.NullAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>TestFormFactor2</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>TestContactlessRetap</core:toActionID>
+            <core:condition>process.cardTenderItem.hostDeclined &amp;&amp; process.cardTenderItem.acquirerResponseCode == 65</core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:assignAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>SetFallForwardSCA</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIAssignAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.notes</key>
+                <value>Note4</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>27</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1382</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>783</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.CardTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.ICardTenderItem</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.mfc.PaymentCardType">
+                    <core:interfaceName>com.enactor.mfc.cardType.IPaymentCardType</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="true" name="enactor.mfc.CardTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.ICardTenderItem</core:interfaceName>
+                </core:output>
+                <core:output required="true" name="message">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.Assign</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>EndProcessFallForward</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:dataAssignment toExpression="cardTenderItem.cardDetails.ICCFallForward" fromExpression="true"/>
+        <core:dataAssignment toExpression="cardTenderItem.cardDetails.ICCFallForwardReason" fromExpression="enumValue('com.enactor.mfc.basket.items.ICardDetails$FallForwardReason', 'HOST_FORCED_SCA')"/>
+        <core:dataAssignment toExpression="message" fromExpression="resolveMessage('Pos/Tender/TenderMessages', 'CTLS_FF_HOST_FORCED_INSERT_CARD')"/>
+    </core:assignAction>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>TestContactlessRetap</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UINullAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.notes</key>
+                <value>Note2</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>591</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>786</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.NullAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>TestFormFactorSCA</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>SetContactlessRetap</core:toActionID>
+            <core:condition>process.cardTenderItem.cardDetails.contactlessForceCVM &amp;&amp; process.cardTenderItem.cardDetails.ICCFallForwardReason == null</core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:endProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>EndProcessContactlessRetap</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIEndProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2066</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>28</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData/>
+        <core:typeId>enactor.types.EndProcess</core:typeId>
+        <core:outcome>ContactlessRetap</core:outcome>
+        <core:defaultProcessId></core:defaultProcessId>
+    </core:endProcessAction>
+    <core:assignAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>SetContactlessRetap</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIAssignAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>27</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1382</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>1014</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.CardTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.ICardTenderItem</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.mfc.PaymentCardType">
+                    <core:interfaceName>com.enactor.mfc.cardType.IPaymentCardType</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="true" name="enactor.mfc.CardTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.ICardTenderItem</core:interfaceName>
+                </core:output>
+                <core:output required="true" name="message">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.Assign</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID>ContactlessRetapPrompt</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:dataAssignment toExpression="cardTenderItem.cardDetails.ICCFallForwardReason" fromExpression="enumValue('com.enactor.mfc.basket.items.ICardDetails$FallForwardReason', 'HOST_FORCED_SCA_RETAP')"/>
+        <core:dataAssignment toExpression="message" fromExpression="resolveMessage('Pos/Tender/TenderMessages', 'CTLS_HOST_FORCED_RETAP')"/>
+    </core:assignAction>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>TestSchemeMastercard</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UINullAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.notes</key>
+                <value>Note5</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>903</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>311</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.NullAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>TestAuthFailed</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>SetFallForwardMastercard</core:toActionID>
+            <core:condition>(process.cardTenderItem.cardDetails.cardScheme == 'MASTERCARD' || process.cardTenderItem.cardDetails.cardScheme == 'MASTERCARD_DEBIT' 
+ || process.cardTenderItem.cardDetails.cardScheme == 'MAESTRO' || process.cardTenderItem.cardDetails.cardScheme == 'MAESTRO_UK' ) 
+&amp;&amp; (isEmpty(process.cardTenderItem.authorisationError) || process.cardTenderItem.authorisationError == 'ForcedOutOfService')</core:condition>
+            <core:comment>Mastercard schemes and online or offline declined</core:comment>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>TestFormFactor2</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UINullAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.notes</key>
+                <value>Note1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>641</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>397</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.NullAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>EndProcessDecline</core:toActionID>
+            <core:condition>!process.cardTenderItem.ICCResults.isFormFactorCard</core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>TestSchemeMastercard</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>TestFormFactorSCA</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UINullAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.notes</key>
+                <value>Note1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>725</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>673</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.NullAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>SetFallForwardSCA</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>EndProcessDecline</core:toActionID>
+            <core:condition>!process.cardTenderItem.ICCResults.isFormFactorCard</core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>TestAuthFailed</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UINullAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.notes</key>
+                <value>Note5</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1013</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>465</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.NullAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>SetFallForwardAuthError</core:toActionID>
+            <core:condition>!process.cardTenderItem.hostDeclined &amp;&amp; notEmpty(process.cardTenderItem.authorisationError)</core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>EndProcessDecline</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:assignAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>SetFallForwardAuthError</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIAssignAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>27</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1382</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>549</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.CardTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.ICardTenderItem</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.mfc.PaymentCardType">
+                    <core:interfaceName>com.enactor.mfc.cardType.IPaymentCardType</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="true" name="enactor.mfc.CardTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.ICardTenderItem</core:interfaceName>
+                </core:output>
+                <core:output required="true" name="message">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.Assign</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID>ContactlessFallForwardPrompt</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:dataAssignment toExpression="cardTenderItem.cardDetails.ICCFallForward" fromExpression="true"/>
+        <core:dataAssignment toExpression="cardTenderItem.cardDetails.ICCFallForwardReason" fromExpression="enumValue('com.enactor.mfc.basket.items.ICardDetails$FallForwardReason', 'AUTH_FAILED')"/>
+        <core:dataAssignment toExpression="message" fromExpression="resolveMessage('Pos/Tender/TenderMessages', 'CTLS_FF_CARD_DECLINED_ERROR')"/>
+    </core:assignAction>
+    <core:state>
+        <core:url></core:url>
+        <core:stateID>Start</core:stateID>
+        <core:name></core:name>
+        <core:className></core:className>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>257</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>449</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <handledEvents>
+                <handledEvent name="StateEntered"/>
+            </handledEvents>
+            <stateDataTypes/>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicState</core:typeId>
+        <core:singleInstance>false</core:singleInstance>
+        <core:respondToViewEvents>false</core:respondToViewEvents>
+        <core:actionInputMappings/>
+        <core:actionOutputMappings/>
+        <core:eventLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>EndProcessDecline</core:toActionID>
+            <core:condition></core:condition>
+            <core:comment>Normal action is decline</core:comment>
+            <core:event>StateEntered</core:event>
+        </core:eventLink>
+        <core:eventLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>TestSCAIndicator</core:toActionID>
+            <core:condition>process.cardTenderItem.cardDetails.contactless &amp;&amp; !process.cardTenderItem.isRefund</core:condition>
+            <core:comment>Applies to contactless only</core:comment>
+            <core:event>StateEntered</core:event>
+        </core:eventLink>
+    </core:state>
+    <core:promptState>
+        <core:url>/Message/PopUpModalOKCancel</core:url>
+        <core:stateID>ContactlessFallForwardPrompt</core:stateID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.states.UIPromptState</core:className>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>127</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1661</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>311</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input name="enactor.mfc.CardTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.ICardTenderItem</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="message">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <handledEvents>
+                <handledEvent name="CancelPressed"/>
+                <handledEvent name="OKPressed"/>
+                <handledEvent name="PromptTimeout"/>
+            </handledEvents>
+            <stateDataTypes>
+                <stateDataType name="enactor.mfc.CardTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.ICardTenderItem</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="true" name="message">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </stateDataType>
+            </stateDataTypes>
+        </core:metaData>
+        <core:typeId>enactor.types.PromptState</core:typeId>
+        <core:singleInstance>false</core:singleInstance>
+        <core:respondToViewEvents>true</core:respondToViewEvents>
+        <core:actionInputMappings/>
+        <core:actionOutputMappings/>
+        <core:eventLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>EndProcessFallForward</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>OKPressed</core:event>
+        </core:eventLink>
+        <core:eventLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>EndProcessCancel</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>CancelPressed</core:event>
+        </core:eventLink>
+        <core:eventLink>
+            <core:linkID>3</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>EndProcessFallForward</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>PromptTimeout</core:event>
+        </core:eventLink>
+        <core:keepPromptOpen>false</core:keepPromptOpen>
+        <core:closeOnNextPrompt>false</core:closeOnNextPrompt>
+        <core:keepPreviousPromptOpen>false</core:keepPreviousPromptOpen>
+        <core:promptTimeout>30</core:promptTimeout>
+        <core:hideOpenPrompt>false</core:hideOpenPrompt>
+        <core:allowDatabasePromptLookup>false</core:allowDatabasePromptLookup>
+    </core:promptState>
+    <core:promptState>
+        <core:url>/Message/PopUpModalOKCancel</core:url>
+        <core:stateID>ContactlessRetapPrompt</core:stateID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.states.UIPromptState</core:className>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.notes</key>
+                <value>Note3</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>127</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1661</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>782</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input name="enactor.mfc.CardTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.ICardTenderItem</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="message">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <handledEvents>
+                <handledEvent name="CancelPressed"/>
+                <handledEvent name="OKPressed"/>
+                <handledEvent name="PromptTimeout"/>
+            </handledEvents>
+            <stateDataTypes>
+                <stateDataType name="enactor.mfc.CardTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.ICardTenderItem</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="true" name="message">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </stateDataType>
+            </stateDataTypes>
+        </core:metaData>
+        <core:typeId>enactor.types.PromptState</core:typeId>
+        <core:singleInstance>false</core:singleInstance>
+        <core:respondToViewEvents>true</core:respondToViewEvents>
+        <core:actionInputMappings/>
+        <core:actionOutputMappings/>
+        <core:eventLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>EndProcessCancel</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>CancelPressed</core:event>
+        </core:eventLink>
+        <core:eventLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>EndProcessContactlessRetap</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>OKPressed</core:event>
+        </core:eventLink>
+        <core:eventLink>
+            <core:linkID>3</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>EndProcessContactlessRetap</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>PromptTimeout</core:event>
+        </core:eventLink>
+        <core:keepPromptOpen>false</core:keepPromptOpen>
+        <core:closeOnNextPrompt>false</core:closeOnNextPrompt>
+        <core:keepPreviousPromptOpen>false</core:keepPreviousPromptOpen>
+        <core:promptTimeout>10</core:promptTimeout>
+        <core:hideOpenPrompt>false</core:hideOpenPrompt>
+        <core:allowDatabasePromptLookup>false</core:allowDatabasePromptLookup>
+    </core:promptState>
+    <core:stateTransitions/>
+</core:process>

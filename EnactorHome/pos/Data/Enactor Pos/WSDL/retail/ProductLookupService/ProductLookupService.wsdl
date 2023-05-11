@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:mjstring="com.enactor.tools.core.util.JavaCodeGenUtils"
+	xmlns:plnk="http://schemas.xmlsoap.org/ws/2003/05/partner-link/" xmlns:format="http://schemas.xmlsoap.org/wsdl/formatbinding/"
+	xmlns:java="http://schemas.xmlsoap.org/wsdl/java/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	name="ProductLookupService" targetNamespace="http://www.enactor.com/retail/product/service" xmlns:service="http://www.enactor.com/retail/product/service"
+	xmlns:core="http://www.enactor.com/core">
+	<wsdl:types>
+		<xsd:schema>
+			<xsd:import namespace="http://www.enactor.com/retail/product/service" schemaLocation="retail/ProductLookupService/ProductLookupService.xsd" />
+		</xsd:schema>
+		<xsd:schema>
+			<xsd:import namespace="http://www.enactor.com/core" schemaLocation="Core.xsd" />
+		</xsd:schema>
+	</wsdl:types>
+	<wsdl:message name="productSearchRequestMessage">
+		<wsdl:part name="parameters" element="service:productSearch" />
+	</wsdl:message>
+	<wsdl:message name="productSearchResponseMessage">
+		<wsdl:part name="parameters" element="service:productSearchResponse" />
+	</wsdl:message>
+	<wsdl:message name="productEnquiryRequestMessage">
+		<wsdl:part name="parameters" element="service:productEnquiry" />
+	</wsdl:message>
+	<wsdl:message name="productEnquiryResponseMessage">
+		<wsdl:part name="parameters" element="service:productEnquiryResponse" />
+	</wsdl:message>
+	<wsdl:message name="databaseException">
+		<wsdl:part name="databaseException" element="core:databaseException" />
+	</wsdl:message>
+	<wsdl:message name="noSuchRecordException">
+		<wsdl:part name="noSuchRecordException" element="core:noSuchRecordException" />
+	</wsdl:message>
+	<wsdl:message name="productSearchFault">
+		<wsdl:part name="productSearchFault" element="service:productSearchFault" />
+	</wsdl:message>
+	<wsdl:message name="productEnquiryFault">
+		<wsdl:part name="productEnquiryFault" element="service:productEnquiryFault" />
+	</wsdl:message>
+	<wsdl:portType name="ProductLookupServicePT">
+		<wsdl:documentation>This service is used to perform product search and enquiry functions</wsdl:documentation>
+		<wsdl:operation name="productSearch">
+			<wsdl:documentation>This operation is used to provide a list of products matching the supplied product id and/or
+				description.
+
+				The product id/description should be used within a wild-card match, i.e. it should be possible to match
+				on part of a product id.
+
+				The location id will be the id for the location where the search is being requested.
+
+				The user id may be used to perform filtering of the matching list of products if required.
+
+				The maxHits will be used to control how many records of data should be returned, if this value is less than 1, all
+				available records should be returned.
+			</wsdl:documentation>
+			<wsdl:input message="service:productSearchRequestMessage" name="productSearchRequestMessage" />
+			<wsdl:output message="service:productSearchResponseMessage" name="productSearchResponseMessage" />
+			<wsdl:fault name="databaseException" message="service:databaseException"></wsdl:fault>
+			<wsdl:fault name="productSearchFault" message="service:productSearchFault"></wsdl:fault>		
+		</wsdl:operation>
+		<wsdl:operation name="productEnquiry">
+			<wsdl:documentation>This operation is used to describe a single product.
+
+				The product id supplied will be a complete
+				product id -- it should not be necessary to perform a wildcard match against
+				the product id.
+
+				The location id will be
+				the id of the location where the enquiry is being performed.
+
+				The user id may be used to restrict the available
+				information about the returned product if necessary
+			</wsdl:documentation>
+			<wsdl:input message="service:productEnquiryRequestMessage" name="productEnquiryRequestMessage" />
+			<wsdl:output message="service:productEnquiryResponseMessage" name="productEnquiryResponseMessage" />
+			<wsdl:fault name="databaseException" message="service:databaseException"></wsdl:fault>
+			<wsdl:fault name="noSuchRecordException" message="service:noSuchRecordException"></wsdl:fault>
+			<wsdl:fault name="productEnquiryFault" message="service:productEnquiryFault"></wsdl:fault>
+		</wsdl:operation>
+	</wsdl:portType>
+	<wsdl:binding name="SOAPBinding" type="service:ProductLookupServicePT">
+		<soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document" />
+		<wsdl:operation name="productSearch">
+			<soap:operation soapAction="http://www.enactor.com/retail/product/service/ProductLookupService/productSearch" />
+			<wsdl:input name="productSearchRequestMessage">
+				<soap:body parts="parameters" use="literal" />
+			</wsdl:input>
+			<wsdl:output name="productSearchResponseMessage">
+				<soap:body parts="parameters" use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="productEnquiry">
+			<soap:operation soapAction="http://www.enactor.com/retail/product/service/ProductLookupService/productEnquiry" />
+			<wsdl:input name="productEnquiryRequestMessage">
+				<soap:body parts="parameters" use="literal" />
+			</wsdl:input>
+			<wsdl:output name="productEnquiryResponseMessage">
+				<soap:body parts="parameters" use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+	</wsdl:binding>
+	<wsdl:service name="ProductLookupService">
+		<wsdl:port name="SOAPPort" binding="service:SOAPBinding">
+			<soap:address location="http://{SERVICE_URL}" />
+		</wsdl:port>
+	</wsdl:service>
+</wsdl:definitions>

@@ -1,0 +1,488 @@
+version: '3'
+
+volumes:
+  enactor-data-ema-home:
+  enactor-data-emc-home:    
+  enactor-data-emp-home:
+  enactor-data-emr-home:
+  enactor-data-ems-home:
+  enactor-data-oma-home:
+  enactor-data-omp-home:      
+  enactor-data-oms-home:
+  enactor-data-pdp-home:
+  enactor-data-cma-home:
+  enactor-data-cmp-home:
+  enactor-data-cms-home: 
+  enactor-data-is-home: 
+  enactor-data-ss-home: 
+  enactor-data-ws-home:     
+  enactor-data-ems-tomcat-temp: 
+  enactor-data-oms-tomcat-temp:     
+  enactor-data-cms-tomcat-temp:   
+
+services:
+
+##################################################################
+##             Estate Manager
+##################################################################
+
+  em-application:
+    image: ${REGISTRY_URL}/${REGISTRY_BASE}/${REGISTRY_OS}/${EMA_IMAGE_NAME}:${TAG}    
+    links:
+      - mysql-em:db
+    depends_on:
+      - mysql-em        
+    container_name: ${EMA_NAME}
+    env_file:
+      - ./env/common.env
+      - ./env/common-em.env
+      - ./env/ema.env
+    ports:
+      - "${EMA_PORT}:${EMA_PORT}"
+      - "${RMI_PORT}:${RMI_PORT}"      
+    restart: unless-stopped 
+    hostname: ${EMA_HOSTNAME} 
+    volumes:
+      - enactor-data-ema-home:/enactor/app/home
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "${LOG_MAX_FILE_SIZE}"
+        max-file: "${LOG_MAX_FILE_COUNT}"                
+
+  em-processing:
+    image: ${REGISTRY_URL}/${REGISTRY_BASE}/${REGISTRY_OS}/${EMP_IMAGE_NAME}:${TAG}    
+    links:
+      - mysql-em:db
+    depends_on:
+      - mysql-em
+    container_name: ${EMP_NAME}
+    env_file:
+      - ./env/common.env
+      - ./env/common-em.env
+      - ./env/emp.env
+    ports:
+      - "${EMP_PORT}:${EMP_PORT}"
+    restart: unless-stopped
+    hostname: ${EMP_HOSTNAME} 
+    volumes:
+      - enactor-data-emp-home:/enactor/app/home
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "${LOG_MAX_FILE_SIZE}"
+        max-file: "${LOG_MAX_FILE_COUNT}"                
+    
+  em-services:
+    image: ${REGISTRY_URL}/${REGISTRY_BASE}/${REGISTRY_OS}/${EMS_IMAGE_NAME}:${TAG}    
+    links:
+      - mysql-em:db
+    depends_on:
+      - mysql-em
+    container_name: ${EMS_NAME}
+    env_file:
+      - ./env/common.env
+      - ./env/common-em.env
+      - ./env/ems.env
+    ports:
+      - "${EMS_PORT}:${EMS_PORT}"
+    restart: unless-stopped
+    hostname: ${EMS_HOSTNAME} 
+    volumes:
+      - enactor-data-ems-home:/enactor/app/home 
+      - enactor-data-ems-tomcat-temp:/enactor/shared/tomcat/temp
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "${LOG_MAX_FILE_SIZE}"
+        max-file: "${LOG_MAX_FILE_COUNT}"                          
+             
+  em-reports:
+    image: ${REGISTRY_URL}/${REGISTRY_BASE}/${REGISTRY_OS}/${EMR_IMAGE_NAME}:${TAG}    
+    links:
+      - mysql-em:db
+    depends_on:
+      - mysql-em
+    container_name: ${EMR_NAME}
+    env_file:
+      - ./env/common.env
+      - ./env/common-em.env
+      - ./env/emr.env
+    ports:
+      - "${EMR_PORT}:${EMR_PORT}"
+    restart: unless-stopped
+    hostname: ${EMR_HOSTNAME}   
+    volumes:
+      - enactor-data-emr-home:/enactor/app/home
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "${LOG_MAX_FILE_SIZE}"
+        max-file: "${LOG_MAX_FILE_COUNT}"                    
+         
+
+  em-cardauth:
+    image: ${REGISTRY_URL}/${REGISTRY_BASE}/${REGISTRY_OS}/${EMC_IMAGE_NAME}:${TAG}    
+    links:
+      - mysql-em:db
+    depends_on:
+      - mysql-em
+    container_name: ${EMC_NAME}
+    env_file:
+      - ./env/common.env
+      - ./env/common-em.env
+      - ./env/emc.env
+    ports:
+      - "${EMC_PORT}:${EMC_PORT}"
+    restart: unless-stopped
+    hostname: ${EMC_HOSTNAME} 
+    volumes:
+      - enactor-data-emc-home:/enactor/app/home
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "${LOG_MAX_FILE_SIZE}"
+        max-file: "${LOG_MAX_FILE_COUNT}"                  
+             
+##################################################################
+##             Order Manager
+##################################################################
+
+  om-application:
+    image: ${REGISTRY_URL}/${REGISTRY_BASE}/${REGISTRY_OS}/${OMA_IMAGE_NAME}:${TAG}    
+    links:
+      - mysql-em:db
+    depends_on:
+      - mysql-em
+    container_name: ${OMA_NAME}
+    env_file:
+      - ./env/common.env
+      - ./env/common-em.env
+      - ./env/oma.env
+    ports:
+      - "${OMA_PORT}:${OMA_PORT}"
+    restart: unless-stopped
+    hostname: ${OMA_HOSTNAME} 
+    volumes:
+      - enactor-data-oma-home:/enactor/app/home 
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "${LOG_MAX_FILE_SIZE}"
+        max-file: "${LOG_MAX_FILE_COUNT}"                 
+         
+  om-processing:
+    image: ${REGISTRY_URL}/${REGISTRY_BASE}/${REGISTRY_OS}/${OMP_IMAGE_NAME}:${TAG}    
+    links:
+      - mysql-em:db
+    depends_on:
+      - mysql-em
+    container_name: ${OMP_NAME}
+    env_file:
+      - ./env/common.env
+      - ./env/common-em.env
+      - ./env/omp.env
+    ports:
+      - "${OMP_PORT}:${OMP_PORT}"
+    restart: unless-stopped
+    hostname: ${OMP_HOSTNAME}
+    volumes:
+      - enactor-data-omp-home:/enactor/app/home
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "${LOG_MAX_FILE_SIZE}"
+        max-file: "${LOG_MAX_FILE_COUNT}"      
+
+  om-services:
+    image: ${REGISTRY_URL}/${REGISTRY_BASE}/${REGISTRY_OS}/${OMS_IMAGE_NAME}:${TAG}    
+    links:
+      - mysql-em:db
+    depends_on:
+      - mysql-em
+    container_name: ${OMS_NAME}
+    env_file:
+      - ./env/common.env
+      - ./env/common-om.env
+      - ./env/oms.env
+    ports:
+      - "${OMS_PORT}:${OMS_PORT}"
+    restart: unless-stopped
+    hostname: ${OMS_HOSTNAME} 
+    volumes:
+      - enactor-data-oms-home:/enactor/app/home
+      - enactor-data-oms-tomcat-temp:/enactor/shared/tomcat/temp 
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "${LOG_MAX_FILE_SIZE}"
+        max-file: "${LOG_MAX_FILE_COUNT}"                  
+               
+##################################################################
+##             Web Shop
+##################################################################
+
+  web-shop:
+    image: ${REGISTRY_URL}/${REGISTRY_BASE}/${REGISTRY_OS}/${WS_IMAGE_NAME}:${TAG}    
+    links:
+      - mysql-em:db
+    depends_on:
+      - mysql-em        
+    container_name: ${WS_NAME}
+    env_file:
+      - ./env/common.env
+      - ./env/common-em.env      
+      - ./env/ws.env
+    ports:
+      - "${WS_PORT}:${WS_PORT}"
+    restart: unless-stopped
+    hostname: ${WS_HOSTNAME} 
+    volumes:
+      - enactor-data-ws-home:/enactor/app/home 
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "${LOG_MAX_FILE_SIZE}"
+        max-file: "${LOG_MAX_FILE_COUNT}"         
+
+##################################################################
+##             Store Servers
+##################################################################
+
+  store-server-1:
+    image: ${REGISTRY_URL}/${REGISTRY_BASE}/${REGISTRY_OS}/${SS_IMAGE_NAME}:${TAG}    
+    links:
+      - mysql-store1:db
+    depends_on:
+      - mysql-store1
+    container_name: ${SS1_NAME}
+    env_file:
+      - ./env/common.env
+      - ./env/common-ss.env      
+      - ./env/ss1.env
+    ports:
+      - "${SS1_PORT}:${SS_CONTAINER}"
+    restart: unless-stopped
+    hostname: ${SS1_HOSTNAME} 
+    volumes:
+      - enactor-data-ss-home:/enactor/app/home
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "${LOG_MAX_FILE_SIZE}"
+        max-file: "${LOG_MAX_FILE_COUNT}"          
+         
+
+##################################################################
+##             PDP Servers
+##################################################################
+
+  pdp-server-1:
+    image: ${REGISTRY_URL}/${REGISTRY_BASE}/${REGISTRY_OS}/${PDP_IMAGE_NAME}:${TAG}      
+    links:
+      - mysql-pdp1:db
+    depends_on:
+      - mysql-pdp1            
+    container_name: ${PDP1_NAME}
+    env_file:
+      - ./env/common.env
+      - ./env/common-pdp.env      
+      - ./env/pdp1.env
+    ports:
+      - "${PDP1_PORT}:${PDP1_PORT}"
+    restart: unless-stopped       
+    hostname: ${PDP1_HOSTNAME} 
+    volumes:
+      - enactor-data-pdp-home:/enactor/app/home
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "${LOG_MAX_FILE_SIZE}"
+        max-file: "${LOG_MAX_FILE_COUNT}"            
+    
+##################################################################
+##             Customer App
+##################################################################
+
+  cm-application:
+    image: ${REGISTRY_URL}/${REGISTRY_BASE}/${REGISTRY_OS}/${CMA_IMAGE_NAME}:${TAG}
+    links:
+      - mysql-em:db   
+    depends_on:
+      - mysql-em        
+    container_name: ${CMA_NAME}  
+    env_file:
+      - ./env/common.env
+      - ./env/common-cm.env
+      - ./env/cma.env
+    ports:
+      - "${CMA_PORT}:${CMA_PORT}"
+    restart: unless-stopped
+    hostname: ${CMA_HOSTNAME} 
+    volumes:
+      - enactor-data-cma-home:/enactor/app/home
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "${LOG_MAX_FILE_SIZE}"
+        max-file: "${LOG_MAX_FILE_COUNT}"          
+
+
+  cm-processing:
+    image: ${REGISTRY_URL}/${REGISTRY_BASE}/${REGISTRY_OS}/${CMP_IMAGE_NAME}:${TAG}
+    links:
+      - mysql-em:db   
+    depends_on:
+      - mysql-em      
+    container_name: ${CMP_NAME}
+    env_file:
+      - ./env/common.env
+      - ./env/common-cm.env
+      - ./env/cmp.env
+    ports:
+      - "${CMP_PORT}:${CMP_PORT}"
+    restart: unless-stopped
+    hostname: ${CMP_HOSTNAME} 
+    volumes:
+      - enactor-data-cmp-home:/enactor/app/home
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "${LOG_MAX_FILE_SIZE}"
+        max-file: "${LOG_MAX_FILE_COUNT}"          
+
+  cm-services:
+    image: ${REGISTRY_URL}/${REGISTRY_BASE}/${REGISTRY_OS}/${CMS_IMAGE_NAME}:${TAG}
+    links:
+      - mysql-em:db   
+    depends_on:
+      - mysql-em   
+    container_name: ${CMS_NAME}
+    env_file:
+      - ./env/common.env
+      - ./env/common-cm.env
+      - ./env/cms.env
+    ports:
+      - "${CMS_PORT}:${CMS_PORT}"
+    restart: unless-stopped
+    hostname: ${CMS_HOSTNAME} 
+    volumes:
+      - enactor-data-cms-home:/enactor/app/home
+      - enactor-data-cms-tomcat-temp:/enactor/shared/tomcat/temp
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "${LOG_MAX_FILE_SIZE}"
+        max-file: "${LOG_MAX_FILE_COUNT}"                    
+
+
+##################################################################
+##             Databases
+##################################################################
+
+  mysql-em:
+    image: ${REGISTRY_URL}/enactor-mysql:latest
+    ports:
+     - "3326:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=enactor
+      - MYSQL_DATABASE=enactorem
+    volumes:
+      - ./mysql-em:/var/lib/mysql
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "${LOG_MAX_FILE_SIZE}"
+        max-file: "${LOG_MAX_FILE_COUNT}"           
+
+  mysql-store1:
+    image: ${REGISTRY_URL}/enactor-mysql:latest
+    ports:
+     - "3336:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=enactor
+      - MYSQL_DATABASE=enactorss1
+    volumes:
+      - ./mysql-store1:/var/lib/mysql  
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "${LOG_MAX_FILE_SIZE}"
+        max-file: "${LOG_MAX_FILE_COUNT}"               
+
+  mysql-pdp1:
+    image: ${REGISTRY_URL}/enactor-mysql:latest
+    ports:
+     - "3346:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=enactor
+      - MYSQL_DATABASE=enactorpdp1
+    volumes:
+      - ./mysql-pdp1:/var/lib/mysql  
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "${LOG_MAX_FILE_SIZE}"
+        max-file: "${LOG_MAX_FILE_COUNT}"               
+
+  solr:
+    image: ${REGISTRY_URL}/${REGISTRY_STANDARD_BASE}/${REGISTRY_OS}/${SOLR_IMAGE_NAME}:${SOLR_TAG}
+    ports:
+      - "${SOLR_PORT}:${SOLR_PORT}"
+    restart: unless-stopped 
+    container_name: ${SOLR_NAME}
+    hostname: ${SOLR_HOSTNAME}    
+    env_file:
+      - ./env/solr.env
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "${LOG_MAX_FILE_SIZE}"
+        max-file: "${LOG_MAX_FILE_COUNT}"      
+
+
+##################################################################
+##             Consumer Application
+##################################################################
+
+  mongodb:
+    image: mongo
+    ports:
+      - "${MONGO_PORT}:${MONGO_PORT}"
+    restart: unless-stopped 
+    container_name: ${MONGO_NAME}
+    hostname: ${MONGO_HOSTNAME}    
+    env_file:
+      - ./env/mongo.env
+    restart: unless-stopped
+    volumes: 
+      - ./mongo:/data/db
+      - ./mongo/conf:/data/configdb
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "${LOG_MAX_FILE_SIZE}"
+        max-file: "${LOG_MAX_FILE_COUNT}"    
+
+      
+  can:
+    image: ${REGISTRY_URL}/${REGISTRY_BASE}/${REGISTRY_OS}/${CAN_IMAGE_NAME}:${TAG}
+    depends_on:
+      - mongodb
+    ports:
+      - "${CAN_PORT}:${CAN_PORT}"
+    restart: unless-stopped 
+    container_name: ${CAN_NAME}
+    hostname: ${CAN_HOSTNAME}    
+    env_file:
+      - ./env/can.env
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "${LOG_MAX_FILE_SIZE}"
+        max-file: "${LOG_MAX_FILE_COUNT}"         

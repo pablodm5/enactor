@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<core:peripheralSupportWindow xmlns:core="http://www.enactor.com/core" xmlns:retail="http://www.enactor.com/retail" xmlns:ns4="http://www.enactor.com/crm" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803" xmlns:ns6="http://www.apis-it.hr/fin/2012/types/f73" xmlns:ns7="http://www.w3.org/2000/09/xmldsig#" xmlns:ns8="http://www.enactor.com/retail/storedRetailTransaction/service" xmlns:ns9="http://www.fu.gov.si/" xmlns:ns10="http://www.enactor.com/addressLookup/service" xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:ns14="http://www.enactor.com/crm/customerLoyalty/service" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" hasBorders="FALSE" height="320" width="320" messageBase="HHT/ProductEnquiry/ProductEnquiryMessages" titleId="PRODUCT_SEARCH_PAGE_TITLE" url="WM65/HHT/ProductEnquiryDetails/ProductEnquiryInventory">
+    <core:elements>
+        <core:panel styleClass="mainPanel" id="MAIN_PANEL">
+            <core:boundsConstraint height="230" width="320" y="35" x="0"/>
+            <core:elements>
+                <core:label messageId="PRODUCT_ID_LABEL" styleClass="fieldLabel" id="PRODUCT_ID_LABEL">
+                    <core:boundsConstraint height="17" width="100" y="0" x="5"/>
+                </core:label>
+                <core:text styleClass="message" id="PRODUCT_ID">
+                    <core:boundsConstraint height="17" width="161" y="0" x="89"/>
+                    <core:text>#{ length(productDetail.productId) &gt; 15 ? concat(strings:substring(productDetail.productId,0,15),'...') : productDetail.productId}</core:text>
+                </core:text>
+                <core:text styleClass="message" id="PRODUCT_DESCRIPTION">
+                    <core:boundsConstraint height="17" width="273" y="22" x="5"/>
+                    <core:text>#{length(productDetail.description) &gt; 45 ? concat(strings:substring(productDetail.description,0,45),'...') : productDetail.description}</core:text>
+                </core:text>
+                <core:text id="SELECT_COLOUR_INPUT_BOX">
+                    <core:boundsConstraint height="17" width="70" y="42" x="125"/>
+                    <core:text>#{notEmpty(selectedColour)?(length(dynamicMap[selectedColour].description) &gt; 6 ? concat(strings:substring(dynamicMap[selectedColour].description,0,6),'...') : dynamicMap[selectedColour].description):&quot;&quot;}</core:text>
+                </core:text>
+                <core:text id="SELECT_SIZE_INPUT_BOX">
+                    <core:boundsConstraint height="17" width="70" y="60" x="125"/>
+                    <core:text>#{notEmpty(selectedSize)?(length(dynamicMap[selectedSize.sizeKey].description) &gt; 6 ? concat(strings:substring(dynamicMap[selectedSize.sizeKey].description,0,6),'...') : dynamicMap[selectedSize.sizeKey].description):&quot;&quot;}</core:text>
+                </core:text>
+                <core:button messageId="SELECT_BUTTON" styleClass="button" enable="#{!isEmpty(colourList) &amp;&amp; !instanceOf(product, 'com.enactor.mfc.product.ISKUProduct')}" id="SELECT_COLOUR_BUTTON">
+                    <core:boundsConstraint height="17" width="60" y="42" x="218"/>
+                    <core:text>SelectColourPressed</core:text>
+                </core:button>
+                <core:button messageId="SELECT_BUTTON" styleClass="button" enable="#{!isEmpty(sizeList) &amp;&amp; !instanceOf(product, 'com.enactor.mfc.product.ISKUProduct')}" id="SELECT_SIZE_BUTTON">
+                    <core:boundsConstraint height="17" width="60" y="60" x="218"/>
+                    <core:text>SelectSizePressed</core:text>
+                </core:button>
+                <core:label messageId="LOCAL_STOCK_LABEL" id="LOCAL_STOCK_LABEL">
+                    <core:boundsConstraint height="17" width="100" y="82" x="5"/>
+                </core:label>
+                <core:text styleClass="message" id="STOCK_LEVEL">
+                    <core:boundsConstraint height="17" width="65" y="82" x="118"/>
+                    <core:text>#{notEmpty(selectedSize) &amp;&amp; notEmpty(getValue(localInventorySkuMap, selectedSize.productId).value) ? getValue(localInventorySkuMap,selectedSize.productId).value : localInventoryLevel.value}</core:text>
+                </core:text>
+                <core:label messageId="WAREHOUSE_LABEL" id="WAREHOUSE_STOCK_LABEL">
+                    <core:boundsConstraint height="17" width="100" y="105" x="5"/>
+                </core:label>
+                <core:text styleClass="message" id="WAREHOUSE_STOCK_LEVEL">
+                    <core:boundsConstraint height="17" width="65" y="105" x="118"/>
+                    <core:text>#{notEmpty(warehouseInventoryLevel) ? warehouseInventoryLevel.value : '-'}</core:text>
+                </core:text>
+                <core:label messageId="EXPECTED_LABEL" id="EXPECTED_STOCK_LABEL">
+                    <core:boundsConstraint height="17" width="100" y="127" x="5"/>
+                </core:label>
+                <core:text id="EXPECTED_STOCK_LEVEL">
+                    <core:boundsConstraint height="17" width="65" y="126" x="118"/>
+                    <core:text>#{notEmpty(expectedInventoryLevel) ? expectedInventoryLevel.value : '-'}</core:text>
+                </core:text>
+                <core:text id="EXPECTED_STOCK_LEVEL_DATE">
+                    <core:boundsConstraint height="17" width="65" y="126" x="198"/>
+                </core:text>
+                <core:panel styleClass="tablePanel" id="DATA_PANEL">
+                    <core:boundsConstraint height="56" width="308" y="146" x="5"/>
+                    <core:elements>
+                        <core:dataTable rowSelection="true" var="rowStock" data="#{instanceOf(product, 'com.enactor.mfc.product.ISKUProduct')  ? alternativeLocationInventoryLevel :  (notEmpty(selectedSize)  ? productEnquiryBean:getSizeInventoryLevelList(selectedSize.productId, alternateSizeList) : alternateSizeList)}" borderSize="1" borderStyle="None" styleClass="tableNoSpacing" id="ITEMS_TABLE">
+                            <core:flowConstraint width="304"/>
+                            <core:headerRow id="ITEMS_TABLE_HEADER">
+<core:cell styleClass="left" id="HEADER">
+    <core:elements>
+        <core:label messageId="LOCATION_LABEL" styleClass="columnHeading" id="LOCATION_LABEL">
+            <core:flowConstraint/>
+        </core:label>
+    </core:elements>
+</core:cell>
+<core:cell styleClass="left" id="TABLE_CELL_1">
+    <core:elements>
+        <core:label messageId="SIZE_LABEL" styleClass="columnHeading left" id="SIZE_LABEL">
+            <core:flowConstraint/>
+        </core:label>
+    </core:elements>
+</core:cell>
+<core:cell styleClass="left" id="TABLE_CELL_2">
+    <core:elements>
+        <core:label messageId="QUANTITY_LABEL" id="STOCK_LABEL">
+            <core:flowConstraint/>
+        </core:label>
+    </core:elements>
+</core:cell>
+                            </core:headerRow>
+                            <core:cell styleClass="left" id="TABLE_CELL_1">
+<core:elements>
+    <core:text id="LOCATION">
+        <core:flowConstraint/>
+        <core:text>#{length(rowStock.locationName) &gt; 15 ? concat(strings:substring(rowStock.locationName,0,15),'...') : rowStock.locationName}</core:text>
+    </core:text>
+</core:elements>
+                            </core:cell>
+                            <core:cell styleClass="left" visibility="#{notEmpty(alternateSizeList)}" id="TABLE_CELL_2">
+<core:elements>
+    <core:text id="SIZE">
+        <core:flowConstraint/>
+        <core:text>#{instanceOf(rowStock, 'com.enactor.inventoryManagement.itemInventoryLevel.ISKUProductLocationInventoryLevel') &amp;&amp; notEmpty(rowStock.sizeId) ? productEnquiryBean:getSizeDescription(rowStock.sizeId, styleColourSizeProduct.sizeRangeKey.sizeRangeId, dynamicMap) : '-'}</core:text>
+    </core:text>
+</core:elements>
+                            </core:cell>
+                            <core:cell styleClass="left" id="TABLE_CELL_3">
+<core:elements>
+    <core:text id="STOCK">
+        <core:flowConstraint/>
+        <core:text>#{rowStock.value}</core:text>
+    </core:text>
+</core:elements>
+                            </core:cell>
+                        </core:dataTable>
+                    </core:elements>
+                </core:panel>
+                <core:button messageId="VIEW_ALL_LABEL" styleClass="button" enable="#{instanceOf(product, 'com.enactor.mfc.product.ISKUProduct') &amp;&amp; size(alternativeLocationInventoryLevel)&gt;2|| notEmpty(selectedSize) &amp;&amp; size(ProductEnquiryBean:getSizeInventoryLevelList(selectedSize.productId,alternateSizeList))&gt;2 || size(alternateSizeList)&gt;2 }" id="VIEW_ALL_BUTTON">
+                    <core:boundsConstraint height="17" width="60" y="206" x="243"/>
+                    <core:text>ViewAllAltLocationInventoryPressed</core:text>
+                </core:button>
+                <core:label messageId="COLOUR_LABEL" id="COLOUR_LABEL">
+                    <core:boundsConstraint height="17" width="100" y="42" x="5"/>
+                </core:label>
+                <core:label messageId="SIZE_LABEL" id="SIZE_LABEL">
+                    <core:boundsConstraint height="17" width="100" y="60" x="5"/>
+                </core:label>
+            </core:elements>
+        </core:panel>
+    </core:elements>
+    <core:templateURL>HHT/HHTPage</core:templateURL>
+    <core:events>
+        <core:event destination="AMEND" event="key.KeyCode27Pressed"></core:event>
+    </core:events>
+    <core:preferredConstraintType>BOUNDS</core:preferredConstraintType>
+    <core:variables>
+        <core:variable required="true" name="enactor.inventoryManager.ExpectedInventoryLevel">
+            <core:interfaceName>com.enactor.inventoryManagement.itemInventoryLevel.ILocationInventoryLevel</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.mfc.Product">
+            <core:interfaceName>com.enactor.mfc.product.IProduct</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.inventoryManager.LocalInventoryLevel">
+            <core:interfaceName>com.enactor.inventoryManagement.itemInventoryLevel.ILocationInventoryLevel</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.inventoryManager.WarehouseInventoryLevel">
+            <core:interfaceName>com.enactor.inventoryManagement.itemInventoryLevel.ILocationInventoryLevel</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.productCatalogue.ProductDetail">
+            <core:interfaceName>com.enactor.productCatalogueSearchMessages.productCatalogueSearch.IProductSearchDetail</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.inventoryManager.AlternativeLocationInventoryLevel">
+            <core:interfaceName>java.util.List</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.hht.AlternateSizeList">
+            <core:interfaceName>java.util.List</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.mfc.StyleColourSizeProduct">
+            <core:interfaceName>com.enactor.mfc.product.IStyleColourSizeProduct</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.hht.SelectedSize">
+            <core:interfaceName>com.enactor.mfc.product.ISKUProduct</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.dynamicMap.DynamicMap">
+            <core:interfaceName>com.enactor.core.utilities.DynamicMap</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.mfc.ColourList">
+            <core:interfaceName>java.util.List</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.hht.SizeList">
+            <core:interfaceName>java.util.List</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.hht.LocalInventorySkuMap">
+            <core:interfaceName>java.util.Map</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.hht.SelectedColour">
+            <core:interfaceName>com.enactor.mfc.product.colour.IColourKey</core:interfaceName>
+        </core:variable>
+    </core:variables>
+    <core:functionLibraries>
+        <core:functionLibrary name="ProductEnquiryBean" path="com.enactor.storeInventoryManagement.productEnquiry.ProductEnquiryBean">
+            <core:type>CLASS</core:type>
+        </core:functionLibrary>
+    </core:functionLibraries>
+    <core:scannerEnabled>false</core:scannerEnabled>
+    <core:scannerDataName></core:scannerDataName>
+</core:peripheralSupportWindow>

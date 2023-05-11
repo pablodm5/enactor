@@ -1,0 +1,2767 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<core:process xmlns:core="http://www.enactor.com/core" xmlns:retail="http://www.enactor.com/retail" xmlns:ns4="http://www.enactor.com/crm" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803" xmlns:ns6="http://www.apis-it.hr/fin/2012/types/f73" xmlns:ns7="http://www.w3.org/2000/09/xmldsig#" xmlns:ns8="http://www.enactor.com/retail/storedRetailTransaction/service" xmlns:ns9="http://www.fu.gov.si/" xmlns:ns10="http://www.enactor.com/addressLookup/service" xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:ns14="http://www.enactor.com/crm/customerLoyalty/service" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <core:processID>CardPayment/ValidateCardAsPaymentCard</core:processID>
+    <core:version>1.0</core:version>
+    <core:name>Validate Card As Payment Card</core:name>
+    <core:defaultMessageBaseName></core:defaultMessageBaseName>
+    <core:firstStateID>Start</core:firstStateID>
+    <core:className></core:className>
+    <core:uiHints>
+        <entry>
+            <key>com.enactor.tools.editor.process.style</key>
+            <value>127</value>
+        </entry>
+        <entry>
+            <key>com.enactor.tools.editor.process.xloc</key>
+            <value>8</value>
+        </entry>
+        <entry>
+            <key>com.enactor.tools.editor.process.yloc</key>
+            <value>8</value>
+        </entry>
+    </core:uiHints>
+    <core:metaData>
+        <core:inputs>
+            <core:input required="true" name="enactor.mfc.IINRange">
+                <core:interfaceName>com.enactor.mfc.iinRange.IIINRange</core:interfaceName>
+            </core:input>
+            <core:input required="true" name="enactor.mfc.PaymentCardType">
+                <core:interfaceName>com.enactor.mfc.cardType.IPaymentCardType</core:interfaceName>
+            </core:input>
+            <core:input required="true" name="enactor.mfc.CardTenderItem">
+                <core:interfaceName>com.enactor.mfc.basket.items.ICardTenderItem</core:interfaceName>
+            </core:input>
+        </core:inputs>
+        <core:outputs>
+            <core:output required="false" name="enactor.mfc.CardTenderItem">
+                <core:interfaceName>com.enactor.mfc.basket.items.ICardTenderItem</core:interfaceName>
+            </core:output>
+            <core:output required="true" name="enactor.pos.ServiceCodeICC">
+                <core:interfaceName>java.lang.Boolean</core:interfaceName>
+            </core:output>
+            <core:output required="true" name="enactor.pos.ServiceCodeNoCashback">
+                <core:interfaceName>java.lang.Boolean</core:interfaceName>
+            </core:output>
+        </core:outputs>
+        <stateDataTypes>
+            <stateDataType required="false" name="enactor.mfc.CardTenderItem">
+                <core:interfaceName>com.enactor.mfc.basket.items.ICardTenderItem</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.pos.ServiceCodeICC">
+                <core:interfaceName>java.lang.Boolean</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.pos.ServiceCodeNoCashback">
+                <core:interfaceName>java.lang.Boolean</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.mfc.PaymentCardType">
+                <core:interfaceName>com.enactor.mfc.cardType.PaymentCardType</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="false" name="enactor.mfc.IINRange">
+                <core:interfaceName>com.enactor.mfc.iinRange.IIINRange</core:interfaceName>
+            </stateDataType>
+        </stateDataTypes>
+    </core:metaData>
+    <core:comment>Validate card process for card tender. Although this process is specifically for payment card tenders, the intention is that the majority of the actions can be reused in more general card validation.</core:comment>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>ValidateExpiryDate</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.cardPayment.processes.card.ValidateCardExpiryDate</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>63</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>936</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>742</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.CardDetails">
+                    <core:interfaceName>com.enactor.mfc.basket.items.ICardDetails</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.IINRange">
+                    <core:interfaceName>com.enactor.mfc.iinRange.IIINRange</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.pos.ExpiryDate">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+                <core:outcome name="enactor.pos.InvalidCard"/>
+                <core:outcome name="enactor.pos.ExpiryDateInvalid"/>
+                <core:outcome name="enactor.pos.Expired"/>
+                <core:outcome name="enactor.pos.ExpiryDateLimitExceeded"/>
+                <core:outcome name="enactor.pos.ExpiryDateRequired"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>TestExpiredCardAction</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>enactor.pos.Expired</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID>InvalidExpiryDate</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>enactor.pos.ExpiryDateInvalid</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>3</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>TestExpiryDateLimitExceededAction</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>enactor.pos.ExpiryDateLimitExceeded</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>4</core:linkID>
+            <core:toStateID>InputExpiryDate</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition>!(notEmpty(process.cardTenderItem.cardDetails.p2PEncryptedPan) || process.cardTenderItem.cardDetails.keyedAtPED)</core:condition>
+            <core:outcome>enactor.pos.ExpiryDateRequired</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>5</core:linkID>
+            <core:toStateID>InvalidCardData</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>enactor.pos.InvalidCard</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>6</core:linkID>
+            <core:toStateID>ValidateStartDate</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>7</core:linkID>
+            <core:toStateID>InvalidExpiryDate</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>enactor.pos.ExpiryDateRequired</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>8</core:linkID>
+            <core:toStateID>InvalidCardExpiryDate</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition>process.cardTenderItem.cardDetails.swiped &amp;&amp; process.cardTenderItem.cardDetails.cardScheme == 'CUP'</core:condition>
+            <core:comment>It is known that UnionPay swiped cards having '0000' expiry date can't be accepted by Optomany. 
+This could perhaps be generalised to all swiped cards.</core:comment>
+            <core:outcome>enactor.pos.ExpiryDateInvalid</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>ValidateStartDate</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.cardPayment.processes.card.ValidateCardStartDate</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>63</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2103</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>734</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.IINRange">
+                    <core:interfaceName>com.enactor.mfc.iinRange.IIINRange</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.CardDetails">
+                    <core:interfaceName>com.enactor.mfc.basket.items.ICardDetails</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.pos.StartDate">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+                <core:outcome name="enactor.pos.InvalidCard"/>
+                <core:outcome name="enactor.pos.StartDateInvalid"/>
+                <core:outcome name="enactor.pos.PreValid"/>
+                <core:outcome name="enactor.pos.StartDateRequired"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID>InvalidCardData</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>enactor.pos.InvalidCard</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>TestPrevalidCardAction</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>enactor.pos.PreValid</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>3</core:linkID>
+            <core:toStateID>InvalidStartDate</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>enactor.pos.StartDateInvalid</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>4</core:linkID>
+            <core:toStateID>InputStartDate</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition>!(notEmpty(process.cardTenderItem.cardDetails.p2PEncryptedPan) || process.cardTenderItem.cardDetails.keyedAtPED)</core:condition>
+            <core:outcome>enactor.pos.StartDateRequired</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>5</core:linkID>
+            <core:toStateID>ValidateIssueNumber</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>6</core:linkID>
+            <core:toStateID>InvalidStartDate</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>enactor.pos.StartDateRequired</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>ClearCardInputData</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIClearValuesAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2918</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>217</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="false" name="enactor.mfc.CardTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.ICardTenderItem</core:interfaceName>
+                </core:input>
+                <core:input required="false" name="enactor.mfc.IINRange">
+                    <core:interfaceName>com.enactor.mfc.iinRange.IIINRange</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.mfc.PaymentCardType">
+                    <core:interfaceName>com.enactor.mfc.cardType.IPaymentCardType</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="false" name="enactor.mfc.CardTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.ICardTenderItem</core:interfaceName>
+                </core:output>
+                <core:output required="false" name="enactor.mfc.IINRange">
+                    <core:interfaceName>com.enactor.mfc.iinRange.IIINRange</core:interfaceName>
+                </core:output>
+                <core:output required="true" name="enactor.mfc.PaymentCardType">
+                    <core:interfaceName>com.enactor.mfc.cardType.IPaymentCardType</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>EndProcessCancel</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>ValidateServiceCode</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.cardPayment.processes.card.ValidateServiceCode</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>63</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>4049</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>722</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.IINRange">
+                    <core:interfaceName>com.enactor.mfc.iinRange.IIINRange</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.ServiceCodeActionCode">
+                    <core:interfaceName>com.enactor.mfc.cardType.CardActionCode</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.CardTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.ICardTenderItem</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output name="enactor.mfc.CardTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.ICardTenderItem</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+                <core:outcome name="Fail"/>
+            </core:outcomes>
+            <core:sessionManagementType>NONE</core:sessionManagementType>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID>CardNotAllowed</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Fail</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>3</core:linkID>
+            <core:toStateID>CheckFallbackAction</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>ValidateIssueNumber</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.cardPayment.processes.card.ValidateIssueNumber</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>63</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2946</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>733</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.IINRange">
+                    <core:interfaceName>com.enactor.mfc.iinRange.IIINRange</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.CardDetails">
+                    <core:interfaceName>com.enactor.mfc.basket.items.ICardDetails</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.pos.CardIssueNumber">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+                <core:outcome name="enactor.pos.InvalidCard"/>
+                <core:outcome name="enactor.pos.IssueNumberInvalid"/>
+                <core:outcome name="enactor.pos.IssueNumber1Required"/>
+                <core:outcome name="enactor.pos.IssueNumber2Required"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID>InvalidCardData</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>enactor.pos.InvalidCard</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID>InputIssueNumber1</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition>!(notEmpty(process.cardTenderItem.cardDetails.p2PEncryptedPan) || process.cardTenderItem.cardDetails.keyedAtPED)</core:condition>
+            <core:outcome>enactor.pos.IssueNumber1Required</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>3</core:linkID>
+            <core:toStateID>InputIssueNumber2</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition>!(notEmpty(process.cardTenderItem.cardDetails.p2PEncryptedPan) || process.cardTenderItem.cardDetails.keyedAtPED)</core:condition>
+            <core:outcome>enactor.pos.IssueNumber2Required</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>4</core:linkID>
+            <core:toStateID>InvalidIssueNumber</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>enactor.pos.IssueNumberInvalid</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>5</core:linkID>
+            <core:toStateID>ProcessServiceCode</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>6</core:linkID>
+            <core:toStateID>InvalidCardData</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>enactor.pos.IssueNumber1Required</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>7</core:linkID>
+            <core:toStateID>InvalidCardData</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>enactor.pos.IssueNumber2Required</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:endProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>EndProcessFail</core:actionID>
+        <core:name>End Process Fail</core:name>
+        <core:className>com.enactor.coreUI.actions.UIEndProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2097</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>80</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData/>
+        <core:typeId>enactor.types.EndProcess</core:typeId>
+        <core:outcome>Fail</core:outcome>
+        <core:defaultProcessId></core:defaultProcessId>
+    </core:endProcessAction>
+    <core:endProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>EndProcessSuccess</core:actionID>
+        <core:name>End Process Success</core:name>
+        <core:className>com.enactor.coreUI.actions.UIEndProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>4980</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>59</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData/>
+        <core:typeId>enactor.types.EndProcess</core:typeId>
+        <core:outcome>Success</core:outcome>
+        <core:defaultProcessId></core:defaultProcessId>
+    </core:endProcessAction>
+    <core:endProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>EndProcessCancel</core:actionID>
+        <core:name>End Process Cancel</core:name>
+        <core:className>com.enactor.coreUI.actions.UIEndProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2917</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>83</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData/>
+        <core:typeId>enactor.types.EndProcess</core:typeId>
+        <core:outcome>Cancel</core:outcome>
+        <core:defaultProcessId></core:defaultProcessId>
+    </core:endProcessAction>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>TestPrevalidCardAction</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.cardPayment.processes.card.TestPrevalidCardAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>27</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2636</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>730</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.PaymentCardType">
+                    <core:interfaceName>com.enactor.mfc.cardType.IPaymentCardType</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.CardTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.ICardTenderItem</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output name="enactor.mfc.CardTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.ICardTenderItem</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+                <core:outcome name="Fail"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID>PreValidCard</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Fail</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID>ValidateIssueNumber</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>TestExpiryDateLimitExceededAction</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.cardPayment.processes.card.TestExpiryDateLimitExceededAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>27</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1733</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>742</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.PaymentCardType">
+                    <core:interfaceName>com.enactor.mfc.cardType.IPaymentCardType</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.CardTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.ICardTenderItem</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output name="enactor.mfc.CardTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.ICardTenderItem</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+                <core:outcome name="Fail"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID>ExpiredCard</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Fail</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID>ValidateStartDate</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>TestExpiredCardAction</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.cardPayment.processes.card.TestExpiredCardAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>27</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1455</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>742</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.PaymentCardType">
+                    <core:interfaceName>com.enactor.mfc.cardType.IPaymentCardType</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.CardTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.ICardTenderItem</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output name="enactor.mfc.CardTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.ICardTenderItem</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+                <core:outcome name="Fail"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID>ExpiredCard</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Fail</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID>ValidateStartDate</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>CheckInputType</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.cardPayment.processes.card.CheckInputType</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>127</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>384</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>740</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.PaymentCardType">
+                    <core:interfaceName>com.enactor.mfc.cardType.IPaymentCardType</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.CardTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.ICardTenderItem</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+                <core:outcome name="enactor.pos.KeyedInputNotAllowed"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID>ValidateExpiryDate</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID>KeyedInputNotAllowed</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>enactor.pos.KeyedInputNotAllowed</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>3</core:linkID>
+            <core:toStateID>RefundsNotEnabled</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition>process.cardTenderItem.isRefund &amp;&amp; !process.paymentCardType.enableRefund</core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>ProcessServiceCode</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.cardPayment.processes.card.ProcessServiceCode</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>127</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>3699</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>721</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.CardTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.ICardTenderItem</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.pos.ServiceCode">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output name="enactor.mfc.ServiceCodeActionCode">
+                    <core:interfaceName>com.enactor.mfc.cardType.CardActionCode</core:interfaceName>
+                </core:output>
+                <core:output name="enactor.pos.ServiceCodeNoCashback">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+                <core:outcome name="enactor.pos.ServiceCodeICC"/>
+            </core:outcomes>
+            <core:sessionManagementType>NONE</core:sessionManagementType>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>ValidateServiceCode</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>3</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>SetServiceCodeIsICC</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>enactor.pos.ServiceCodeICC</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:assignAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>SetServiceCodeIsICC</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIAssignAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>3859</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>560</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:outputs>
+                <core:output required="true" name="enactor.pos.ServiceCodeICC">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.Assign</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>ValidateServiceCode</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:dataAssignment toExpression="serviceCodeICC" fromExpression="true"/>
+    </core:assignAction>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>CheckFallbackAction</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.cardPayment.processes.card.CheckFallbackAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>127</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>4332</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>718</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.CardTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.ICardTenderItem</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.PaymentCardType">
+                    <core:interfaceName>com.enactor.mfc.cardType.IPaymentCardType</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+                <core:outcome name="Fail"/>
+            </core:outcomes>
+            <core:sessionManagementType>NONE</core:sessionManagementType>
+        </core:metaData>
+        <core:comment>If fallback to MSR is being used, check if allowed when card is an ICC</core:comment>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID>FallbackNotAllowed</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Fail</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID>CheckHotCardFile</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>CreateHotCardKey</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.CreateFactoryKeyObjectAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1023</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>4751</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>199</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="http://www.enactor.com/mfc" name="enactor.coreUI.EntityNamespace">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:param value="hotCard" name="enactor.coreUI.EntityName">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.coreUI.EntityName">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.coreUI.EntityNamespace">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output name="enactor.coreUI.Key">
+                    <core:interfaceName>com.enactor.core.entities.IEntityKey</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>SetHotCardKeyProperties</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:assignAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>SetHotCardKeyProperties</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIAssignAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1023</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>4982</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>199</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.HotCardKey">
+                    <core:interfaceName>com.enactor.mfc.tender.IHotCardKey</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.CardDetails">
+                    <core:interfaceName>com.enactor.mfc.basket.items.ICardDetails</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="true" name="enactor.mfc.HotCardKey">
+                    <core:interfaceName>com.enactor.mfc.tender.IHotCardKey</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.Assign</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>LoadHotCard</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:dataAssignment toExpression="hotCardKey.PAN" fromExpression="notEmpty(cardDetails.PANToken) ? cardDetails.PANToken : cardDetails.PAN"/>
+        <core:dataAssignment toExpression="hotCardKey.issueNumber" fromExpression="cardDetails.issueNumber"/>
+    </core:assignAction>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>LoadHotCard</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.commonUI.entities.processes.LoadEntityLenientAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>127</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>5208</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>199</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input name="enactor.coreUI.Key">
+                    <core:interfaceName>com.enactor.core.entities.IEntityKey</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output name="enactor.coreUI.Entity">
+                    <core:interfaceName>com.enactor.core.entities.IEntity</core:interfaceName>
+                </core:output>
+                <core:output name="enactor.coreUI.Key">
+                    <core:interfaceName>com.enactor.core.entities.IEntityKey</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+                <core:outcome name="InputEmpty"/>
+                <core:outcome name="NoSuchRecord"/>
+            </core:outcomes>
+            <core:sessionManagementType>NONE</core:sessionManagementType>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>EndProcessSuccess</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>InputEmpty</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>EndProcessSuccess</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>NoSuchRecord</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>3</core:linkID>
+            <core:toStateID>CardOnHotCardFile</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>ExtractServiceCode</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.cardPayment.processes.card.ExtractServiceCode</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>127</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>3488</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>721</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.IINRange">
+                    <core:interfaceName>com.enactor.mfc.iinRange.IIINRange</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.CardDetails">
+                    <core:interfaceName>com.enactor.mfc.basket.items.ICardDetails</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output name="enactor.mfc.CardDetails">
+                    <core:interfaceName>com.enactor.mfc.basket.items.ICardDetails</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+                <core:outcome name="enactor.pos.InvalidCard"/>
+            </core:outcomes>
+            <core:sessionManagementType>NONE</core:sessionManagementType>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>SetServiceCode</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID>InvalidCardData</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>enactor.pos.InvalidCard</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>CheckFallback</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UINullAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>4572</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>930</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.NullAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>CheckFallbackAction</core:toActionID>
+            <core:condition>!process.cardTenderItem.isRefund &amp;&amp; process.serviceCodeICC</core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>SuppressFallbackIndicator</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:assignAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>SuppressFallbackIndicator</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIAssignAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>4778</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>861</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.CardTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.ICardTenderItem</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="true" name="enactor.mfc.CardTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.ICardTenderItem</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:comment>For chip cards which fail ICC read but have a track2 indicating not ICC, e.g. ETEC Interop 22.</core:comment>
+        <core:typeId>enactor.types.Assign</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID>CheckHotCardFile</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:dataAssignment toExpression="cardTenderItem.cardDetails.ICCFallback" fromExpression="false"/>
+    </core:assignAction>
+    <core:assignAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>SetServiceCode</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIAssignAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1023</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>3699</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>1002</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.IINRange">
+                    <core:interfaceName>com.enactor.mfc.iinRange.IIINRange</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.CardTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.ICardTenderItem</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.pos.ServiceCode">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="true" name="enactor.pos.ServiceCode">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:comment>Set (potentially truncated) service code for service code checking.</core:comment>
+        <core:typeId>enactor.types.Assign</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>ProcessServiceCode</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:dataAssignment toExpression="serviceCode" fromExpression="cardTenderItem.cardDetails.serviceCode"/>
+        <core:dataAssignment toExpression="serviceCode" fromExpression="(length(serviceCode) &gt; 1 &amp;&amp;  (cardTenderItem.cardDetails.cardScheme == 'MAESTRO' || cardTenderItem.cardDetails.cardScheme == 'CUP')) ? strings:substring(serviceCode, 0, 1) : serviceCode"/>
+    </core:assignAction>
+    <core:messageState>
+        <core:url>/Error/Error</core:url>
+        <core:stateID>InvalidCardData</core:stateID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.states.UIMessageState</core:className>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2097</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>223</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <handledEvents>
+                <handledEvent name="OKPressed"/>
+            </handledEvents>
+        </core:metaData>
+        <core:unusedEvents>
+            <core:handledEvent name="OKPressed"/>
+        </core:unusedEvents>
+        <core:typeId>ErrorMessage</core:typeId>
+        <core:singleInstance>false</core:singleInstance>
+        <core:respondToViewEvents>false</core:respondToViewEvents>
+        <core:actionInputMappings/>
+        <core:actionOutputMappings/>
+        <core:eventLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>EndProcessFail</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>OKPressed</core:event>
+        </core:eventLink>
+        <core:keepPromptOpen>false</core:keepPromptOpen>
+        <core:keepPreviousPromptOpen>false</core:keepPreviousPromptOpen>
+        <core:promptTimeout>0</core:promptTimeout>
+        <core:hideOpenPrompt>false</core:hideOpenPrompt>
+        <core:allowDatabasePromptLookup>false</core:allowDatabasePromptLookup>
+        <core:messageBase>Pos/Tender/TenderMessages</core:messageBase>
+        <core:messageId>INVALID_CARD</core:messageId>
+        <core:messageText></core:messageText>
+    </core:messageState>
+    <core:state>
+        <core:url></core:url>
+        <core:stateID>ValidateIssueNumber</core:stateID>
+        <core:name></core:name>
+        <core:className></core:className>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2946</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>1082</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <handledEvents>
+                <handledEvent name="StateEntered"/>
+            </handledEvents>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicState</core:typeId>
+        <core:singleInstance>false</core:singleInstance>
+        <core:respondToViewEvents>false</core:respondToViewEvents>
+        <core:actionInputMappings>
+            <core:actionMapping>
+                <core:actionID>ValidateIssueNumber</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="false" name="enactor.mfc.IINRange">
+<core:interfaceName>com.enactor.mfc.iinRange.IIINRange</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.IINRange">
+<core:interfaceName>com.enactor.mfc.iinRange.IIINRange</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="false" name="enactor.mfc.CardTenderItem">
+<core:interfaceName>com.enactor.mfc.basket.items.ICardTenderItem</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.CardDetails">
+<core:interfaceName>com.enactor.mfc.basket.items.ICardDetails</core:interfaceName>
+                            </core:targetDataType>
+                            <core:expression>cardTenderItem.cardDetails</core:expression>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.pos.CardIssueNumber">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+        </core:actionInputMappings>
+        <core:actionOutputMappings/>
+        <core:eventLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>ValidateIssueNumber</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>StateEntered</core:event>
+        </core:eventLink>
+    </core:state>
+    <core:messageState>
+        <core:url>/Error/Error</core:url>
+        <core:stateID>InvalidIssueNumber</core:stateID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.states.UIMessageState</core:className>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2807</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>618</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <handledEvents>
+                <handledEvent name="OKPressed"/>
+            </handledEvents>
+        </core:metaData>
+        <core:unusedEvents>
+            <core:handledEvent name="OKPressed"/>
+        </core:unusedEvents>
+        <core:typeId>ErrorMessage</core:typeId>
+        <core:singleInstance>false</core:singleInstance>
+        <core:respondToViewEvents>false</core:respondToViewEvents>
+        <core:actionInputMappings/>
+        <core:actionOutputMappings/>
+        <core:eventLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID>ValidateIssueNumber</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition>!(notEmpty(process.cardTenderItem.cardDetails.p2PEncryptedPan) || process.cardTenderItem.cardDetails.keyedAtPED)</core:condition>
+            <core:event>OKPressed</core:event>
+        </core:eventLink>
+        <core:eventLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID>InvalidCardData</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:event>OKPressed</core:event>
+        </core:eventLink>
+        <core:keepPromptOpen>false</core:keepPromptOpen>
+        <core:keepPreviousPromptOpen>false</core:keepPreviousPromptOpen>
+        <core:promptTimeout>0</core:promptTimeout>
+        <core:hideOpenPrompt>false</core:hideOpenPrompt>
+        <core:allowDatabasePromptLookup>false</core:allowDatabasePromptLookup>
+        <core:messageBase>Pos/Tender/TenderMessages</core:messageBase>
+        <core:messageId>INVALID_ISSUE_NUMBER</core:messageId>
+        <core:messageText></core:messageText>
+    </core:messageState>
+    <core:state>
+        <core:url></core:url>
+        <core:stateID>ValidateStartDate</core:stateID>
+        <core:name></core:name>
+        <core:className></core:className>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2103</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>1072</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <handledEvents>
+                <handledEvent name="StateEntered"/>
+            </handledEvents>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicState</core:typeId>
+        <core:singleInstance>false</core:singleInstance>
+        <core:respondToViewEvents>false</core:respondToViewEvents>
+        <core:actionInputMappings>
+            <core:actionMapping>
+                <core:actionID>ValidateStartDate</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="false" name="enactor.mfc.IINRange">
+<core:interfaceName>com.enactor.mfc.iinRange.IIINRange</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.IINRange">
+<core:interfaceName>com.enactor.mfc.iinRange.IIINRange</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="false" name="enactor.mfc.CardTenderItem">
+<core:interfaceName>com.enactor.mfc.basket.items.ICardTenderItem</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.CardDetails">
+<core:interfaceName>com.enactor.mfc.basket.items.ICardDetails</core:interfaceName>
+                            </core:targetDataType>
+                            <core:expression>cardTenderItem.cardDetails</core:expression>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.pos.StartDate">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+        </core:actionInputMappings>
+        <core:actionOutputMappings/>
+        <core:eventLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>ValidateStartDate</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>StateEntered</core:event>
+        </core:eventLink>
+        <core:eventLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID>ProcessServiceCode</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition>process.cardTenderItem.cardDetails.contactless &amp;&amp; enumEquals(process.cardTenderItem.ICCResults.contactlessMode, 'MSD')</core:condition>
+            <core:comment>Start date probably not present for contactless mag-stripe mode</core:comment>
+            <core:event>StateEntered</core:event>
+        </core:eventLink>
+    </core:state>
+    <core:promptState>
+        <core:url>Pos/Tender/EnterIssueNumber2</core:url>
+        <core:stateID>InputIssueNumber2</core:stateID>
+        <core:name>Input Issue Number 2</core:name>
+        <core:className>com.enactor.coreUI.states.UIPromptState</core:className>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>37</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>3223</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>762</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <handledEvents>
+                <handledEvent name="OKPressed"/>
+                <handledEvent name="CancelPressed"/>
+            </handledEvents>
+            <stateDataTypes>
+                <stateDataType required="false" name="enactor.pos.CardIssueNumber">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </stateDataType>
+            </stateDataTypes>
+        </core:metaData>
+        <core:typeId>enactor.types.PromptState</core:typeId>
+        <core:singleInstance>false</core:singleInstance>
+        <core:respondToViewEvents>false</core:respondToViewEvents>
+        <core:actionInputMappings>
+            <core:actionMapping>
+                <core:actionID>ValidateIssueNumber</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="false" name="enactor.mfc.IINRange">
+<core:interfaceName>com.enactor.mfc.iinRange.IIINRange</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.IINRange">
+<core:interfaceName>com.enactor.mfc.iinRange.IIINRange</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="false" name="enactor.mfc.CardTenderItem">
+<core:interfaceName>com.enactor.mfc.basket.items.ICardTenderItem</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.CardDetails">
+<core:interfaceName>com.enactor.mfc.basket.items.ICardDetails</core:interfaceName>
+                            </core:targetDataType>
+                            <core:expression>cardTenderItem.cardDetails</core:expression>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="false" name="enactor.pos.CardIssueNumber">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="false" name="enactor.pos.CardIssueNumber">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+        </core:actionInputMappings>
+        <core:actionOutputMappings/>
+        <core:eventLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>ClearCardInputData</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>CancelPressed</core:event>
+        </core:eventLink>
+        <core:eventLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>ValidateIssueNumber</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>OKPressed</core:event>
+        </core:eventLink>
+        <core:keepPromptOpen>false</core:keepPromptOpen>
+        <core:keepPreviousPromptOpen>false</core:keepPreviousPromptOpen>
+        <core:promptTimeout>0</core:promptTimeout>
+        <core:hideOpenPrompt>false</core:hideOpenPrompt>
+        <core:allowDatabasePromptLookup>false</core:allowDatabasePromptLookup>
+    </core:promptState>
+    <core:messageState>
+        <core:url>/Error/Error</core:url>
+        <core:stateID>ExpiredCard</core:stateID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.states.UIMessageState</core:className>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1576</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>431</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <handledEvents>
+                <handledEvent name="OKPressed"/>
+            </handledEvents>
+        </core:metaData>
+        <core:unusedEvents>
+            <core:handledEvent name="OKPressed"/>
+        </core:unusedEvents>
+        <core:typeId>ErrorMessage</core:typeId>
+        <core:singleInstance>false</core:singleInstance>
+        <core:respondToViewEvents>false</core:respondToViewEvents>
+        <core:actionInputMappings/>
+        <core:actionOutputMappings/>
+        <core:eventLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>EndProcessFail</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>OKPressed</core:event>
+        </core:eventLink>
+        <core:keepPromptOpen>false</core:keepPromptOpen>
+        <core:keepPreviousPromptOpen>false</core:keepPreviousPromptOpen>
+        <core:promptTimeout>0</core:promptTimeout>
+        <core:hideOpenPrompt>false</core:hideOpenPrompt>
+        <core:allowDatabasePromptLookup>false</core:allowDatabasePromptLookup>
+        <core:messageBase>Pos/Tender/TenderMessages</core:messageBase>
+        <core:messageId>CARD_EXPIRED</core:messageId>
+        <core:messageText></core:messageText>
+    </core:messageState>
+    <core:promptState>
+        <core:url>Pos/Tender/EnterExpiryDate</core:url>
+        <core:stateID>InputExpiryDate</core:stateID>
+        <core:name>Input Expiry Date</core:name>
+        <core:className>com.enactor.coreUI.states.UIPromptState</core:className>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>37</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1215</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>545</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <handledEvents>
+                <handledEvent name="OKPressed"/>
+                <handledEvent name="CancelPressed"/>
+            </handledEvents>
+            <stateDataTypes>
+                <stateDataType required="false" name="enactor.pos.ExpiryDate">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </stateDataType>
+            </stateDataTypes>
+        </core:metaData>
+        <core:typeId>enactor.types.PromptState</core:typeId>
+        <core:singleInstance>false</core:singleInstance>
+        <core:respondToViewEvents>true</core:respondToViewEvents>
+        <core:actionInputMappings>
+            <core:actionMapping>
+                <core:actionID>ValidateExpiryDate</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="false" name="enactor.mfc.IINRange">
+<core:interfaceName>com.enactor.mfc.iinRange.IIINRange</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.IINRange">
+<core:interfaceName>com.enactor.mfc.iinRange.IIINRange</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="false" name="enactor.mfc.CardTenderItem">
+<core:interfaceName>com.enactor.mfc.basket.items.ICardTenderItem</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.CardDetails">
+<core:interfaceName>com.enactor.mfc.basket.items.ICardDetails</core:interfaceName>
+                            </core:targetDataType>
+                            <core:expression>cardTenderItem.cardDetails</core:expression>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="false" name="enactor.pos.ExpiryDate">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType name="enactor.pos.ExpiryDate">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+        </core:actionInputMappings>
+        <core:actionOutputMappings/>
+        <core:eventLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>ValidateExpiryDate</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>OKPressed</core:event>
+        </core:eventLink>
+        <core:eventLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>ClearCardInputData</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>CancelPressed</core:event>
+        </core:eventLink>
+        <core:keepPromptOpen>false</core:keepPromptOpen>
+        <core:keepPreviousPromptOpen>false</core:keepPreviousPromptOpen>
+        <core:promptTimeout>0</core:promptTimeout>
+        <core:hideOpenPrompt>false</core:hideOpenPrompt>
+        <core:allowDatabasePromptLookup>false</core:allowDatabasePromptLookup>
+    </core:promptState>
+    <core:messageState>
+        <core:url>/Error/Error</core:url>
+        <core:stateID>InvalidExpiryDate</core:stateID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.states.UIMessageState</core:className>
+        <core:defaultNextStateID>InputExpiryDate</core:defaultNextStateID>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>45</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>936</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>545</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.CardTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.ICardTenderItem</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <handledEvents>
+                <handledEvent name="OKPressed"/>
+            </handledEvents>
+            <stateDataTypes>
+                <stateDataType required="true" name="enactor.mfc.CardTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.ICardTenderItem</core:interfaceName>
+                </stateDataType>
+            </stateDataTypes>
+        </core:metaData>
+        <core:unusedEvents>
+            <core:handledEvent name="OKPressed"/>
+        </core:unusedEvents>
+        <core:typeId>ErrorMessage</core:typeId>
+        <core:singleInstance>false</core:singleInstance>
+        <core:respondToViewEvents>true</core:respondToViewEvents>
+        <core:actionInputMappings/>
+        <core:actionOutputMappings/>
+        <core:eventLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID>InputExpiryDate</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition>!(notEmpty(process.cardTenderItem.cardDetails.p2PEncryptedPan) || process.cardTenderItem.cardDetails.keyedAtPED)</core:condition>
+            <core:event>OKPressed</core:event>
+        </core:eventLink>
+        <core:eventLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>EndProcessFail</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>OKPressed</core:event>
+        </core:eventLink>
+        <core:keepPromptOpen>false</core:keepPromptOpen>
+        <core:keepPreviousPromptOpen>false</core:keepPreviousPromptOpen>
+        <core:promptTimeout>0</core:promptTimeout>
+        <core:hideOpenPrompt>false</core:hideOpenPrompt>
+        <core:allowDatabasePromptLookup>false</core:allowDatabasePromptLookup>
+        <core:messageBase>Pos/Tender/TenderMessages</core:messageBase>
+        <core:messageId>INVALID_EXPIRY_DATE</core:messageId>
+        <core:messageText></core:messageText>
+    </core:messageState>
+    <core:messageState>
+        <core:url>/Error/Error</core:url>
+        <core:stateID>PreValidCard</core:stateID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.states.UIMessageState</core:className>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2631</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>433</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <handledEvents>
+                <handledEvent name="OKPressed"/>
+            </handledEvents>
+        </core:metaData>
+        <core:unusedEvents>
+            <core:handledEvent name="OKPressed"/>
+        </core:unusedEvents>
+        <core:typeId>ErrorMessage</core:typeId>
+        <core:singleInstance>false</core:singleInstance>
+        <core:respondToViewEvents>false</core:respondToViewEvents>
+        <core:actionInputMappings/>
+        <core:actionOutputMappings/>
+        <core:eventLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>EndProcessFail</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>OKPressed</core:event>
+        </core:eventLink>
+        <core:keepPromptOpen>false</core:keepPromptOpen>
+        <core:keepPreviousPromptOpen>false</core:keepPreviousPromptOpen>
+        <core:promptTimeout>0</core:promptTimeout>
+        <core:hideOpenPrompt>false</core:hideOpenPrompt>
+        <core:allowDatabasePromptLookup>false</core:allowDatabasePromptLookup>
+        <core:messageBase>Pos/Tender/TenderMessages</core:messageBase>
+        <core:messageId>CARD_NOT_YET_VALID</core:messageId>
+        <core:messageText></core:messageText>
+    </core:messageState>
+    <core:state>
+        <core:url></core:url>
+        <core:stateID>ValidateExpiryDate</core:stateID>
+        <core:name></core:name>
+        <core:className></core:className>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>936</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>1071</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <handledEvents>
+                <handledEvent name="StateEntered"/>
+            </handledEvents>
+            <stateDataTypes/>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicState</core:typeId>
+        <core:singleInstance>false</core:singleInstance>
+        <core:respondToViewEvents>false</core:respondToViewEvents>
+        <core:actionInputMappings>
+            <core:actionMapping>
+                <core:actionID>ValidateExpiryDate</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="false" name="enactor.mfc.IINRange">
+<core:interfaceName>com.enactor.mfc.iinRange.IIINRange</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.IINRange">
+<core:interfaceName>com.enactor.mfc.iinRange.IIINRange</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="false" name="enactor.mfc.CardTenderItem">
+<core:interfaceName>com.enactor.mfc.basket.items.ICardTenderItem</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.CardDetails">
+<core:interfaceName>com.enactor.mfc.basket.items.ICardDetails</core:interfaceName>
+                            </core:targetDataType>
+                            <core:expression>cardTenderItem.cardDetails</core:expression>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.pos.ExpiryDate">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+        </core:actionInputMappings>
+        <core:actionOutputMappings/>
+        <core:eventLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>ValidateExpiryDate</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>StateEntered</core:event>
+        </core:eventLink>
+    </core:state>
+    <core:promptState>
+        <core:url>Pos/Tender/EnterStartDate</core:url>
+        <core:stateID>InputStartDate</core:stateID>
+        <core:name>Input Start Date</core:name>
+        <core:className>com.enactor.coreUI.states.UIPromptState</core:className>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>37</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2376</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>561</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <handledEvents>
+                <handledEvent name="OKPressed"/>
+                <handledEvent name="CancelPressed"/>
+            </handledEvents>
+            <stateDataTypes>
+                <stateDataType required="false" name="enactor.pos.StartDate">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </stateDataType>
+            </stateDataTypes>
+        </core:metaData>
+        <core:typeId>enactor.types.PromptState</core:typeId>
+        <core:singleInstance>false</core:singleInstance>
+        <core:respondToViewEvents>false</core:respondToViewEvents>
+        <core:actionInputMappings>
+            <core:actionMapping>
+                <core:actionID>ValidateStartDate</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="false" name="enactor.mfc.IINRange">
+<core:interfaceName>com.enactor.mfc.iinRange.IIINRange</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.IINRange">
+<core:interfaceName>com.enactor.mfc.iinRange.IIINRange</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="false" name="enactor.mfc.CardTenderItem">
+<core:interfaceName>com.enactor.mfc.basket.items.ICardTenderItem</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.CardDetails">
+<core:interfaceName>com.enactor.mfc.basket.items.ICardDetails</core:interfaceName>
+                            </core:targetDataType>
+                            <core:expression>cardTenderItem.cardDetails</core:expression>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="false" name="enactor.pos.StartDate">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="false" name="enactor.pos.StartDate">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+        </core:actionInputMappings>
+        <core:actionOutputMappings/>
+        <core:eventLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>ClearCardInputData</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>CancelPressed</core:event>
+        </core:eventLink>
+        <core:eventLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>ValidateStartDate</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>OKPressed</core:event>
+        </core:eventLink>
+        <core:keepPromptOpen>false</core:keepPromptOpen>
+        <core:keepPreviousPromptOpen>false</core:keepPreviousPromptOpen>
+        <core:promptTimeout>0</core:promptTimeout>
+        <core:hideOpenPrompt>false</core:hideOpenPrompt>
+        <core:allowDatabasePromptLookup>false</core:allowDatabasePromptLookup>
+    </core:promptState>
+    <core:messageState>
+        <core:url>/Error/Error</core:url>
+        <core:stateID>InvalidStartDate</core:stateID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.states.UIMessageState</core:className>
+        <core:defaultNextStateID>InputStartDate</core:defaultNextStateID>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1909</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>525</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <handledEvents>
+                <handledEvent name="OKPressed"/>
+            </handledEvents>
+        </core:metaData>
+        <core:unusedEvents>
+            <core:handledEvent name="OKPressed"/>
+        </core:unusedEvents>
+        <core:typeId>ErrorMessage</core:typeId>
+        <core:singleInstance>false</core:singleInstance>
+        <core:respondToViewEvents>false</core:respondToViewEvents>
+        <core:actionInputMappings/>
+        <core:actionOutputMappings/>
+        <core:eventLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID>InputStartDate</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition>!(notEmpty(process.cardTenderItem.cardDetails.p2PEncryptedPan) || process.cardTenderItem.cardDetails.keyedAtPED)</core:condition>
+            <core:event>OKPressed</core:event>
+        </core:eventLink>
+        <core:eventLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>EndProcessFail</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>OKPressed</core:event>
+        </core:eventLink>
+        <core:keepPromptOpen>false</core:keepPromptOpen>
+        <core:keepPreviousPromptOpen>false</core:keepPreviousPromptOpen>
+        <core:promptTimeout>0</core:promptTimeout>
+        <core:hideOpenPrompt>false</core:hideOpenPrompt>
+        <core:allowDatabasePromptLookup>false</core:allowDatabasePromptLookup>
+        <core:messageBase>Pos/Tender/TenderMessages</core:messageBase>
+        <core:messageId>INVALID_START_DATE</core:messageId>
+        <core:messageText></core:messageText>
+    </core:messageState>
+    <core:promptState>
+        <core:url>Pos/Tender/EnterIssueNumber1</core:url>
+        <core:stateID>InputIssueNumber1</core:stateID>
+        <core:name>Input Issue Number 1</core:name>
+        <core:className>com.enactor.coreUI.states.UIPromptState</core:className>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>37</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>3223</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>551</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <handledEvents>
+                <handledEvent name="OKPressed"/>
+                <handledEvent name="CancelPressed"/>
+            </handledEvents>
+            <stateDataTypes>
+                <stateDataType required="false" name="enactor.pos.CardIssueNumber">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </stateDataType>
+            </stateDataTypes>
+        </core:metaData>
+        <core:typeId>enactor.types.PromptState</core:typeId>
+        <core:singleInstance>false</core:singleInstance>
+        <core:respondToViewEvents>false</core:respondToViewEvents>
+        <core:actionInputMappings>
+            <core:actionMapping>
+                <core:actionID>ValidateIssueNumber</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="false" name="enactor.mfc.IINRange">
+<core:interfaceName>com.enactor.mfc.iinRange.IIINRange</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.IINRange">
+<core:interfaceName>com.enactor.mfc.iinRange.IIINRange</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="false" name="enactor.mfc.CardTenderItem">
+<core:interfaceName>com.enactor.mfc.basket.items.ICardTenderItem</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.CardDetails">
+<core:interfaceName>com.enactor.mfc.basket.items.ICardDetails</core:interfaceName>
+                            </core:targetDataType>
+                            <core:expression>cardTenderItem.cardDetails</core:expression>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="false" name="enactor.pos.CardIssueNumber">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="false" name="enactor.pos.CardIssueNumber">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+        </core:actionInputMappings>
+        <core:actionOutputMappings/>
+        <core:eventLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>ClearCardInputData</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>CancelPressed</core:event>
+        </core:eventLink>
+        <core:eventLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>ValidateIssueNumber</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>OKPressed</core:event>
+        </core:eventLink>
+        <core:keepPromptOpen>false</core:keepPromptOpen>
+        <core:keepPreviousPromptOpen>false</core:keepPreviousPromptOpen>
+        <core:promptTimeout>0</core:promptTimeout>
+        <core:hideOpenPrompt>false</core:hideOpenPrompt>
+        <core:allowDatabasePromptLookup>false</core:allowDatabasePromptLookup>
+    </core:promptState>
+    <core:messageState>
+        <core:url>/Error/Error</core:url>
+        <core:stateID>CardNotAllowed</core:stateID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.states.UIMessageState</core:className>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>3513</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>444</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <handledEvents>
+                <handledEvent name="OKPressed"/>
+            </handledEvents>
+        </core:metaData>
+        <core:unusedEvents>
+            <core:handledEvent name="OKPressed"/>
+        </core:unusedEvents>
+        <core:typeId>ErrorMessage</core:typeId>
+        <core:singleInstance>false</core:singleInstance>
+        <core:respondToViewEvents>false</core:respondToViewEvents>
+        <core:actionInputMappings/>
+        <core:actionOutputMappings/>
+        <core:eventLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>EndProcessFail</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>OKPressed</core:event>
+        </core:eventLink>
+        <core:keepPromptOpen>false</core:keepPromptOpen>
+        <core:keepPreviousPromptOpen>false</core:keepPreviousPromptOpen>
+        <core:promptTimeout>0</core:promptTimeout>
+        <core:hideOpenPrompt>false</core:hideOpenPrompt>
+        <core:allowDatabasePromptLookup>false</core:allowDatabasePromptLookup>
+        <core:messageBase>Pos/Tender/TenderMessages</core:messageBase>
+        <core:messageId>CARD_NOT_ALLOWED</core:messageId>
+        <core:messageText></core:messageText>
+    </core:messageState>
+    <core:messageState>
+        <core:url>/Error/Error</core:url>
+        <core:stateID>KeyedInputNotAllowed</core:stateID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.states.UIMessageState</core:className>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>376</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>421</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <handledEvents>
+                <handledEvent name="OKPressed"/>
+            </handledEvents>
+        </core:metaData>
+        <core:unusedEvents>
+            <core:handledEvent name="OKPressed"/>
+        </core:unusedEvents>
+        <core:typeId>ErrorMessage</core:typeId>
+        <core:singleInstance>false</core:singleInstance>
+        <core:respondToViewEvents>false</core:respondToViewEvents>
+        <core:actionInputMappings/>
+        <core:actionOutputMappings/>
+        <core:eventLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>EndProcessFail</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>OKPressed</core:event>
+        </core:eventLink>
+        <core:keepPromptOpen>false</core:keepPromptOpen>
+        <core:keepPreviousPromptOpen>false</core:keepPreviousPromptOpen>
+        <core:promptTimeout>0</core:promptTimeout>
+        <core:hideOpenPrompt>false</core:hideOpenPrompt>
+        <core:allowDatabasePromptLookup>false</core:allowDatabasePromptLookup>
+        <core:messageBase>Pos/Tender/TenderMessages</core:messageBase>
+        <core:messageId>KEYED_INPUT_NOT_ALLOWED</core:messageId>
+        <core:messageText></core:messageText>
+    </core:messageState>
+    <core:messageState>
+        <core:url>/Error/Error</core:url>
+        <core:stateID>RefundsNotEnabled</core:stateID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.states.UIMessageState</core:className>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>9</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>654</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>503</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.PaymentCardType">
+                    <core:interfaceName>com.enactor.mfc.cardType.IPaymentCardType</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <handledEvents>
+                <handledEvent name="OKPressed"/>
+            </handledEvents>
+        </core:metaData>
+        <core:unusedEvents>
+            <core:handledEvent name="OKPressed"/>
+        </core:unusedEvents>
+        <core:typeId>ErrorMessage</core:typeId>
+        <core:singleInstance>false</core:singleInstance>
+        <core:respondToViewEvents>false</core:respondToViewEvents>
+        <core:actionInputMappings/>
+        <core:actionOutputMappings/>
+        <core:eventLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>EndProcessFail</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>OKPressed</core:event>
+        </core:eventLink>
+        <core:keepPromptOpen>false</core:keepPromptOpen>
+        <core:keepPreviousPromptOpen>false</core:keepPreviousPromptOpen>
+        <core:promptTimeout>0</core:promptTimeout>
+        <core:hideOpenPrompt>false</core:hideOpenPrompt>
+        <core:allowDatabasePromptLookup>false</core:allowDatabasePromptLookup>
+        <core:messageBase>Pos/Tender/TenderMessages</core:messageBase>
+        <core:messageId>REFUNDS_NOT_ENABLED</core:messageId>
+        <core:messageText></core:messageText>
+    </core:messageState>
+    <core:state>
+        <core:url></core:url>
+        <core:stateID>ProcessServiceCode</core:stateID>
+        <core:name></core:name>
+        <core:className></core:className>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>33</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>3488</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>1002</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <handledEvents>
+                <handledEvent name="StateEntered"/>
+            </handledEvents>
+            <stateDataTypes>
+                <stateDataType required="true" name="enactor.mfc.ServiceCodeActionCode">
+                    <core:interfaceName>com.enactor.mfc.cardType.CardActionCode</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="true" name="enactor.pos.ServiceCode">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </stateDataType>
+            </stateDataTypes>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicState</core:typeId>
+        <core:singleInstance>false</core:singleInstance>
+        <core:respondToViewEvents>false</core:respondToViewEvents>
+        <core:actionInputMappings>
+            <core:actionMapping>
+                <core:actionID>ExtractServiceCode</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="false" name="enactor.mfc.IINRange">
+<core:interfaceName>com.enactor.mfc.iinRange.IIINRange</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.IINRange">
+<core:interfaceName>com.enactor.mfc.iinRange.IIINRange</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="false" name="enactor.mfc.CardTenderItem">
+<core:interfaceName>com.enactor.mfc.basket.items.ICardTenderItem</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.CardDetails">
+<core:interfaceName>com.enactor.mfc.basket.items.ICardDetails</core:interfaceName>
+                            </core:targetDataType>
+                            <core:expression>cardTenderItem.cardDetails</core:expression>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings/>
+                </core:mappings>
+            </core:actionMapping>
+        </core:actionInputMappings>
+        <core:actionOutputMappings>
+            <core:actionMapping>
+                <core:actionID>ExtractServiceCode</core:actionID>
+                <core:mappings>
+                    <core:processMappings/>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:sourceDataType name="enactor.mfc.CardDetails">
+<core:interfaceName>com.enactor.mfc.basket.items.ICardDetails</core:interfaceName>
+                            </core:sourceDataType>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+        </core:actionOutputMappings>
+        <core:eventLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>ExtractServiceCode</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>StateEntered</core:event>
+        </core:eventLink>
+    </core:state>
+    <core:messageState>
+        <core:url>/Error/Error</core:url>
+        <core:stateID>FallbackNotAllowed</core:stateID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.states.UIMessageState</core:className>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>9</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>4332</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>461</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.PaymentCardType">
+                    <core:interfaceName>com.enactor.mfc.cardType.IPaymentCardType</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <handledEvents>
+                <handledEvent name="OKPressed"/>
+            </handledEvents>
+        </core:metaData>
+        <core:unusedEvents>
+            <core:handledEvent name="OKPressed"/>
+        </core:unusedEvents>
+        <core:typeId>ErrorMessage</core:typeId>
+        <core:singleInstance>false</core:singleInstance>
+        <core:respondToViewEvents>false</core:respondToViewEvents>
+        <core:actionInputMappings/>
+        <core:actionOutputMappings/>
+        <core:eventLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>EndProcessFail</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>OKPressed</core:event>
+        </core:eventLink>
+        <core:keepPromptOpen>false</core:keepPromptOpen>
+        <core:keepPreviousPromptOpen>false</core:keepPreviousPromptOpen>
+        <core:promptTimeout>0</core:promptTimeout>
+        <core:hideOpenPrompt>false</core:hideOpenPrompt>
+        <core:allowDatabasePromptLookup>false</core:allowDatabasePromptLookup>
+        <core:messageBase>Pos/Tender/TenderMessages</core:messageBase>
+        <core:messageId>FALLBACK_NOT_ALLOWED</core:messageId>
+        <core:messageText></core:messageText>
+    </core:messageState>
+    <core:state>
+        <core:url></core:url>
+        <core:stateID>CheckFallbackAction</core:stateID>
+        <core:name></core:name>
+        <core:className></core:className>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>4332</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>1027</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <handledEvents>
+                <handledEvent name="StateEntered"/>
+            </handledEvents>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicState</core:typeId>
+        <core:singleInstance>false</core:singleInstance>
+        <core:respondToViewEvents>false</core:respondToViewEvents>
+        <core:actionInputMappings/>
+        <core:actionOutputMappings/>
+        <core:eventLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>CheckFallback</core:toActionID>
+            <core:condition>process.cardTenderItem.cardDetails.ICCFallback</core:condition>
+            <core:event>StateEntered</core:event>
+        </core:eventLink>
+        <core:eventLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID>CheckHotCardFile</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:event>StateEntered</core:event>
+        </core:eventLink>
+    </core:state>
+    <core:state>
+        <core:url></core:url>
+        <core:stateID>CheckHotCardFile</core:stateID>
+        <core:name></core:name>
+        <core:className></core:className>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>4622</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>554</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <handledEvents>
+                <handledEvent name="StateEntered"/>
+            </handledEvents>
+            <stateDataTypes>
+                <stateDataType required="true" name="enactor.mfc.HotCardKey">
+                    <core:interfaceName>com.enactor.mfc.tender.IHotCardKey</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="true" name="enactor.mfc.HotCard">
+                    <core:interfaceName>com.enactor.mfc.tender.IHotCard</core:interfaceName>
+                </stateDataType>
+            </stateDataTypes>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicState</core:typeId>
+        <core:singleInstance>false</core:singleInstance>
+        <core:respondToViewEvents>false</core:respondToViewEvents>
+        <core:actionInputMappings>
+            <core:actionMapping>
+                <core:actionID>SetHotCardKeyProperties</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="false" name="enactor.mfc.CardTenderItem">
+<core:interfaceName>com.enactor.mfc.basket.items.ICardTenderItem</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.CardDetails">
+<core:interfaceName>com.enactor.mfc.basket.items.ICardDetails</core:interfaceName>
+                            </core:targetDataType>
+                            <core:expression>cardTenderItem.cardDetails</core:expression>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.HotCardKey">
+<core:interfaceName>com.enactor.mfc.tender.IHotCardKey</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.HotCardKey">
+<core:interfaceName>com.enactor.mfc.tender.IHotCardKey</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>LoadHotCard</core:actionID>
+                <core:mappings>
+                    <core:processMappings/>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.HotCardKey">
+<core:interfaceName>com.enactor.mfc.tender.IHotCardKey</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType name="enactor.coreUI.Key">
+<core:interfaceName>com.enactor.core.entities.IEntityKey</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+        </core:actionInputMappings>
+        <core:actionOutputMappings>
+            <core:actionMapping>
+                <core:actionID>CreateHotCardKey</core:actionID>
+                <core:mappings>
+                    <core:processMappings/>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:sourceDataType name="enactor.coreUI.Key">
+<core:interfaceName>com.enactor.core.entities.IEntityKey</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.HotCardKey">
+<core:interfaceName>com.enactor.mfc.tender.IHotCardKey</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>LoadHotCard</core:actionID>
+                <core:mappings>
+                    <core:processMappings/>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:sourceDataType name="enactor.coreUI.Entity">
+<core:interfaceName>com.enactor.core.entities.IEntity</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.HotCard">
+<core:interfaceName>com.enactor.mfc.tender.IHotCard</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType name="enactor.coreUI.Key">
+<core:interfaceName>com.enactor.core.entities.IEntityKey</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.HotCardKey">
+<core:interfaceName>com.enactor.mfc.tender.IHotCardKey</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+        </core:actionOutputMappings>
+        <core:eventLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>CreateHotCardKey</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>StateEntered</core:event>
+        </core:eventLink>
+    </core:state>
+    <core:messageState>
+        <core:url>/Error/Error</core:url>
+        <core:stateID>CardOnHotCardFile</core:stateID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.states.UIMessageState</core:className>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>9</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>4472</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>293</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.PaymentCardType">
+                    <core:interfaceName>com.enactor.mfc.cardType.IPaymentCardType</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <handledEvents>
+                <handledEvent name="OKPressed"/>
+            </handledEvents>
+        </core:metaData>
+        <core:unusedEvents>
+            <core:handledEvent name="OKPressed"/>
+        </core:unusedEvents>
+        <core:typeId>ErrorMessage</core:typeId>
+        <core:singleInstance>false</core:singleInstance>
+        <core:respondToViewEvents>true</core:respondToViewEvents>
+        <core:actionInputMappings/>
+        <core:actionOutputMappings/>
+        <core:eventLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>EndProcessFail</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>OKPressed</core:event>
+        </core:eventLink>
+        <core:keepPromptOpen>false</core:keepPromptOpen>
+        <core:keepPreviousPromptOpen>false</core:keepPreviousPromptOpen>
+        <core:promptTimeout>0</core:promptTimeout>
+        <core:hideOpenPrompt>false</core:hideOpenPrompt>
+        <core:allowDatabasePromptLookup>false</core:allowDatabasePromptLookup>
+        <core:messageBase>Pos/Tender/TenderMessages</core:messageBase>
+        <core:messageId>CARD_IS_HOT_CARD</core:messageId>
+        <core:messageText></core:messageText>
+    </core:messageState>
+    <core:state>
+        <core:url></core:url>
+        <core:stateID>Start</core:stateID>
+        <core:name></core:name>
+        <core:className></core:className>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>44</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>421</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <handledEvents>
+                <handledEvent name="StateEntered"/>
+            </handledEvents>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicState</core:typeId>
+        <core:singleInstance>false</core:singleInstance>
+        <core:respondToViewEvents>false</core:respondToViewEvents>
+        <core:actionInputMappings/>
+        <core:actionOutputMappings/>
+        <core:eventLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>CheckInputType</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>StateEntered</core:event>
+        </core:eventLink>
+    </core:state>
+    <core:messageState>
+        <core:url>/Error/Error</core:url>
+        <core:stateID>InvalidCardExpiryDate</core:stateID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.states.UIMessageState</core:className>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1147</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>431</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.CardTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.ICardTenderItem</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <handledEvents>
+                <handledEvent name="OKPressed"/>
+            </handledEvents>
+            <stateDataTypes>
+                <stateDataType required="true" name="enactor.mfc.CardTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.ICardTenderItem</core:interfaceName>
+                </stateDataType>
+            </stateDataTypes>
+        </core:metaData>
+        <core:unusedEvents>
+            <core:handledEvent name="OKPressed"/>
+        </core:unusedEvents>
+        <core:typeId>ErrorMessage</core:typeId>
+        <core:singleInstance>false</core:singleInstance>
+        <core:respondToViewEvents>true</core:respondToViewEvents>
+        <core:actionInputMappings/>
+        <core:actionOutputMappings/>
+        <core:eventLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>EndProcessFail</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>OKPressed</core:event>
+        </core:eventLink>
+        <core:keepPromptOpen>false</core:keepPromptOpen>
+        <core:keepPreviousPromptOpen>false</core:keepPreviousPromptOpen>
+        <core:promptTimeout>0</core:promptTimeout>
+        <core:hideOpenPrompt>false</core:hideOpenPrompt>
+        <core:allowDatabasePromptLookup>false</core:allowDatabasePromptLookup>
+        <core:messageBase>Pos/Tender/TenderMessages</core:messageBase>
+        <core:messageId>INVALID_CARD_EXPIRY_DATE</core:messageId>
+        <core:messageText></core:messageText>
+    </core:messageState>
+    <core:stateTransitions/>
+</core:process>

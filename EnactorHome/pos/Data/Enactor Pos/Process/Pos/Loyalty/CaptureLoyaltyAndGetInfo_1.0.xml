@@ -1,0 +1,3913 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<core:process xmlns:core="http://www.enactor.com/core" xmlns:retail="http://www.enactor.com/retail" xmlns:ns4="http://www.enactor.com/crm" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803" xmlns:ns6="http://www.apis-it.hr/fin/2012/types/f73" xmlns:ns7="http://www.w3.org/2000/09/xmldsig#" xmlns:ns8="http://www.enactor.com/retail/storedRetailTransaction/service" xmlns:ns9="http://www.fu.gov.si/" xmlns:ns10="http://www.enactor.com/addressLookup/service" xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:ns14="http://www.enactor.com/crm/customerLoyalty/service" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <core:processID>Pos/Loyalty/CaptureLoyaltyAndGetInfo</core:processID>
+    <core:version>1.0</core:version>
+    <core:name>Capture Loyalty number and get loyalty information</core:name>
+    <core:defaultMessageBaseName></core:defaultMessageBaseName>
+    <core:firstStateID>Start</core:firstStateID>
+    <core:className></core:className>
+    <core:uiHints>
+        <entry>
+            <key>com.enactor.tools.editor.process.style</key>
+            <value>63</value>
+        </entry>
+        <entry>
+            <key>com.enactor.tools.editor.process.xloc</key>
+            <value>0</value>
+        </entry>
+        <entry>
+            <key>com.enactor.tools.editor.process.yloc</key>
+            <value>0</value>
+        </entry>
+    </core:uiHints>
+    <core:metaData>
+        <core:inputs>
+            <core:input name="enactor.coreUI.CurrentEvent">
+                <core:interfaceName>com.enactor.core.events.IEvent</core:interfaceName>
+            </core:input>
+            <core:input name="enactor.pos.AllowLoyaltyWithoutAccount">
+                <core:interfaceName>java.lang.Boolean</core:interfaceName>
+            </core:input>
+            <core:input name="enactor.coreUI.User">
+                <core:interfaceName>com.enactor.core.signOn.ISignedOnUser</core:interfaceName>
+            </core:input>
+            <core:input name="enactor.mfc.Device">
+                <core:interfaceName>com.enactor.mfc.device.IDevice</core:interfaceName>
+            </core:input>
+            <core:input name="enactor.coreUI.PromptTimeoutSecs">
+                <core:interfaceName>java.lang.Integer</core:interfaceName>
+            </core:input>
+            <core:input required="true" name="enactor.mfc.PosTerminal">
+                <core:interfaceName>com.enactor.mfc.posTerminal.POSTerminal</core:interfaceName>
+            </core:input>
+            <core:input name="enactor.pos.AllowCancel">
+                <core:interfaceName>java.lang.Boolean</core:interfaceName>
+            </core:input>
+            <core:input name="enactor.pos.AllowSkip">
+                <core:interfaceName>java.lang.Boolean</core:interfaceName>
+            </core:input>
+            <core:input name="enactor.pos.IgnoreCustomerEmployee">
+                <core:interfaceName>java.lang.Boolean</core:interfaceName>
+            </core:input>
+            <core:input required="true" name="enactor.mfc.Location">
+                <core:interfaceName>com.enactor.mfc.location.ILocation</core:interfaceName>
+            </core:input>
+            <core:input required="true" name="enactor.mfc.TransactionHandler">
+                <core:interfaceName>com.enactor.mfc.retail.transaction.IRetailTransactionHandler</core:interfaceName>
+            </core:input>
+            <core:input name="enactor.pos.CardTrack2">
+                <core:interfaceName>java.lang.String</core:interfaceName>
+            </core:input>
+            <core:input name="enactor.pos.RepromptAfterError">
+                <core:interfaceName>java.lang.Boolean</core:interfaceName>
+            </core:input>
+            <core:input name="enactor.pos.FromTender">
+                <core:interfaceName>java.lang.Boolean</core:interfaceName>
+            </core:input>
+            <core:input name="enactor.pos.CardNumberHashed">
+                <core:interfaceName>java.lang.String</core:interfaceName>
+            </core:input>
+            <core:input name="enactor.pos.DisplayLoyalty">
+                <core:interfaceName>java.lang.Boolean</core:interfaceName>
+            </core:input>
+            <core:input name="enactor.pos.ConfirmLoyalty">
+                <core:interfaceName>java.lang.Boolean</core:interfaceName>
+            </core:input>
+            <core:input name="enactor.pos.CardPAN">
+                <core:interfaceName>java.lang.String</core:interfaceName>
+            </core:input>
+            <core:input name="enactor.mfc.IINRange">
+                <core:interfaceName>com.enactor.mfc.iinRange.IIINRange</core:interfaceName>
+            </core:input>
+        </core:inputs>
+        <core:outputs>
+            <core:output required="true" name="enactor.mfc.AlternativeAmount">
+                <core:interfaceName>java.lang.Long</core:interfaceName>
+            </core:output>
+            <core:output required="true" name="enactor.mfc.Customer">
+                <core:interfaceName>com.enactor.mfc.customer.ICustomer</core:interfaceName>
+            </core:output>
+            <core:output required="true" name="enactor.mfc.LoyaltyTier">
+                <core:interfaceName>com.enactor.mfc.loyaltyScheme.ILoyaltyTier</core:interfaceName>
+            </core:output>
+            <core:output required="true" name="enactor.coreUI.CardDataEvent">
+                <core:interfaceName>com.enactor.coreUI.peripherals.ICardDataEvent</core:interfaceName>
+            </core:output>
+            <core:output required="true" name="enactor.mfc.account.CustomerLoyaltyAccountTotal">
+                <core:interfaceName>com.enactor.mfc.account.customerLoyaltyAccountTotal.ICustomerLoyaltyAccountTotal</core:interfaceName>
+            </core:output>
+            <core:output required="true" name="enactor.mfc.InputMethod">
+                <core:interfaceName>com.enactor.mfc.basket.items.InputMethod</core:interfaceName>
+            </core:output>
+            <core:output required="true" name="enactor.mfc.LoyaltyTierItem">
+                <core:interfaceName>com.enactor.mfc.loyaltyScheme.ILoyaltyTierItem</core:interfaceName>
+            </core:output>
+            <core:output required="true" name="enactor.mfc.TransactionHandler">
+                <core:interfaceName>com.enactor.mfc.retail.transaction.IRetailTransactionHandler</core:interfaceName>
+            </core:output>
+            <core:output required="true" name="enactor.pos.ExternalLoyaltyData">
+                <core:interfaceName>java.util.Map</core:interfaceName>
+            </core:output>
+            <core:output required="true" name="enactor.mfc.CustomerCard">
+                <core:interfaceName>com.enactor.mfc.customer.customerCard.ICustomerCard</core:interfaceName>
+            </core:output>
+            <core:output required="true" name="enactor.mfc.account.CustomerLoyaltyAccount">
+                <core:interfaceName>com.enactor.mfc.account.ICustomerLoyaltyAccount</core:interfaceName>
+            </core:output>
+            <core:output required="true" name="enactor.mfc.LoyaltyScheme">
+                <core:interfaceName>com.enactor.mfc.loyaltyScheme.ILoyaltyScheme</core:interfaceName>
+            </core:output>
+            <core:output required="true" name="enactor.mfc.AccountBalanceEntity">
+                <core:interfaceName>com.enactor.mfc.account.accountBalance.IAccountBalance</core:interfaceName>
+            </core:output>
+            <core:output name="enactor.pos.CardPAN">
+                <core:interfaceName>java.lang.String</core:interfaceName>
+            </core:output>
+            <core:output required="true" name="enactor.mfc.CustomerGroups">
+                <core:interfaceName>java.util.List</core:interfaceName>
+            </core:output>
+            <core:output name="enactor.pos.CardNumberHashed">
+                <core:interfaceName>java.lang.String</core:interfaceName>
+            </core:output>
+            <core:output name="enactor.mfc.IINRange">
+                <core:interfaceName>com.enactor.mfc.iinRange.IIINRange</core:interfaceName>
+            </core:output>
+        </core:outputs>
+        <stateDataTypes>
+            <stateDataType name="enactor.pos.AllowCancel">
+                <core:interfaceName>java.lang.Boolean</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.mfc.CustomerGroups">
+                <core:interfaceName>java.util.List</core:interfaceName>
+            </stateDataType>
+            <stateDataType name="enactor.pos.AllowSkip">
+                <core:interfaceName>java.lang.Boolean</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.mfc.account.CustomerLoyaltyAccount">
+                <core:interfaceName>com.enactor.mfc.account.ICustomerLoyaltyAccount</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.mfc.TransactionHandler">
+                <core:interfaceName>com.enactor.mfc.retail.transaction.IRetailTransactionHandler</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.mfc.Location">
+                <core:interfaceName>com.enactor.mfc.location.ILocation</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.coreUI.Message">
+                <core:interfaceName>java.lang.String</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.mfc.LoyaltyTierItem">
+                <core:interfaceName>com.enactor.mfc.loyaltyScheme.ILoyaltyTierItem</core:interfaceName>
+            </stateDataType>
+            <stateDataType name="enactor.pos.RepromptAfterError">
+                <core:interfaceName>java.lang.Boolean</core:interfaceName>
+            </stateDataType>
+            <stateDataType name="enactor.pos.CardPAN">
+                <core:interfaceName>java.lang.String</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.mfc.LoyaltyScheme">
+                <core:interfaceName>com.enactor.mfc.loyaltyScheme.ILoyaltyScheme</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.mfc.LoyaltyTier">
+                <core:interfaceName>com.enactor.mfc.loyaltyScheme.ILoyaltyTier</core:interfaceName>
+            </stateDataType>
+            <stateDataType name="enactor.coreUI.PromptTimeoutSecs">
+                <core:interfaceName>java.lang.Integer</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.pos.CardNumberSelected">
+                <core:interfaceName>java.lang.String</core:interfaceName>
+            </stateDataType>
+            <stateDataType name="enactor.pos.CardNumberHashed">
+                <core:interfaceName>java.lang.String</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.coreUI.AccountList">
+                <core:interfaceName>java.util.List</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.pos.EmployeeSaleStarted">
+                <core:interfaceName>java.lang.Boolean</core:interfaceName>
+            </stateDataType>
+            <stateDataType name="enactor.pos.FromTender">
+                <core:interfaceName>java.lang.Boolean</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.mfc.AlternativeAmount">
+                <core:interfaceName>java.lang.Long</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.pos.CardNumberKeyed">
+                <core:interfaceName>java.lang.String</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.mfc.RetailSaleTransaction">
+                <core:interfaceName>com.enactor.mfc.retail.transaction.IRetailSaleTransaction</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.pos.AccountBalanceEnquiryOutcome">
+                <core:interfaceName>com.enactor.core.application.process.IApplicationProcessOutcome</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.mfc.Customer">
+                <core:interfaceName>com.enactor.mfc.customer.ICustomer</core:interfaceName>
+            </stateDataType>
+            <stateDataType name="enactor.mfc.Device">
+                <core:interfaceName>com.enactor.mfc.device.IDevice</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.pos.ShowNameSearch">
+                <core:interfaceName>java.lang.Boolean</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.mfc.CustomerCard">
+                <core:interfaceName>com.enactor.mfc.customer.customerCard.ICustomerCard</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.mfc.InputMethod">
+                <core:interfaceName>com.enactor.mfc.basket.items.InputMethod</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.pos.ExternalLoyaltyData">
+                <core:interfaceName>java.util.Map</core:interfaceName>
+            </stateDataType>
+            <stateDataType name="enactor.pos.CardTrack2">
+                <core:interfaceName>java.lang.String</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.mfc.account.CustomerLoyaltyAccountKey">
+                <core:interfaceName>com.enactor.mfc.account.ICustomerLoyaltyAccountKey</core:interfaceName>
+            </stateDataType>
+            <stateDataType name="enactor.pos.IgnoreCustomerEmployee">
+                <core:interfaceName>java.lang.Boolean</core:interfaceName>
+            </stateDataType>
+            <stateDataType name="enactor.pos.AllowLoyaltyWithoutAccount">
+                <core:interfaceName>java.lang.Boolean</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.mfc.PosTerminal">
+                <core:interfaceName>com.enactor.mfc.posTerminal.POSTerminal</core:interfaceName>
+            </stateDataType>
+            <stateDataType name="enactor.pos.ConfirmLoyalty">
+                <core:interfaceName>java.lang.Boolean</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.pos.CardNumberScanned">
+                <core:interfaceName>java.lang.String</core:interfaceName>
+            </stateDataType>
+            <stateDataType name="enactor.coreUI.User">
+                <core:interfaceName>com.enactor.core.signOn.ISignedOnUser</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.mfc.account.CustomerLoyaltyAccountTotal">
+                <core:interfaceName>com.enactor.mfc.account.customerLoyaltyAccountTotal.ICustomerLoyaltyAccountTotal</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.mfc.TransactionBalance">
+                <core:interfaceName>java.lang.Long</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.pos.ICCTrack2">
+                <core:interfaceName>java.lang.String</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.pos.ShowPostCodeSearch">
+                <core:interfaceName>java.lang.Boolean</core:interfaceName>
+            </stateDataType>
+            <stateDataType name="enactor.mfc.IINRange">
+                <core:interfaceName>com.enactor.mfc.iinRange.IIINRange</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.coreUI.CardDataEvent">
+                <core:interfaceName>com.enactor.coreUI.peripherals.ICardDataEvent</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.mfc.AccountBalanceEntity">
+                <core:interfaceName>com.enactor.mfc.account.accountBalance.IAccountBalance</core:interfaceName>
+            </stateDataType>
+            <stateDataType name="enactor.pos.DisplayLoyalty">
+                <core:interfaceName>java.lang.Boolean</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.pos.HideAlphaKeyboard">
+                <core:interfaceName>java.lang.Boolean</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.pos.ShowEmailSearch">
+                <core:interfaceName>java.lang.Boolean</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.pos.ForceLoyaltyCard">
+                <core:interfaceName>java.lang.Boolean</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="false" name="FormErrors">
+                <core:interfaceName>com.enactor.coreUI.processes.IFormErrors</core:interfaceName>
+            </stateDataType>
+            <stateDataType name="enactor.coreUI.CurrentEvent">
+                <core:interfaceName>com.enactor.core.events.IEvent</core:interfaceName>
+            </stateDataType>
+        </stateDataTypes>
+    </core:metaData>
+    <core:endProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>EndProcessSuccess</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIEndProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>3109</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>592</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData/>
+        <core:typeId>enactor.types.EndProcess</core:typeId>
+        <core:outcome>Success</core:outcome>
+        <core:defaultProcessId></core:defaultProcessId>
+    </core:endProcessAction>
+    <core:endProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>EndProcessCancel</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIEndProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>874</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>23</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData/>
+        <core:typeId>enactor.types.EndProcess</core:typeId>
+        <core:outcome>Cancel</core:outcome>
+        <core:defaultProcessId></core:defaultProcessId>
+    </core:endProcessAction>
+    <core:endProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>EndProcessFail</core:actionID>
+        <core:name>Fail</core:name>
+        <core:className>com.enactor.coreUI.actions.UIEndProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1353</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>23</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData/>
+        <core:typeId>enactor.types.EndProcess</core:typeId>
+        <core:outcome>Fail</core:outcome>
+        <core:defaultProcessId></core:defaultProcessId>
+    </core:endProcessAction>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>LoyaltySchemeNotFoundMessage</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.commonUI.message.processes.ConstructMessageAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2793</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>422</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="Pos/Loyalty/LoyaltyMessages" name="enactor.coreUI.MessageBasename">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:param value="LOG_LOYALTY_SCHEME_NOT_FOUND" name="enactor.coreUI.MessageId">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:param value="true" name="enactor.coreUI.AllowWithoutLocale">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:param>
+        <core:param value="customerLoyaltyAccount.loyaltySchemeKey.schemeId" name="enactor.coreUI.MessageVariables">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input name="enactor.coreUI.AllowWithoutLocale">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.MessageBasename">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.MessageId">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.MessageVariables">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.account.CustomerLoyaltyAccount">
+                    <core:interfaceName>com.enactor.mfc.account.ICustomerLoyaltyAccount</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output name="enactor.coreUI.Message">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+            <core:sessionManagementType>NONE</core:sessionManagementType>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>LogLoyaltySchemeNotFound</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>LogLoyaltySchemeError</core:actionID>
+        <core:name>UILogMessageAction</core:name>
+        <core:className>com.enactor.coreUI.actions.UILogMessageAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2547</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>445</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input name="enactor.coreUI.LogMessage">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+            <core:sessionManagementType>NONE</core:sessionManagementType>
+        </core:metaData>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID>DisplayLoyaltySchemeError</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>LoyaltySchemeKeyEmptyMessage</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.commonUI.message.processes.ConstructMessageAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2547</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>496</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="Pos/Loyalty/LoyaltyMessages" name="enactor.coreUI.MessageBasename">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:param value="LOG_LOYALTY_SCHEME_KEY_EMPTY" name="enactor.coreUI.MessageId">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:param value="true" name="enactor.coreUI.AllowWithoutLocale">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input name="enactor.coreUI.MessageBasename">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.MessageId">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.AllowWithoutLocale">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output name="enactor.coreUI.Message">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+            <core:sessionManagementType>NONE</core:sessionManagementType>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>LogLoyaltySchemeError</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>LoyaltyTierNotFoundMessage</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.commonUI.message.processes.ConstructMessageAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>3109</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>422</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="Pos/Loyalty/LoyaltyMessages" name="enactor.coreUI.MessageBasename">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:param value="LOG_LOYALTY_TIER_NOT_FOUND" name="enactor.coreUI.MessageId">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:param value="true" name="enactor.coreUI.AllowWithoutLocale">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:param>
+        <core:param value="customerLoyaltyAccount.tierCode,customerLoyaltyAccount.loyaltySchemeKey.schemeId" name="enactor.coreUI.MessageVariables">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input name="enactor.coreUI.AllowWithoutLocale">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.MessageBasename">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.MessageId">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.mfc.account.CustomerLoyaltyAccount">
+                    <core:interfaceName>com.enactor.mfc.account.ICustomerLoyaltyAccount</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.MessageVariables">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output name="enactor.coreUI.Message">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+            <core:sessionManagementType>NONE</core:sessionManagementType>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>LogLoyaltyTierError</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:endProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>EndProcessOffline</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIEndProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1988</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>155</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData/>
+        <core:typeId>enactor.types.EndProcess</core:typeId>
+        <core:outcome>Offline</core:outcome>
+        <core:defaultProcessId></core:defaultProcessId>
+    </core:endProcessAction>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>LogLoyaltyTierError</core:actionID>
+        <core:name>UILogMessageAction</core:name>
+        <core:className>com.enactor.coreUI.actions.UILogMessageAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>3109</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>332</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input name="enactor.coreUI.LogMessage">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+            <core:sessionManagementType>NONE</core:sessionManagementType>
+        </core:metaData>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID>DisplayLoyaltyTierError</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:endProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>EndProcessSchemeError</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIEndProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2793</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>90</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData/>
+        <core:typeId>enactor.types.EndProcess</core:typeId>
+        <core:outcome>LoyaltySchemeError</core:outcome>
+        <core:defaultProcessId></core:defaultProcessId>
+    </core:endProcessAction>
+    <core:endProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>EndProcessTierError</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIEndProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>3109</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>90</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData/>
+        <core:typeId>enactor.types.EndProcess</core:typeId>
+        <core:outcome>LoyaltyTierError</core:outcome>
+        <core:defaultProcessId></core:defaultProcessId>
+    </core:endProcessAction>
+    <core:endProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>EndProcessLoyaltyAccountNotFound</core:actionID>
+        <core:name>LoyaltyAccountNotFound</core:name>
+        <core:className>com.enactor.coreUI.actions.UIEndProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2275</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>90</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData/>
+        <core:typeId>enactor.types.EndProcess</core:typeId>
+        <core:outcome>LoyaltyAccountNotFound</core:outcome>
+        <core:defaultProcessId></core:defaultProcessId>
+    </core:endProcessAction>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>LogLoyaltySchemeNotFound</core:actionID>
+        <core:name>UILogMessageAction</core:name>
+        <core:className>com.enactor.coreUI.actions.UILogMessageAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2793</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>332</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input name="enactor.coreUI.LogMessage">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+            <core:sessionManagementType>NONE</core:sessionManagementType>
+        </core:metaData>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID>DisplayLoyaltySchemeNotFound</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:endProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>EndProcessExternalProvider</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIEndProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1988</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>90</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData/>
+        <core:typeId>enactor.types.EndProcess</core:typeId>
+        <core:outcome>ExternalProvider</core:outcome>
+        <core:defaultProcessId></core:defaultProcessId>
+    </core:endProcessAction>
+    <core:endProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>End Process Skip</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIEndProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>621</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>23</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData/>
+        <core:typeId>enactor.types.EndProcess</core:typeId>
+        <core:outcome>Skip</core:outcome>
+        <core:defaultProcessId></core:defaultProcessId>
+    </core:endProcessAction>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>CheckRepromptAfterError</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UINullAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1353</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>184</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>EndProcessFail</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>ClearGetCardNumberVariables</core:toActionID>
+            <core:condition>notEmpty(process.repromptAfterError) &amp;&amp; process.repromptAfterError</core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>CheckRepromptAfterError2</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UINullAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2793</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>156</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>EndProcessSchemeError</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>ClearGetCardNumberVariables</core:toActionID>
+            <core:condition>notEmpty(process.repromptAfterError) &amp;&amp; process.repromptAfterError</core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>CheckRepromptAfterError3</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UINullAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>3109</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>156</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>EndProcessTierError</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>ClearGetCardNumberVariables</core:toActionID>
+            <core:condition>notEmpty(process.repromptAfterError) &amp;&amp; process.repromptAfterError</core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>ClearGetCardNumberVariables</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIClearValuesAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>874</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>184</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input name="enactor.mfc.account.CustomerLoyaltyAccountKey">
+                    <core:interfaceName>com.enactor.mfc.account.ICustomerLoyaltyAccountKey</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.pos.CardNumberKeyed">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.pos.CardNumberScanned">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.pos.CardPAN">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.pos.CardTrack2">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.pos.ICCTrack2">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.pos.ForceLoyaltyCard">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="true" name="enactor.mfc.account.CustomerLoyaltyAccountKey">
+                    <core:interfaceName>com.enactor.mfc.account.ICustomerLoyaltyAccountKey</core:interfaceName>
+                </core:output>
+                <core:output required="true" name="enactor.pos.CardNumberKeyed">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:output>
+                <core:output required="true" name="enactor.pos.CardNumberScanned">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:output>
+                <core:output required="true" name="enactor.pos.CardPAN">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:output>
+                <core:output required="true" name="enactor.pos.CardTrack2">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:output>
+                <core:output required="true" name="enactor.pos.ICCTrack2">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:output>
+                <core:output required="true" name="enactor.pos.ForceLoyaltyCard">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>ClearIINRange</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>TestReprompt</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UINullAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2275</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>267</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>TestAllowLoyaltyWithoutAccount</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>3</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>LoyaltyAccountNotFoundExtension</core:toActionID>
+            <core:condition>notEmpty(process.allowLoyaltyWithoutAccount) &amp;&amp; process.allowLoyaltyWithoutAccount</core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>ClearIINRange</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIClearValuesAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>663</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>184</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input name="enactor.mfc.IINRange">
+                    <core:interfaceName>com.enactor.mfc.iinRange.IIINRange</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="true" name="enactor.mfc.IINRange">
+                    <core:interfaceName>com.enactor.mfc.iinRange.IIINRange</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:comment>This is required, otherwise if an invalid card number matches an IINRange and a new card numebr is entered then at the CardNumberLookup state the system will have a IINRange and jump to the GetLoyaltyAccount state</core:comment>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID>PromtpCardNumber</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>TestAllowLoyaltyWithoutAccount</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UINullAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2275</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>177</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID>LoyaltyAccountNotFound</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition>notEmpty(process.repromptAfterError) &amp;&amp; process.repromptAfterError</core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>EndProcessLoyaltyAccountNotFound</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:endProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>EndProcessAllowedLoyaltyAccountNotFound</core:actionID>
+        <core:name>AllowedLoyaltyAccountNotFound</core:name>
+        <core:className>com.enactor.coreUI.actions.UIEndProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2550</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>90</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData/>
+        <core:typeId>enactor.types.EndProcess</core:typeId>
+        <core:outcome>AllowedLoyaltyAccountNotFound</core:outcome>
+        <core:defaultProcessId></core:defaultProcessId>
+    </core:endProcessAction>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>CheckShowLoyaltyNameSearch</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.CheckPrivilegesAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>67</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>436</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>1286</value>
+            </entry>
+        </core:uiHints>
+        <core:privileges>enactor.pos.ShowLoyaltyNameSearch</core:privileges>
+        <core:metaData>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+                <core:outcome name="Fail"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>SetShowLoyaltyNameSearch</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>CheckShowLoyaltyPostCodeSearch</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Fail</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>CheckShowLoyaltyPostCodeSearch</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.CheckPrivilegesAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>67</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>690</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>1090</value>
+            </entry>
+        </core:uiHints>
+        <core:privileges>enactor.pos.ShowLoyaltyPostCodeSearch</core:privileges>
+        <core:metaData>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+                <core:outcome name="Fail"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>SetShowLoyaltyPostCodeSearch</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>CheckShowEmailSearch</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Fail</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:assignAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>SetShowLoyaltyPostCodeSearch</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIAssignAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>19</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>436</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>1090</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:outputs>
+                <core:output required="true" name="enactor.pos.ShowPostCodeSearch">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.Assign</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>CheckShowEmailSearch</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:dataAssignment toExpression="showPostCodeSearch" fromExpression="true"/>
+    </core:assignAction>
+    <core:assignAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>SetShowLoyaltyNameSearch</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIAssignAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>19</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>690</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>1286</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:outputs>
+                <core:output required="true" name="enactor.pos.ShowNameSearch">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.Assign</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>CheckShowLoyaltyPostCodeSearch</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:dataAssignment toExpression="showNameSearch" fromExpression="true"/>
+    </core:assignAction>
+    <core:assignAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>GetAccountKey</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIAssignAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>27</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1009</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>816</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.coreUI.ListElement">
+                    <core:interfaceName>com.enactor.core.database.list.IKeyedListElement</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="true" name="enactor.mfc.CustomerLoyaltyAccountKey">
+                    <core:interfaceName>com.enactor.mfc.account.ICustomerLoyaltyAccountKey</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.Assign</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID>ForceNewStatge</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:dataAssignment toExpression="customerLoyaltyAccountKey" fromExpression="listElement.key"/>
+    </core:assignAction>
+    <core:executeProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>GetCustomerLoyaltyAccountRemote</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UICallProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>27</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>705</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>594</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="true" name="enactor.pos.LoyaltyAccount">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input name="enactor.coreUI.CurrentEvent">
+                    <core:interfaceName>com.enactor.core.events.IEvent</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.pos.LoyaltyAccount">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.CustomerNumber">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="true" name="enactor.coreUI.List">
+                    <core:interfaceName>java.util.List</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+                <core:outcome name="Cancel"/>
+                <core:outcome name="Fail"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.CallProcess</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>GetAccountKey</core:toActionID>
+            <core:condition>size(process.accountList) == 1</core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>CallLoyaltyAccountNotFoundSearch</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>3</core:linkID>
+            <core:toStateID>LoyaltySearchFailed</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Fail</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>4</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>EndProcessCancel</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Cancel</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>5</core:linkID>
+            <core:toStateID>SearchResultsList</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition>size(process.accountList) &gt; 1</core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:executeProcessId>Pos/Loyalty/LoyaltyAccountSearch</core:executeProcessId>
+    </core:executeProcessAction>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>ClearCardData</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIClearValuesAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>705</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>469</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input name="enactor.pos.CardNumberKeyed">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.pos.CardNumberScanned">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.pos.CardPAN">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.pos.CardTrack2">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.pos.ICCTrack2">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="true" name="enactor.pos.CardNumberKeyed">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:output>
+                <core:output required="true" name="enactor.pos.CardNumberScanned">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:output>
+                <core:output required="true" name="enactor.pos.CardPAN">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:output>
+                <core:output required="true" name="enactor.pos.CardTrack2">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:output>
+                <core:output required="true" name="enactor.pos.ICCTrack2">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>GetCardNumber</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:endProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>End Process: PromptTimeout</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIEndProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>438</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>20</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData/>
+        <core:typeId>enactor.types.EndProcess</core:typeId>
+        <core:outcome>PromptTimeout</core:outcome>
+        <core:defaultProcessId></core:defaultProcessId>
+    </core:endProcessAction>
+    <core:endProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>End Process:PromptTimeout</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIEndProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>3109</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>701</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData/>
+        <core:typeId>enactor.types.EndProcess</core:typeId>
+        <core:outcome>PromptTimeout</core:outcome>
+        <core:defaultProcessId></core:defaultProcessId>
+    </core:endProcessAction>
+    <core:executeProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>CallProcessHandleGetCardNumberEventExternal</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UICallProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>2047</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1007</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>1090</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input name="enactor.pos.Action">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.pos.ExternalLoyaltyData">
+                    <core:interfaceName>java.util.Map</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.CurrentEvent">
+                    <core:interfaceName>com.enactor.core.events.IEvent</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="true" name="enactor.pos.CardNumberSelected">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:output>
+                <core:output required="true" name="enactor.pos.ExternalLoyaltyData">
+                    <core:interfaceName>java.util.Map</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Cancel"/>
+                <core:outcome name="Back"/>
+                <core:outcome name="CardNumberSelected"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.CallProcess</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>GetCardNumber</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Back</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>EndProcessCancel</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Cancel</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>3</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>Assign</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>CardNumberSelected</core:outcome>
+        </core:outcomeLink>
+        <core:executeProcessId>Pos/Tender/HandleGetCardNumberEventExternal</core:executeProcessId>
+    </core:executeProcessAction>
+    <core:assignAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>Assign</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIAssignAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>27</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>877</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>246</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.pos.CardNumberSelected">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="false" name="enactor.pos.CardNumberKeyed">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.Assign</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID>CardNumberLookup</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:dataAssignment toExpression="cardNumberKeyed" fromExpression="cardNumberSelected"/>
+    </core:assignAction>
+    <core:executeProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>CallLoyaltyAccountNotFound</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UICallProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2547</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>157</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.Customer">
+                    <core:interfaceName>com.enactor.mfc.customer.ICustomer</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.pos.CardPAN">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.CustomerCard">
+                    <core:interfaceName>com.enactor.mfc.customer.customerCard.ICustomerCard</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.TransactionHandler">
+                    <core:interfaceName>com.enactor.mfc.retail.transaction.IRetailTransactionHandler</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="true" name="enactor.mfc.Customer">
+                    <core:interfaceName>com.enactor.mfc.customer.ICustomer</core:interfaceName>
+                </core:output>
+                <core:output required="true" name="enactor.mfc.CustomerCard">
+                    <core:interfaceName>com.enactor.mfc.customer.customerCard.ICustomerCard</core:interfaceName>
+                </core:output>
+                <core:output required="true" name="enactor.mfc.CustomerGroups">
+                    <core:interfaceName>java.util.List</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Cancel"/>
+                <core:outcome name="Fail"/>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.CallProcess</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>EndProcessAllowedLoyaltyAccountNotFound</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>EndProcessAllowedLoyaltyAccountNotFound</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Fail</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>3</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>EndProcessCancel</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Cancel</core:outcome>
+        </core:outcomeLink>
+        <core:executeProcessId>Pos/Loyalty/External/LoyaltyAccountNotFoundHook</core:executeProcessId>
+    </core:executeProcessAction>
+    <core:executeProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>CallLoyaltyAccountNotFoundSearch</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UICallProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1031</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>433</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:outcomes>
+                <core:outcome name="SuccessDoNotContinue"/>
+                <core:outcome name="Cancel"/>
+                <core:outcome name="Fail"/>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.CallProcess</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>ClearCardData</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>SuccessDoNotContinue</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>EndProcessFail</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Fail</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>3</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>EndProcessCancel</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Cancel</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>4</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>CallLoyaltyAccountNotFound</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:executeProcessId>Pos/Loyalty/External/LoyaltyAccountNotFoundSearchHook</core:executeProcessId>
+    </core:executeProcessAction>
+    <core:executeProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>CallCheckDisplayAlphaKeyboard</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UICallProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>438</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>80</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:outcomes>
+                <core:outcome name="HideAlphaKeyboard"/>
+                <core:outcome name="ShowAlphaKeyboard"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.CallProcess</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>HideAlphaKeyboard</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>HideAlphaKeyboard</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>ShowAlphaKeyboard</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>ShowAlphaKeyboard</core:outcome>
+        </core:outcomeLink>
+        <core:executeProcessId>Pos/Loyalty/CheckDisplayAlphaKeyboard</core:executeProcessId>
+    </core:executeProcessAction>
+    <core:assignAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>HideAlphaKeyboard</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIAssignAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>438</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>139</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:outputs>
+                <core:output required="false" name="enactor.pos.HideAlphaKeyboard">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.Assign</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>GetCardNumber</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:dataAssignment toExpression="hideAlphaKeyboard" fromExpression="true"/>
+    </core:assignAction>
+    <core:assignAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>ShowAlphaKeyboard</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIAssignAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>438</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>206</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:outputs>
+                <core:output required="false" name="enactor.pos.HideAlphaKeyboard">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.Assign</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>GetCardNumber</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:dataAssignment toExpression="hideAlphaKeyboard" fromExpression="false"/>
+    </core:assignAction>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>CheckShowEmailSearch</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.CheckPrivilegesAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>67</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>208</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>606</value>
+            </entry>
+        </core:uiHints>
+        <core:privileges>enactor.pos.ShowEmailSearch</core:privileges>
+        <core:metaData>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+                <core:outcome name="Fail"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID>PromtpCardNumber</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Fail</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>SetShowEmailSearch</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:assignAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>SetShowEmailSearch</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIAssignAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>19</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>213</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>412</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:outputs>
+                <core:output required="true" name="enactor.pos.ShowEmailSearch">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.Assign</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID>PromtpCardNumber</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:dataAssignment toExpression="showEmailSearch" fromExpression="true"/>
+    </core:assignAction>
+    <core:executeProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>CallDoGetLoyaltyAccount</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UICallProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>2047</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1988</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>511</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input name="enactor.pos.CardNumberScanned">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.CurrentEvent">
+                    <core:interfaceName>com.enactor.core.events.IEvent</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.mfc.InputMethod">
+                    <core:interfaceName>com.enactor.mfc.basket.items.InputMethod</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.pos.ICCTrack2">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.pos.CardTrack2">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.CardDataEvent">
+                    <core:interfaceName>com.enactor.coreUI.peripherals.ICardDataEvent</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.pos.CardNumberKeyed">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.pos.CardPAN">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.TransactionHandler">
+                    <core:interfaceName>com.enactor.mfc.retail.transaction.IRetailTransactionHandler</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.pos.CardNumberHashed">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input required="false" name="enactor.pos.DisplayLoyalty">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+                <core:input required="false" name="enactor.pos.ConfirmLoyalty">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+                <core:input required="false" name="enactor.mfc.Customer">
+                    <core:interfaceName>com.enactor.mfc.customer.ICustomer</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.account.CustomerLoyaltyAccountKey">
+                    <core:interfaceName>com.enactor.mfc.account.ICustomerLoyaltyAccountKey</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.IINRange">
+                    <core:interfaceName>com.enactor.mfc.iinRange.IIINRange</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output name="enactor.mfc.InputMethod">
+                    <core:interfaceName>com.enactor.mfc.basket.items.InputMethod</core:interfaceName>
+                </core:output>
+                <core:output required="false" name="enactor.mfc.AccountBalanceEntity">
+                    <core:interfaceName>com.enactor.mfc.account.accountBalance.IAccountBalance</core:interfaceName>
+                </core:output>
+                <core:output required="false" name="enactor.mfc.AlternativeAmount">
+                    <core:interfaceName>java.lang.Long</core:interfaceName>
+                </core:output>
+                <core:output required="true" name="enactor.mfc.Customer">
+                    <core:interfaceName>com.enactor.mfc.customer.ICustomer</core:interfaceName>
+                </core:output>
+                <core:output required="false" name="enactor.mfc.CustomerGroups">
+                    <core:interfaceName>java.util.List</core:interfaceName>
+                </core:output>
+                <core:output required="false" name="enactor.mfc.account.CustomerLoyaltyAccount">
+                    <core:interfaceName>com.enactor.mfc.account.ICustomerLoyaltyAccount</core:interfaceName>
+                </core:output>
+                <core:output required="true" name="enactor.mfc.account.CustomerLoyaltyAccountTotal">
+                    <core:interfaceName>com.enactor.mfc.account.customerLoyaltyAccountTotal.ICustomerLoyaltyAccountTotal</core:interfaceName>
+                </core:output>
+                <core:output required="false" name="enactor.pos.ExternalLoyaltyData">
+                    <core:interfaceName>java.util.Map</core:interfaceName>
+                </core:output>
+                <core:output required="false" name="enactor.mfc.LoyaltyScheme">
+                    <core:interfaceName>com.enactor.mfc.loyaltyScheme.ILoyaltyScheme</core:interfaceName>
+                </core:output>
+                <core:output required="false" name="enactor.mfc.LoyaltyTier">
+                    <core:interfaceName>com.enactor.mfc.loyaltyScheme.ILoyaltyTier</core:interfaceName>
+                </core:output>
+                <core:output required="false" name="enactor.mfc.LoyaltyTierItem">
+                    <core:interfaceName>com.enactor.mfc.loyaltyScheme.ILoyaltyTierItem</core:interfaceName>
+                </core:output>
+                <core:output required="true" name="enactor.mfc.TransactionHandler">
+                    <core:interfaceName>com.enactor.mfc.retail.transaction.IRetailTransactionHandler</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Offline"/>
+                <core:outcome name="ExternalProvider"/>
+                <core:outcome name="LoyaltyAccountNotFound"/>
+                <core:outcome name="LoyaltySchemeError"/>
+                <core:outcome name="LoyaltyTierError"/>
+                <core:outcome name="PromptTimeout"/>
+                <core:outcome name="Fail"/>
+                <core:outcome name="Cancel"/>
+                <core:outcome name="Success"/>
+                <core:outcome name="Back"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.CallProcess</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>EndProcessOffline</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Offline</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>EndProcessExternalProvider</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>ExternalProvider</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>3</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>TestReprompt</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>LoyaltyAccountNotFound</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>4</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>EndProcessFail</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Fail</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>5</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>EndProcessCancel</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Cancel</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>6</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>LoyaltySchemeNotFoundMessage</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>LoyaltySchemeError</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>7</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>LoyaltyTierNotFoundMessage</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>LoyaltyTierError</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>8</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>EndProcessSuccess</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>9</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>End Process:PromptTimeout</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>PromptTimeout</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>10</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>ClearCardDataAction</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Back</core:outcome>
+        </core:outcomeLink>
+        <core:executeProcessId>Pos/Loyalty/DoGetLoyaltyAccount</core:executeProcessId>
+    </core:executeProcessAction>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>ClearCardDataAction</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIClearValuesAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>25</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1683</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>915</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input name="enactor.pos.CardNumberKeyed">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input required="false" name="enactor.pos.CardPAN">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.mfc.IINRange">
+                    <core:interfaceName>com.enactor.mfc.iinRange.IIINRange</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.pos.ForceLoyaltyCard">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+                <core:input required="false" name="FormErrors">
+                    <core:interfaceName>com.enactor.coreUI.processes.IFormErrors</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="false" name="enactor.pos.CardNumberKeyed">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:output>
+                <core:output required="false" name="enactor.pos.CardPAN">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:output>
+                <core:output required="false" name="enactor.mfc.IINRange">
+                    <core:interfaceName>com.enactor.mfc.iinRange.IIINRange</core:interfaceName>
+                </core:output>
+                <core:output required="true" name="enactor.pos.ForceLoyaltyCard">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:output>
+                <core:output required="false" name="FormErrors">
+                    <core:interfaceName>com.enactor.coreUI.processes.IFormErrors</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>CallProcessHandleGetCardNumberEventExternal</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:executeProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>GetCardNumber</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UICallExtensionPointProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>27</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>436</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>271</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="true" name="enactor.pos.ForLoyalty">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:param>
+        <core:param value="Pos/Loyalty/LoyaltyMessages" name="MessageBase">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:param value="false" name="enactor.pos.ForNewLoyalty">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:param>
+        <core:param value="false" name="enactor.pos.EnableICCReader">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:param>
+        <core:param value="INSERT_LOYALTY_CARD_WITH_SCANNER" name="MessageId">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:param value="GetLoyaltyCardNumberExtension" name="enactor.coreUI.ExtensionPointId">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="false" name="ICCReader">
+                    <core:interfaceName>com.enactor.coreUI.peripherals.icc.IICCReader</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.PromptTimeoutSecs">
+                    <core:interfaceName>java.lang.Integer</core:interfaceName>
+                </core:input>
+                <core:input name="MessageBase">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="MessageId">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input required="false" name="enactor.mfc.PosTerminal">
+                    <core:interfaceName>com.enactor.mfc.posTerminal.POSTerminal</core:interfaceName>
+                </core:input>
+                <core:input required="false" name="enactor.mfc.TransactionHandler">
+                    <core:interfaceName>com.enactor.mfc.retail.transaction.IRetailTransactionHandler</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.pos.AllowCancel">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.pos.AllowSkip">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.pos.CardNumberKeyed">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.pos.EnableICCReader">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.pos.ForLoyalty">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.pos.ForNewLoyalty">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.pos.ShowCustomerAccountSearch">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.pos.ShowNameSearch">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.pos.ShowPostCodeSearch">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+                <core:input name="message">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.pos.HideAlphaKeyboard">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.pos.ShowEmailSearch">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.pos.FromTender">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+                <core:input required="false" name="enactor.coreUI.ExtensionPointId">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input required="false" name="FormErrors">
+                    <core:interfaceName>com.enactor.coreUI.processes.IFormErrors</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="true" name="enactor.mfc.Customer">
+                    <core:interfaceName>com.enactor.mfc.customer.ICustomer</core:interfaceName>
+                </core:output>
+                <core:output required="false" name="enactor.pos.CardNumberKeyed">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:output>
+                <core:output required="true" name="enactor.pos.CardNumberScanned">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:output>
+                <core:output required="false" name="enactor.pos.CardPAN">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:output>
+                <core:output required="false" name="enactor.pos.CardTrack2">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:output>
+                <core:output required="false" name="enactor.pos.ICCTrack2">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:output>
+                <core:output required="true" name="enactor.coreUI.CardDataEvent">
+                    <core:interfaceName>com.enactor.coreUI.peripherals.ICardDataEvent</core:interfaceName>
+                </core:output>
+                <core:output required="true" name="enactor.pos.CardNumberHashed">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:output>
+                <core:output required="true" name="enactor.mfc.InputMethod">
+                    <core:interfaceName>com.enactor.mfc.basket.items.InputMethod</core:interfaceName>
+                </core:output>
+                <core:output required="true" name="enactor.mfc.IINRange">
+                    <core:interfaceName>com.enactor.mfc.iinRange.IIINRange</core:interfaceName>
+                </core:output>
+                <core:output required="true" name="enactor.pos.ForceLoyaltyCard">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="GotSwipedCardNumber"/>
+                <core:outcome name="Fail"/>
+                <core:outcome name="CustomerSelected"/>
+                <core:outcome name="PromptTimeout"/>
+                <core:outcome name="Skip"/>
+                <core:outcome name="GotKeyedCardNumber"/>
+                <core:outcome name="CancelPressed"/>
+                <core:outcome name="GotScannedCardNumber"/>
+                <core:outcome name="GotICCCardNumber"/>
+                <core:outcome name="*"/>
+                <core:outcome name="GotCardNumber"/>
+                <core:outcome name="Success"/>
+                <core:outcome name="enactor.action.StopExtensionLinking"/>
+                <core:outcome name="ProcessingCompleted"/>
+            </core:outcomes>
+            <core:sessionManagementType>NONE</core:sessionManagementType>
+        </core:metaData>
+        <core:typeId>enactor.types.CallExtensionPoint</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID>CardNumberLookup</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>GotICCCardNumber</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID>CardNumberLookup</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>GotKeyedCardNumber</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>3</core:linkID>
+            <core:toStateID>CardNumberLookup</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>GotSwipedCardNumber</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>4</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>EndProcessCancel</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>CancelPressed</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>6</core:linkID>
+            <core:toStateID>CardNumberLookup</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>GotScannedCardNumber</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>5</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>End Process Skip</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Skip</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>7</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>GetCustomerLoyaltyAccountRemote</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>CustomerSelected</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>8</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>End Process: PromptTimeout</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>PromptTimeout</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>9</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>CallProcessHandleGetCardNumberEventExternal</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>*</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>10</core:linkID>
+            <core:toStateID>CardNumberLookup</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>GotCardNumber</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>11</core:linkID>
+            <core:toStateID>InvalidCardNumber</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Fail</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>12</core:linkID>
+            <core:toStateID>CardNumberLookup</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>enactor.action.StopExtensionLinking</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>13</core:linkID>
+            <core:toStateID>CardNumberLookup</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>14</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>EndProcessSuccess</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>ProcessingCompleted</core:outcome>
+        </core:outcomeLink>
+        <core:executeProcessId></core:executeProcessId>
+    </core:executeProcessAction>
+    <core:executeProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>CallDoCardNumberLookupExtension</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UICallExtensionPointProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>27</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1281</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>491</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="DoCardNumberLookupExtension" name="enactor.coreUI.ExtensionPointId">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.coreUI.CardDataEvent">
+                    <core:interfaceName>com.enactor.coreUI.peripherals.ICardDataEvent</core:interfaceName>
+                </core:input>
+                <core:input required="false" name="enactor.pos.CardNumberKeyed">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input required="false" name="enactor.pos.CardNumberScanned">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input required="false" name="enactor.pos.CardPAN">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input required="false" name="enactor.pos.CardTrack2">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input required="false" name="enactor.pos.ICCTrack2">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input required="false" name="enactor.coreUI.ExtensionPointId">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="false" name="enactor.pos.CardPAN">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:output>
+                <core:output required="false" name="enactor.mfc.IINRange">
+                    <core:interfaceName>com.enactor.mfc.iinRange.IIINRange</core:interfaceName>
+                </core:output>
+                <core:output required="true" name="enactor.pos.CardNumberHashed">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:output>
+                <core:output required="false" name="FormErrors">
+                    <core:interfaceName>com.enactor.coreUI.processes.IFormErrors</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+                <core:outcome name="InvalidCardNumber"/>
+                <core:outcome name="CardError"/>
+                <core:outcome name="InvalidCheckDigit"/>
+                <core:outcome name="InvalidKeyedValue"/>
+                <core:outcome name="InvalidIIN"/>
+                <core:outcome name="NotLoyaltyCard"/>
+                <core:outcome name="Fail"/>
+                <core:outcome name="enactor.action.StopExtensionLinking"/>
+            </core:outcomes>
+            <core:sessionManagementType>NONE</core:sessionManagementType>
+        </core:metaData>
+        <core:typeId>enactor.types.CallExtensionPoint</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID>InvalidCardNumber</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>InvalidCardNumber</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>3</core:linkID>
+            <core:toStateID>InvalidCardNumber</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>InvalidCheckDigit</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>6</core:linkID>
+            <core:toStateID>GetLoyaltyAccount</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>7</core:linkID>
+            <core:toStateID>GetLoyaltyAccount</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>enactor.action.StopExtensionLinking</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>8</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>CheckRepromptAfterError</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Fail</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>4</core:linkID>
+            <core:toStateID>InvalidCard</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>InvalidIIN</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>9</core:linkID>
+            <core:toStateID>InvalidCardNumber</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>CardError</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID>NotLoyaltyCard</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>NotLoyaltyCard</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>5</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>CheckRepromptAfterError</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>InvalidKeyedValue</core:outcome>
+        </core:outcomeLink>
+        <core:executeProcessId></core:executeProcessId>
+    </core:executeProcessAction>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>ClearFormErrors</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIClearValuesAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1281</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>412</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="false" name="FormErrors">
+                    <core:interfaceName>com.enactor.coreUI.processes.IFormErrors</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="false" name="FormErrors">
+                    <core:interfaceName>com.enactor.coreUI.processes.IFormErrors</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>CallDoCardNumberLookupExtension</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:executeProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>LoyaltyAccountNotFoundExtension</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UICallExtensionPointProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>3</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2547</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>261</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="LoyaltyAccountNotFoundExtension" name="enactor.coreUI.ExtensionPointId">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input name="enactor.coreUI.ExtensionPointId">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input required="false" name="enactor.pos.AllowLoyaltyWithoutAccount">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.IINRange">
+                    <core:interfaceName>com.enactor.mfc.iinRange.IIINRange</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outcomes>
+                <core:outcome name="Cancel"/>
+                <core:outcome name="Success"/>
+                <core:outcome name="enactor.action.StopExtensionLinking"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.CallExtensionPoint</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>CallLoyaltyAccountNotFound</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>enactor.action.StopExtensionLinking</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>CallLoyaltyAccountNotFound</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>3</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>EndProcessCancel</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Cancel</core:outcome>
+        </core:outcomeLink>
+        <core:executeProcessId></core:executeProcessId>
+    </core:executeProcessAction>
+    <core:state>
+        <core:url></core:url>
+        <core:stateID>CardNumberLookup</core:stateID>
+        <core:name></core:name>
+        <core:className></core:className>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1281</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>332</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <handledEvents>
+                <handledEvent name="StateEntered"/>
+            </handledEvents>
+            <stateDataTypes/>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicState</core:typeId>
+        <core:singleInstance>false</core:singleInstance>
+        <core:respondToViewEvents>false</core:respondToViewEvents>
+        <core:actionInputMappings/>
+        <core:actionOutputMappings/>
+        <core:eventLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID>GetLoyaltyAccount</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition>notEmpty(process.iINRange) || (true == process.forceLoyaltyCard)</core:condition>
+            <core:event>StateEntered</core:event>
+        </core:eventLink>
+        <core:eventLink>
+            <core:linkID>3</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>ClearFormErrors</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>StateEntered</core:event>
+        </core:eventLink>
+    </core:state>
+    <core:state>
+        <core:url></core:url>
+        <core:stateID>Start</core:stateID>
+        <core:name></core:name>
+        <core:className></core:className>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>197</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>1090</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <handledEvents>
+                <handledEvent name="StateEntered"/>
+            </handledEvents>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicState</core:typeId>
+        <core:singleInstance>false</core:singleInstance>
+        <core:respondToViewEvents>false</core:respondToViewEvents>
+        <core:actionInputMappings/>
+        <core:actionOutputMappings/>
+        <core:eventLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>CheckShowLoyaltyNameSearch</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>StateEntered</core:event>
+        </core:eventLink>
+        <core:eventLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID>CardNumberLookup</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition>notEmpty(process.cardPAN) || notEmpty(process.cardNumberHashed)</core:condition>
+            <core:event>StateEntered</core:event>
+        </core:eventLink>
+    </core:state>
+    <core:messageState>
+        <core:url>/Error/Error</core:url>
+        <core:stateID>InvalidCardNumber</core:stateID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.states.UIMessageState</core:className>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1678</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>180</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <handledEvents>
+                <handledEvent name="OKPressed"/>
+            </handledEvents>
+        </core:metaData>
+        <core:unusedEvents>
+            <core:handledEvent name="OKPressed"/>
+        </core:unusedEvents>
+        <core:typeId>ErrorMessage</core:typeId>
+        <core:singleInstance>false</core:singleInstance>
+        <core:respondToViewEvents>false</core:respondToViewEvents>
+        <core:actionInputMappings/>
+        <core:actionOutputMappings/>
+        <core:eventLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>CheckRepromptAfterError</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>OKPressed</core:event>
+        </core:eventLink>
+        <core:keepPromptOpen>false</core:keepPromptOpen>
+        <core:closeOnNextPrompt>false</core:closeOnNextPrompt>
+        <core:keepPreviousPromptOpen>false</core:keepPreviousPromptOpen>
+        <core:promptTimeout>0</core:promptTimeout>
+        <core:hideOpenPrompt>false</core:hideOpenPrompt>
+        <core:allowDatabasePromptLookup>false</core:allowDatabasePromptLookup>
+        <core:messageBase>Pos/Loyalty/LoyaltyMessages</core:messageBase>
+        <core:messageId>INVALID_CARD_NUMBER</core:messageId>
+        <core:messageText></core:messageText>
+    </core:messageState>
+    <core:messageState>
+        <core:url>/Error/Error</core:url>
+        <core:stateID>InvalidCard</core:stateID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.states.UIMessageState</core:className>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1678</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>357</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <handledEvents>
+                <handledEvent name="OKPressed"/>
+            </handledEvents>
+        </core:metaData>
+        <core:unusedEvents>
+            <core:handledEvent name="OKPressed"/>
+        </core:unusedEvents>
+        <core:typeId>ErrorMessage</core:typeId>
+        <core:singleInstance>false</core:singleInstance>
+        <core:respondToViewEvents>false</core:respondToViewEvents>
+        <core:actionInputMappings/>
+        <core:actionOutputMappings/>
+        <core:eventLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>CheckRepromptAfterError</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>OKPressed</core:event>
+        </core:eventLink>
+        <core:keepPromptOpen>false</core:keepPromptOpen>
+        <core:closeOnNextPrompt>false</core:closeOnNextPrompt>
+        <core:keepPreviousPromptOpen>false</core:keepPreviousPromptOpen>
+        <core:promptTimeout>0</core:promptTimeout>
+        <core:hideOpenPrompt>false</core:hideOpenPrompt>
+        <core:allowDatabasePromptLookup>false</core:allowDatabasePromptLookup>
+        <core:messageBase>Pos/Loyalty/LoyaltyMessages</core:messageBase>
+        <core:messageId>INVALID_LOYALTY_CARD</core:messageId>
+        <core:messageText></core:messageText>
+    </core:messageState>
+    <core:messageState>
+        <core:url>/Error/Error</core:url>
+        <core:stateID>NotLoyaltyCard</core:stateID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.states.UIMessageState</core:className>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1678</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>267</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <handledEvents>
+                <handledEvent name="OKPressed"/>
+            </handledEvents>
+        </core:metaData>
+        <core:unusedEvents>
+            <core:handledEvent name="OKPressed"/>
+        </core:unusedEvents>
+        <core:typeId>ErrorMessage</core:typeId>
+        <core:singleInstance>false</core:singleInstance>
+        <core:respondToViewEvents>false</core:respondToViewEvents>
+        <core:actionInputMappings/>
+        <core:actionOutputMappings/>
+        <core:eventLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>CheckRepromptAfterError</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>OKPressed</core:event>
+        </core:eventLink>
+        <core:keepPromptOpen>false</core:keepPromptOpen>
+        <core:closeOnNextPrompt>false</core:closeOnNextPrompt>
+        <core:keepPreviousPromptOpen>false</core:keepPreviousPromptOpen>
+        <core:promptTimeout>0</core:promptTimeout>
+        <core:hideOpenPrompt>false</core:hideOpenPrompt>
+        <core:allowDatabasePromptLookup>false</core:allowDatabasePromptLookup>
+        <core:messageBase>Pos/Loyalty/LoyaltyMessages</core:messageBase>
+        <core:messageId>NOT_LOYALTY_CARD</core:messageId>
+        <core:messageText></core:messageText>
+    </core:messageState>
+    <core:messageState>
+        <core:url>/Error/Error</core:url>
+        <core:stateID>DisplayLoyaltySchemeError</core:stateID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.states.UIMessageState</core:className>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2547</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>392</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <handledEvents>
+                <handledEvent name="OKPressed"/>
+            </handledEvents>
+        </core:metaData>
+        <core:unusedEvents>
+            <core:handledEvent name="OKPressed"/>
+        </core:unusedEvents>
+        <core:typeId>ErrorMessage</core:typeId>
+        <core:singleInstance>false</core:singleInstance>
+        <core:respondToViewEvents>false</core:respondToViewEvents>
+        <core:actionInputMappings/>
+        <core:actionOutputMappings/>
+        <core:eventLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>CheckRepromptAfterError2</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>OKPressed</core:event>
+        </core:eventLink>
+        <core:keepPromptOpen>false</core:keepPromptOpen>
+        <core:closeOnNextPrompt>false</core:closeOnNextPrompt>
+        <core:keepPreviousPromptOpen>false</core:keepPreviousPromptOpen>
+        <core:promptTimeout>0</core:promptTimeout>
+        <core:hideOpenPrompt>false</core:hideOpenPrompt>
+        <core:allowDatabasePromptLookup>false</core:allowDatabasePromptLookup>
+        <core:messageBase>Pos/Loyalty/LoyaltyMessages</core:messageBase>
+        <core:messageId>LOG_LOYALTY_SCHEME_KEY_EMPTY</core:messageId>
+        <core:messageText></core:messageText>
+    </core:messageState>
+    <core:messageState>
+        <core:url>/Error/Error</core:url>
+        <core:stateID>DisplayLoyaltyTierError</core:stateID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.states.UIMessageState</core:className>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>3109</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>245</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <handledEvents>
+                <handledEvent name="OKPressed"/>
+            </handledEvents>
+        </core:metaData>
+        <core:unusedEvents>
+            <core:handledEvent name="OKPressed"/>
+        </core:unusedEvents>
+        <core:typeId>ErrorMessage</core:typeId>
+        <core:singleInstance>false</core:singleInstance>
+        <core:respondToViewEvents>false</core:respondToViewEvents>
+        <core:actionInputMappings/>
+        <core:actionOutputMappings/>
+        <core:eventLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>CheckRepromptAfterError3</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>OKPressed</core:event>
+        </core:eventLink>
+        <core:keepPromptOpen>false</core:keepPromptOpen>
+        <core:closeOnNextPrompt>false</core:closeOnNextPrompt>
+        <core:keepPreviousPromptOpen>false</core:keepPreviousPromptOpen>
+        <core:promptTimeout>0</core:promptTimeout>
+        <core:hideOpenPrompt>false</core:hideOpenPrompt>
+        <core:allowDatabasePromptLookup>false</core:allowDatabasePromptLookup>
+        <core:messageBase>Pos/Loyalty/LoyaltyMessages</core:messageBase>
+        <core:messageId>LOYALTY_TIER_NOT_FOUND</core:messageId>
+        <core:messageText></core:messageText>
+    </core:messageState>
+    <core:state>
+        <core:url></core:url>
+        <core:stateID>GetLoyaltyAccount</core:stateID>
+        <core:name></core:name>
+        <core:className></core:className>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>37</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1683</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>514</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <handledEvents>
+                <handledEvent name="StateEntered"/>
+            </handledEvents>
+            <stateDataTypes>
+                <stateDataType required="true" name="enactor.pos.ExternalDataMap">
+                    <core:interfaceName>java.util.Map</core:interfaceName>
+                </stateDataType>
+            </stateDataTypes>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicState</core:typeId>
+        <core:singleInstance>false</core:singleInstance>
+        <core:respondToViewEvents>false</core:respondToViewEvents>
+        <core:actionInputMappings>
+            <core:actionMapping>
+                <core:actionID>LogLoyaltyTierError</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.coreUI.Message">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType name="enactor.coreUI.LogMessage">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings/>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>LogLoyaltySchemeNotFound</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.coreUI.Message">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType name="enactor.coreUI.LogMessage">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings/>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>GetCustomerLoyaltyAccountRemote</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.Customer">
+<core:interfaceName>com.enactor.mfc.customer.ICustomer</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.CustomerNumber">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:targetDataType>
+                            <core:expression>customer.customerNumber</core:expression>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType name="enactor.coreUI.CurrentEvent">
+<core:interfaceName>com.enactor.core.events.IEvent</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType name="enactor.coreUI.CurrentEvent">
+<core:interfaceName>com.enactor.core.events.IEvent</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings/>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>GetAccountKey</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.coreUI.AccountList">
+<core:interfaceName>java.util.List</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.coreUI.ListElement">
+<core:interfaceName>com.enactor.core.database.list.IKeyedListElement</core:interfaceName>
+                            </core:targetDataType>
+                            <core:expression>accountList[0]</core:expression>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings/>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>CallProcessHandleGetCardNumberEventExternal</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.pos.ExternalLoyaltyData">
+<core:interfaceName>java.util.Map</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.pos.ExternalLoyaltyData">
+<core:interfaceName>java.util.Map</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.pos.Action">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.coreUI.CurrentEvent">
+<core:interfaceName>com.enactor.core.events.IEvent</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+        </core:actionInputMappings>
+        <core:actionOutputMappings>
+            <core:actionMapping>
+                <core:actionID>GetCustomerLoyaltyAccountRemote</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.coreUI.List">
+<core:interfaceName>java.util.List</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.coreUI.AccountList">
+<core:interfaceName>java.util.List</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.coreUI.List">
+<core:interfaceName>java.util.List</core:interfaceName>
+                            </core:sourceDataType>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>GetAccountKey</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.CustomerLoyaltyAccountKey">
+<core:interfaceName>com.enactor.mfc.account.ICustomerLoyaltyAccountKey</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.account.CustomerLoyaltyAccountKey">
+<core:interfaceName>com.enactor.mfc.account.ICustomerLoyaltyAccountKey</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings/>
+                </core:mappings>
+            </core:actionMapping>
+        </core:actionOutputMappings>
+        <core:eventLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>CallDoGetLoyaltyAccount</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>StateEntered</core:event>
+        </core:eventLink>
+    </core:state>
+    <core:messageState>
+        <core:url>/Error/Error</core:url>
+        <core:stateID>DisplayLoyaltySchemeNotFound</core:stateID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.states.UIMessageState</core:className>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2793</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>245</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <handledEvents>
+                <handledEvent name="OKPressed"/>
+            </handledEvents>
+        </core:metaData>
+        <core:unusedEvents>
+            <core:handledEvent name="OKPressed"/>
+        </core:unusedEvents>
+        <core:typeId>ErrorMessage</core:typeId>
+        <core:singleInstance>false</core:singleInstance>
+        <core:respondToViewEvents>false</core:respondToViewEvents>
+        <core:actionInputMappings/>
+        <core:actionOutputMappings/>
+        <core:eventLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>CheckRepromptAfterError2</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>OKPressed</core:event>
+        </core:eventLink>
+        <core:keepPromptOpen>false</core:keepPromptOpen>
+        <core:closeOnNextPrompt>false</core:closeOnNextPrompt>
+        <core:keepPreviousPromptOpen>false</core:keepPreviousPromptOpen>
+        <core:promptTimeout>0</core:promptTimeout>
+        <core:hideOpenPrompt>false</core:hideOpenPrompt>
+        <core:allowDatabasePromptLookup>false</core:allowDatabasePromptLookup>
+        <core:messageBase>Pos/Loyalty/LoyaltyMessages</core:messageBase>
+        <core:messageId>LOYALTY_SCHEME_NOT_FOUND</core:messageId>
+        <core:messageText></core:messageText>
+    </core:messageState>
+    <core:state>
+        <core:url></core:url>
+        <core:stateID>PromtpCardNumber</core:stateID>
+        <core:name></core:name>
+        <core:className></core:className>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>33</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>224</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>184</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <handledEvents>
+                <handledEvent name="StateEntered"/>
+            </handledEvents>
+            <stateDataTypes>
+                <stateDataType required="true" name="enactor.coreUI.CurrentOutcome">
+                    <core:interfaceName>com.enactor.core.application.process.IApplicationProcessOutcome</core:interfaceName>
+                </stateDataType>
+            </stateDataTypes>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicState</core:typeId>
+        <core:singleInstance>false</core:singleInstance>
+        <core:respondToViewEvents>false</core:respondToViewEvents>
+        <core:actionInputMappings>
+            <core:actionMapping>
+                <core:actionID>GetCustomerLoyaltyAccountRemote</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.Customer">
+<core:interfaceName>com.enactor.mfc.customer.ICustomer</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.CustomerNumber">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:targetDataType>
+                            <core:expression>customer.customerNumber</core:expression>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings/>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>GetAccountKey</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.coreUI.AccountList">
+<core:interfaceName>java.util.List</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.coreUI.ListElement">
+<core:interfaceName>com.enactor.core.database.list.IKeyedListElement</core:interfaceName>
+                            </core:targetDataType>
+                            <core:expression>accountList[0]</core:expression>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings/>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>CallProcessHandleGetCardNumberEventExternal</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.pos.ExternalLoyaltyData">
+<core:interfaceName>java.util.Map</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.pos.ExternalLoyaltyData">
+<core:interfaceName>java.util.Map</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.coreUI.CurrentEvent">
+<core:interfaceName>com.enactor.core.events.IEvent</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.coreUI.CurrentOutcome">
+<core:interfaceName>com.enactor.core.application.process.IApplicationProcessOutcome</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.pos.Action">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:targetDataType>
+                            <core:expression>currentOutcome.name</core:expression>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+        </core:actionInputMappings>
+        <core:actionOutputMappings>
+            <core:actionMapping>
+                <core:actionID>GetCustomerLoyaltyAccountRemote</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.coreUI.List">
+<core:interfaceName>java.util.List</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.coreUI.AccountList">
+<core:interfaceName>java.util.List</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings/>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>GetAccountKey</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.CustomerLoyaltyAccountKey">
+<core:interfaceName>com.enactor.mfc.account.ICustomerLoyaltyAccountKey</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.account.CustomerLoyaltyAccountKey">
+<core:interfaceName>com.enactor.mfc.account.ICustomerLoyaltyAccountKey</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings/>
+                </core:mappings>
+            </core:actionMapping>
+        </core:actionOutputMappings>
+        <core:eventLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>CallCheckDisplayAlphaKeyboard</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>StateEntered</core:event>
+        </core:eventLink>
+    </core:state>
+    <core:messageState>
+        <core:url>/Error/Error</core:url>
+        <core:stateID>LoyaltyAccountNotFound</core:stateID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.states.UIMessageState</core:className>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1678</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>90</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <handledEvents>
+                <handledEvent name="OKPressed"/>
+            </handledEvents>
+        </core:metaData>
+        <core:unusedEvents>
+            <core:handledEvent name="OKPressed"/>
+        </core:unusedEvents>
+        <core:typeId>ErrorMessage</core:typeId>
+        <core:singleInstance>false</core:singleInstance>
+        <core:respondToViewEvents>false</core:respondToViewEvents>
+        <core:actionInputMappings/>
+        <core:actionOutputMappings/>
+        <core:eventLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>ClearGetCardNumberVariables</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>OKPressed</core:event>
+        </core:eventLink>
+        <core:keepPromptOpen>false</core:keepPromptOpen>
+        <core:closeOnNextPrompt>false</core:closeOnNextPrompt>
+        <core:keepPreviousPromptOpen>false</core:keepPreviousPromptOpen>
+        <core:promptTimeout>0</core:promptTimeout>
+        <core:hideOpenPrompt>false</core:hideOpenPrompt>
+        <core:allowDatabasePromptLookup>false</core:allowDatabasePromptLookup>
+        <core:messageBase>Pos/Loyalty/LoyaltyMessages</core:messageBase>
+        <core:messageId>LOYALTY_ACCOUNT_NOT_FOUND</core:messageId>
+        <core:messageText></core:messageText>
+    </core:messageState>
+    <core:messageState>
+        <core:url></core:url>
+        <core:stateID>LoyaltySearchFailed</core:stateID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.states.UIErrorState</core:className>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1024</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>618</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <handledEvents>
+                <handledEvent name="OKPressed"/>
+            </handledEvents>
+        </core:metaData>
+        <core:typeId>DefaultMessageType</core:typeId>
+        <core:singleInstance>false</core:singleInstance>
+        <core:respondToViewEvents>false</core:respondToViewEvents>
+        <core:actionInputMappings>
+            <core:actionMapping>
+                <core:actionID>GetCustomerLoyaltyAccountRemote</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.Customer">
+<core:interfaceName>com.enactor.mfc.customer.ICustomer</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.CustomerNumber">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:targetDataType>
+                            <core:expression>customer.customerNumber</core:expression>
+                        </core:mappings>
+                    </core:processMappings>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>GetAccountKey</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.coreUI.AccountList">
+<core:interfaceName>java.util.List</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.coreUI.ListElement">
+<core:interfaceName>com.enactor.core.database.list.IKeyedListElement</core:interfaceName>
+                            </core:targetDataType>
+                            <core:expression>accountList[0]</core:expression>
+                        </core:mappings>
+                    </core:processMappings>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>CallProcessHandleGetCardNumberEventExternal</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.pos.ExternalLoyaltyData">
+<core:interfaceName>java.util.Map</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.pos.ExternalLoyaltyData">
+<core:interfaceName>java.util.Map</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.pos.Action">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.coreUI.CurrentEvent">
+<core:interfaceName>com.enactor.core.events.IEvent</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+        </core:actionInputMappings>
+        <core:actionOutputMappings>
+            <core:actionMapping>
+                <core:actionID>GetCustomerLoyaltyAccountRemote</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.coreUI.List">
+<core:interfaceName>java.util.List</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.coreUI.AccountList">
+<core:interfaceName>java.util.List</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.coreUI.List">
+<core:interfaceName>java.util.List</core:interfaceName>
+                            </core:sourceDataType>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>GetAccountKey</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.CustomerLoyaltyAccountKey">
+<core:interfaceName>com.enactor.mfc.account.ICustomerLoyaltyAccountKey</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.account.CustomerLoyaltyAccountKey">
+<core:interfaceName>com.enactor.mfc.account.ICustomerLoyaltyAccountKey</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                </core:mappings>
+            </core:actionMapping>
+        </core:actionOutputMappings>
+        <core:eventLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>ClearCardData</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>OKPressed</core:event>
+        </core:eventLink>
+        <core:keepPromptOpen>false</core:keepPromptOpen>
+        <core:closeOnNextPrompt>false</core:closeOnNextPrompt>
+        <core:keepPreviousPromptOpen>false</core:keepPreviousPromptOpen>
+        <core:promptTimeout>0</core:promptTimeout>
+        <core:hideOpenPrompt>false</core:hideOpenPrompt>
+        <core:allowDatabasePromptLookup>false</core:allowDatabasePromptLookup>
+        <core:messageBase>Pos/Loyalty/LoyaltyMessages</core:messageBase>
+        <core:messageId>FAILED_LOYALTY_ACCOUNT_SEARCH</core:messageId>
+        <core:messageText></core:messageText>
+    </core:messageState>
+    <core:state>
+        <core:url></core:url>
+        <core:stateID>ForceNewStatge</core:stateID>
+        <core:name></core:name>
+        <core:className></core:className>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>5</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1281</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>929</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <handledEvents>
+                <handledEvent name="StateEntered"/>
+            </handledEvents>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicState</core:typeId>
+        <core:singleInstance>false</core:singleInstance>
+        <core:respondToViewEvents>false</core:respondToViewEvents>
+        <core:actionInputMappings/>
+        <core:actionOutputMappings/>
+        <core:eventLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID>GetLoyaltyAccount</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:event>StateEntered</core:event>
+        </core:eventLink>
+    </core:state>
+    <core:promptState>
+        <core:url>Pos/General/SelectionPrompt</core:url>
+        <core:stateID>SearchResultsList</core:stateID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.states.UIPromptState</core:className>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1023</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1272</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>1138</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="customerLoyaltyAccount" name="enactor.coreUI.EntityName">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:param value="http://www.enactor.com/retail" name="enactor.coreUI.EntityNamespace">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:param value="Pos/Loyalty/SelectCustomerLoyaltyAccountListTemplate" name="listTemplateUrl">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:param value="SELECT_LOYALTY_ACCOUNT" name="messageId">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:param value="Pos/Loyalty/LoyaltyMessages" name="messageBase">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.coreUI.EntityName">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.coreUI.EntityNamespace">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.UserLocale">
+                    <core:interfaceName>com.enactor.core.localisation.ILocale</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="listTemplateUrl">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.coreUI.List">
+                    <core:interfaceName>java.util.List</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="messageId">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="messageBase">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="true" name="enactor.coreUI.SelectedItem">
+                    <core:interfaceName>com.enactor.core.database.list.IKeyedListElement</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <handledEvents>
+                <handledEvent name="OKPressed"/>
+                <handledEvent name="CancelPressed"/>
+            </handledEvents>
+            <stateDataTypes>
+                <stateDataType required="true" name="enactor.coreUI.EntityName">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="true" name="enactor.coreUI.EntityNamespace">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </stateDataType>
+                <stateDataType name="enactor.coreUI.UserLocale">
+                    <core:interfaceName>com.enactor.core.localisation.ILocale</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="true" name="enactor.coreUI.SelectedItem">
+                    <core:interfaceName>com.enactor.core.database.list.IKeyedListElement</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="true" name="listTemplateUrl">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="true" name="enactor.coreUI.List">
+                    <core:interfaceName>java.util.List</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="true" name="messageBase">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="true" name="messageId">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </stateDataType>
+            </stateDataTypes>
+        </core:metaData>
+        <core:typeId>enactor.types.PromptState</core:typeId>
+        <core:singleInstance>false</core:singleInstance>
+        <core:respondToViewEvents>false</core:respondToViewEvents>
+        <core:stateInputMappings>
+            <core:mappings>
+                <core:sourceDataType required="true" name="enactor.coreUI.AccountList">
+                    <core:interfaceName>java.util.List</core:interfaceName>
+                </core:sourceDataType>
+                <core:targetDataType required="true" name="enactor.coreUI.List">
+                    <core:interfaceName>java.util.List</core:interfaceName>
+                </core:targetDataType>
+            </core:mappings>
+        </core:stateInputMappings>
+        <core:stateOutputMappings>
+            <core:mappings>
+                <core:sourceDataType required="true" name="enactor.coreUI.SelectedItem">
+                    <core:interfaceName>com.enactor.core.database.list.IKeyedListElement</core:interfaceName>
+                </core:sourceDataType>
+                <core:targetDataType required="true" name="enactor.mfc.account.CustomerLoyaltyAccountKey">
+                    <core:interfaceName>com.enactor.mfc.account.ICustomerLoyaltyAccountKey</core:interfaceName>
+                </core:targetDataType>
+                <core:expression>selectedItem.key</core:expression>
+            </core:mappings>
+        </core:stateOutputMappings>
+        <core:actionInputMappings/>
+        <core:actionOutputMappings/>
+        <core:eventLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>EndProcessCancel</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>CancelPressed</core:event>
+        </core:eventLink>
+        <core:eventLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID>ForceNewStatge</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:event>OKPressed</core:event>
+        </core:eventLink>
+        <core:keepPromptOpen>false</core:keepPromptOpen>
+        <core:closeOnNextPrompt>false</core:closeOnNextPrompt>
+        <core:keepPreviousPromptOpen>false</core:keepPreviousPromptOpen>
+        <core:promptTimeout>0</core:promptTimeout>
+        <core:hideOpenPrompt>false</core:hideOpenPrompt>
+        <core:allowDatabasePromptLookup>false</core:allowDatabasePromptLookup>
+    </core:promptState>
+    <core:messageState>
+        <core:url>/Error/Error</core:url>
+        <core:stateID>InvalidKeyedValue</core:stateID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.states.UIMessageState</core:className>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1683</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>442</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <handledEvents>
+                <handledEvent name="OKPressed"/>
+            </handledEvents>
+        </core:metaData>
+        <core:unusedEvents>
+            <core:handledEvent name="OKPressed"/>
+        </core:unusedEvents>
+        <core:typeId>ErrorMessage</core:typeId>
+        <core:singleInstance>false</core:singleInstance>
+        <core:respondToViewEvents>false</core:respondToViewEvents>
+        <core:actionInputMappings/>
+        <core:actionOutputMappings/>
+        <core:eventLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>CheckRepromptAfterError</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>OKPressed</core:event>
+        </core:eventLink>
+        <core:keepPromptOpen>false</core:keepPromptOpen>
+        <core:closeOnNextPrompt>false</core:closeOnNextPrompt>
+        <core:keepPreviousPromptOpen>false</core:keepPreviousPromptOpen>
+        <core:promptTimeout>0</core:promptTimeout>
+        <core:hideOpenPrompt>false</core:hideOpenPrompt>
+        <core:allowDatabasePromptLookup>false</core:allowDatabasePromptLookup>
+        <core:messageBase>Pos/Loyalty/LoyaltyMessages</core:messageBase>
+        <core:messageId>INVALID_KEYED_VALUE</core:messageId>
+        <core:messageText></core:messageText>
+    </core:messageState>
+    <core:stateTransitions/>
+</core:process>

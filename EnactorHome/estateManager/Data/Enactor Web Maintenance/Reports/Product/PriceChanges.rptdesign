@@ -1,0 +1,1059 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.23" id="1">
+    <property name="author">Rob Harot</property>
+    <property name="comments">Copyright (c) 2010 Enactor</property>
+    <property name="createdBy">Eclipse BIRT Designer Version 4.6.0.v201606072122</property>
+    <text-property name="title">Price Changes</text-property>
+    <simple-property-list name="includeResource">
+        <value>Messages/Product/PriceChangesMessages</value>
+    </simple-property-list>
+    <property name="units">in</property>
+    <method name="initialize"><![CDATA[
+globalDataFormatter = Packages.com.enactor.coreUI.factories.DataFormatterFactory.getInstance().getFormatter(reportContext.getLocale());
+baseCurrencyId = globalDataFormatter.getBaseCurrencyId();
+
+if(params["locationId"].value == null){
+	params["locationId"].value = "";
+}
+
+if(params["startDate"].value == null){
+	params["startDate"].value = Packages.com.enactor.core.utilities.DateUtils.getStartOfWeek(null);
+}
+
+params["startDate"].value = Packages.com.enactor.core.utilities.DateUtils.getDayStart(params["startDate"].value);
+startDateStr = globalDataFormatter.formatDate(params["startDate"].value);
+
+if(params["endDate"].value == null){
+	params["endDate"].value = Packages.com.enactor.core.utilities.DateUtils.getEndOfWeek(null);
+}
+
+params["endDate"].value = Packages.com.enactor.core.utilities.DateUtils.getDayEnd(params["endDate"].value);
+endDateStr = globalDataFormatter.formatDate(params["endDate"].value);
+
+storedProductId = "";
+currentPrice = 0;
+hide = false;]]></method>
+    <property name="theme">ReportLibrary.BasicReportTheme</property>
+    <text-property name="displayName">Price Changes</text-property>
+    <property name="layoutPreference">auto layout</property>
+    <property name="imageDPI">96</property>
+    <list-property name="libraries">
+        <structure>
+            <property name="fileName">ReportLibrary.rptlibrary</property>
+            <property name="namespace">ReportLibrary</property>
+        </structure>
+    </list-property>
+    <parameters>
+        <scalar-parameter name="userName" id="462" extends="ReportLibrary.userName">
+            <text-property name="promptText">Displayable User Name</text-property>
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant"></value>
+            </simple-property-list>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="odaJndiName" id="367">
+            <text-property name="promptText">ODA JNDI Name</text-property>
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant"></value>
+            </simple-property-list>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="locationId" id="500">
+            <text-property name="promptText">Location Id</text-property>
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="startDate" id="518">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">dateTime</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant">1970-01-01</value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="concealValue">false</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="endDate" id="519">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">dateTime</property>
+            <property name="distinct">true</property>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+    </parameters>
+    <data-sources>
+        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="Data Source" id="51"
+ extends="ReportLibrary.Data Source">
+            <property name="odaDriverClass">com.microsoft.sqlserver.jdbc.SQLServerDriver</property>
+            <property name="odaURL">jdbc:sqlserver://localhost:1433;SelectMethod=cursor;DatabaseName=Enactor</property>
+            <property name="odaUser">enactor</property>
+            <encrypted-property name="odaPassword" encryptionID="base64">ZW5hY3Rvcg==</encrypted-property>
+        </oda-data-source>
+    </data-sources>
+    <data-sets>
+        <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="LocationDescription" id="999"
+ extends="ReportLibrary.LocationDescription"/>
+        <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="MainQuery" id="1627">
+            <property name="eventHandlerClass">com.enactor.coreReporting.reportEventHandlers.DataSourceQueryTranslatorEventHandler</property>
+            <property name="newHandlerOnEachEvent">true</property>
+            <property name="nullsOrdering">nulls lowest</property>
+            <list-property name="computedColumns">
+                <structure>
+                    <property name="name">UP_OR_DOWN</property>
+                    <expression name="expression">row["PRICE"] &lt; currentPrice ? 'DOWN' : 'UP';</expression>
+                    <property name="dataType">string</property>
+                </structure>
+            </list-property>
+            <list-property name="columnHints">
+                <structure>
+                    <property name="columnName">MMGROUP_ID</property>
+                    <property name="alias">MMGROUP_ID</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">MMGROUP_ID</text-property>
+                    <text-property name="heading">MMGROUP_ID</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">MMGROUP_DESCRIPTION</property>
+                    <property name="alias">MMGROUP_DESCRIPTION</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">MMGROUP_DESCRIPTION</text-property>
+                    <text-property name="heading">MMGROUP_DESCRIPTION</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">PRODUCT_ID</property>
+                    <property name="alias">PRODUCT_ID</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">PRODUCT_ID</text-property>
+                    <text-property name="heading">PRODUCT_ID</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">DESCRIPTION</property>
+                    <property name="alias">DESCRIPTION</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">DESCRIPTION</text-property>
+                    <text-property name="heading">DESCRIPTION</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">PRICE</property>
+                    <property name="alias">PRICE</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">PRICE</text-property>
+                    <text-property name="heading">PRICE</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">START_DATE</property>
+                    <property name="alias">START_DATE</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">START_DATE</text-property>
+                    <text-property name="heading">START_DATE</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">IS_START_DATE_B4_START_PARAM</property>
+                    <property name="alias">IS_START_DATE_B4_START_PARAM</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">IS_START_DATE_B4_START_PARAM</text-property>
+                    <text-property name="heading">IS_START_DATE_B4_START_PARAM</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">NON_NULL_START_DATE</property>
+                    <property name="alias">NON_NULL_START_DATE</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">NON_NULL_START_DATE</text-property>
+                    <text-property name="heading">NON_NULL_START_DATE</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">NON_NULL_END_DATE</property>
+                    <property name="alias">NON_NULL_END_DATE</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">NON_NULL_END_DATE</text-property>
+                    <text-property name="heading">NON_NULL_END_DATE</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">UP_OR_DOWN</property>
+                    <property name="alias">UP_OR_DOWN</property>
+                    <property name="analysis">dimension</property>
+                </structure>
+            </list-property>
+            <list-property name="parameters">
+                <structure>
+                    <property name="name">caseStartDate</property>
+                    <property name="paramName">startDate</property>
+                    <property name="nativeName"></property>
+                    <property name="dataType">dateTime</property>
+                    <property name="nativeDataType">0</property>
+                    <property name="position">1</property>
+                    <property name="isOptional">false</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">beginningOfTime</property>
+                    <property name="nativeName"></property>
+                    <property name="dataType">dateTime</property>
+                    <property name="nativeDataType">0</property>
+                    <property name="position">2</property>
+                    <expression name="defaultValue" type="constant">1970-01-01 00:00:00.000</expression>
+                    <property name="isOptional">false</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">endOfTime</property>
+                    <property name="nativeName"></property>
+                    <property name="dataType">dateTime</property>
+                    <property name="nativeDataType">0</property>
+                    <property name="position">3</property>
+                    <expression name="defaultValue" type="constant">2069-12-31 23:59:59.999</expression>
+                    <property name="isOptional">false</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">priceGroup</property>
+                    <property name="nativeName"></property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">0</property>
+                    <property name="position">4</property>
+                    <expression name="defaultValue" type="constant">priceGroup</expression>
+                    <property name="isOptional">false</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">region</property>
+                    <property name="nativeName"></property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">0</property>
+                    <property name="position">5</property>
+                    <expression name="defaultValue" type="constant">region</expression>
+                    <property name="isOptional">false</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">mmGroup</property>
+                    <property name="nativeName"></property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">0</property>
+                    <property name="position">6</property>
+                    <expression name="defaultValue" type="constant">mmGroup</expression>
+                    <property name="isOptional">false</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">locationIdIn</property>
+                    <property name="paramName">locationId</property>
+                    <property name="nativeName"></property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">0</property>
+                    <property name="position">7</property>
+                    <property name="isOptional">false</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">locationIdIn2</property>
+                    <property name="paramName">locationId</property>
+                    <property name="nativeName"></property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">0</property>
+                    <property name="position">8</property>
+                    <property name="isOptional">false</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">startDateIn</property>
+                    <property name="paramName">startDate</property>
+                    <property name="nativeName"></property>
+                    <property name="dataType">dateTime</property>
+                    <property name="nativeDataType">0</property>
+                    <property name="position">9</property>
+                    <property name="isOptional">false</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">endDateIn</property>
+                    <property name="paramName">endDate</property>
+                    <property name="nativeName"></property>
+                    <property name="dataType">dateTime</property>
+                    <property name="nativeDataType">0</property>
+                    <property name="position">10</property>
+                    <property name="isOptional">false</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">locationId</property>
+                    <property name="paramName">locationId</property>
+                    <property name="nativeName"></property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">0</property>
+                    <property name="position">11</property>
+                    <property name="isOptional">false</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">locationId2</property>
+                    <property name="paramName">locationId</property>
+                    <property name="nativeName"></property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">0</property>
+                    <property name="position">12</property>
+                    <property name="isOptional">false</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">endDate</property>
+                    <property name="paramName">endDate</property>
+                    <property name="nativeName"></property>
+                    <property name="dataType">dateTime</property>
+                    <property name="nativeDataType">0</property>
+                    <property name="position">13</property>
+                    <property name="isOptional">false</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">startDate</property>
+                    <property name="paramName">startDate</property>
+                    <property name="nativeName"></property>
+                    <property name="dataType">dateTime</property>
+                    <property name="nativeDataType">0</property>
+                    <property name="position">14</property>
+                    <property name="isOptional">false</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+            </list-property>
+            <structure name="cachedMetaData">
+                <list-property name="resultSet">
+                    <structure>
+                        <property name="position">1</property>
+                        <property name="name">MMGROUP_ID</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">2</property>
+                        <property name="name">MMGROUP_DESCRIPTION</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">3</property>
+                        <property name="name">PRODUCT_ID</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">4</property>
+                        <property name="name">DESCRIPTION</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">5</property>
+                        <property name="name">PRICE</property>
+                        <property name="dataType">decimal</property>
+                    </structure>
+                    <structure>
+                        <property name="position">6</property>
+                        <property name="name">START_DATE</property>
+                        <property name="dataType">date-time</property>
+                    </structure>
+                    <structure>
+                        <property name="position">7</property>
+                        <property name="name">IS_START_DATE_B4_START_PARAM</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                    <structure>
+                        <property name="position">8</property>
+                        <property name="name">NON_NULL_START_DATE</property>
+                        <property name="dataType">date-time</property>
+                    </structure>
+                    <structure>
+                        <property name="position">9</property>
+                        <property name="name">NON_NULL_END_DATE</property>
+                        <property name="dataType">date-time</property>
+                    </structure>
+                    <structure>
+                        <property name="position">10</property>
+                        <property name="name">UP_OR_DOWN</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                </list-property>
+            </structure>
+            <property name="dataSource">Data Source</property>
+            <list-property name="resultSet">
+                <structure>
+                    <property name="position">1</property>
+                    <property name="name">MMGROUP_ID</property>
+                    <property name="nativeName">MMGROUP_ID</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">2</property>
+                    <property name="name">MMGROUP_DESCRIPTION</property>
+                    <property name="nativeName">MMGROUP_DESCRIPTION</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">3</property>
+                    <property name="name">PRODUCT_ID</property>
+                    <property name="nativeName">PRODUCT_ID</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">4</property>
+                    <property name="name">DESCRIPTION</property>
+                    <property name="nativeName">DESCRIPTION</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">5</property>
+                    <property name="name">PRICE</property>
+                    <property name="nativeName">PRICE</property>
+                    <property name="dataType">decimal</property>
+                    <property name="nativeDataType">-5</property>
+                </structure>
+                <structure>
+                    <property name="position">6</property>
+                    <property name="name">START_DATE</property>
+                    <property name="nativeName">START_DATE</property>
+                    <property name="dataType">date-time</property>
+                    <property name="nativeDataType">93</property>
+                </structure>
+                <structure>
+                    <property name="position">7</property>
+                    <property name="name">IS_START_DATE_B4_START_PARAM</property>
+                    <property name="nativeName">IS_START_DATE_B4_START_PARAM</property>
+                    <property name="dataType">integer</property>
+                    <property name="nativeDataType">4</property>
+                </structure>
+                <structure>
+                    <property name="position">8</property>
+                    <property name="name">NON_NULL_START_DATE</property>
+                    <property name="nativeName">NON_NULL_START_DATE</property>
+                    <property name="dataType">date-time</property>
+                    <property name="nativeDataType">93</property>
+                </structure>
+                <structure>
+                    <property name="position">9</property>
+                    <property name="name">NON_NULL_END_DATE</property>
+                    <property name="nativeName">NON_NULL_END_DATE</property>
+                    <property name="dataType">date-time</property>
+                    <property name="nativeDataType">93</property>
+                </structure>
+            </list-property>
+            <xml-property name="queryText"><![CDATA[select P.MMGROUP_ID as MMGROUP_ID,
+		G.NAME as MMGROUP_DESCRIPTION,
+		LPP.PRODUCT_ID as PRODUCT_ID,
+		P.DESCRIPTION as DESCRIPTION,
+		LPP.PRICE as PRICE,
+		LPP.START_DATE as START_DATE,
+		CASE WHEN LPP.START_DATE is null or LPP.START_DATE < ? THEN 1 ELSE 0 END AS IS_START_DATE_B4_START_PARAM, 
+		CASE WHEN LPP.START_DATE is null then ? else LPP.START_DATE end as NON_NULL_START_DATE,
+		CASE WHEN LPP.END_DATE is null then ? else LPP.END_DATE end as NON_NULL_END_DATE
+from	Locations L 
+inner join ProductPrices LPP on L.LOCATION_ID = LPP.LOCATION_ID or (
+	L.PRICE_GROUP_ID = LPP.GROUP_ID and L.PRICE_GROUP_HIERARCHY_ID = LPP.GROUP_HIERARCHY_ID and ? = LPP.GROUP_TYPE_ID
+	and L.PRICE_VAR_GROUP_ID = LPP.VARIANT_GROUP_ID and L.PRICE_VAR_GROUP_HIERARCHY_ID = LPP.VARIANT_GROUP_HIERARCHY_ID and ? = LPP.VARIANT_GROUP_TYPE_ID)
+left outer join Products P on P.PRODUCT_ID = LPP.PRODUCT_ID
+left outer join Groups G on G.GROUP_ID = P.MMGROUP_ID and G.GROUP_HIERARCHY_ID = P.MMGROUP_HIERARCHY_ID and G.GROUP_TYPE_ID = ? 
+inner join
+(
+	select	PIn.MMGROUP_ID as MMGROUP_ID_IN,
+			PIn.MMGROUP_HIERARCHY_ID as MMGROUP_HIERARCHY_ID_IN,
+			count(distinct LPPIn.PRODUCT_ID) as PRODUCT_ID_DISTINCT_COUNT,
+			COUNT(LPPIn.PRODUCT_ID) as PRODUCT_ID_ALL_COUNT
+	from 	ProductPrices LPPIn
+	left outer join Products PIn on PIn.PRODUCT_ID = LPPIn.PRODUCT_ID
+	where 	(LPPIn.LOCATION_ID = '-' or LPPIn.LOCATION_ID is null or ? = !~''~! or LPPIn.LOCATION_ID = ?)  
+	and		(LPPIn.START_DATE >= ?)
+	and		(LPPIn.START_DATE <= ?)
+	group by PIn.MMGROUP_ID, PIn.MMGROUP_HIERARCHY_ID
+) VT on VT.MMGROUP_ID_IN = P.MMGROUP_ID and VT.MMGROUP_HIERARCHY_ID_IN = P.MMGROUP_HIERARCHY_ID
+where 	(? = !~''~! or L.LOCATION_ID = ?) 
+and		(LPP.START_DATE is null or LPP.START_DATE <= ?)
+and		(LPP.END_DATE is null or LPP.END_DATE >= ?)
+order by PRODUCT_ID,
+IS_START_DATE_B4_START_PARAM desc, 
+NON_NULL_START_DATE desc, 
+NON_NULL_END_DATE asc
+]]></xml-property>
+        </oda-data-set>
+    </data-sets>
+    <page-setup>
+        <simple-master-page name="Simple MasterPage" id="2">
+            <property name="type">a4</property>
+            <property name="orientation">landscape</property>
+            <property name="topMargin">0.75in</property>
+            <property name="leftMargin">0.75in</property>
+            <property name="bottomMargin">0.75in</property>
+            <property name="rightMargin">0.75in</property>
+            <page-header>
+                <grid name="ReportHeader" id="368" extends="ReportLibrary.ReportHeader">
+                    <overridden-values>
+                        <ref-entry baseId="316" id="316"/>
+                        <ref-entry baseId="317" id="317"/>
+                        <ref-entry baseId="318" id="318"/>
+                        <ref-entry baseId="319" id="319"/>
+                        <ref-entry baseId="327" name="CompanyLogoWide" id="327"/>
+                        <ref-entry baseId="380" name="NewImage" id="380"/>
+                        <ref-entry baseId="320" id="320"/>
+                        <ref-entry baseId="481" name="PoweredBy" id="481"/>
+                        <ref-entry baseId="328" name="CompanyTitle" id="328"/>
+                    </overridden-values>
+                </grid>
+            </page-header>
+            <page-footer>
+                <grid id="3">
+                    <property name="width">100%</property>
+                    <column id="523">
+                        <property name="width">45%</property>
+                    </column>
+                    <column id="524">
+                        <property name="width">4.3020833333in</property>
+                    </column>
+                    <column id="525">
+                        <property name="width">5%</property>
+                    </column>
+                    <row id="526">
+                        <cell id="527">
+                            <text name="GeneratedOnText" id="531" extends="ReportLibrary.GeneratedOnText">
+                                <property name="style">reportFooterLeft</property>
+                                                            <property name="contentType">html</property>
+                                <text-property name="content"><![CDATA[
+<value-of>l10nParams = new Array(1); l10nParams[0] = Packages.com.enactor.core.utilities.DateUtils.formatShortDateMediumTime(reportContext.getLocale(), new Date) ; reportContext.getMessage("GENERATED_ON", reportContext.getLocale(), l10nParams);</value-of>
+]]></text-property>
+                            </text>
+                        </cell>
+                        <cell id="528">
+                            <text name="GeneratedByText" id="530" extends="ReportLibrary.GeneratedByText">
+                                <property name="style">reportFooterLeft</property>
+                                                            <property name="contentType">html</property>
+                                <text-property name="content"><![CDATA[
+<value-of>l10nParams = new Array(1); l10nParams[0] = params["userName"] ; reportContext.getMessage("GENERATED_BY", reportContext.getLocale(), l10nParams);</value-of>
+]]></text-property>
+                            </text>
+                        </cell>
+                        <cell id="529">
+                            <grid id="532">
+                                <property name="width">100%</property>
+                                <column id="533"/>
+                                <column id="534"/>
+                                <column id="535"/>
+                                <row id="536">
+                                    <cell id="537">
+                                        <auto-text id="538">
+                                            <property name="style">reportFooterRight</property>
+                                            <property name="type">page-number</property>
+                                        </auto-text>
+                                    </cell>
+                                    <cell id="539">
+                                        <text id="540">
+                                            <property name="style">reportFooterCentre</property>
+                                            <property name="contentType">plain</property>
+                                            <text-property name="content"><![CDATA[/]]></text-property>
+                                        </text>
+                                    </cell>
+                                    <cell id="541">
+                                        <auto-text id="542">
+                                            <property name="style">reportFooterRight</property>
+                                            <property name="type">total-page</property>
+                                        </auto-text>
+                                    </cell>
+                                </row>
+                            </grid>
+                        </cell>
+                    </row>
+                </grid>
+            </page-footer>
+        </simple-master-page>
+    </page-setup>
+    <body>
+        <grid name="ReportTitleGrid" id="362">
+            <property name="width">100%</property>
+            <column id="363"/>
+            <row id="364">
+                <cell id="365">
+                    <property name="paddingTop">1pt</property>
+                    <label name="ReportTitleLabel" id="521">
+                        <property name="style">reportTitle</property>
+                        <property name="fontFamily">sans-serif</property>
+                        <property name="fontSize">larger</property>
+                        <property name="paddingTop">1pt</property>
+                        <property name="textAlign">center</property>
+                        <text-property name="text" key="TITLE"></text-property>
+                    </label>
+                </cell>
+            </row>
+        </grid>
+        <grid name="CriteriaGrid" id="502">
+            <property name="marginTop">0pt</property>
+            <property name="width">100%</property>
+            <list-property name="visibility">
+                <structure>
+                    <property name="format">all</property>
+                    <expression name="valueExpr">if (pageNumber > 1) {
+ true;
+} else {
+ false;
+}</expression>
+                </structure>
+            </list-property>
+            <column id="377">
+                <property name="width">11%</property>
+            </column>
+            <column id="567">
+                <property name="width">39%</property>
+            </column>
+            <column id="993">
+                <property name="width">11%</property>
+            </column>
+            <column id="578">
+                <property name="width">39%</property>
+            </column>
+            <row id="992">
+                <cell id="991">
+                    <property name="colSpan">4</property>
+                    <property name="rowSpan">1</property>
+                    <label id="990">
+                        <property name="style">subReportHeader</property>
+                        <property name="marginTop">0pt</property>
+                        <property name="paddingTop">1pt</property>
+                        <property name="textAlign">center</property>
+                        <text-property name="text" key="REPORT_CRITERIA">The Report Criteria</text-property>
+                    </label>
+                </cell>
+            </row>
+            <row id="989">
+                <cell id="988">
+                    <property name="paddingTop">1pt</property>
+                    <label id="568">
+                        <property name="style">criteriaLabel</property>
+                        <text-property name="text" key="CRITERIA_1"></text-property>
+                    </label>
+                </cell>
+                <cell id="562">
+                    <property name="paddingTop">1pt</property>
+                    <data id="1014">
+                        <property name="style">reportCriteria</property>
+                        <property name="fontWeight">normal</property>
+                        <list-property name="mapRules">
+                            <structure>
+                                <expression name="testExpr">row["LOCATION_DESCRIPTION"]</expression>
+                                <property name="operator">is-null</property>
+                                <text-property name="display" key="BLANK"></text-property>
+                            </structure>
+                        </list-property>
+                        <property name="dataSet">LocationDescription</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">LOCATION_DESCRIPTION</property>
+                                <expression name="expression">dataSetRow["LOCATION_DESCRIPTION"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                        </list-property>
+                        <property name="resultSetColumn">LOCATION_DESCRIPTION</property>
+                    </data>
+                </cell>
+                <cell id="985">
+                    <label id="437">
+                        <property name="style">criteriaLabel</property>
+                        <text-property name="text" key="CRITERIA_2"></text-property>
+                    </label>
+                </cell>
+                <cell id="573"/>
+            </row>
+            <row id="984">
+                <cell id="983">
+                    <label id="438">
+                        <property name="style">criteriaLabel</property>
+                        <text-property name="text" key="CRITERIA_3"></text-property>
+                    </label>
+                </cell>
+                <cell id="563">
+                    <text-data id="1035">
+                        <property name="style">criteriaLabel</property>
+                        <expression name="valueExpr">startDateStr;</expression>
+                        <property name="contentType">html</property>
+                    </text-data>
+                </cell>
+                <cell id="982">
+                    <label id="1039">
+                        <property name="style">criteriaLabel</property>
+                        <text-property name="text" key="CRITERIA_4"></text-property>
+                    </label>
+                </cell>
+                <cell id="574">
+                    <text-data id="1036">
+                        <property name="style">criteriaLabel</property>
+                        <expression name="valueExpr">endDateStr;</expression>
+                        <property name="contentType">html</property>
+                    </text-data>
+                </cell>
+            </row>
+            <row id="981">
+                <cell id="980"/>
+                <cell id="564"/>
+                <cell id="979"/>
+                <cell id="575"/>
+            </row>
+            <row id="420">
+                <cell id="421"/>
+                <cell id="566"/>
+                <cell id="422"/>
+                <cell id="577"/>
+            </row>
+        </grid>
+        <grid name="ResultsGrid" id="998">
+            <property name="width">100%</property>
+            <column id="997"/>
+            <row id="1625">
+                <cell id="1626"/>
+            </row>
+            <row id="425">
+                <cell id="426">
+                    <table id="1629">
+                        <property name="dataSet">MainQuery</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">MMGROUP_ID</property>
+                                <text-property name="displayName">MMGROUP_HEADER</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["MMGROUP_ID"] + ' - ' + dataSetRow["MMGROUP_DESCRIPTION"]</expression>
+                                <property name="dataType">string</property>
+                                <property name="allowExport">true</property>
+                            </structure>
+                            <structure>
+                                <property name="name">MMGROUP_DESCRIPTION</property>
+                                <text-property name="displayName">MMGROUP_DESCRIPTION</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["MMGROUP_DESCRIPTION"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">PRODUCT_ID</property>
+                                <text-property name="displayName">PRODUCT_ID</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["PRODUCT_ID"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">DESCRIPTION</property>
+                                <text-property name="displayName">DESCRIPTION</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["DESCRIPTION"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">PRICE</property>
+                                <text-property name="displayName">PRICE</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["PRICE"]</expression>
+                                <property name="dataType">decimal</property>
+                            </structure>
+                            <structure>
+                                <property name="name">START_DATE</property>
+                                <text-property name="displayName">START_DATE</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["START_DATE"]</expression>
+                                <property name="dataType">date-time</property>
+                            </structure>
+                            <structure>
+                                <property name="name">IS_START_DATE_B4_START_PARAM</property>
+                                <text-property name="displayName">IS_START_DATE_B4_START_PARAM</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["IS_START_DATE_B4_START_PARAM"]</expression>
+                                <property name="dataType">integer</property>
+                            </structure>
+                            <structure>
+                                <property name="name">NON_NULL_START_DATE</property>
+                                <text-property name="displayName">NON_NULL_START_DATE</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["NON_NULL_START_DATE"]</expression>
+                                <property name="dataType">date-time</property>
+                            </structure>
+                            <structure>
+                                <property name="name">NON_NULL_END_DATE</property>
+                                <text-property name="displayName">NON_NULL_END_DATE</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["NON_NULL_END_DATE"]</expression>
+                                <property name="dataType">date-time</property>
+                            </structure>
+                            <structure>
+                                <property name="name">FORMATTED_PRICE</property>
+                                <text-property name="displayName">FORMATTED_PRICE</text-property>
+                                <expression name="expression" type="javascript">longVal = dataSetRow["PRICE"] != null ? dataSetRow["PRICE"]  : 0;&#13;
+globalDataFormatter.formatCurrencyAmount(longVal, baseCurrencyId);</expression>
+                                <property name="dataType">string</property>
+                                <property name="allowExport">true</property>
+                            </structure>
+                            <structure>
+                                <property name="name">UP_OR_DOWN</property>
+                                <text-property name="displayName">UP_OR_DOWN</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["UP_OR_DOWN"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">FORMATTED_CURRENT_PRICE</property>
+                                <expression name="expression" type="javascript">globalDataFormatter.formatCurrencyAmount(currentPrice, baseCurrencyId);</expression>
+                                <property name="dataType">string</property>
+                                <property name="allowExport">true</property>
+                            </structure>
+                            <structure>
+                                <property name="name">RECALCULATED_UP_OR_DOWN</property>
+                                <expression name="expression" type="javascript">row["PRICE"] &lt; currentPrice ? 'DOWN' : 'UP';</expression>
+                                <property name="dataType">string</property>
+                                <property name="allowExport">true</property>
+                            </structure>
+                            <structure>
+                                <property name="name">FORMATTED_NON_NULL_START_DATE</property>
+                                <expression name="expression" type="javascript">var date = dataSetRow["START_DATE"];&#13;
+&#13;
+if (date != null)&#13;
+	globalDataFormatter.formatDate(date);&#13;
+else&#13;
+		globalDataFormatter.formatDate(new Date("1970-01-01"));</expression>
+                                <property name="dataType">string</property>
+                                <property name="allowExport">true</property>
+                            </structure>
+                            <structure>
+                                <property name="name">CALCULATE_VARIABLES</property>
+                                <expression name="expression" type="javascript">previousProductId = storedProductId;&#13;
+storedProductId = row["PRODUCT_ID"];&#13;
+&#13;
+hide = false;&#13;
+&#13;
+if( previousProductId != storedProductId ) {&#13;
+	currentPrice = row["PRICE"];&#13;
+	hide= true;&#13;
+}&#13;
+&#13;
+if ( dataSetRow["NON_NULL_START_DATE"] &lt; params["startDate"].value ) {&#13;
+	hide = true;&#13;
+}&#13;
+	&#13;
+hide;</expression>
+                                <property name="dataType">string</property>
+                                <property name="allowExport">true</property>
+                            </structure>
+                        </list-property>
+                        <column id="1654"/>
+                        <column id="1655"/>
+                        <column id="1656"/>
+                        <column id="1657"/>
+                        <column id="1658"/>
+                        <column id="1659"/>
+                        <column id="1660"/>
+                        <header>
+                            <row id="1630">
+                                <cell id="1631">
+                                    <label id="1550">
+                                        <property name="style">columnHeader</property>
+                                        <text-property name="text" key="MMGROUP">MMGROUP_ID</text-property>
+                                        <text-property name="helpText" key="TOOLTIP_MMGROUP"></text-property>
+                                    </label>
+                                </cell>
+                                <cell id="1632">
+                                    <label id="1426">
+                                        <property name="style">columnHeader</property>
+                                        <text-property name="text" key="PRODUCT_ID">PRODUCT_ID</text-property>
+                                        <text-property name="helpText" key="TOOLTIP_PRODUCT_ID"></text-property>
+                                    </label>
+                                </cell>
+                                <cell id="1633">
+                                    <label id="1428">
+                                        <property name="style">columnHeader</property>
+                                        <text-property name="text" key="DESCRIPTION">DESCRIPTION</text-property>
+                                        <text-property name="helpText" key="TOOLTIP_DESCRIPTION"></text-property>
+                                    </label>
+                                </cell>
+                                <cell id="1634">
+                                    <label id="1549">
+                                        <property name="style">columnHeaderRight</property>
+                                        <text-property name="text" key="CURRENT_PRICE">CURRENT_PRICE</text-property>
+                                        <text-property name="helpText" key="TOOLTIP_CURRENT_PRICE"></text-property>
+                                    </label>
+                                </cell>
+                                <cell id="1635">
+                                    <label id="1440">
+                                        <property name="style">columnHeaderRight</property>
+                                        <text-property name="text" key="NEW_PRICE">FORMATTED_PRICE</text-property>
+                                        <text-property name="helpText" key="TOOLTIP_NEW_PRICE"></text-property>
+                                    </label>
+                                </cell>
+                                <cell id="1636">
+                                    <label id="1442">
+                                        <property name="style">columnHeader</property>
+                                        <text-property name="text" key="UP_DOWN">UP_OR_DOWN</text-property>
+                                        <text-property name="helpText" key="TOOLTIP_UP_DOWN"></text-property>
+                                    </label>
+                                </cell>
+                                <cell id="1637">
+                                    <label id="1436">
+                                        <property name="style">columnHeaderRight</property>
+                                        <text-property name="text" key="EFFECTIVE_DATE">NON_NULL_START_DATE</text-property>
+                                        <text-property name="helpText" key="TOOLTIP_EFFECTIVE_DATE"></text-property>
+                                    </label>
+                                </cell>
+                            </row>
+                        </header>
+                        <group id="1699">
+                            <property name="groupName">MMGROUP_HEADER</property>
+                            <expression name="keyExpr" type="javascript">row["MMGROUP_ID"]</expression>
+                            <structure name="toc">
+                                <expression name="expressionValue" type="javascript">row["MMGROUP_ID"]</expression>
+                            </structure>
+                            <property name="hideDetail">false</property>
+                            <header>
+                                <row id="1700">
+                                    <cell id="1701">
+                                        <data id="1716">
+                                            <property name="resultSetColumn">MMGROUP_ID</property>
+                                        </data>
+                                    </cell>
+                                    <cell id="1702"/>
+                                    <cell id="1703"/>
+                                    <cell id="1704"/>
+                                    <cell id="1705"/>
+                                    <cell id="1706"/>
+                                    <cell id="1707"/>
+                                </row>
+                            </header>
+                            <footer>
+                                <row id="1708">
+                                    <cell id="1709"/>
+                                    <cell id="1710"/>
+                                    <cell id="1711"/>
+                                    <cell id="1712"/>
+                                    <cell id="1713"/>
+                                    <cell id="1714"/>
+                                    <cell id="1715"/>
+                                </row>
+                            </footer>
+                        </group>
+                        <detail>
+                            <row id="1638">
+                                <cell id="1639">
+                                    <data id="1534">
+                                        <property name="fontStyle">italic</property>
+                                        <list-property name="visibility">
+                                            <structure>
+                                                <property name="format">all</property>
+                                                <expression name="valueExpr">true</expression>
+                                            </structure>
+                                        </list-property>
+                                        <property name="resultSetColumn">CALCULATE_VARIABLES</property>
+                                    </data>
+                                </cell>
+                                <cell id="1640">
+                                    <data id="1453">
+                                        <property name="style">reportColumn</property>
+                                        <property name="resultSetColumn">PRODUCT_ID</property>
+                                        <text-property name="helpText" key="TOOLTIP_PRODUCT_ID"></text-property>
+                                    </data>
+                                </cell>
+                                <cell id="1641">
+                                    <data id="1455">
+                                        <property name="style">reportColumn</property>
+                                        <property name="resultSetColumn">DESCRIPTION</property>
+                                        <text-property name="helpText" key="TOOLTIP_DESCRIPTION"></text-property>
+                                    </data>
+                                </cell>
+                                <cell id="1642">
+                                    <data id="1661">
+                                        <property name="style">reportColumnRight</property>
+                                        <property name="resultSetColumn">FORMATTED_CURRENT_PRICE</property>
+                                        <text-property name="helpText" key="TOOLTIP_CURRENT_PRICE"></text-property>
+                                    </data>
+                                </cell>
+                                <cell id="1643">
+                                    <data id="1719">
+                                        <property name="style">reportColumnRight</property>
+                                        <property name="resultSetColumn">FORMATTED_PRICE</property>
+                                        <text-property name="helpText" key="TOOLTIP_NEW_PRICE"></text-property>
+                                    </data>
+                                </cell>
+                                <cell id="1644">
+                                    <data id="1542">
+                                        <property name="style">reportColumn</property>
+                                        <list-property name="mapRules">
+                                            <structure>
+                                                <expression name="testExpr">row["RECALCULATED_UP_OR_DOWN"]</expression>
+                                                <property name="operator">eq</property>
+                                                <simple-property-list name="value1">
+                                                    <value>'UP'</value>
+                                                </simple-property-list>
+                                                <text-property name="display" key="UP"></text-property>
+                                            </structure>
+                                            <structure>
+                                                <expression name="testExpr">row["RECALCULATED_UP_OR_DOWN"]</expression>
+                                                <property name="operator">eq</property>
+                                                <simple-property-list name="value1">
+                                                    <value>'DOWN'</value>
+                                                </simple-property-list>
+                                                <text-property name="display" key="DOWN"></text-property>
+                                            </structure>
+                                        </list-property>
+                                        <property name="resultSetColumn">RECALCULATED_UP_OR_DOWN</property>
+                                        <text-property name="helpText" key="TOOLTIP_UP_DOWN"></text-property>
+                                    </data>
+                                </cell>
+                                <cell id="1645">
+                                    <data id="1551">
+                                        <property name="style">reportColumnRight</property>
+                                        <property name="resultSetColumn">FORMATTED_NON_NULL_START_DATE</property>
+                                        <text-property name="helpText" key="TOOLTIP_EFFECTIVE_DATE"></text-property>
+                                    </data>
+                                </cell>
+                            </row>
+                        </detail>
+                        <footer>
+                            <row id="1646">
+                                <cell id="1647"/>
+                                <cell id="1648"/>
+                                <cell id="1649"/>
+                                <cell id="1650"/>
+                                <cell id="1651"/>
+                                <cell id="1652"/>
+                                <cell id="1653"/>
+                            </row>
+                        </footer>
+                    </table>
+                </cell>
+            </row>
+        </grid>
+    </body>
+</report>

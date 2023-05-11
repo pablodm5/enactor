@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<core:documentTemplate xmlns:core="http://www.enactor.com/core" xmlns:retail="http://www.enactor.com/retail" xmlns:ns4="http://www.enactor.com/crm" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803" xmlns:ns6="http://www.apis-it.hr/fin/2012/types/f73" xmlns:ns7="http://www.w3.org/2000/09/xmldsig#" xmlns:ns8="http://www.enactor.com/retail/storedRetailTransaction/service" xmlns:ns9="http://www.fu.gov.si/" xmlns:ns10="http://www.enactor.com/addressLookup/service" xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:ns14="http://www.enactor.com/crm/customerLoyalty/service" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" paginated="false" width="30" messageBase="Pos/Print/ReceiptMessages" title="Customer Signature Slip" url="Pos/Print/Serbia/FiscalCustomerSignatureSlipTemplate30">
+    <core:elements>
+        <core:formatElement formatId="initialise"/>
+        <core:formatElement formatId="storeAddress"/>
+        <core:formatElement applicability="#{transaction.trainingDetails.trainingMode}" formatId="trainingModeHeader"/>
+        <core:formatElement applicability="#{instanceOf(transaction, 'com.enactor.mfc.retail.transaction.IRetailSaleTransaction') &amp;&amp; transaction.isTransactionReversed}" formatId="reversedTransactionHeader"/>
+        <core:formatElement applicability="#{instanceOf(transaction, 'com.enactor.mfc.retail.transaction.IRetailSaleTransaction') &amp;&amp; transaction.isTransactionReversal}" formatId="reversalTransactionHeader"/>
+        <core:formatElement applicability="#{basket.total &gt;= 0}" formatId="saleHeader"/>
+        <core:formatElement applicability="#{basket.total &lt; 0}" formatId="refundHeader"/>
+        <core:formatElement applicability="#{instanceOf(transaction, 'com.enactor.mfc.retail.transaction.IRestaurantSaleTransaction') &amp;&amp; !empty (transaction.tableId)}" formatId="restaurantHeader"/>
+        <core:formatElement formatId="separator"/>
+        <core:assign to="customerName" type="com.enactor.mfc.name.Name" value="transaction.customerRetailDetails.customerName"/>
+        <core:assign to="customerAddress" type="com.enactor.mfc.address.Address" value="transaction.customerRetailDetails.customerAddress"/>
+        <core:formatElement applicability="#{!empty(sale.customerRetailDetails) &amp;&amp; !instanceOf(sale.customerRetailDetails, 'com.enactor.mfc.retail.model.BusinessCustomerRetailDetails') &amp;&amp; (!empty(sale.customerRetailDetails.customerName) || !empty(sale.customerRetailDetails.customerAddress))}" formatId="customerNameAndAddress"/>
+        <core:assign to="merchItemsQuantity" type="int" value="0"/>
+        <core:assign to="merchItemsValue" type="long" value="0"/>
+        <core:assign to="salespersonId" type="java.lang.String" value=""/>
+        <core:assign to="repairItems" type="int" value="0"/>
+        <core:formatElement formatId="basketDispatchList" visibility="#{isDispatch}"/>
+        <core:formatElement applicability="#{!multipleCollections}" formatId="collectionReceiptBody"/>
+        <core:formatElement formatId="basketItemsList"/>
+        <core:formatElement applicability="#{notEmpty(basket.promotionCalculation) and (basket.promotionCalculation.totalSaving != 0 || basket.promotionCalculation.totalPoints != 0)}" formatId="promotionCalculation"/>
+        <core:formatElement applicability="#{basket.total != 0 || repairItems == 0}" formatId="total"/>
+        <core:formatElement formatId="splitOrStandardTenderItemsList"/>
+        <core:formatElement applicability="#{!empty(sale.customerRetailDetails) &amp;&amp; instanceOf(sale.customerRetailDetails, 'com.enactor.mfc.retail.model.BusinessCustomerRetailDetails') &amp;&amp; (!empty(sale.customerRetailDetails.customerName) || !empty(sale.customerRetailDetails.customerAddress))}" formatId="customerNameAndIDNumber"/>
+        <core:lineElement/>
+        <core:lineElement/>
+        <core:lineElement/>
+        <core:column maxLines="0" columnDefId="7" id="7">
+            <core:elements>
+                <core:lineElement messageId="CUSTOMER_SIGNATURE">
+                    <core:formatters>
+                        <core:formatPadRight pad="45" width="30"/>
+                    </core:formatters>
+                </core:lineElement>
+            </core:elements>
+        </core:column>
+        <core:formatElement applicability="#{transaction.trainingDetails.trainingMode}" formatId="trainingModeTrailer"/>
+        <core:formatElement applicability="#{instanceOf(transaction, 'com.enactor.mfc.retail.transaction.IRetailSaleTransaction') &amp;&amp; transaction.isTransactionReversed}" formatId="reversedTransactionTrailer"/>
+        <core:formatElement applicability="#{instanceOf(transaction, 'com.enactor.mfc.retail.transaction.IRetailSaleTransaction') &amp;&amp; transaction.isTransactionReversal}" formatId="reversalTransactionTrailer"/>
+        <core:lineElement/>
+        <core:formatElement formatId="trailerLine"/>
+        <core:page number="0"/>
+    </core:elements>
+    <core:includedTemplateUrl>Pos/Print/ReceiptCommonColumnDefs30</core:includedTemplateUrl>
+    <core:includedTemplateUrl>Pos/Print/ReceiptItemFormatEntries</core:includedTemplateUrl>
+    <core:includedTemplateUrl>Pos/Print/ReceiptGeneralFormatEntries30</core:includedTemplateUrl>
+    <core:formatEntry id="customerNameAndIDNumber">
+        <core:elements>
+            <core:assign to="customerDetails" type="com.enactor.mfc.retail.model.BusinessCustomerRetailDetails" value="transaction.customerRetailDetails"/>
+            <core:formatElement formatId="separatorRow"/>
+            <core:line>
+                <core:elements>
+                    <core:column maxLines="0" columnDefId="CustomerDetailsHeader" id="CustomerDeatilsHeaderID">
+                        <core:elements>
+                            <core:text messageId="CUSTOMER_DETAILS"/>
+                        </core:elements>
+                    </core:column>
+                </core:elements>
+            </core:line>
+            <core:line visibility="#{!empty customerName.forename}">
+                <core:elements>
+                    <core:column maxLines="0" columnDefId="CustomerDetailsLeftColumn" id="CustomerFirstNameLabelID">
+                        <core:elements>
+                            <core:text messageId="FIRST_NAME"/>
+                        </core:elements>
+                    </core:column>
+                    <core:column maxLines="0" columnDefId="CustomerDetailsRightColumn" id="CustomerFirstNameID">
+                        <core:elements>
+                            <core:text>
+<core:text>#{customerDetails.customerName.forename}</core:text>
+                            </core:text>
+                        </core:elements>
+                    </core:column>
+                </core:elements>
+            </core:line>
+            <core:line visibility="#{!empty customerName.surname}">
+                <core:elements>
+                    <core:column maxLines="0" columnDefId="CustomerDetailsLeftColumn" id="CustomerLastNameLabelID">
+                        <core:elements>
+                            <core:text messageId="SUR_NAME"/>
+                        </core:elements>
+                    </core:column>
+                    <core:column maxLines="0" columnDefId="CustomerDetailsRightColumn" id="CustomerLastNameID">
+                        <core:elements>
+                            <core:text>
+<core:text>#{customerDetails.customerName.surname}</core:text>
+                            </core:text>
+                        </core:elements>
+                    </core:column>
+                </core:elements>
+            </core:line>
+            <core:line visibility="#{!empty customerDetails.taxIdentification}">
+                <core:elements>
+                    <core:column maxLines="0" columnDefId="CustomerDetailsLeftColumn" id="CustomerIDLabelID">
+                        <core:elements>
+                            <core:text messageId="PERSONAL_ID_NUMBER"/>
+                        </core:elements>
+                    </core:column>
+                    <core:column maxLines="0" columnDefId="CustomerDetailsRightColumn" id="CustomerID">
+                        <core:elements>
+                            <core:text>
+<core:text>#{customerDetails.taxIdentification}</core:text>
+                            </core:text>
+                        </core:elements>
+                    </core:column>
+                </core:elements>
+            </core:line>
+        </core:elements>
+    </core:formatEntry>
+</core:documentTemplate>

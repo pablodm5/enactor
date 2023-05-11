@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<retail:posPromptPage xmlns:core="http://www.enactor.com/core" xmlns:retail="http://www.enactor.com/retail" xmlns:ns4="http://www.enactor.com/crm" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803" xmlns:ns6="http://www.apis-it.hr/fin/2012/types/f73" xmlns:ns7="http://www.w3.org/2000/09/xmldsig#" xmlns:ns8="http://www.enactor.com/retail/storedRetailTransaction/service" xmlns:ns9="http://www.fu.gov.si/" xmlns:ns10="http://www.enactor.com/addressLookup/service" xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:ns14="http://www.enactor.com/crm/customerLoyalty/service" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" allowResize="true" allowMove="true" allowClose="true" height="1080" width="1920" updateMode="REDRAW_PAGE" messageBase="POSInventoryManagement/TransferIn/TransferInMessages" url="NextGen1920x1080/POSInventoryManagement/TransferIn/TransferInItems">
+    <core:elements>
+        <core:hidden id="Receipt"/>
+        <core:button lineHeight="0" messageId="TRANSFER_ITEMS_ADD_ITEM_BUTTON_LABEL" id="Button1">
+            <core:text>AddItemPressed</core:text>
+        </core:button>
+        <core:button lineHeight="0" messageId="UP_BUTTON_LABEL" visibility="#{page['PagingSelectionListPanel.PagingSelectionListBoxLarge'].visible &amp;&amp; page['PagingSelectionListPanel.PagingSelectionListBoxLarge'].moveUp}" id="Button2">
+            <core:updateTriggers>
+                <core:element>PagingSelectionListBoxLarge</core:element>
+            </core:updateTriggers>
+            <core:text>page.PagingSelectionListPanel.PagingSelectionListBoxLarge.up</core:text>
+        </core:button>
+        <core:button lineHeight="0" messageId="DOWN_BUTTON_LABEL" visibility="#{page['PagingSelectionListPanel.PagingSelectionListBoxLarge'].visible &amp;&amp; page['PagingSelectionListPanel.PagingSelectionListBoxLarge'].moveDown}" id="Button3">
+            <core:updateTriggers>
+                <core:element>PagingSelectionListBoxLarge</core:element>
+            </core:updateTriggers>
+            <core:text>page.PagingSelectionListPanel.PagingSelectionListBoxLarge.down</core:text>
+        </core:button>
+        <core:button lineHeight="0" messageId="#{selectedItem.data['isContainer'] ? 'TRANSFER_ITEMS_VERIFY_CONTAINER_BUTTON_LABEL' : 'TRANSFER_ITEMS_MODIFY_ITEM_BUTTON_LABEL'}" visibility="#{size(containersAndItemsList) &gt; 0}" id="Button4">
+            <core:updateTriggers>
+                <core:element>PagingSelectionListBoxLarge</core:element>
+            </core:updateTriggers>
+            <core:text>ItemPressed</core:text>
+        </core:button>
+        <core:button lineHeight="0" messageId="TRANSFER_ITEMS_REMOVE_ITEM_LABEL" visibility="#{size(containersAndItemsList) &gt; 0}" id="Button5">
+            <core:text>VoidItemPressed</core:text>
+        </core:button>
+        <core:button lineHeight="0" messageBase="POSInventoryManagement/Common/GeneralMessages" messageId="ADD_CONTAINER_BUTTON_LABEL" visibility="#{showContainers}" id="Button6">
+            <core:text>AddContainerPressed</core:text>
+        </core:button>
+        <core:button lineHeight="0" messageBase="POSInventoryManagement/Common/GeneralMessages" messageId="DONE_BUTTON_LABEL" id="Button7">
+            <core:text>BackPressed</core:text>
+        </core:button>
+        <core:button lineHeight="0" messageBase="POSInventoryManagement/TransferIn/TransferInMessages" messageId="REMOVE_BUTTON_LABEL" id="Button8">
+            <core:text>CancelPressed</core:text>
+        </core:button>
+        <core:text lineHeight="0" messageId="TRANSFER_ITEMS_MESSAGE" transparentBackground="true" id="Prompt">
+            <core:boundsConstraint height="97" width="321" y="378" x="13"/>
+        </core:text>
+        <core:inputText lineHeight="0" id="InputBox">
+            <core:text>#{productId}</core:text>
+            <core:textElementEvents enterEvent="OKPressed"/>
+        </core:inputText>
+        <core:panel id="PagingSelectionListPanel">
+            <core:elements>
+                <core:panel id="PagingSelectionHeaderPanelLarge">
+                    <core:boundsConstraint height="90" width="821" y="0" x="0"/>
+                    <core:elements>
+                        <core:label lineHeight="0" messageId="TRANSFER_ITEMS_TITLE" styleClass="posPageHeading" id="INVENTORY_ITEMS_TITLE">
+                            <core:boundsConstraint height="30" width="400" y="8" x="5"/>
+                        </core:label>
+                        <core:label lineHeight="0" messageId="TRANSFER_ITEMS_DISPATCH_ID_LABEL" styleClass="formFieldLabel" id="DISPATCH_ID_LABEL">
+                            <core:boundsConstraint height="25" width="175" y="66" x="24"/>
+                        </core:label>
+                        <core:label lineHeight="0" styleClass="formInputText" id="DISPATCH_ID">
+                            <core:boundsConstraint height="28" width="180" y="66" x="265"/>
+                            <core:text>#{notEmpty(transferInHeader.deliveryId) ? transferInHeader.deliveryId : transferInHeader.transferInHeaderId}</core:text>
+                        </core:label>
+                        <core:label lineHeight="0" messageId="TRANSFER_ITEMS_CONTAINERS_ONLY_LABEL" styleClass="formFieldLabel" visibility="#{showContainers}" id="CONTAINERS_ONLY_LABEL">
+                            <core:boundsConstraint height="20" width="275" y="66" x="690"/>
+                        </core:label>
+                        <core:checkbox lineHeight="0" transparentBackground="true" visibility="#{showContainers}" id="CONTAINERS_ONLY_CHECK">
+                            <core:boundsConstraint height="20" width="20" y="66" x="1030"/>
+                            <core:text>#{isContainersOnly}</core:text>
+                            <core:toggleEvent>ShowContainersOnly</core:toggleEvent>
+                        </core:checkbox>
+                        <core:label lineHeight="0" messageId="TRANSFER_ITEMS_CONTAINER_ID_LABEL" styleClass="formFieldLabel" visible="false" id="CONTAINER_ID_LABEL">
+                            <core:boundsConstraint height="20" width="175" y="46" x="379"/>
+                        </core:label>
+                        <core:label lineHeight="0" styleClass="formFieldInputText" visible="false" id="CONTAINER_ID">
+                            <core:boundsConstraint height="28" width="180" y="42" x="504"/>
+                        </core:label>
+                    </core:elements>
+                </core:panel>
+                <core:listBox lazyLoad="false" listSelectionMethod="DEFAULT" documentTemplateUrl="POSInventoryManagement/TransferIn/TransferInItemsListTemplate" selectedIndex="0" styleClass="dataListBox" id="PagingSelectionListBoxLarge">
+                    <core:boundsConstraint height="304" width="821" y="90" x="0"/>
+                    <core:elements/>
+                    <core:listExpression>#{containersAndItemsList}</core:listExpression>
+                    <core:dataExpression>item</core:dataExpression>
+                    <core:listingElementEvents>
+                        <core:selectionEvent>ItemSelected</core:selectionEvent>
+                    </core:listingElementEvents>
+                    <core:selectedIndices>
+                        <item>0</item>
+                    </core:selectedIndices>
+                </core:listBox>
+                <core:panel id="PagingSelectionPageControlsPanel">
+                    <core:elements>
+                        <core:panel hAlign="CENTRE" id="PagingSelectionPageControlsReferencePanel">
+                            <core:flowConstraint width="100%" height="100%"/>
+                            <core:elements>
+<core:pageElementRef pageDefinitionURL="POSInventoryManagement/Common/POSInventoryManagementPagedListPageControl" id="PAGE_CONTROLS">
+    <core:flowConstraint/>
+    <core:elements/>
+    <core:parameter value="#{containersAndItemsList}" name="enactor.coreUI.List">
+        <core:interfaceName>com.enactor.core.database.list.IPagedList</core:interfaceName>
+    </core:parameter>
+    <core:parameter value="#{pageSize}" name="enactor.coreUI.PageSize">
+        <core:interfaceName>java.lang.Integer</core:interfaceName>
+    </core:parameter>
+</core:pageElementRef>
+                            </core:elements>
+                        </core:panel>
+                    </core:elements>
+                </core:panel>
+            </core:elements>
+        </core:panel>
+    </core:elements>
+    <core:templateURL>NextGen1024x768/Pos/FullScreenTraditionalPosTemplate</core:templateURL>
+    <core:events>
+        <core:event destination="Button8" event="key.KeyCode27Pressed">press</core:event>
+        <core:event destination="Button2" event="key.UpPressed">press</core:event>
+        <core:event destination="Button3" event="key.DownPressed">press</core:event>
+    </core:events>
+    <core:preferredConstraintType>BOUNDS</core:preferredConstraintType>
+    <core:variables>
+        <core:variable name="enactor.inventoryManagement.local.TransferInHeader">
+            <core:interfaceName>com.enactor.storeInventoryManagement.local.transferIn.ITransferInHeader</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.inventoryManagement.local.TransferInItemsList">
+            <core:interfaceName>java.util.List</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.coreUI.ListCriteria">
+            <core:interfaceName>com.enactor.core.servers.IListCriteria</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.inventoryManagement.DisplayStatusInItemList">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.mfc.Device">
+            <core:interfaceName>com.enactor.mfc.device.IDevice</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.coreUI.User">
+            <core:interfaceName>com.enactor.core.signOn.ISignedOnUser</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.coreUI.SelectedRow">
+            <core:interfaceName>com.enactor.core.database.list.IKeyedListElement</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.coreUI.PageSize">
+            <core:interfaceName>java.lang.Integer</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.mfc.ProductId">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.coreUI.DocumentTemplateUrl">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.inventoryManagement.local.ContainersAndItemsList">
+            <core:interfaceName>java.util.List</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.inventoryManagement.local.IsContainersOnly">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.coreUI.SelectedItem">
+            <core:interfaceName>com.enactor.core.database.list.ModifiableListElement</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.inventoryManagement.ShowContainers">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:variable>
+    </core:variables>
+    <core:scannerEnabled>true</core:scannerEnabled>
+    <core:scannerDataName>#{scannerData}</core:scannerDataName>
+</retail:posPromptPage>

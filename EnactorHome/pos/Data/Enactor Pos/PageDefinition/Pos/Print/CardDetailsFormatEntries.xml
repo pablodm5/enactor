@@ -1,0 +1,1547 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<core:documentTemplate xmlns:core="http://www.enactor.com/core" xmlns:retail="http://www.enactor.com/retail" xmlns:ns4="http://www.enactor.com/crm" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803" xmlns:ns6="http://www.apis-it.hr/fin/2012/types/f73" xmlns:ns7="http://www.w3.org/2000/09/xmldsig#" xmlns:ns8="http://www.enactor.com/retail/storedRetailTransaction/service" xmlns:ns9="http://www.fu.gov.si/" xmlns:ns10="http://www.enactor.com/addressLookup/service" xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:ns14="http://www.enactor.com/crm/customerLoyalty/service" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" paginated="false" messageBase="Pos/Print/ReceiptMessages" title="Card Details Format Entries" url="Pos/Print/CardDetailsFormatEntries">
+    <core:elements/>
+    <core:formatEntry id="combinedCardDetailsTenderList">
+        <core:elements>
+            <core:tableTemplate listVariableName="cardTenderItem" list="#{basket.tenderItemIterator}" id="CardTenders">
+                <core:formatElement applicableClassName="com.enactor.mfc.basket.items.ICardPaymentDetails" applicability="#{!cardTenderItem.voided &amp;&amp; cardTenderItem.printCombinedReceipt &amp;&amp; !cardTenderItem.receiptPrinted}" formatId="cardDetailsWithVerification"/>
+                <core:formatElement id="hideCardTenderItem"/>
+            </core:tableTemplate>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="cardDetails">
+        <core:elements>
+            <core:formatElement formatId="separatorRow"/>
+            <core:formatElement formatId="cardDescription"/>
+            <core:formatElement formatId="cardNumberAndEntryType"/>
+            <core:formatElement formatId="cardIssueNumber"/>
+            <core:formatElement formatId="authorisationCode"/>
+            <core:formatElement formatId="merchantIDMasked"/>
+            <core:formatElement formatId="terminalIDMasked"/>
+            <core:formatElement formatId="panSeq"/>
+            <core:formatElement formatId="iccResults"/>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="cardDetailsFull">
+        <core:elements>
+            <core:formatElement formatId="separatorRow"/>
+            <core:formatElement formatId="cardDescription"/>
+            <core:formatElement formatId="cardNumberFullAndEntryType"/>
+            <core:formatElement formatId="cardIssueNumber"/>
+            <core:formatElement formatId="authorisationCode"/>
+            <core:formatElement formatId="merchantID"/>
+            <core:formatElement formatId="terminalID"/>
+            <core:formatElement formatId="panSeq"/>
+            <core:formatElement formatId="iccResults"/>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="cardDetailsWithVerification">
+        <core:elements>
+            <core:formatElement formatId="cardDetails"/>
+            <core:formatElement applicability="#{cardTenderItem.printICCTestData}" formatId="iccResultsTesting"/>
+            <core:formatElement formatId="partialApproval"/>
+            <core:formatElement formatId="cardBalance"/>
+            <core:formatElement formatId="cardTenderPreAuthAmount"/>
+            <core:formatElement applicability="#{!cardTenderItem.DCCAccepted}" formatId="cardTenderAmount"/>
+            <core:formatElement applicability="#{cardTenderItem.DCCAccepted}" formatId="cardTenderDCCAmount"/>
+            <core:formatElement applicability="#{cardTenderItem.tenderAmount != 0}" formatId="pleaseDebitCreditMessage"/>
+            <core:formatElement applicability="#{cardTenderItem.cardDetails.contactless &amp;&amp; !cardTenderItem.isRefund}" formatId="contactlessLogoRow"/>
+            <core:formatElement applicability="#{!cardTenderItem.cardDetails.contactless}" formatId="blankLineRow"/>
+            <core:formatElement applicability="#{!cardTenderItem.isRefund}" formatId="cardVerificationMessage"/>
+            <core:formatElement applicability="#{cardTenderItem.isCardOnFile}" formatId="cardOnFileMessage"/>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="cardSalesVoucherHeader">
+        <core:elements>
+            <core:column maxLines="0" columnDefId="FullCentre" id="CardSalesVoucherHeaderColumn">
+                <core:elements>
+                    <core:lineElement messageId="CARD_VOUCHER_HEADER_SALE" colour="blue" style="BOLD;DOUBLE_HIGH;DOUBLE_WIDE" id="CardSalesVoucherHeaderSaleText"/>
+                </core:elements>
+            </core:column>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="cardRefundVoucherHeader">
+        <core:elements>
+            <core:column maxLines="0" columnDefId="FullCentre" id="CardRefundVoucherHeaderColumn">
+                <core:elements>
+                    <core:lineElement messageId="CARD_VOUCHER_HEADER_REFUND" colour="blue" style="BOLD;DOUBLE_HIGH;DOUBLE_WIDE" id="CardVoucherHeaderRefundText"/>
+                </core:elements>
+            </core:column>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="cancelledCardSalesVoucherHeader">
+        <core:elements>
+            <core:column maxLines="0" columnDefId="FullCentre" id="CancelledCardSalesVoucherHeaderColumn">
+                <core:elements>
+                    <core:lineElement messageId="CANCELLED_CARD_VOUCHER_HEADER_SALE" colour="blue" style="BOLD;DOUBLE_HIGH;DOUBLE_WIDE" id="CancelledCardVoucherHeaderSaleText"/>
+                </core:elements>
+            </core:column>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="cancelledCardRefundVoucherHeader">
+        <core:elements>
+            <core:column maxLines="0" columnDefId="FullCentre" id="CancelledCardRefundVoucherHeaderColumn">
+                <core:elements>
+                    <core:lineElement messageId="CANCELLED_CARD_VOUCHER_HEADER_REFUND" colour="blue" style="BOLD;DOUBLE_HIGH;DOUBLE_WIDE" id="CancelledCardVoucherHeaderRefund"/>
+                </core:elements>
+            </core:column>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="merchantCopyHeader">
+        <core:elements>
+            <core:column maxLines="0" columnDefId="FullCentre" id="MerchantCopyHeaderLabel">
+                <core:elements>
+                    <core:text messageId="HEADER_MERCHANT_COPY" colour="blue" id="HeaderMerchantCopyLabelText"/>
+                </core:elements>
+            </core:column>
+            <core:lineElement/>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="customerCopyHeader">
+        <core:elements>
+            <core:column maxLines="0" columnDefId="FullCentre" id="CustomerCopyHeaderLabel">
+                <core:elements>
+                    <core:text messageId="HEADER_CUSTOMER_COPY" colour="blue" id="HeaderCustomerCopyLabelText"/>
+                </core:elements>
+            </core:column>
+            <core:lineElement id="CustomerCopyHeaderLine"/>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="cardCancelledMessage">
+        <core:elements>
+            <core:formatElement formatId="separator"/>
+            <core:lineElement id="CardCancelledMessageLine"/>
+            <core:column maxLines="0" columnDefId="FullCentre" id="CardCancelledMessageColumn">
+                <core:elements>
+                    <core:lineElement messageId="CARD_CANCELLED" style="BOLD;DOUBLE_HIGH;DOUBLE_WIDE" id="CardCancelledMessageText">
+                        <core:uiMessage messageId="CARD_NOT_AUTHORISED" applicability="#{(enumSetContains(cardTenderItem.voidReasons,'NOT_AUTHORISED') || enumSetContains(cardTenderItem.voidReasons,'CARD_DECLINED') || enumSetContains(cardTenderItem.voidReasons,'HOST_DECLINED') || enumSetContains(cardTenderItem.voidReasons,'REFERRAL_DECLINED') || enumSetContains(cardTenderItem.voidReasons,'AVS_DECLINED'))}"/>
+                    </core:lineElement>
+                </core:elements>
+            </core:column>
+            <core:lineElement id="LineBreakerLine"/>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="cardDescription">
+        <core:elements>
+            <core:row id="CardDescriptionRow">
+                <core:rowLine id="CardDescriptionRowLine">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="CardDetailsTag" id="CardDetailsTag">
+                            <core:elements>
+<core:text messageId="CARD" visibility="#{!cardTenderItem.cardDetails.contactless}" id="CardLabelText"/>
+<core:text messageId="CARD_CONTACTLESS" visibility="#{cardTenderItem.cardDetails.contactless}" id="CardContactLessLabelText"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="CardDetailsData" id="CardDetailsData">
+                            <core:elements>
+<core:text messageId="COLON_SPACE" id="ColonSpaceLabelText"/>
+<core:text id="CardDescriptionText">
+    <core:text>#{cardTenderItem.cardDetails.cardDescription}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="cardDescriptionAndEntryType">
+        <core:elements>
+            <core:row id="CardDescriptionAndEntryTypeRow">
+                <core:rowLine id="CardDescriptionAndEntryTypeRowLine">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="CardDetailsTag" id="CardDetailsTag">
+                            <core:elements>
+<core:text messageId="CARD" visibility="#{!cardTenderItem.cardDetails.contactless}" id="CardLabelText"/>
+<core:text messageId="CARD_CONTACTLESS" visibility="#{cardTenderItem.cardDetails.contactless}" id="CardContactLessLabelText"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="CardDetailsData" id="CardDetailsData">
+                            <core:elements>
+<core:text messageId="COLON_SPACE" id="ColonSpaceLabelText"/>
+<core:text id="CardDescriptionText">
+    <core:text>#{cardTenderItem.cardDetails.cardDescription}</core:text>
+</core:text>
+<core:text messageId="ONE_SPACE" id="OneSpaceLabelText"/>
+<core:text messageId="ICC" visibility="#{cardTenderItem.cardDetails.ICC &amp;&amp; !cardTenderItem.cardDetails.contactless}" id="IccLabelText"/>
+<core:text messageId="SWIPED" visibility="#{cardTenderItem.cardDetails.swiped}" id="SwipedLabelText"/>
+<core:text messageId="KEYED" visibility="#{cardTenderItem.cardDetails.keyed}" id="KeyedLabelText"/>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="cardResult">
+        <core:elements>
+            <core:row>
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="CardDetailsTag" id="CardDetailsTag">
+                            <core:elements>
+<core:text messageId="CARD_RESULT"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="CardDetailsData" id="CardDetailsData">
+                            <core:elements>
+<core:text messageId="COLON_SPACE"/>
+<core:text>
+    <core:text>#{resolveMessageQuiet('Pos/Print/ReceiptMessages', cardTenderItem.hostMessage)}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="cardNumber">
+        <core:elements>
+            <core:row id="CardNumberRow">
+                <core:rowLine id="CardNumberRowLine">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="CardDetailsTag" id="CardDetailsTag">
+                            <core:elements>
+<core:text messageId="CARD_NUMBER" id="MessageIdLabelText"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="CardDetailsData" id="CardDetailsData">
+                            <core:elements>
+<core:text messageId="COLON_SPACE" id="ColonSpaceLabelText"/>
+<core:text id="MangledPanText">
+    <core:text>#{cardTenderItem.cardDetails.mangledPAN}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="cardNumberFull">
+        <core:elements>
+            <core:row id="CardNumberFullRow">
+                <core:rowLine id="CardNumberFullRowLine">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="CardDetailsTag" id="CardDetailsTag">
+                            <core:elements>
+<core:text messageId="CARD_NUMBER" id="CardNumberText"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="CardDetailsData" id="CardDetailsData">
+                            <core:elements>
+<core:text messageId="COLON_SPACE" id="ColonSpaceLabelText"/>
+<core:text sensitive="true" visibility="#{notEmpty(cardTenderItem.cardDetails.formattedPAN)}" id="FormattedPanText">
+    <core:text>#{cardTenderItem.cardDetails.formattedPAN}</core:text>
+</core:text>
+<core:text visibility="#{isEmpty(cardTenderItem.cardDetails.formattedPAN)}" id="MangledPanText">
+    <core:text>#{cardTenderItem.cardDetails.mangledPAN}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="cardNumberAndEntryType">
+        <core:elements>
+            <core:row id="CardNumberAndEntryTypeRow">
+                <core:rowLine id="CardNumberAndEntryTypeRowLine">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="CardDetailsTag" id="CardDetailsTag">
+                            <core:elements>
+<core:text messageId="ICC" visibility="#{cardTenderItem.cardDetails.ICC &amp;&amp; !cardTenderItem.cardDetails.contactless}" id="IccLabelText"/>
+<core:text messageId="SWIPED" visibility="#{cardTenderItem.cardDetails.swiped}" id="SwipedLabelText"/>
+<core:text messageId="KEYED" visibility="#{cardTenderItem.cardDetails.keyed}" id="KeyedLabelText"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="CardDetailsData" id="CardDetailsData">
+                            <core:elements>
+<core:text messageId="COLON_SPACE" id="ColonSpaceLabelText"/>
+<core:text id="MangledPanText">
+    <core:text>#{cardTenderItem.cardDetails.mangledPAN}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="cardNumberFullAndEntryType">
+        <core:elements>
+            <core:row id="CardNumberFullAndEntryTypeRow">
+                <core:rowLine id="CardNumberFullAndEntryTypeRowLine">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="CardDetailsTag" id="CardDetailsTag">
+                            <core:elements>
+<core:text messageId="ICC" visibility="#{cardTenderItem.cardDetails.ICC &amp;&amp; !cardTenderItem.cardDetails.contactless}" id="IccLabelText"/>
+<core:text messageId="SWIPED" visibility="#{cardTenderItem.cardDetails.swiped}" id="SwipedLabelText"/>
+<core:text messageId="KEYED" visibility="#{cardTenderItem.cardDetails.keyed}" id="KeyedLabelText"/>
+<core:text messageId="MANGLED_PAN" visibility="#{cardTenderItem.isCardOnFile}"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="CardDetailsData" id="CardDetailsData">
+                            <core:elements>
+<core:text messageId="COLON_SPACE" id="ColonSpaceLabelText"/>
+<core:text sensitive="true" visible="false" id="FormattedPanText">
+    <core:text>#{cardTenderItem.cardDetails.formattedPAN}</core:text>
+</core:text>
+<core:text id="MangledPanText">
+    <core:text>#{cardTenderItem.cardDetails.mangledPAN}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="cardIssueNumber">
+        <core:elements>
+            <core:row id="CardIssueNumberRow">
+                <core:rowLine visibility="#{( cardTenderItem.cardDetails.swiped || cardTenderItem.cardDetails.keyed) &amp;&amp; !empty cardTenderItem.cardDetails.issueNumber}" id="CardIssueNumberRowLine">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="CardDetailsTag" id="CardDetailsTag">
+                            <core:elements>
+<core:text messageId="ISSUE_NUMBER" id="IssueNumberLabelText"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="CardDetailsData" id="CardDetailsData">
+                            <core:elements>
+<core:text messageId="COLON_SPACE" id="ColonSpaceLabelText"/>
+<core:text id="CardIssueNumberText">
+    <core:text>#{cardTenderItem.cardDetails.issueNumber}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="cardExpiryDate">
+        <core:elements>
+            <core:row id="CardExpiryDateRow">
+                <core:rowLine visibility="#{(cardTenderItem.cardDetails.swiped || cardTenderItem.cardDetails.keyed) &amp;&amp; !empty cardTenderItem.cardDetails.expiryDate}" id="CardExpiryDateRowLine">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="CardDetailsTag" id="CardDetailsTag">
+                            <core:elements>
+<core:text messageId="EXPIRY_DATE" id="ExpiryDateLabelText"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="CardDetailsData" id="CardDetailsData">
+                            <core:elements>
+<core:text messageId="COLON_SPACE" id="ColonSpaceLabelText"/>
+<core:text id="ExpiryDateText">
+    <core:formatters>
+        <core:formatSubstring end="4" start="2"/>
+    </core:formatters>
+    <core:text>#{cardTenderItem.cardDetails.expiryDate}</core:text>
+</core:text>
+<core:text id="SeparatorText">
+    <core:text>/</core:text>
+</core:text>
+<core:text id="ExpiryDateFormatted">
+    <core:formatters>
+        <core:formatSubstring end="2" start="0"/>
+    </core:formatters>
+    <core:text>#{cardTenderItem.cardDetails.expiryDate}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine visibility="#{false &amp;&amp; (cardTenderItem.cardDetails.swiped || cardTenderItem.cardDetails.keyed) &amp;&amp; !empty cardTenderItem.cardDetails.startDate}" id="StartDateRowLine">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="CardDetailsTag" id="CardDetailsTag">
+                            <core:elements>
+<core:text messageId="START_DATE" id="StartDateLabelText"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="CardDetailsData" id="CardDetailsData">
+                            <core:elements>
+<core:text messageId="COLON_SPACE" id="ColonSpaceLabelText2"/>
+<core:text id="StartDateText">
+    <core:formatters>
+        <core:formatSubstring end="4" start="2"/>
+    </core:formatters>
+    <core:text>#{cardTenderItem.cardDetails.startDate}</core:text>
+</core:text>
+<core:text id="SeparatorText">
+    <core:text>/</core:text>
+</core:text>
+<core:text id="StartDateText2">
+    <core:formatters>
+        <core:formatSubstring end="2" start="0"/>
+    </core:formatters>
+    <core:text>#{cardTenderItem.cardDetails.startDate}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine visibility="#{cardTenderItem.cardDetails.ICC &amp;&amp; !empty cardTenderItem.ICCResults.applicationEffectiveDate}" id="ApplicationEffectiveDateRowLine">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="CardDetailsTag" id="CardDetailsTag">
+                            <core:elements>
+<core:text messageId="EFFECTIVE_DATES" id="EffectiveDatesLabelText"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="CardDetailsData" id="CardDetailsData">
+                            <core:elements>
+<core:text messageId="COLON_SPACE" id="ColonSpaceLabelText3"/>
+<core:text id="ApplicationEffectiveDateText">
+    <core:formatters>
+        <core:formatDate inputPattern="YYMMDD" pattern="shortDate"/>
+    </core:formatters>
+    <core:text>#{cardTenderItem.ICCResults.applicationEffectiveDate}</core:text>
+</core:text>
+<core:text messageId="EFFECTIVE_DATES_SEPARATOR" id="EffectiveDateSeparatorLabelText"/>
+<core:text id="ApplicationExpiryDateText">
+    <core:formatters>
+        <core:formatDate inputPattern="YYMMDD" pattern="shortDate"/>
+    </core:formatters>
+    <core:text>#{cardTenderItem.ICCResults.applicationExpiryDate}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="authorisationCode">
+        <core:elements>
+            <core:row visibility="#{!empty(cardTenderItem.authorisationCode) &amp;&amp; !cardTenderItem.voided &amp;&amp; (!instanceOf(cardTenderItem, 'com.enactor.mfc.basket.items.ICardTenderItem') || cardTenderItem.preAuthValue == 0)}" id="AuthorisationCodeRow">
+                <core:rowLine id="AuthorisationCodeRowLine">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="CardDetailsTag" id="CardDetailsTag">
+                            <core:elements>
+<core:text messageId="AUTH_CODE" id="AuthCodeLabelText"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="CardDetailsData" id="CardDetailsData">
+                            <core:elements>
+<core:text messageId="COLON_SPACE" id="ColonSpaceLabelText"/>
+<core:text id="AuthorisationCodeText">
+    <core:text>#{cardTenderItem.authorisationCode}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="merchantID">
+        <core:elements>
+            <core:row visibility="#{!empty(cardTenderItem.eftMerchantId)}" id="MerchantIdRow">
+                <core:rowLine id="MerchantIdRowLine">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="CardDetailsTag" id="CardDetailsTag">
+                            <core:elements>
+<core:text messageId="MERCHANT_ID" id="MerchantIdLabelText"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="CardDetailsData" id="CardDetailsData">
+                            <core:elements>
+<core:text messageId="COLON_SPACE" id="ColonSpaceLabelText"/>
+<core:text id="MerchantIdText">
+    <core:text>#{cardTenderItem.eftMerchantId}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="merchantIDMasked">
+        <core:elements>
+            <core:row visibility="#{!empty(cardTenderItem.eftMerchantId)}" id="MerchantIdMaskedRow">
+                <core:rowLine id="MerchantIdMaskedRowLine">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="CardDetailsTag" id="CardDetailsTag">
+                            <core:elements>
+<core:text messageId="MERCHANT_ID" id="MerchantIdLabelText"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="CardDetailsData" id="CardDetailsData">
+                            <core:elements>
+<core:text messageId="COLON_SPACE" id="ColonSpaceLabelText"/>
+<core:text id="MerchantIdMaskedText">
+    <core:text>#{strings:mangleString(cardTenderItem.eftMerchantId, 0, 5)}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="terminalID">
+        <core:elements>
+            <core:row visibility="#{!empty(cardTenderItem.eftTerminalId)}" id="TerminalIdRow">
+                <core:rowLine id="TerminalIdRowLine">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="CardDetailsTag" id="CardDetailsTag">
+                            <core:elements>
+<core:text messageId="TERMINAL_ID" id="TerminalIdLabelText"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="CardDetailsData" id="CardDetailsData">
+                            <core:elements>
+<core:text messageId="COLON_SPACE" id="ColonSpaceLabelText"/>
+<core:text id="EftTerminalIdText">
+    <core:text>#{cardTenderItem.eftTerminalId}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="terminalIDMasked">
+        <core:elements>
+            <core:row visibility="#{!empty(cardTenderItem.eftTerminalId)}" id="TerminalIdMaskedRow">
+                <core:rowLine id="TerminalIdMaskedRowLine">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="CardDetailsTag" id="CardDetailsTag">
+                            <core:elements>
+<core:text messageId="TERMINAL_ID" id="TerminalIdLabelText"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="CardDetailsData" id="CardDetailsData">
+                            <core:elements>
+<core:text messageId="COLON_SPACE" id="ColonSpaceLabelText"/>
+<core:text id="TerminalIdMaskedText">
+    <core:text>#{strings:mangleString(cardTenderItem.eftTerminalId, 0, 4)}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="panSeq">
+        <core:elements>
+            <core:row id="PanSeqRow">
+                <core:rowLine visibility="#{cardTenderItem.cardDetails.ICC &amp;&amp; !empty cardTenderItem.ICCResults.PANSequenceNumber}" id="PanSeqRowLine">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="CardDetailsTag" id="CardDetailsTag">
+                            <core:elements>
+<core:text messageId="PAN_SEQ" id="PanSeqLabelText"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="CardDetailsData" id="CardDetailsData">
+                            <core:elements>
+<core:text messageId="COLON_SPACE" id="ColonSpaceLabelText"/>
+<core:text id="PanSequenceNumberText">
+    <core:text>#{cardTenderItem.ICCResults.PANSequenceNumber}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="iccResults">
+        <core:elements>
+            <core:row id="IccResultsRow">
+                <core:rowLine visibility="#{cardTenderItem.cardDetails.ICC &amp;&amp; !empty cardTenderItem.ICCResults.applicationIdentifier}" id="IccResultsRowLine">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="CardDetailsTag" id="CardDetailsTag">
+                            <core:elements>
+<core:text messageId="AID" id="AidLabelText"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="CardDetailsData" id="CardDetailsData">
+                            <core:elements>
+<core:text messageId="COLON_SPACE" id="ColonSpaceLabelText"/>
+<core:text id="IccResultsText">
+    <core:text>#{(cardTenderItem.cardDetails.contactless &amp;&amp;   (cardTenderItem.cardDetails.cardScheme == 'VISA' || cardTenderItem.cardDetails.cardScheme == 'VISA_DEBIT' || cardTenderItem.cardDetails.cardScheme == 'ELECTRON'))    ? strings:truncate(cardTenderItem.ICCResults.applicationIdentifier, 14) : cardTenderItem.ICCResults.applicationIdentifier}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine visibility="#{cardTenderItem.cardDetails.ICC &amp;&amp; !empty cardTenderItem.ICCResults.applicationCryptogram}" id="CryptogramInformationDataRowLine">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="CardDetailsTag" id="CardDetailsTag">
+                            <core:elements>
+<core:text messageId="CRYPTOGRAM" id="CryptogramLabelText"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="CardDetailsData" id="CardDetailsData">
+                            <core:elements>
+<core:text messageId="COLON_SPACE" id="ColonSpaceLabelText2"/>
+<core:text visibility="#{!empty(cardTenderItem.ICCResults.cryptogramInformationData)}" id="CryptogramInformationDataText">
+    <core:text>#{cardTenderItem.ICCResults.cryptogramInformationData}/</core:text>
+</core:text>
+<core:text id="ApplicationCryptogramText">
+    <core:text>#{cardTenderItem.ICCResults.applicationCryptogram}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="iccResultsTesting">
+        <core:elements>
+            <core:row id="IccResultsTestingRow">
+                <core:rowLine visibility="#{notEmpty(cardTenderItem.ICCResults.applicationInterchangeProfile)}" id="IccResultsTestingRowLine">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="CardDetailsTag" id="CardDetailsTag">
+                            <core:elements>
+<core:text id="AipLabelText">
+    <core:text>AIP</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="CardDetailsData" id="CardDetailsData">
+                            <core:elements>
+<core:text messageId="COLON_SPACE" id="ColonSpaceLabelText"/>
+<core:text id="ApplicationInterchangeProfileText">
+    <core:text>#{cardTenderItem.ICCResults.applicationInterchangeProfile}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine visibility="#{notEmpty(cardTenderItem.ICCResults.applicationTransactionCounter)}" id="ApplicationTransactionCounterRowLine">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="CardDetailsTag" id="CardDetailsTag">
+                            <core:elements>
+<core:text id="AtcLabelText">
+    <core:text>ATC</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="CardDetailsData" id="CardDetailsData">
+                            <core:elements>
+<core:text messageId="COLON_SPACE" id="ColonSpaceLabelText2"/>
+<core:text id="ApplicationTransactionCounterText">
+    <core:text>#{cardTenderItem.ICCResults.applicationTransactionCounter}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine visibility="#{notEmpty(cardTenderItem.ICCResults.applicationUsageControl)}" id="ApplicationUsageControlRowLine">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="CardDetailsTag" id="CardDetailsTag">
+                            <core:elements>
+<core:text id="AucLabelText">
+    <core:text>AUC</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="CardDetailsData" id="CardDetailsData">
+                            <core:elements>
+<core:text messageId="COLON_SPACE" id="ColonSpaceLabelText3"/>
+<core:text id="ApplicationUsageControlText">
+    <core:text>#{cardTenderItem.ICCResults.applicationUsageControl}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine visibility="#{notEmpty(cardTenderItem.ICCResults.applicationVersionNumberCard)}" id="ApplicationVersionNumberCardRowLine">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="CardDetailsTag" id="CardDetailsTag">
+                            <core:elements>
+<core:text id="AvnCardLabelText">
+    <core:text>AVN Card</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="CardDetailsData" id="CardDetailsData">
+                            <core:elements>
+<core:text messageId="COLON_SPACE" id="ColonSpaceLabelText4"/>
+<core:text id="ApplicationVersionNumberCardText">
+    <core:text>#{cardTenderItem.ICCResults.applicationVersionNumberCard}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine visibility="#{notEmpty(cardTenderItem.ICCResults.applicationVersionNumberTerminal)}" id="ApplicationVersionNumberTerminalRowLine">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="CardDetailsTag" id="CardDetailsTag">
+                            <core:elements>
+<core:text id="AvnTerminalLabelText">
+    <core:text>AVN Terminal</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="CardDetailsData" id="CardDetailsData">
+                            <core:elements>
+<core:text messageId="COLON_SPACE" id="ColonSpaceLabelText"/>
+<core:text id="ApplicationVersionNumberTerminalText">
+    <core:text>#{cardTenderItem.ICCResults.applicationVersionNumberTerminal}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine visibility="#{notEmpty(cardTenderItem.ICCResults.authResponseCode)}" id="AuthResponseCodeRowLine">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="CardDetailsTag" id="CardDetailsTag">
+                            <core:elements>
+<core:text id="ArcLabelText">
+    <core:text>ARC</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="CardDetailsData" id="CardDetailsData">
+                            <core:elements>
+<core:text messageId="COLON_SPACE" id="ColonSpaceLabelText"/>
+<core:text id="AuthResponseCodeText">
+    <core:text>#{cardTenderItem.ICCResults.authResponseCode}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine visibility="#{notEmpty(cardTenderItem.ICCResults.cardholderName)}" id="CardholderNameRowLine">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="CardDetailsTag" id="CardDetailsTag">
+                            <core:elements>
+<core:text id="CardholderNameLabelText">
+    <core:text>C/H Name</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="CardDetailsData" id="CardDetailsData">
+                            <core:elements>
+<core:text messageId="COLON_SPACE" id="ColonSpaceLabelText"/>
+<core:text id="CardholderNameText">
+    <core:text>#{cardTenderItem.ICCResults.cardholderName}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine visibility="#{notEmpty(cardTenderItem.ICCResults.cardholderVerificationMethodResults)}" id="CardholderVerificationMethodResultsTextLine">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="CardDetailsTag" id="CardDetailsTag">
+                            <core:elements>
+<core:text id="CardholderVerificationMethodResultsLabelText">
+    <core:text>CVMR</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="CardDetailsData" id="CardDetailsData">
+                            <core:elements>
+<core:text messageId="COLON_SPACE" id="ColonSpaceLabelText"/>
+<core:text id="CardholderVerificationMethodResultsText">
+    <core:text>#{cardTenderItem.ICCResults.cardholderVerificationMethodResults}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine visibility="#{notEmpty(cardTenderItem.ICCResults.IACDefault)}" id="IacDefaultRowLine">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="CardDetailsTag" id="CardDetailsTag">
+                            <core:elements>
+<core:text id="IacDefaultLabelText">
+    <core:text>IAC Default</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="CardDetailsData" id="CardDetailsData">
+                            <core:elements>
+<core:text messageId="COLON_SPACE" id="ColonSpaceLabelText"/>
+<core:text id="IacDefaultText">
+    <core:text>#{cardTenderItem.ICCResults.IACDefault}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine visibility="#{notEmpty(cardTenderItem.ICCResults.IACDenial)}" id="IacDenialRowLine">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="CardDetailsTag" id="CardDetailsTag">
+                            <core:elements>
+<core:text id="IacDenialLabelText">
+    <core:text>IAC Denial</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="CardDetailsData" id="CardDetailsData">
+                            <core:elements>
+<core:text messageId="COLON_SPACE" id="ColonSpaceLabelText"/>
+<core:text id="IacDenialText">
+    <core:text>#{cardTenderItem.ICCResults.IACDenial}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine visibility="#{notEmpty(cardTenderItem.ICCResults.IACOnline)}" id="IacOnlineRowLine">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="CardDetailsTag" id="CardDetailsTag">
+                            <core:elements>
+<core:text id="IacOnlineLabelText">
+    <core:text>IAC Online</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="CardDetailsData" id="CardDetailsData">
+                            <core:elements>
+<core:text messageId="COLON_SPACE" id="ColonSpaceLabelText"/>
+<core:text id="IacOnlineText">
+    <core:text>#{cardTenderItem.ICCResults.IACOnline}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine visibility="#{notEmpty(cardTenderItem.ICCResults.issuerApplicationData)}" id="IssuerApplicationDataRowLine">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="CardDetailsTag" id="CardDetailsTag">
+                            <core:elements>
+<core:text id="IssuerApplicationDataLabelText">
+    <core:text>IAppD</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" wrap="true" columnDefId="CardDetailsData" id="CardDetailsData">
+                            <core:elements>
+<core:text messageId="COLON_SPACE" id="ColonSpaceLabelText"/>
+<core:text id="IssuerApplicationDataText">
+    <core:text>#{cardTenderItem.ICCResults.issuerApplicationData}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine visibility="#{notEmpty(cardTenderItem.ICCInputData) &amp;&amp; notEmpty(cardTenderItem.ICCInputData.issuerAuthenticationData)}" id="IssuerAuthenticationDataRowLine">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="CardDetailsTag" id="CardDetailsTag">
+                            <core:elements>
+<core:text id="IssuerAuthenticationDataLabelText">
+    <core:text>IAuthD</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" wrap="true" columnDefId="CardDetailsData" id="CardDetailsData">
+                            <core:elements>
+<core:text messageId="COLON_SPACE" id="ColonSpaceLabelText"/>
+<core:text id="IssuerAuthenticationDataText">
+    <core:text>#{cardTenderItem.ICCInput.issuerAuthenticationData}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine visibility="#{notEmpty(cardTenderItem.ICCResults.issuerScriptResults)}" id="IssuerScriptResultsRowLine">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="CardDetailsTag" id="CardDetailsTag">
+                            <core:elements>
+<core:text id="IssuerScriptResultsLabelText">
+    <core:text>Iss Script R</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" wrap="true" columnDefId="CardDetailsData" id="CardDetailsData">
+                            <core:elements>
+<core:text messageId="COLON_SPACE" id="ColonSpaceLabelText"/>
+<core:text id="IssuerScriptResultsText">
+    <core:text>#{cardTenderItem.ICCResults.issuerScriptResults}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine visibility="#{notEmpty(cardTenderItem.ICCResults.issuerCountryCode)}" id="IssuerCountryCodeRowLine">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="CardDetailsTag" id="CardDetailsTag">
+                            <core:elements>
+<core:text id="IssuerCountryCodeLabelText">
+    <core:text>Iss Country</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="CardDetailsData" id="CardDetailsData">
+                            <core:elements>
+<core:text messageId="COLON_SPACE" id="ColonSpaceLabelText"/>
+<core:text id="IssuerCountryCodeText">
+    <core:text>#{cardTenderItem.ICCResults.issuerCountryCode}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine visibility="#{notEmpty(cardTenderItem.ICCResults.POSEntryMode)}" id="PosEntryModeRowLine">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="CardDetailsTag" id="CardDetailsTag">
+                            <core:elements>
+<core:text id="PosEntryModeLabelText">
+    <core:text>POSEntryMode</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="CardDetailsData" id="CardDetailsData">
+                            <core:elements>
+<core:text messageId="COLON_SPACE" id="ColonSpaceLabelText"/>
+<core:text id="PosEntryModeText">
+    <core:text>#{cardTenderItem.ICCResults.POSEntryMode}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine visibility="#{cardTenderItem.reasonOnlineCode != -1}" id="ReasonOnlineRowLine">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="CardDetailsTag" id="CardDetailsTag">
+                            <core:elements>
+<core:text id="ReasonOnlineLabelText">
+    <core:text>ReasonOnline</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="CardDetailsData" id="CardDetailsData">
+                            <core:elements>
+<core:text messageId="COLON_SPACE" id="ColonSpaceLabelText"/>
+<core:text id="ReasonOnlineText">
+    <core:text>#{cardTenderItem.reasonOnlineCode}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine visibility="#{notEmpty(cardTenderItem.ICCResults.TACDefault)}" id="TacDefaultRowLine">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="CardDetailsTag" id="CardDetailsTag">
+                            <core:elements>
+<core:text id="TacDefaultLabelText">
+    <core:text>TAC Default</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="CardDetailsData" id="CardDetailsData">
+                            <core:elements>
+<core:text messageId="COLON_SPACE" id="ColonSpaceLabelText"/>
+<core:text id="TacDefaultText">
+    <core:text>#{cardTenderItem.ICCResults.TACDefault}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine visibility="#{notEmpty(cardTenderItem.ICCResults.TACDenial)}" id="TacDenialRowLine">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="CardDetailsTag" id="CardDetailsTag">
+                            <core:elements>
+<core:text id="TacDenialLabelText">
+    <core:text>TAC Denial</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="CardDetailsData" id="CardDetailsData">
+                            <core:elements>
+<core:text messageId="COLON_SPACE" id="ColonSpaceLabelText"/>
+<core:text id="TacDenialText">
+    <core:text>#{cardTenderItem.ICCResults.TACDenial}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine visibility="#{notEmpty(cardTenderItem.ICCResults.TACOnline)}" id="TacOnlineRowLine">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="CardDetailsTag" id="CardDetailsTag">
+                            <core:elements>
+<core:text id="TacOnlineLabelText">
+    <core:text>TAC Online</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="CardDetailsData" id="CardDetailsData">
+                            <core:elements>
+<core:text messageId="COLON_SPACE" id="ColonSpaceLabelText"/>
+<core:text id="TacOnlineText">
+    <core:text>#{cardTenderItem.ICCResults.TACOnline}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine visibility="#{notEmpty(cardTenderItem.ICCResults.EMVTerminalCapabilities)}" id="EmvTerminalCapabilitiesRowLine">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="CardDetailsTag" id="CardDetailsTag">
+                            <core:elements>
+<core:text id="EmvTerminalCapabilitiesLabelText">
+    <core:text>TermCap</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="CardDetailsData" id="CardDetailsData">
+                            <core:elements>
+<core:text messageId="COLON_SPACE" id="ColonSpaceLabelText"/>
+<core:text id="EmvTerminalCapabilitiesText">
+    <core:text>#{cardTenderItem.ICCResults.EMVTerminalCapabilities}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine visibility="#{notEmpty(cardTenderItem.ICCResults.EMVAdditionalTerminalCapabilities)}" id="EmvAdditionalTerminalCapabilitiesRowLine">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="CardDetailsTag" id="CardDetailsTag">
+                            <core:elements>
+<core:text id="EmvAdditionalTerminalCapabilitiesLabelText">
+    <core:text>AddTermCap</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="CardDetailsData" id="CardDetailsData">
+                            <core:elements>
+<core:text messageId="COLON_SPACE" id="ColonSpaceLabelText"/>
+<core:text id="EmvAdditionalTerminalCapabilitiesText">
+    <core:text>#{cardTenderItem.ICCResults.EMVAdditionalTerminalCapabilities}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine visibility="#{notEmpty(cardTenderItem.ICCResults.terminalVerificationResults)}" id="TerminalVerificationResultsRowLine">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="CardDetailsTag" id="CardDetailsTag">
+                            <core:elements>
+<core:text id="TerminalVerificationResultsLabelText">
+    <core:text>TVR</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="CardDetailsData" id="CardDetailsData">
+                            <core:elements>
+<core:text messageId="COLON_SPACE" id="ColonSpaceLabelText"/>
+<core:text id="TerminalVerificationResultsText">
+    <core:text>#{cardTenderItem.ICCResults.terminalVerificationResults}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine visibility="#{notEmpty(cardTenderItem.ICCResults.transactionStatusInformation)}" id="TransactionStatusInformationRowLine">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="CardDetailsTag" id="CardDetailsTag">
+                            <core:elements>
+<core:text id="TransactionStatusInformationLabelText">
+    <core:text>TSI</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="CardDetailsData" id="CardDetailsData">
+                            <core:elements>
+<core:text messageId="COLON_SPACE" id="ColonSpaceLabelText"/>
+<core:text id="TransactionStatusInformationText">
+    <core:text>#{cardTenderItem.ICCResults.transactionStatusInformation}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine visibility="#{notEmpty(cardTenderItem.ICCResults.unpredictableNumber)}" id="UnpredictableNumberRowLine">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="CardDetailsTag" id="CardDetailsTag">
+                            <core:elements>
+<core:text id="UnpredictableNumberLabelText">
+    <core:text>Unp Num</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="CardDetailsData" id="CardDetailsData">
+                            <core:elements>
+<core:text messageId="COLON_SPACE" id="ColonSpaceLabelText"/>
+<core:text id="UnpredictableNumberText">
+    <core:text>#{cardTenderItem.ICCResults.unpredictableNumber}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine visibility="#{notEmpty(cardTenderItem.ICCInputData) &amp;&amp; cardTenderItem.ICCInputData.floorLimit != 0}" id="FloorLimitRowLine">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="CardDetailsTag" id="CardDetailsTag">
+                            <core:elements>
+<core:text id="FloorLimitLabelText">
+    <core:text>FloorLimit</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="CardDetailsData" id="CardDetailsData">
+                            <core:elements>
+<core:text messageId="COLON_SPACE" id="ColonSpaceLabelText"/>
+<core:text id="FloorLimitText">
+    <core:formatters>
+        <core:formatCurrencyAmount/>
+    </core:formatters>
+    <core:text>#{cardTenderItem.ICCInputData.floorLimit}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine id="EmptyRowLine">
+                    <core:elements/>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="cardVerificationMessage">
+        <core:elements>
+            <core:row id="CardVerificationMessageRow">
+                <core:rowLine visibility="#{cardTenderItem.signatureRequired &amp;&amp; cardTenderItem.tenderAmount != 0}" id="CardHolderSignatureVerifiedRowLine">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="FullCentre" id="CardHolderSignatureVerifiedLabel">
+                            <core:elements>
+<core:text messageId="CARDHOLDER_SIGNATURE_VERIFIED" id="CardHolderSignatureVerifiedLabelText"/>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine visibility="#{cardTenderItem.ICCResults.PINVerified}" id="CardHolderPinVerifiedRowLine">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="FullCentre" id="CardHolderPinVerifiedLabel">
+                            <core:elements>
+<core:text messageId="CARDHOLDER_PIN_VERIFIED" id="CardHolderPinVerifiedLabelText"/>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine visibility="#{cardTenderItem.ICCResults.CDCVM}" id="CardHolderDeviceVerifiedRowLine">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="FullCentre" id="CardHolderDeviceVerifiedLabel">
+                            <core:elements>
+<core:text messageId="CARDHOLDER_DEVICE_VERIFIED" id="CardHolderDeviceVerifiedLabelText"/>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine visibility="#{cardTenderItem.cardholderNotPresent &amp;&amp; !cardTenderItem.isCardOnFile}" id="CardHolderNotPresentRowLine">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="FullCentre" id="CardHolderNotPresentLabel">
+                            <core:elements>
+<core:text messageId="CARDHOLDER_NOT_PRESENT" id="CardHolderNotPresentLabelText"/>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine visibility="#{!cardTenderItem.ICCResults.PINVerified &amp;&amp; !cardTenderItem.signatureRequired &amp;&amp; !cardTenderItem.ICCResults.CDCVM &amp;&amp; !cardTenderItem.cardholderNotPresent &amp;&amp; !cardTenderItem.isCardOnFile}" id="CardHolderNoCvmRowLine">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="FullCentre" id="CardHolderNoCvmLabel">
+                            <core:elements>
+<core:text messageId="CARDHOLDER_NO_CVM" id="CardHolderNoCvmLabelText"/>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="cardOnFileMessage">
+        <core:elements>
+            <core:row>
+                <core:rowLine id="CardOnFileMessageRowLine">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="FullCentre" id="CardOnFileMessageLabel">
+                            <core:elements>
+<core:text messageId="CARD_ON_FILE" id="CardOnFileMessageLabelText"/>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="pleaseDebitCreditMessage">
+        <core:elements>
+            <core:row visibility="#{cardTenderItem.tenderAmount != 0}">
+                <core:rowLine visibility="#{!cardTenderItem.isRefund}" id="PleaseDebitCreditMessageRowLine">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="FullCentre" id="PleaseDebitMessageLabel">
+                            <core:elements>
+<core:text messageId="PLEASE_DEBIT_MESSAGE" id="PleaseDebitMessageLabelText"/>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine visibility="#{cardTenderItem.isRefund}" id="PleaseCreditMessageRowLine">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="FullCentre" id="PleaseCreditMessageLabel">
+                            <core:elements>
+<core:text messageId="PLEASE_CREDIT_MESSAGE" id="PleaseCreditMessageLabelText"/>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="contactlessLogoRow">
+        <core:elements>
+            <core:row id="ContactlessLogoRow">
+                <core:rowLine id="ContactlessLogoRowLine">
+                    <core:elements>
+                        <core:formatElement formatId="contactlessLogo"/>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="contactlessLogo">
+        <core:elements>
+            <core:column maxLines="0" columnDefId="FullCentre" id="ContactlessLogo">
+                <core:elements>
+                    <core:imageElement originalFilename="ContactlessInd.bmp" id="ContactlessLogoImage"/>
+                </core:elements>
+            </core:column>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="cardTenderAmount">
+        <core:elements>
+            <core:row id="CardTenderAmountRow">
+                <core:rowLine id="CardTenderAmountRowLine">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="FullLeft" id="CardTenderAmountLabel">
+                            <core:elements>
+<core:text messageId="CARD_TENDER_AMOUNT" id="CardTenderAmountLabelText"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" align="RIGHT" columnDefId="RightColumn" id="CardTenderAmountColumn">
+                            <core:elements>
+<core:text visibility="#{cardTenderItem.tenderAmount != 0}" style="BOLD;DOUBLE_HIGH;DOUBLE_WIDE" id="CardTenderAmountText">
+    <core:formatters>
+        <core:formatCurrencyAmount/>
+    </core:formatters>
+    <core:text>#{cardTenderItem.tenderAmount}</core:text>
+</core:text>
+<core:text visibility="#{cardTenderItem.tenderAmount == 0}" id="CardTenderAmountNone">
+    <core:formatters>
+        <core:formatCurrencyAmount/>
+    </core:formatters>
+    <core:text>#{cardTenderItem.tenderAmount}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="cardTenderDCCAmount">
+        <core:elements>
+            <core:row id="CardTenderDccAmountRow">
+                <core:rowLine visibility="#{instanceOf(cardTenderItem, 'com.enactor.mfc.basket.items.ICardTenderItem') &amp;&amp; cardTenderItem.preAuthValue != 0}" id="CardTenderDccAmountRowLine">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="2" id="2">
+                            <core:elements>
+<core:text messageId="CARD_TENDER_PREAUTH_AMOUNT" id="CardTenderPreauthAmountLabelText"/>
+<core:text id="CardTenderPreauthAmountText">
+    <core:formatters>
+        <core:formatCurrencyAmount/>
+    </core:formatters>
+    <core:text>#{cardTenderItem.preAuthValue}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine id="CardTenderAmountRowLine">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="2" id="CardTenderAmountLabel">
+                            <core:elements>
+<core:text messageId="CARD_TENDER_AMOUNT_BASE" id="CardTenderAmountBaseLabelText">
+    <core:uiMessage messageId="CARD_REFUND_AMOUNT_BASE" applicability="#{cardTenderItem.isRefund}"/>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" align="RIGHT" columnDefId="RightColumn" id="TenderAmountColumn">
+                            <core:elements>
+<core:text id="TenderAmountText">
+    <core:formatters>
+        <core:formatCurrencyAmount/>
+    </core:formatters>
+    <core:text>#{cardTenderItem.tenderAmount}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine id="EmptyRowLine">
+                    <core:elements/>
+                </core:rowLine>
+                <core:rowLine style="BOLD" id="CurrencyDescriptionRowLine">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="FullLeft" id="CurrencyDescriptionColumn">
+                            <core:elements>
+<core:text messageId="TRANSACTION_CURRENCY" id="TransactionCurrencyLabelText"/>
+<core:text id="SpaceSeparatorText">
+    <core:text> </core:text>
+</core:text>
+<core:text id="CurrencyDescriptionText">
+    <core:text>#{cardTenderItem.currencyDescription}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine style="BOLD" id="DccExchangeRateRowLine">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="CardExchangeRateLabel" id="DccExchangeRateLabelColumn">
+                            <core:elements>
+<core:text messageId="DCC_EXCHANGE_RATE_LABEL" id="DccExchangeRateLabelText"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="CardExchangeRateValue" id="DccExchangeRateValueColumn">
+                            <core:elements>
+<core:text messageId="DCC_EXCHANGE_RATE_VALUE" id="DccExchangeRateValueText"/>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine visibility="#{notEmpty(cardTenderItem.rateMarkupIndicator)}" style="BOLD" id="DccRateMarkupRowLine">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="CardExchangeRateLabel" id="DccRateMarkupLabelColumn">
+                            <core:elements>
+<core:text messageId="DCC_RATE_MARKUP_LABEL" id="DccRateMarkupLabelText"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="CardExchangeRateValue" id="DccRateMarkupValueColumn">
+                            <core:elements>
+<core:text messageId="DCC_RATE_MARKUP_VALUE" id="DccRateMarkupValueText"/>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine style="BOLD" id="CardTenderForeignAmountRowLine">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="2" id="CardAmountCurrencyColumn">
+                            <core:elements>
+<core:text messageId="CARD_TENDER_AMOUNT_CURRENCY" id="CardAmountCurrencyLabelText">
+    <core:uiMessage messageId="CARD_REFUND_AMOUNT_CURRENCY" applicability="#{cardTenderItem.isRefund}"/>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="FullRight" style="BOLD;DOUBLE_HIGH;DOUBLE_WIDE" id="ForeignAmountColumn">
+                            <core:elements>
+<core:text id="ForeignAmountText">
+    <core:formatters>
+        <core:formatCurrencyAmount currencyId="#{cardTenderItem.currencyId}"/>
+    </core:formatters>
+    <core:text>#{cardTenderItem.foreignAmount}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine id="EmptyRowLine">
+                    <core:elements/>
+                </core:rowLine>
+                <core:rowLine id="VoucherMessageRowLine">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="FullLeftWrapped" visibility="#{!cardTenderItem.isRefund &amp;&amp; !cardTenderItem.voided}" id="DebitVoucherMessageColumn">
+                            <core:elements>
+<core:text id="DebitVoucherMessageText">
+    <core:text>#{dccConfiguration.debitVoucherMessage}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="FullLeftWrapped" visibility="#{cardTenderItem.isRefund &amp;&amp; !cardTenderItem.voided}" id="CreditVoucherMessageColumn">
+                            <core:elements>
+<core:text id="CreditVoucherMessageText">
+    <core:text>#{dccConfiguration.creditVoucherMessage}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine visibility="#{!cardTenderItem.voided}" id="RowLineIfCardTenderItemNotVoided">
+                    <core:elements/>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+        <core:entityReferences>
+            <core:entityReference name="dccConfiguration" keyValue="#{cardTenderItem.DCCConfigurationId}"/>
+        </core:entityReferences>
+    </core:formatEntry>
+    <core:formatEntry id="cardTenderPreAuthAmount">
+        <core:elements>
+            <core:row visibility="#{instanceOf(cardTenderItem, 'com.enactor.mfc.basket.items.ICardTenderItem') &amp;&amp; cardTenderItem.preAuthValue != 0}" id="CardTenderPreauthAmountRow">
+                <core:rowLine id="EmptyRowLine">
+                    <core:elements/>
+                </core:rowLine>
+                <core:rowLine id="CardTenderPreauthAmountRowLine">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="2" id="CardTenderPreauthAmountLabel">
+                            <core:elements>
+<core:text messageId="CARD_TENDER_PREAUTH_AMOUNT" id="CardTenderPreauthAmountLabelText"/>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="partialApproval">
+        <core:elements>
+            <core:row visibility="#{cardTenderItem.partialApproval}">
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="FullLeft" id="CardPartialApprovalLabel">
+                            <core:elements>
+<core:text messageId="PARTIAL_APPROVAL" id="CardPartialApprovalLabelText"/>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="cardBalance">
+        <core:elements>
+            <core:row visibility="#{cardTenderItem.cardBalanceAvailable &amp;&amp;              (!cardTenderItem.cardDetails.contactless || cardTenderItem.cardDetails.cardScheme == 'VISA' || cardTenderItem.cardDetails.cardScheme == 'VISA_DEBIT' || cardTenderItem.cardDetails.cardScheme == 'ELECTRON') }" id="CardBalanceRow">
+                <core:rowLine id="EmptyRowLine">
+                    <core:elements/>
+                </core:rowLine>
+                <core:rowLine id="CardBalanceRowLine">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="2" visibility="#{notEmpty(cardTenderItem.cardBalanceCurrency)}" id="CardBalanceCurrencyLabel">
+                            <core:elements>
+<core:text messageId="CARD_BALANCE_CURRENCY" id="CardBalanceCurrencyLabelText"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="2" visibility="#{isEmpty(cardTenderItem.cardBalanceCurrency)}" id="CardBalanceLabel">
+                            <core:elements>
+<core:text messageId="CARD_BALANCE" id="CardBalanceLabel"/>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="cardholderSignature">
+        <core:elements>
+            <core:lineElement visibility="#{empty(cardTenderItem.signatureData)}" id="Line1"/>
+            <core:lineElement visibility="#{empty(cardTenderItem.signatureData)}" id="Line2"/>
+            <core:lineElement visibility="#{empty(cardTenderItem.signatureData)}" id="Line3"/>
+            <core:imageElement visibility="#{notEmpty(cardTenderItem.signatureData)}" style="centered" id="SignatureImage">
+                <core:dataExpression>#{basket:getSignatureData(cardTenderItem.signatureData, cardTenderItem.signatureType)}</core:dataExpression>
+            </core:imageElement>
+            <core:column maxLines="0" columnDefId="7" visibility="#{empty(cardTenderItem.signatureData)}" id="DottedLineColumn">
+                <core:elements>
+                    <core:lineElement messageId="DOTTED_LINE" id="DottedLine"/>
+                </core:elements>
+            </core:column>
+            <core:column maxLines="0" columnDefId="7" id="CardholderSignatureColumn">
+                <core:elements>
+                    <core:lineElement messageId="CARDHOLDER_SIGNATURE" id="CardholderSignatureText"/>
+                </core:elements>
+            </core:column>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="cardholderNotPresent">
+        <core:elements>
+            <core:column maxLines="0" columnDefId="FullCentre" id="CardholderNotPresentColumn">
+                <core:elements>
+                    <core:lineElement messageId="CARDHOLDER_NOT_PRESENT" id="CardholderNotPresentText"/>
+                </core:elements>
+            </core:column>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="cardholderPINVerified">
+        <core:elements>
+            <core:column maxLines="0" columnDefId="FullCentre" id="CardholderPINVerifiedColumn">
+                <core:elements>
+                    <core:lineElement messageId="CARDHOLDER_PIN_VERIFIED" id="CardholderPINVerifiedText"/>
+                </core:elements>
+            </core:column>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="paymentServiceCombinedCardDetailsTenderList">
+        <core:elements>
+            <core:tableTemplate listVariableName="cardTenderItem" list="#{basket.tenderItemIterator}" id="PaymentServiceCardTenders">
+                <core:formatElement applicableClassName="com.enactor.mfc.basket.items.ICardPaymentDetails" applicability="#{!cardTenderItem.voided &amp;&amp; cardTenderItem.printCombinedReceipt &amp;&amp; !cardTenderItem.receiptPrinted}" formatId="paymentServiceCombinedCardDetails"/>
+                <core:formatElement id="hideCardTenderItem"/>
+            </core:tableTemplate>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="paymentServiceCombinedCardDetails">
+        <core:elements>
+            <core:formatElement formatId="separatorRow"/>
+            <core:formatElement formatId="paymentServiceCustomerReceiptDataRaw"/>
+            <core:formatElement formatId="blankLineRow"/>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="paymentServiceMerchantReceiptDataRaw">
+        <core:elements>
+            <core:row visibility="#{notEmpty(cardTenderItem.receiptData['MERCHANT_RECEIPT'])}" id="PaymentServiceMerchantReceiptDataRawRow">
+                <core:rowLine id="PaymentServiceMerchantReceiptDataRawLine">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="FullLeft" id="PaymentServiceMerchantReceiptDataRawColumn">
+                            <core:elements>
+<core:text id="PaymentServiceMerchantReceiptDataRawText">
+    <core:text>#{cardTenderItem.receiptData['MERCHANT_RECEIPT']}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="paymentServiceCustomerReceiptDataRaw">
+        <core:elements>
+            <core:row visibility="#{notEmpty(cardTenderItem.receiptData['CUSTOMER_RECEIPT'])}" id="PaymentServiceCustomerReceiptDataRawRow">
+                <core:rowLine id="PaymentServiceCustomerReceiptDataRawLine">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="FullLeft" id="PaymentServiceCustomerReceiptDataRawColumn">
+                            <core:elements>
+<core:text id="PaymentServiceCustomerReceiptDataRawText">
+    <core:text>#{cardTenderItem.receiptData['CUSTOMER_RECEIPT']}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="paymentServiceReceiptData">
+        <core:elements>
+            <core:tableTemplate listVariableName="receiptLine" list="#{basket:getReceiptLines(cardTenderItem.receiptData['CUSTOMER_RECEIPT'], cardTenderItem.receiptType)}" id="PaymentServiceReceipt">
+                <core:formatElement applicableClassName="com.enactor.coreUI.receipt.IReceiptLine" formatId="paymentServiceReceiptLine"/>
+            </core:tableTemplate>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="paymentServiceReceiptLine">
+        <core:elements>
+            <core:row>
+                <core:rowLine id="PaymentServiceReceiptRowLine">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="FullCentre" id="PaymentServiceReceiptColumn">
+                            <core:elements>
+<core:text fontName="#{receiptLine.fontName}" colour="#{receiptLine.colour}" id="PaymentServiceReceiptText">
+    <core:text>#{receiptLine.text}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+</core:documentTemplate>

@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<core:window xmlns:core="http://www.enactor.com/core" xmlns:retail="http://www.enactor.com/retail" xmlns:ns4="http://www.enactor.com/crm" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803" xmlns:ns6="http://www.apis-it.hr/fin/2012/types/f73" xmlns:ns7="http://www.w3.org/2000/09/xmldsig#" xmlns:ns8="http://www.enactor.com/retail/storedRetailTransaction/service" xmlns:ns9="http://www.fu.gov.si/" xmlns:ns10="http://www.enactor.com/addressLookup/service" xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:ns14="http://www.enactor.com/crm/customerLoyalty/service" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" hasBorders="FALSE" height="637" width="480" messageBase="NextGen/PosMessages" url="NextGen480x800/Pos/Product/RichProductSearch/RichProductSearchResults">
+    <core:elements>
+        <core:panel transparentBackground="true" id="ProductSearchRefPanel">
+            <core:flowConstraint width="100%" height="100%"/>
+            <core:elements>
+                <core:label styleClass="browseTermLabel" id="SearchTermLabel">
+                    <core:boundsConstraint height="78" width="430" y="0" x="17"/>
+                    <core:alignment>CENTRE</core:alignment>
+                    <core:text>#{notEmpty(descriptionFilter) ? concatenate('&quot;', descriptionFilter, '&quot;') : groupNamesMap[selectedParentGroup]}</core:text>
+                </core:label>
+                <core:panel styleClass="filterPanel" id="FilterPanel">
+                    <core:boundsConstraint height="80" width="480" y="78" x="0"/>
+                    <core:elements>
+                        <core:label styleClass="browseFilterLabel" id="ItemCountLabel">
+                            <core:boundsConstraint height="37" width="87" y="21" x="17"/>
+                            <core:alignment>CENTRE</core:alignment>
+                            <core:text>#{!noResults ? concatenate(strings:toString(totalRows), ' ', resolveMessage('NextGen/PosMessages', 'ITEMS')) : concatenate('0 ', resolveMessage('NextGen/PosMessages', 'ITEMS'))}</core:text>
+                        </core:label>
+                        <core:panel styleClass="separatorPanel" id="ItemCountSeparatorPanel">
+                            <core:boundsConstraint height="37" width="2" y="21" x="104"/>
+                            <core:elements/>
+                        </core:panel>
+                        <core:eventPanel value="ChangeDisplayState" transparentBackground="true" id="SortByEventPanel">
+                            <core:boundsConstraint height="80" width="119" y="0" x="106"/>
+                            <core:elements>
+<core:panel styleClass="sortByImagePanel" id="SortByImagePanel">
+    <core:boundsConstraint height="16" width="24" y="33" x="12"/>
+    <core:elements/>
+</core:panel>
+<core:label messageId="SORT_BY" styleClass="browseFilterLabel" id="SortByLabel">
+    <core:boundsConstraint height="37" width="69" y="21" x="48"/>
+</core:label>
+                            </core:elements>
+                            <core:data>
+<core:expression value="SORT_BY" javaInterfaceName="java.lang.String" name="enactor.pos.DisplayState"/>
+                            </core:data>
+                        </core:eventPanel>
+                        <core:panel styleClass="separatorPanel" id="SortBySeparatorPanel">
+                            <core:boundsConstraint height="37" width="2" y="21" x="225"/>
+                            <core:elements/>
+                        </core:panel>
+                        <core:eventPanel value="ChangeDisplayState" transparentBackground="true" id="RefineEventPanel">
+                            <core:boundsConstraint height="80" width="105" y="0" x="227"/>
+                            <core:elements>
+<core:panel styleClass="refineImagePanel" id="RefineImagePanel">
+    <core:boundsConstraint height="18" width="18" y="33" x="13"/>
+    <core:elements/>
+</core:panel>
+<core:label messageId="REFINE" styleClass="browseFilterLabel" id="RefineLabel">
+    <core:boundsConstraint height="37" width="63" y="21" x="41"/>
+    <core:alignment>CENTRE</core:alignment>
+</core:label>
+                            </core:elements>
+                            <core:data>
+<core:expression value="REFINE" javaInterfaceName="java.lang.String" name="enactor.pos.DisplayState"/>
+                            </core:data>
+                        </core:eventPanel>
+                        <core:panel styleClass="separatorPanel" id="RefineSeparatorPanel">
+                            <core:boundsConstraint height="37" width="2" y="21" x="332"/>
+                            <core:elements/>
+                        </core:panel>
+                        <core:button styleClass="browseListButton" enable="#{empty(displayState) || !strings:compareStrings(displayState, 'LIST')}" id="DisplayListButton">
+                            <core:boundsConstraint height="54" width="54" y="14" x="347"/>
+                            <core:text>ChangeDisplayState</core:text>
+                            <core:data>
+<core:expression value="LIST" javaInterfaceName="java.lang.String" name="enactor.pos.DisplayState"/>
+                            </core:data>
+                        </core:button>
+                        <core:button styleClass="browseGridButton" enable="#{!empty(displayState) &amp;&amp; !strings:compareStrings(displayState, 'GRID')}" id="DisplayGridButton">
+                            <core:boundsConstraint height="54" width="54" y="14" x="409"/>
+                            <core:text>ChangeDisplayState</core:text>
+                            <core:data>
+<core:expression value="GRID" javaInterfaceName="java.lang.String" name="enactor.pos.DisplayState"/>
+                            </core:data>
+                        </core:button>
+                    </core:elements>
+                </core:panel>
+                <core:panel verticalScrollBars="WhenNeeded" renderedExpression="#{empty(displayState) || strings:compareStrings(displayState, 'GRID')}" transparentBackground="true" visibility="#{!noResults || notEmpty(productPagedList)}" id="ProductGridResultPanel">
+                    <core:boundsConstraint height="401" width="480" y="158" x="0"/>
+                    <core:elements>
+                        <core:dataTable maxRepeatCount="3" repeatColumns="true" rowSelection="false" var="item" data="#{productPagedList}" renderedExpression="#{empty(displayState) || strings:compareStrings(displayState, 'GRID')}" transparentBackground="true" id="ProductGridDataTable">
+                            <core:flowConstraint width="480"/>
+                            <core:cell id="ProductDetailsCell">
+<core:flowConstraint/>
+<core:elements>
+    <core:pageElementRef pageDefinitionURL="Pos/Product/RichProductSearch/RichProductSearchCell" elementIdRef="ProductSearchDetailsCellRefPanel" id="PRODUCT_DETAILS_CELL_PAGE_REFERENCE">
+        <core:elements/>
+        <core:parameter value="#{item}" name="item">
+            <core:interfaceName>com.enactor.productCatalogueSearchMessages.productCatalogueSearch.IProductSearchDetail</core:interfaceName>
+        </core:parameter>
+    </core:pageElementRef>
+</core:elements>
+                            </core:cell>
+                        </core:dataTable>
+                    </core:elements>
+                    <core:elementPadding top="24"/>
+                </core:panel>
+                <core:panel verticalScrollBars="WhenNeeded" renderedExpression="#{!empty(displayState) &amp;&amp; strings:compareStrings(displayState, 'LIST')}" transparentBackground="true" visibility="#{!noResults || notEmpty(productPagedList)}" id="ProductListResultPanel">
+                    <core:boundsConstraint height="401" width="480" y="158" x="0"/>
+                    <core:elements>
+                        <core:dataTable repeatColumns="false" rowSelection="false" var="item" data="#{productPagedList}" transparentBackground="true" id="ProductListDataTable">
+                            <core:flowConstraint width="480"/>
+                            <core:cell id="ProductDetailsCell">
+<core:elements>
+    <core:pageElementRef pageDefinitionURL="Pos/Product/RichProductSearch/RichProductSearchCell" elementIdRef="ProductSearchDetailsListRefPanel" id="PRODUCT_DETAILS_CELL_PAGE_REFERENCE">
+        <core:elements/>
+        <core:parameter value="#{item}" name="item">
+            <core:interfaceName>com.enactor.productCatalogueSearchMessages.productCatalogueSearch.IProductSearchDetail</core:interfaceName>
+        </core:parameter>
+    </core:pageElementRef>
+</core:elements>
+                            </core:cell>
+                        </core:dataTable>
+                    </core:elements>
+                </core:panel>
+                <core:panel styleClass="loadingSpinner" visibility="#{!noResults &amp;&amp; isEmpty(productPagedList)}" id="LoadingSpinnerImagePanel">
+                    <core:boundsConstraint height="32" width="32" y="302" x="224"/>
+                    <core:elements/>
+                </core:panel>
+                <core:panel styleClass="resultPaginationPanel" visibility="#{productPagedList.totalRows &gt; 0}" enable="#{productPagedList.totalPages &gt; 1}" id="PaginationPanel">
+                    <core:boundsConstraint height="80" width="480" y="558" x="0"/>
+                    <core:elements>
+                        <core:button styleClass="resultNextPageButton" enable="#{productPagedList.currentRowOffset + productPagedList.rowsPerPage &lt; productPagedList.totalRows}" id="NextPage">
+                            <core:boundsConstraint height="53" width="53" y="13" x="414"/>
+                            <core:text>NextPage</core:text>
+                        </core:button>
+                        <core:button styleClass="resultPreviousPageButton" enable="#{productPagedList.currentRowOffset &gt; 0}" id="PreviousPage">
+                            <core:boundsConstraint height="53" width="53" y="13" x="13"/>
+                            <core:text>PreviousPage</core:text>
+                        </core:button>
+                        <core:label styleClass="resultPaginationLabel" id="PaginationLabel">
+                            <core:boundsConstraint height="53" width="350" y="13" x="65"/>
+                            <core:text>PAGE #{productPagedList.currentPage}/#{productPagedList.totalPages}</core:text>
+                        </core:label>
+                    </core:elements>
+                </core:panel>
+            </core:elements>
+        </core:panel>
+    </core:elements>
+    <core:events>
+        <core:event destination="ProductSearchRefPanel.ResultPanel.ProductListDataTable" event="view.enactor.pos.UpdateResultsTable">update</core:event>
+    </core:events>
+    <core:variables>
+        <core:variable required="true" name="enactor.pos.DisplayState">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.mfc.DescriptionFilter">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.mfc.TotalRows">
+            <core:interfaceName>java.lang.Integer</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.mfc.NoResults">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.coreUI.ProductPagedList">
+            <core:interfaceName>com.enactor.core.database.list.IPagedList</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.mfc.SelectedProductId">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:variable>
+    </core:variables>
+</core:window>

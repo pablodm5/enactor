@@ -1,0 +1,286 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<retail:posPromptPage xmlns:core="http://www.enactor.com/core" xmlns:retail="http://www.enactor.com/retail" xmlns:ns4="http://www.enactor.com/crm" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803" xmlns:ns6="http://www.apis-it.hr/fin/2012/types/f73" xmlns:ns7="http://www.w3.org/2000/09/xmldsig#" xmlns:ns8="http://www.enactor.com/retail/storedRetailTransaction/service" xmlns:ns9="http://www.fu.gov.si/" xmlns:ns10="http://www.enactor.com/addressLookup/service" xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:ns14="http://www.enactor.com/crm/customerLoyalty/service" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" allowResize="true" allowMove="true" allowClose="true" windowtype="view-panel" height="609" width="833" transparentBackground="true" messageBase="Pos/Product/ProductSelectionOptionSetMessage" url="Pos/OptionSet/CaptureOptionReferences">
+    <core:elements>
+        <core:label messageId="CAPTURE_OPTION_REFERENCE_PROMPT" id="Prompt"/>
+        <core:button messageBase="Pos/General/PosMessages" messageId="BUTTON_OK" visible="false" id="Button1">
+            <core:text>OKPressed</core:text>
+        </core:button>
+        <core:button messageBase="Pos/General/PosMessages" messageId="BUTTON_CANCEL" skipPageValidation="true" id="Button8">
+            <core:text>CancelPressed</core:text>
+        </core:button>
+        <core:panel transparentBackground="true" id="DialogPanel">
+            <core:elements>
+                <core:panel id="OPTIONS_SELECTION_OPTIONS_PANEL">
+                    <core:boundsConstraint height="306" width="640" y="0" x="0"/>
+                    <core:elements>
+                        <core:panel autoScroll="EndOfPage" verticalScrollBars="WhenNeeded" id="OPTIONS_SCROLL_PANEL">
+                            <core:boundsConstraint height="306" width="640" y="0" x="0"/>
+                            <core:elements>
+<core:panel id="SPACER_PANEL">
+    <core:flowConstraint width="100%" height="10"/>
+    <core:elements/>
+</core:panel>
+<core:dataTable rowIndexVar="rowIndex" rowSelection="false" var="optionReferenceDataRow" data="#{optionReferenceDataList}" verticalScrollBars="None" transparentBackground="true" id="DATA_CAPTURE_TABLE">
+    <core:flowConstraint width="100%"/>
+    <core:variables>
+        <core:variable name="enactor.pos.OptionReferenceDataRow">
+            <core:interfaceName>com.enactor.mfc.option.OptionReferenceData</core:interfaceName>
+        </core:variable>
+    </core:variables>
+    <core:cell vAlign="TOP" styleClass="optionsFieldCell" id="OPTIONS_FIELD_CELL">
+        <core:flowConstraint/>
+        <core:elements>
+            <core:panel id="CONTROL_PANEL">
+                <core:flowConstraint width="150"/>
+                <core:elements>
+                    <core:panel vAlign="CENTRE" id="DATA_CAPTURE_TITLE_PANEL">
+                        <core:flowConstraint width="150"/>
+                        <core:elements>
+                            <core:text allowWrap="true" styleClass="optionsSelectionLabel" id="DATA_CAPTURE_DESCRIPTION">
+<core:flowConstraint width="150"/>
+<core:text>#{notEmpty(optionReferenceDataRow.option.description) ? optionReferenceDataRow.option.description : optionReferenceDataRow.option.name}</core:text>
+                            </core:text>
+                        </core:elements>
+                    </core:panel>
+                    <core:panel renderedExpression="#{size(optionReferenceDataList) != rowIndex + 1}" id="BUTTON_REMOVE_PANEL">
+                        <core:flowConstraint width="150" height="55"/>
+                        <core:elements>
+                            <core:button adjustImagesToSize="true" messageBase="Pos/Product/ProductSelectionOptionSetMessage" messageId="BUTTON_REMOVE" styleClass="removeOption" id="BUTTON_REMOVE">
+<core:flowConstraint width="98" height="45"/>
+<core:text>RemoveOption</core:text>
+<core:data>
+    <core:expression value="#{rowIndex}" javaInterfaceName="java.lang.Integer" name="enactor.pos.RowIndex"/>
+</core:data>
+                            </core:button>
+                        </core:elements>
+                    </core:panel>
+                    <core:panel renderedExpression="#{size(optionReferenceDataList) == rowIndex + 1}" id="BUTTON_NEXT_PANEL">
+                        <core:flowConstraint width="150" height="55"/>
+                        <core:elements>
+                            <core:button adjustImagesToSize="true" messageBase="Pos/Product/ProductSelectionOptionSetMessage" messageId="BUTTON_NEXT" styleClass="nextOption" enable="#{!instanceOf(optionReferenceDataRow.option,'com.enactor.mfc.option.dataEntry.ICaptureProductOption') || !optionReferenceDataRow.option.mandatory || notEmpty(optionReferenceDataRow.optionValue)}" enabled="true" id="BUTTON_NEXT">
+<core:flowConstraint width="98" height="45"/>
+<core:text>NextOption</core:text>
+<core:data>
+    <core:expression value="#{rowIndex}" javaInterfaceName="java.lang.Integer" name="enactor.pos.RowIndex"/>
+</core:data>
+                            </core:button>
+                        </core:elements>
+                    </core:panel>
+                </core:elements>
+            </core:panel>
+            <core:panel id="DATA_PANEL">
+                <core:flowConstraint width="490"/>
+                <core:elements>
+                    <core:panel id="OPTIONS_PANEL">
+                        <core:flowConstraint width="100%"/>
+                        <core:elements>
+                            <core:panel renderedExpression="#{instanceOf(optionReferenceDataRow.option,'com.enactor.mfc.option.IProductListOption')}" id="PRODUCT_LIST_OPTION_PANEL">
+<core:flowConstraint width="100%"/>
+<core:elements>
+    <core:dataTable maxRepeatCount="5" repeatColumns="true" rowSelection="false" selectedRow="#{optionReferenceDataRow.optionValue}" var="productListItem" data="#{optionReferenceDataRow.productList}" transparentBackground="true" id="PRODUCT_LIST_DATA_TABLE">
+        <core:flowConstraint width="100%"/>
+        <core:cell visibility="#{notEmpty(productListItem.key) &amp;&amp; productListItem.key != '-'}" id="PRODUCT_LIST_DATA_TABLE_CELL_1">
+            <core:flowConstraint width="117" height="55"/>
+            <core:elements>
+                <core:button adjustImagesToSize="true" styleClass="#{optionReferenceDataRow != null &amp;&amp; notEmpty(optionReferenceDataRow.optionValue) &amp;&amp; notEmpty(productListItem.key) &amp;&amp; productListItem.key == optionReferenceDataRow.optionValue ? 'optionsSelectionButtonPressed' : 'optionsSelectionButton'}" enable="#{isEmpty(optionReferenceDataRow.optionValue)}" id="PRODUCT_LIST_DATA_TABLE_BUTTON">
+                    <core:flowConstraint width="110" height="45"/>
+                    <core:text>ProductSelected</core:text>
+                    <core:labelText>#{productListItem.description}</core:labelText>
+                    <core:data>
+                        <core:expression value="#{optionReferenceDataRow}" javaInterfaceName="com.enactor.mfc.option.OptionReferenceData" name="enactor.pos.SelectedOptionReferenceData"/>
+                        <core:expression value="#{productListItem}" javaInterfaceName="com.enactor.pos.packages.productList.SimpleProductListElement" name="enactor.pos.SelectedProductListItem"/>
+                    </core:data>
+                </core:button>
+            </core:elements>
+        </core:cell>
+    </core:dataTable>
+</core:elements>
+                            </core:panel>
+                            <core:panel visibility="#{instanceOf(optionReferenceDataRow.option,'com.enactor.mfc.option.dataEntry.IChoiceDataOption') &amp;&amp; optionReferenceDataRow.option.displayType != 'BUTTON'}" id="CHOICE_OPTION_DATA_PANEL">
+<core:flowConstraint width="100%"/>
+<core:elements>
+    <core:comboBox manualDropDownDisabled="false" lazyLoad="false" editable="true" styleClass="valueInput" enable="#{size(optionReferenceDataList) == rowIndex + 1}" id="CHOICE_OPTION">
+        <core:flowConstraint width="400" height="29"/>
+        <core:text>#{optionReferenceDataRow.optionValue}</core:text>
+        <core:listExpression>#{optionReferenceDataRow.choiceOptionList}</core:listExpression>
+        <core:listingElementEvents>
+            <core:selectionEvent>SelectionChanged</core:selectionEvent>
+        </core:listingElementEvents>
+    </core:comboBox>
+    <core:errorLabel errorFieldId="CHOICE_OPTION" styleClass="fieldError" colour="RED" id="CHOICE_OPTION_ERROR">
+        <core:flowConstraint/>
+    </core:errorLabel>
+</core:elements>
+                            </core:panel>
+                            <core:panel visibility="#{instanceOf(optionReferenceDataRow.option,'com.enactor.mfc.option.dataEntry.IChoiceDataOption') &amp;&amp; optionReferenceDataRow.option.displayType == 'BUTTON'}" id="CHOICE_OPTION_BUTTONS_DATA_PANEL">
+<core:flowConstraint width="100%"/>
+<core:elements>
+    <core:dataTable maxRepeatCount="5" repeatColumns="true" rowSelection="false" var="choiceItem" data="#{optionReferenceDataRow.choiceOptionList}" transparentBackground="true" id="CHOICE_OPTION_DATA_TABLE">
+        <core:flowConstraint width="100%"/>
+        <core:cell id="CHOICE_OPTION_DATA_TABLE_CELL">
+            <core:elements>
+                <core:button lineHeight="0" styleClass="#{optionReferenceDataRow != null &amp;&amp; notEmpty(optionReferenceDataRow.optionValue) &amp;&amp; notEmpty(choiceItem.key) &amp;&amp; choiceItem.key == optionReferenceDataRow.optionValue ? 'optionsSelectionButtonPressed' : 'optionsSelectionButton'}" enable="#{isEmpty(optionReferenceDataRow.optionValue)}" id="CHOICE_OPTION_DATA_TABLE_BUTTON">
+                    <core:flowConstraint width="110" height="45"/>
+                    <core:text>ChoiceSelected</core:text>
+                    <core:labelText>#{choiceItem.description}</core:labelText>
+                    <core:data>
+                        <core:expression value="#{optionReferenceDataRow}" javaInterfaceName="com.enactor.mfc.option.OptionReferenceData" name="enactor.pos.SelectedOptionReferenceData"/>
+                        <core:expression value="#{choiceItem}" javaInterfaceName="com.enactor.core.database.list.SimpleListElement" name="enactor.pos.SelectedChoiceListItem"/>
+                    </core:data>
+                </core:button>
+            </core:elements>
+        </core:cell>
+    </core:dataTable>
+</core:elements>
+                            </core:panel>
+                            <core:panel renderedExpression="#{instanceOf(optionReferenceDataRow.option,'com.enactor.mfc.option.dataEntry.ITextDataOption') &amp;&amp; !optionReferenceDataRow.option.showMultiLine}" id="TEXT_OPTION_PANEL">
+<core:flowConstraint width="100%"/>
+<core:elements>
+    <core:inputText validationData="#{optionReferenceDataRow.option.validationData}" focusOrderExpression="#{1000-rowIndex}" styleClass="valueInput40" id="TEXT_OPTION">
+        <core:flowConstraint width="400" height="29"/>
+        <core:text>#{optionReferenceDataRow.optionValue}</core:text>
+    </core:inputText>
+    <core:errorLabel errorFieldId="TEXT_OPTION" styleClass="fieldError" colour="RED" id="TEXT_OPTION_ERROR">
+        <core:flowConstraint width="100%"/>
+    </core:errorLabel>
+</core:elements>
+                            </core:panel>
+                            <core:panel renderedExpression="#{instanceOf(optionReferenceDataRow.option,'com.enactor.mfc.option.dataEntry.ITextDataOption') &amp;&amp; optionReferenceDataRow.option.showMultiLine}" id="MULTILINE_TEXT_OPTION_PANEL">
+<core:flowConstraint width="100%"/>
+<core:elements>
+    <core:inputText validationData="#{optionReferenceDataRow.option.validationData}" borderStyle="Line" type="textArea" focusOrderExpression="#{1000-rowIndex}" styleClass="valueInput" id="MULTILINE_TEXT_OPTION">
+        <core:flowConstraint width="400" height="100"/>
+        <core:text>#{optionReferenceDataRow.optionValue}</core:text>
+    </core:inputText>
+    <core:errorLabel errorFieldId="MULTILINE_TEXT_OPTION" styleClass="fieldError" colour="RED" id="MULTILINE_TEXT_OPTION_ERROR">
+        <core:flowConstraint width="100%"/>
+    </core:errorLabel>
+</core:elements>
+                            </core:panel>
+                            <core:panel renderedExpression="#{instanceOf(optionReferenceDataRow.option,'com.enactor.mfc.option.dataEntry.IBooleanDataOption')}" id="BOOLEAN_OPTION_PANEL">
+<core:flowConstraint width="100%"/>
+<core:elements>
+    <core:checkbox transparentBackground="true" id="BOOLEAN_OPTION">
+        <core:flowConstraint width="29" height="29"/>
+        <core:text>#{optionReferenceDataRow.optionValue}</core:text>
+    </core:checkbox>
+    <core:errorLabel errorFieldId="BOOLEAN_OPTION" styleClass="fieldError" colour="RED" id="BOOLEAN_OPTION_ERROR">
+        <core:flowConstraint/>
+    </core:errorLabel>
+</core:elements>
+                            </core:panel>
+                            <core:panel renderedExpression="#{instanceOf(optionReferenceDataRow.option,'com.enactor.mfc.option.dataEntry.IDateDataOption')}" id="DATE_OPTION_PANEL">
+<core:flowConstraint width="100%"/>
+<core:elements>
+    <core:inputDate inputType="selection" id="DATE_OPTION">
+        <core:flowConstraint width="150" height="29"/>
+        <core:text>#{optionReferenceDataRow.optionValue}</core:text>
+    </core:inputDate>
+    <core:errorLabel errorPropertyId="optionId" errorFieldId="DATE_OPTION" styleClass="fieldError" colour="RED" id="DATE_OPTION_ERROR">
+        <core:flowConstraint/>
+    </core:errorLabel>
+</core:elements>
+                            </core:panel>
+                            <core:panel renderedExpression="#{instanceOf(optionReferenceDataRow.option,'com.enactor.mfc.option.dataEntry.INumericDataOption')}" id="NUMERIC_OPTION_PANEL">
+<core:flowConstraint width="100%"/>
+<core:elements>
+    <core:inputText id="NUMERIC_OPTION">
+        <core:flowConstraint width="150" height="29"/>
+        <core:text>#{optionReferenceDataRow.optionValue}</core:text>
+        <core:validationData>
+            <core:floatFieldValidationData>
+                <core:type>Float</core:type>
+                <core:inputMask></core:inputMask>
+                <core:validationClassname></core:validationClassname>
+            </core:floatFieldValidationData>
+        </core:validationData>
+    </core:inputText>
+    <core:errorLabel errorPropertyId="optionId" errorFieldId="NUMERIC_OPTION" styleClass="fieldError" colour="RED" id="NUMERIC_OPTION_ERROR">
+        <core:flowConstraint/>
+    </core:errorLabel>
+</core:elements>
+                            </core:panel>
+                            <core:panel renderedExpression="#{instanceOf(optionReferenceDataRow.option,'com.enactor.mfc.option.dataEntry.IPercentageDataOption')}" id="PERCENTAGE_OPTION_PANEL">
+<core:flowConstraint width="100%"/>
+<core:elements>
+    <core:inputText id="PERCENTAGE_OPTION">
+        <core:flowConstraint width="150" height="29"/>
+        <core:text>#{optionReferenceDataRow.optionValue}</core:text>
+        <core:validationData>
+            <core:percentageFloatFieldValidationData>
+                <core:type>Percentage</core:type>
+                <core:allowNulls>true</core:allowNulls>
+                <core:inputMask></core:inputMask>
+                <core:validationClassname></core:validationClassname>
+            </core:percentageFloatFieldValidationData>
+        </core:validationData>
+    </core:inputText>
+    <core:errorLabel errorPropertyId="optionId" errorFieldId="PERCENTAGE_OPTION" styleClass="fieldError" colour="RED" id="PERCENTAGE_OPTION_ERROR">
+        <core:flowConstraint/>
+    </core:errorLabel>
+</core:elements>
+                            </core:panel>
+                            <core:panel renderedExpression="#{instanceOf(optionReferenceDataRow.option,'com.enactor.mfc.option.IProductOption')}" id="PRODUCT_OPTION_PANEL">
+<core:flowConstraint width="100%"/>
+<core:elements>
+    <core:label id="PRODUCT_OPTION">
+        <core:flowConstraint width="100%"/>
+        <core:text>#{optionReferenceDataRow.optionValue} #{optionReferenceDataRow.productDescription != '-' ? '- ' : ''}#{optionReferenceDataRow.productDescription} #{optionReferenceDataRow.price == null ? '' : '- '}#{optionReferenceDataRow.price != null ? format:formatCurrency(optionReferenceDataRow.price) : ''}</core:text>
+    </core:label>
+</core:elements>
+                            </core:panel>
+                            <core:panel renderedExpression="#{instanceOf(optionReferenceDataRow.option,'com.enactor.mfc.option.dataEntry.ICaptureProductOption')}" id="CAPTURE_PRODUCT_OPTION_PANEL">
+<core:flowConstraint width="100%"/>
+<core:elements>
+    <core:inputText edit="#{true}" styleClass="valueInput40" id="CAPTURE_PRODUCT_OPTION">
+        <core:flowConstraint width="400" height="29"/>
+        <core:updateTriggers>
+            <core:element>BUTTON_NEXT</core:element>
+        </core:updateTriggers>
+        <core:text>#{optionReferenceDataRow.optionValue}</core:text>
+    </core:inputText>
+    <core:errorLabel errorFieldId="CAPTURE_PRODUCT_OPTION" styleClass="fieldError" colour="RED" id="CAPTURE_PRODUCT_OPTION_ERROR">
+        <core:flowConstraint width="100%"/>
+    </core:errorLabel>
+</core:elements>
+                            </core:panel>
+                        </core:elements>
+                    </core:panel>
+                </core:elements>
+            </core:panel>
+        </core:elements>
+    </core:cell>
+</core:dataTable>
+                            </core:elements>
+                        </core:panel>
+                    </core:elements>
+                </core:panel>
+            </core:elements>
+        </core:panel>
+        <core:hidden id="TotalLabel"/>
+        <core:hidden id="InputBox"/>
+        <core:hidden id="Receipt"/>
+    </core:elements>
+    <core:templateURL>Pos/StandardPosFormTemplate</core:templateURL>
+    <core:events>
+        <core:event destination="enactor.Page" event="key.EnterPressed">tabNext</core:event>
+    </core:events>
+    <core:validationEvents>
+        <core:event>OKPressed</core:event>
+        <core:event>InputBoxEnterPressed</core:event>
+    </core:validationEvents>
+    <core:variables>
+        <core:variable name="FormErrors">
+            <core:interfaceName>com.enactor.coreUI.processes.IFormErrors</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.pos.OptionReferenceDataList">
+            <core:interfaceName>java.util.List</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.pos.OptionReferenceDataRow">
+            <core:interfaceName>com.enactor.mfc.option.OptionReferenceData</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.mfc.OptionReferenceData">
+            <core:interfaceName>com.enactor.mfc.option.OptionReferenceData</core:interfaceName>
+        </core:variable>
+    </core:variables>
+</retail:posPromptPage>

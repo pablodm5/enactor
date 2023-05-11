@@ -1,0 +1,305 @@
+<?xml version="1.0" encoding="UTF-8"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<parent>
+		<groupId>com.enactor.training</groupId>
+		<artifactId>parent-pom</artifactId>
+		<version>TRUNK-SNAPSHOT</version>
+		<relativePath>..</relativePath>
+	</parent>
+	<modelVersion>4.0.0</modelVersion>
+	<artifactId>training-release-pom</artifactId>
+	<packaging>pom</packaging>
+	<name>Training Build - Deploy</name>
+	<properties>
+		<release.dir>${project.build.directory}/release</release.dir>
+		<svn.projectRoot>true</svn.projectRoot>
+		<timestamp>${maven.build.timestamp}</timestamp>
+		<maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>		
+		
+		<!-- tell animal sniffer plugin to skip Java API checks -->
+		<animal.sniffer.skip>true</animal.sniffer.skip>		
+		
+		<!-- Remove artifacts from Artifactory once deployed  -->
+		<remove.artifacts.enabled>true</remove.artifacts.enabled>
+		
+		<!-- Comma-separated list of artifacts to remove from Artifactory once deployed -->
+		<remove.artifacts></remove.artifacts>
+		
+		<!-- Pass artifactory username and password  -->
+		<artifactory.username>${env.ARTIFACTORY_USERNAME}</artifactory.username>
+		<artifactory.password>${env.ARTIFACTORY_PASSWORD}</artifactory.password>
+	</properties>
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-deploy-plugin</artifactId>
+				<configuration>
+					<skip>true</skip>
+				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>create-release-descriptor</id>
+						<phase>generate-sources</phase>
+						<configuration>
+							<tasks>
+								<!--
+								Generate the release descriptor. This is principally
+								used when performing automated installs (i.e.
+								for integration testing).
+								 -->
+
+								<touch file="${project.build.directory}/release.xml" mkdirs="true"/>
+								<echo file="${project.build.directory}/release.xml">
+<![CDATA[
+<!-- Release descriptor file for: -->
+<!-- Training Release: ${project.version} -->
+<!-- Using Core: ${core.version} -->
+<!-- Using Platform: ${platform.version} -->
+<!-- Generated at: ${timestamp} -->
+
+<project>
+	<property name="platform.base" value="${releases.home}/Platform/${platform.branch}/${platform.version}" />
+	<property name="training.base" value="${releases.home}/Training/${project.version}/" />
+
+	<!-- Wars that should be deployed to the application server -->
+	<resources id="applicationWars">
+		<fileset dir="${training.base}/WebApplications">
+			<include name="WebMaintenance.war" />
+		</fileset>
+		<fileset dir="${platform.base}/WebApplications">
+			<include name="WebCRM.war" />
+			<include name="WebCustomerAccountManagement.war" />
+			<include name="WebInventoryManagementHHT.war" />
+			<include name="WebPosMaintenance.war" />
+			<include name="WebReports.war" />
+			<include name="WebShop.war" />
+			<include name="WebWorkroom.war" />
+		</fileset>
+	</resources>
+
+	<!-- Wars that should be deployed to the processing server -->
+	<resources id="processingWars">
+		<fileset dir="${training.base}/WebApplications">
+			<include name="WebRetailProcessing.war" />
+		</fileset>
+		<fileset dir="${platform.base}/WebApplications">
+			<include name="WebCardAuthorisation.war" />
+			<include name="WebCore.war" />
+			<include name="WebOrderProcessing.war" />
+		</fileset>
+	</resources>
+
+	<!-- Business Process Archives that should be deployed -->
+	<resources id="businessProcessArchives">
+		<fileset dir="${platform.base}/BusinessProcess">
+			<include name="activity-flow-compensation-${platform.version}.par" />
+			<include name="generic-activity-flow-${platform.version}.par" />
+		</fileset>
+	</resources>
+
+	<!-- Web Services that should be deployed -->
+	<resources id="webServiceArchives">
+		<fileset dir="${platform.base}/WebServices">
+			<include name="address-lookup-service-${platform.version}.aar" />
+			<include name="axis2-maintenance-${platform.version}.aar" />
+			<include name="crm-services-${platform.version}.aar" />
+			<include name="customer-orders-services-${platform.version}.aar" />
+			<include name="inventory-management-services-${platform.version}.aar" />
+			<include name="restaurant-web-service-all-${platform.version}.aar" />
+			<include name="retail-web-service-all-${platform.version}.aar" />
+			<include name="application-download-service-${platform.version}.aar" />
+			<include name="crm-customer-account.aar-${platform.version}.aar" />
+		</fileset>
+	</resources>
+
+	<!-- The Main POS Archive -->
+	<resources id="posArchives">
+		<fileset dir="${training.base}">
+			<include name="training-pos-${project.version}.zip" />
+		</fileset>
+	</resources>
+
+	<!-- The Thin Server Archive -->
+	<resources id="thinServerArchive">
+		<fileset dir="${training.base}">
+			<include name="training-thin-server-${project.version}.zip" />
+		</fileset>
+	</resources>
+
+	<!-- Application Updater -->
+	<resources id="applicationUpdater"></resources>
+
+	<!-- Data -->
+	<!--
+	<resources id="data">
+		<fileset dir="${training.base}">
+			<include name="data-estateManager-${project.version}.zip" />
+			<include name="data-pos-${project.version}.zip" />
+		</fileset>
+		<fileset dir="${platform.base}/Data">
+			<include name="WebShop-data.zip" />
+			<include name="WebShop-solr.zip" />
+		</fileset>
+	</resources>
+	-->
+</project>
+]]>
+								</echo>
+							</tasks>
+						</configuration>
+						<goals>
+							<goal>run</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+	<profiles>
+		<profile>
+			<id>copy-release-artifacts</id>
+			<build>
+				<plugins>
+					<plugin>
+						<artifactId>maven-antrun-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>copy-release-descriptor</id>
+								<phase>package</phase>
+								<configuration>
+									<tasks>
+										<!-- Copy the release descriptor. -->
+										<copy file="${project.build.directory}/release.xml" tofile="${release.dir}/Training/${project.version}/release.xml"/>
+									</tasks>
+								</configuration>
+								<goals>
+									<goal>run</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-dependency-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>copy</id>
+								<phase>package</phase>
+								<goals>
+									<goal>copy</goal>
+								</goals>
+								<configuration>
+									<artifactItems>
+
+										<!-- WARs -->
+										<artifactItem>
+											<groupId>com.enactor.training</groupId>
+											<artifactId>training-web-retail-processing</artifactId>
+											<version>${project.version}</version>
+											<type>war</type>
+											<overWrite>true</overWrite>
+											<destFileName>WebApplications/WebRetailProcessing.war</destFileName>
+										</artifactItem>
+										<artifactItem>
+											<groupId>com.enactor.training</groupId>
+											<artifactId>training-web-maintenance</artifactId>
+											<version>${project.version}</version>
+											<type>war</type>
+											<overWrite>true</overWrite>
+											<destFileName>WebApplications/WebMaintenance.war</destFileName>
+										</artifactItem>
+
+										<!-- ZIPs -->
+										<artifactItem>
+											<groupId>com.enactor.training</groupId>
+											<artifactId>training-pos</artifactId>
+											<version>${project.version}</version>
+											<type>zip</type>
+											<overWrite>true</overWrite>
+											<destFileName>pos-${project.version}.zip</destFileName>
+										</artifactItem>
+										<artifactItem>
+											<groupId>com.enactor.training</groupId>
+											<artifactId>training-thin-client</artifactId>
+											<version>${project.version}</version>
+											<type>zip</type>
+											<overWrite>true</overWrite>
+											<destFileName>thin-client-${project.version}.zip</destFileName>
+										</artifactItem>
+										<artifactItem>
+											<groupId>com.enactor.training</groupId>
+											<artifactId>training-thin-server</artifactId>
+											<version>${project.version}</version>
+											<type>zip</type>
+											<overWrite>true</overWrite>
+											<destFileName>thin-server-${project.version}.zip</destFileName>
+										</artifactItem>
+										
+										<!-- Docker-compose file bundle -->
+	
+										<artifactItem>
+											<groupId>com.enactor.training.docker</groupId>
+											<artifactId>lin-base-compose</artifactId>
+											<version>${project.version}</version>
+											<type>zip</type>
+											<classifier>bundle</classifier>
+											<overWrite>true</overWrite>
+											<destFileName>docker-compose/training-lin-compose-${project.version}-base.zip</destFileName>
+										</artifactItem>
+	
+										<artifactItem>
+											<groupId>com.enactor.training.docker</groupId>
+											<artifactId>win-base-compose</artifactId>
+											<version>${project.version}</version>
+											<type>zip</type>
+											<classifier>bundle</classifier>
+											<overWrite>true</overWrite>
+											<destFileName>docker-compose/training-win-compose-${project.version}-base.zip</destFileName>
+										</artifactItem>
+									</artifactItems>
+									<outputDirectory>${release.dir}/Training/${project.version}</outputDirectory>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<id>delete-release-artifacts</id>
+			<build>
+				<plugins>
+					<!-- Remove artifacts that have been deployed -->
+					<plugin>
+						<groupId>org.codehaus.gmavenplus</groupId>
+						<artifactId>gmavenplus-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>delete-uploaded-artifacts</id>
+								<phase>package</phase>
+								<goals>
+									<goal>execute</goal>
+								</goals>
+								<configuration>
+									<scripts>
+										<script>file:///${project.build.directory}/DeleteArtifact.groovy</script>
+									</scripts>
+									<allowSystemExits>true</allowSystemExits>
+								</configuration>
+							</execution>
+						</executions>
+						<dependencies>
+							<dependency>
+							    <groupId>org.codehaus.groovy.modules.http-builder</groupId>
+							    <artifactId>http-builder</artifactId>
+							    <version>0.7.1</version>
+							</dependency>
+						</dependencies>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+</project>

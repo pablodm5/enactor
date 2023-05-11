@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<core:documentTemplate xmlns:core="http://www.enactor.com/core" xmlns:retail="http://www.enactor.com/retail" xmlns:ns4="http://www.enactor.com/crm" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803" xmlns:ns6="http://www.apis-it.hr/fin/2012/types/f73" xmlns:ns7="http://www.w3.org/2000/09/xmldsig#" xmlns:ns8="http://www.enactor.com/retail/storedRetailTransaction/service" xmlns:ns9="http://www.fu.gov.si/" xmlns:ns10="http://www.enactor.com/addressLookup/service" xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:ns14="http://www.enactor.com/crm/customerLoyalty/service" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" paginated="false" messageBase="Pos/Product/ProductMessages" title="SELECT_PRODUCT_TITLE" url="Pos/Product/SelectProductListTemplate">
+    <core:elements>
+        <core:tableTemplate id="ProductList">
+            <core:formatElement applicableClassName="com.enactor.core.database.list.IKeyedListElement" formatId="selectProductListItem"/>
+            <core:formatElement applicableEntityName="listHeader" formatId="listHeader"/>
+            <core:formatElement applicableEntityName="listFooter" formatId="listFooter"/>
+        </core:tableTemplate>
+    </core:elements>
+    <core:columnDefs>
+        <core:columnDef id="1" start="3" end="21"/>
+        <core:columnDef id="2" start="23" end="56"/>
+        <core:columnDef id="3" start="58" end="79"/>
+        <core:columnDef id="4" start="81" end="95" align="RIGHT"/>
+        <core:columnDef id="5" start="5" end="34"/>
+        <core:columnDef id="6" start="36" end="64"/>
+        <core:columnDef id="7" start="66" end="95"/>
+    </core:columnDefs>
+    <core:formatEntry id="selectProductListItem">
+        <core:elements>
+            <core:row styleClass="recallListItem">
+                <core:rowLine visibility="#{item.data['rowNum'] &lt;= rowsToDisplay}">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="1" id="1">
+                            <core:elements>
+<core:text>
+    <core:text>#{item.data['productId']}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="2" id="2">
+                            <core:elements>
+<core:text>
+    <core:text>#{empty item.description ? item.data['productId'] : item.description}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="3" id="3">
+                            <core:elements>
+<core:text>
+    <core:text>#{item.data['sellingCode']}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="4" id="4">
+                            <core:elements>
+<core:text>
+    <core:formatters>
+        <core:formatCurrencyAmount/>
+    </core:formatters>
+    <core:text>#{empty (productPriceMap[item.data['productId']]) ? 0 : productPriceMap[item.data['productId']].price}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine visibility="#{item.data['rowNum'] &lt;= rowsToDisplay &amp;&amp; (!empty(item.data['SP:sizeKey.sizeId']) || !empty(item.data['SP:colourKey.colourId']) || !empty(item.data['SP:styleId']))}">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="5" id="5">
+                            <core:elements>
+<core:text messageId="SELECT_PRODUCT_STYLE"/>
+<core:text>
+    <core:text> #{empty(item.data['SP:styleId']) ? '-' : item.data['SP:styleId']}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="6" id="6">
+                            <core:elements>
+<core:text messageId="SELECT_PRODUCT_COLOUR"/>
+<core:text visibility="#{!empty(item.data['SP:colourKey.colourId']) &amp;&amp; !empty(item.data['SP:colourKey.colourRangeId'])}">
+    <core:text> #{empty(productColour) || empty(productColour.description) ? item.data['colourKey.colourId'] : getLocalisedString(productColour.localisedDescription, userLocale.locale)}</core:text>
+</core:text>
+<core:text visibility="#{empty(item.data['SP:colourKey.colourId']) || empty(item.data['SP:colourKey.colourRangeId'])}">
+    <core:text> #{empty(item.data['SP:colourKey.colourId']) ? '-' : item.data['SP:colourKey.colourId']}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="7" id="7">
+                            <core:elements>
+<core:text messageId="SELECT_PRODUCT_SIZE"/>
+<core:text visibility="#{!empty(item.data['SP:sizeKey.sizeId']) &amp;&amp; !empty(item.data['SP:sizeKey.sizeRangeId'])}">
+    <core:text> #{empty(productSize) || empty(productSize.description) ? item.data['SP:sizeKey.sizeId'] : getLocalisedString(productSize.localisedDescription, userLocale.locale)}</core:text>
+</core:text>
+<core:text visibility="#{empty(item.data['SP:sizeKey.sizeId']) || empty(item.data['SP:sizeKey.sizeRangeId'])}">
+    <core:text> #{empty(item.data['SP:sizeKey.sizeId']) ? '-' : item.data['SP:sizeKey.sizeId']}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+        <core:entityReferences>
+            <core:entityReference name="productSize" entityName="size" entityNamespace="http://www.enactor.com/mfc">
+                <core:keyProperty name="sizeId" value="#{item.data['SP:sizeKey.sizeId']}"/>
+                <core:keyProperty name="sizeRangeId" value="#{item.data['SP:sizeKey.sizeRangeId']}"/>
+            </core:entityReference>
+            <core:entityReference name="productColour" entityName="colour" entityNamespace="http://www.enactor.com/mfc">
+                <core:keyProperty name="colourId" value="#{item.data['SP:colourKey.colourId']}"/>
+                <core:keyProperty name="colourRangeId" value="#{item.data['SP:colourKey.colourRangeId']}"/>
+            </core:entityReference>
+        </core:entityReferences>
+    </core:formatEntry>
+    <core:formatEntry id="listHeader">
+        <core:elements>
+            <core:row styleClass="listHeader" style="ITALIC">
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="1" id="1">
+                            <core:elements>
+<core:text messageId="SELECT_PRODUCT_PRODUCT_ID"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="2" id="2">
+                            <core:elements>
+<core:text messageId="SELECT_PRODUCT_DESCRIPTION"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="3" id="3">
+                            <core:elements>
+<core:text messageId="SELECT_PRODUCT_SELLING_CODE"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="4" id="4">
+                            <core:elements>
+<core:text messageId="SELECT_PRODUCT_PRICE"/>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="listFooter">
+        <core:elements>
+            <core:row styleClass="listFooter" style="ITALIC">
+                <core:rowLine visibility="#{size(list) &gt; rowsToDisplay}">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="0">
+                            <core:elements>
+<core:text messageId="TOO_MANY_PRODUCT_TO_LIST"/>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+</core:documentTemplate>

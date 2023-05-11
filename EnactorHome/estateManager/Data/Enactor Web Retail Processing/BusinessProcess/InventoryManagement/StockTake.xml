@@ -1,0 +1,1999 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<core:simpleActivityFlowBusinessProcess xmlns:core="http://www.enactor.com/core" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803" xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:ns10="tools" xmlns:ns8="http://maven.apache.org/POM/4.0.0" xmlns:retail="http://www.enactor.com/retail" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:tools="http://www.enactor.com/tools">
+    <core:processId>InventoryManagement/StockTake</core:processId>
+    <core:name>Stock Take</core:name>
+    <core:businessProcessTypeId>InventoryManagement/StockTakeType</core:businessProcessTypeId>
+    <core:startPrivilege>enactor.inventoryManagement.StockTake.Run</core:startPrivilege>
+    <core:participatePrivilege>enactor.inventoryManagement.StockTake.Run</core:participatePrivilege>
+    <core:administerPrivilege>enactor.inventoryManagement.StockTake.Admin</core:administerPrivilege>
+    <core:deprecated>false</core:deprecated>
+    <core:metaData>
+        <core:inputs>
+            <core:input required="true" name="enactor.inventoryManagement.StockTakeRequestId">
+                <core:interfaceName>java.lang.String</core:interfaceName>
+            </core:input>
+            <core:input required="true" name="enactor.inventoryManagement.RequestedByUserId">
+                <core:interfaceName>java.lang.String</core:interfaceName>
+            </core:input>
+            <core:input required="true" name="enactor.mfc.LocationId">
+                <core:interfaceName>java.lang.String</core:interfaceName>
+            </core:input>
+            <core:input required="true" name="enactor.inventoryManagement.StockTakeSnapshotDate">
+                <core:interfaceName>java.util.Date</core:interfaceName>
+            </core:input>
+            <core:input required="true" name="enactor.inventoryManagement.StockTakeLatestCountCompletionDate">
+                <core:interfaceName>java.util.Date</core:interfaceName>
+            </core:input>
+        </core:inputs>
+    </core:metaData>
+    <core:uiSettings xsi:type="tools:BusinessProcessSettings" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <tools:swimLanes>
+            <tools:lane label="Store" height="726" id="Lane 1"/>
+            <tools:lane label="Count Requester" height="101" id="Lane 2"/>
+        </tools:swimLanes>
+        <tools:notes xsi:type="core:WrappedList">
+            <core:listElement>
+                <core:value xsi:type="tools:BPNote">
+                    <tools:noteId>Note0</tools:noteId>
+                    <tools:swimLaneId>Lane 1</tools:swimLaneId>
+                    <tools:description>This server process will execute when a due date is reached. Perhaps with a new symbol. Need to be able to calculate trigger time or pass in.</tools:description>
+                    <tools:constraint>
+                        <core:x>216</core:x>
+                        <core:y>46</core:y>
+                        <core:height>126</core:height>
+                        <core:width>177</core:width>
+                    </tools:constraint>
+                </core:value>
+                <core:index>0</core:index>
+            </core:listElement>
+            <core:listElement>
+                <core:value xsi:type="tools:BPNote">
+                    <tools:noteId>Note1</tools:noteId>
+                    <tools:swimLaneId>Lane 1</tools:swimLaneId>
+                    <tools:description>This is the entry point for HHT count data coming in. This should time out and alert.</tools:description>
+                    <tools:constraint>
+                        <core:x>493</core:x>
+                        <core:y>34</core:y>
+                        <core:height>76</core:height>
+                        <core:width>220</core:width>
+                    </tools:constraint>
+                </core:value>
+                <core:index>1</core:index>
+            </core:listElement>
+        </tools:notes>
+        <tools:style>5</tools:style>
+    </core:uiSettings>
+    <core:activities xsi:type="core:WrappedList" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <core:listElement>
+            <core:value xsi:type="core:HTActivity">
+                <core:activityId>StartHHTCount</core:activityId>
+                <core:name>Start HHT Count</core:name>
+                <core:activityTypeId>InventoryManagement/StartHHTCountActivityType</core:activityTypeId>
+                <core:activityOutcome name="StartCount">
+                    <core:toActivity>AwaitHHT</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:suspendActivityOutcome name="Suspended">
+                    <core:toActivity>StartHHTCount</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:suspendActivityOutcome>
+                <core:activityOutcome name="Cancel">
+                    <core:toActivity>CancelStockTake</core:toActivity>
+                    <core:proceedImmediately>false</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>319</core:x>
+                        <core:y>261</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 1</tools:swimLaneId>
+                </core:uiSettings>
+                <core:metaData>
+                    <core:inputs>
+                        <core:input required="true" name="enactor.inventoryManagement.StockTakeId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input name="enactor.core.ErrorDetails">
+                            <core:interfaceName>com.enactor.core.application.process.IErrorDetails</core:interfaceName>
+                        </core:input>
+                    </core:inputs>
+                    <core:outputs>
+                        <core:output name="enactor.inventoryManagement.CreatedAtLocationId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:output>
+                    </core:outputs>
+                </core:metaData>
+                <core:jobType>Stock Take</core:jobType>
+                <core:jobHeader>Start HHT Count (Stock Take ID: #{stockTakeId}, Location: #{locationId})</core:jobHeader>
+                <core:displayTitleMessageBase>InventoryManagement/StockTake/StockTakeMessages</core:displayTitleMessageBase>
+                <core:displayTitleMessageId>START_HHT_COUNT_TITLE</core:displayTitleMessageId>
+                <core:priority>5</core:priority>
+                <core:peopleGroupEvaluator>{http://www.enactor.com/mfc}LocationPrivilegeEvaluator</core:peopleGroupEvaluator>
+                <core:peopleGroupParameters>
+                    <core:parameter name="privilegeId">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>enactor.inventoryManagement.StockTake.Run</core:value>
+                    </core:parameter>
+                    <core:parameter name="locationId">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>#{locationId}</core:value>
+                    </core:parameter>
+                </core:peopleGroupParameters>
+            </core:value>
+            <core:index>0</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:CallProcessActivity">
+                <core:activityId>GenerateSnapshot</core:activityId>
+                <core:name>Generate Snapshot</core:name>
+                <core:activityTypeId>InventoryManagement/GenerateStockTakeSnapshotActivityType</core:activityTypeId>
+                <core:activityOutcome name="Success">
+                    <core:toActivity>StartHHTCount</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:catchAllOutcome xsi:type="core:ActivityOutcome" name="Error">
+                    <core:toActivity>ShowSnapshotError</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:catchAllOutcome>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>125</core:x>
+                        <core:y>263</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 1</tools:swimLaneId>
+                </core:uiSettings>
+                <core:metaData>
+                    <core:inputs>
+                        <core:input required="true" name="enactor.inventoryManagement.StockTakeRequestId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input name="enactor.inventoryManagement.SnapshotStartDate">
+                            <core:interfaceName>java.util.Date</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.mfc.LocationId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.core.ErrorDetails">
+                            <core:interfaceName>com.enactor.core.application.process.IErrorDetails</core:interfaceName>
+                        </core:input>
+                    </core:inputs>
+                    <core:outputs>
+                        <core:output required="true" name="enactor.inventoryManagement.StockTakeId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:output>
+                        <core:output name="enactor.core.ErrorDetails">
+                            <core:interfaceName>com.enactor.core.application.process.IErrorDetails</core:interfaceName>
+                        </core:output>
+                    </core:outputs>
+                </core:metaData>
+                <core:activationDateTimeExpression>#{stockTakeSnapshotDate}</core:activationDateTimeExpression>
+            </core:value>
+            <core:index>1</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:CallProcessActivity">
+                <core:activityId>CalculateDiscrepancies</core:activityId>
+                <core:name>Calculate Discrepancies</core:name>
+                <core:activityTypeId>InventoryManagement/CalculateStockTakeDiscrepanciesActivityType</core:activityTypeId>
+                <core:activityOutcome name="NoDiscrepancy">
+                    <core:toActivity>GenerateStockTakeSummaryPDF</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:activityOutcome name="NoMoreRecounts">
+                    <core:toActivity>GenerateStockTakeSummaryPDF</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:activityOutcome name="Discrepancy">
+                    <core:toActivity>GenerateStockTakeSummaryPDF</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>1144</core:x>
+                        <core:y>438</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 1</tools:swimLaneId>
+                </core:uiSettings>
+                <core:metaData>
+                    <core:inputs>
+                        <core:input required="true" name="enactor.inventoryManagement.StockTakeId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                    </core:inputs>
+                    <core:outputs>
+                        <core:output required="true" name="enactor.inventoryManagement.HasDiscrepanciesOutsideTolerances">
+                            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                        </core:output>
+                        <core:output name="enactor.core.ErrorDetails">
+                            <core:interfaceName>com.enactor.core.application.process.IErrorDetails</core:interfaceName>
+                        </core:output>
+                        <core:output name="enactor.inventoryManagement.RemainingRecounts">
+                            <core:interfaceName>java.lang.Integer</core:interfaceName>
+                        </core:output>
+                    </core:outputs>
+                </core:metaData>
+            </core:value>
+            <core:index>2</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:HTActivity">
+                <core:activityId>AcceptCount</core:activityId>
+                <core:name>Accept Count</core:name>
+                <core:activityTypeId>InventoryManagement/AcceptCountActivityType</core:activityTypeId>
+                <core:activityOutcome name="Accept">
+                    <core:toActivity>ApplyCount</core:toActivity>
+                    <core:proceedImmediately>false</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:activityOutcome name="Reject">
+                    <core:toActivity>RejectCount</core:toActivity>
+                    <core:proceedImmediately>false</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:activityOutcome name="Recount">
+                    <core:toActivity>AwaitHHT</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:suspendActivityOutcome name="Suspended">
+                    <core:toActivity>AcceptCount</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:suspendActivityOutcome>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>2068</core:x>
+                        <core:y>328</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 1</tools:swimLaneId>
+                    <tools:style>7</tools:style>
+                </core:uiSettings>
+                <core:metaData>
+                    <core:inputs>
+                        <core:input required="true" name="enactor.inventoryManagement.StockTakeId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input name="enactor.inventoryManagement.ReportGenerated">
+                            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                        </core:input>
+                        <core:input name="enactor.inventoryManagement.RemainingRecounts">
+                            <core:interfaceName>java.lang.Integer</core:interfaceName>
+                        </core:input>
+                        <core:input name="enactor.core.ErrorDetails">
+                            <core:interfaceName>com.enactor.core.application.process.IErrorDetails</core:interfaceName>
+                        </core:input>
+                        <core:input name="enactor.inventoryManagement.HasDiscrepanciesOutsideTolerances">
+                            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                        </core:input>
+                    </core:inputs>
+                    <core:outputs/>
+                </core:metaData>
+                <core:jobType>Stock Take</core:jobType>
+                <core:jobHeader>Accept Count (Stock Take ID: #{stockTakeId})</core:jobHeader>
+                <core:displayTitleMessageBase>InventoryManagement/StockTake/StockTakeMessages</core:displayTitleMessageBase>
+                <core:displayTitleMessageId>ACCEPT_COUNT_TITLE</core:displayTitleMessageId>
+                <core:priority>5</core:priority>
+                <core:peopleGroupEvaluator>{http://www.enactor.com/mfc}LocationPrivilegeEvaluator</core:peopleGroupEvaluator>
+                <core:peopleGroupParameters>
+                    <core:parameter name="locationId">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>#{locationId}</core:value>
+                    </core:parameter>
+                    <core:parameter name="privilegeId">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>enactor.inventoryManagement.StockTake.Run</core:value>
+                    </core:parameter>
+                </core:peopleGroupParameters>
+            </core:value>
+            <core:index>3</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:CallProcessActivity">
+                <core:activityId>ApplyCount</core:activityId>
+                <core:name>Apply Count</core:name>
+                <core:activityTypeId>InventoryManagement/ApplyStockTakeCountActivityType</core:activityTypeId>
+                <core:activityOutcome name="Success">
+                    <core:toActivity>AppliedNotification</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:catchAllOutcome xsi:type="core:ActivityOutcome" name="Error">
+                    <core:toActivity>ApplyCountError</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:catchAllOutcome>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>2416</core:x>
+                        <core:y>428</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 1</tools:swimLaneId>
+                </core:uiSettings>
+                <core:metaData>
+                    <core:inputs>
+                        <core:input required="true" name="enactor.inventoryManagement.StockTakeId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                    </core:inputs>
+                    <core:outputs>
+                        <core:output name="enactor.core.ErrorDetails">
+                            <core:interfaceName>com.enactor.core.application.process.IErrorDetails</core:interfaceName>
+                        </core:output>
+                    </core:outputs>
+                </core:metaData>
+            </core:value>
+            <core:index>4</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:HTActivity">
+                <core:activityId>AwaitHHT</core:activityId>
+                <core:name>Await HHT</core:name>
+                <core:activityTypeId>InventoryManagement/AwaitHHTCountActivityType</core:activityTypeId>
+                <core:activityOutcome name="Timeout">
+                    <core:toActivity>ExpireStockTake</core:toActivity>
+                    <core:proceedImmediately>false</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:activityOutcome name="Cancel">
+                    <core:toActivity>CancelStockTake</core:toActivity>
+                    <core:proceedImmediately>false</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:activityOutcome name="CountRecorded">
+                    <core:toActivity>UpdateStockTakeStatusToCounted</core:toActivity>
+                    <core:proceedImmediately>false</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:suspendActivityOutcome name="Suspended">
+                    <core:toActivity>AwaitHHT</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:suspendActivityOutcome>
+                <core:suspendActivityOutcome name="WaitForCount">
+                    <core:toActivity>AwaitHHT</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:suspendActivityOutcome>
+                <core:activityOutcome name="ImportCSV">
+                    <core:toActivity>ImportStockTakeCSV</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:activityOutcome name="RecordCount">
+                    <core:toActivity>CreateRecordCount</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>520</core:x>
+                        <core:y>258</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 1</tools:swimLaneId>
+                    <tools:style>7</tools:style>
+                </core:uiSettings>
+                <core:metaData>
+                    <core:inputs>
+                        <core:input required="true" name="enactor.inventoryManagement.StockTakeId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input name="enactor.core.ErrorDetails">
+                            <core:interfaceName>com.enactor.core.application.process.IErrorDetails</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.inventoryManagement.ImportFilename">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.inventoryManagement.StockTakeLatestCountCompletionDate">
+                            <core:interfaceName>java.util.Date</core:interfaceName>
+                        </core:input>
+                    </core:inputs>
+                </core:metaData>
+                <core:timeoutDuration></core:timeoutDuration>
+                <core:timeoutDateTimeExpression>#{stockTakeLatestCountCompletionDate}</core:timeoutDateTimeExpression>
+                <core:jobType>Stock Take</core:jobType>
+                <core:jobHeader>Await HHT Count (Stock Take ID: #{stockTakeId}, Location: #{locationId})</core:jobHeader>
+                <core:displayTitleMessageBase>InventoryManagement/StockTake/StockTakeMessages</core:displayTitleMessageBase>
+                <core:displayTitleMessageId>AWAIT_HHT_COUNT_TITLE</core:displayTitleMessageId>
+                <core:priority>5</core:priority>
+                <core:peopleGroupEvaluator>{http://www.enactor.com/mfc}LocationPrivilegeEvaluator</core:peopleGroupEvaluator>
+                <core:peopleGroupParameters>
+                    <core:parameter name="locationId">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>#{locationId}</core:value>
+                    </core:parameter>
+                    <core:parameter name="privilegeId">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>enactor.inventoryManagement.AwaitStockTake</core:value>
+                    </core:parameter>
+                </core:peopleGroupParameters>
+            </core:value>
+            <core:index>5</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:HTActivity">
+                <core:activityId>AppliedNotification</core:activityId>
+                <core:name>Applied Notification</core:name>
+                <core:activityTypeId>InventoryManagement/AppliedNotificationActivityType</core:activityTypeId>
+                <core:suspendActivityOutcome name="Suspended">
+                    <core:toActivity>AppliedNotification</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:suspendActivityOutcome>
+                <core:activityOutcome name="Close">
+                    <core:toActivity>End</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:parameters>
+                    <core:parameter name="enactor.inventoryManagement.DisallowBack">
+                        <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                        <core:value>true</core:value>
+                    </core:parameter>
+                </core:parameters>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>2515</core:x>
+                        <core:y>45</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 2</tools:swimLaneId>
+                </core:uiSettings>
+                <core:metaData>
+                    <core:inputs>
+                        <core:input required="true" name="enactor.inventoryManagement.StockTakeId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.inventoryManagement.DisallowBack">
+                            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                        </core:input>
+                    </core:inputs>
+                </core:metaData>
+                <core:jobType>Stock Take</core:jobType>
+                <core:jobHeader>Applied Notification (Stock Take ID: #{stockTakeId})</core:jobHeader>
+                <core:displayTitleMessageBase>InventoryManagement/StockTake/StockTakeMessages</core:displayTitleMessageBase>
+                <core:displayTitleMessageId>APPLIED_NOTIFICATION_TITLE</core:displayTitleMessageId>
+                <core:priority>5</core:priority>
+                <core:peopleGroupEvaluator>{http://www.enactor.com/task}SimpleUserEvaluator</core:peopleGroupEvaluator>
+                <core:peopleGroupParameters>
+                    <core:parameter name="userId">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>#{requestedByUserId}</core:value>
+                    </core:parameter>
+                </core:peopleGroupParameters>
+            </core:value>
+            <core:index>6</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:EndProcessActivity">
+                <core:activityId>End</core:activityId>
+                <core:name>End</core:name>
+                <core:activityTypeId>Generic/EndProcessActivityType</core:activityTypeId>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>2307</core:x>
+                        <core:y>112</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 2</tools:swimLaneId>
+                </core:uiSettings>
+                <core:discard>false</core:discard>
+            </core:value>
+            <core:index>7</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:StartActivity">
+                <core:activityId>StartActivity-1</core:activityId>
+                <core:name>Start Stock Take</core:name>
+                <core:activityTypeId>Generic/StartProcessActivityType</core:activityTypeId>
+                <core:activityOutcome name="Success">
+                    <core:toActivity>GenerateSnapshot</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>25</core:x>
+                        <core:y>345</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 1</tools:swimLaneId>
+                </core:uiSettings>
+            </core:value>
+            <core:index>8</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:HTActivity">
+                <core:activityId>CountNotPerformedAlert</core:activityId>
+                <core:name>Count Not Performed Alert</core:name>
+                <core:activityTypeId>InventoryManagement/ShowMessageActivityType</core:activityTypeId>
+                <core:activityOutcome name="OK">
+                    <core:toActivity>EndNotPerformed</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:suspendActivityOutcome name="Suspended">
+                    <core:toActivity>CountNotPerformedAlert</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:suspendActivityOutcome>
+                <core:parameters>
+                    <core:parameter name="enactor.coreUI.MessageBasename">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>InventoryManagement/StockTake/StockTakeMessages</core:value>
+                    </core:parameter>
+                    <core:parameter name="enactor.inventoryManagement.DisallowSuspend">
+                        <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                        <core:value>false</core:value>
+                    </core:parameter>
+                    <core:parameter name="enactor.inventoryManagement.DisallowOK">
+                        <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                        <core:value>false</core:value>
+                    </core:parameter>
+                    <core:parameter name="enactor.inventoryManagement.DisallowRetry">
+                        <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                        <core:value>true</core:value>
+                    </core:parameter>
+                    <core:parameter name="enactor.coreUI.MessageId">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>COUNT_NOT_PERFORMED_ALERT_MESSAGE</core:value>
+                    </core:parameter>
+                </core:parameters>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>661</core:x>
+                        <core:y>41</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 2</tools:swimLaneId>
+                    <tools:style>7</tools:style>
+                </core:uiSettings>
+                <core:metaData>
+                    <core:inputs>
+                        <core:input required="true" name="enactor.inventoryManagement.StockTakeId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input name="enactor.inventoryManagement.DisallowSuspend">
+                            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                        </core:input>
+                        <core:input name="enactor.inventoryManagement.DisallowOK">
+                            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                        </core:input>
+                        <core:input name="enactor.mfc.LocationId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.coreUI.MessageId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.coreUI.MessageBasename">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.inventoryManagement.DisallowRetry">
+                            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                        </core:input>
+                    </core:inputs>
+                </core:metaData>
+                <core:jobType>Stock Take</core:jobType>
+                <core:jobHeader>Count Not Performed Alert (Stock Take ID: #{stockTakeId})</core:jobHeader>
+                <core:displayTitleMessageBase>InventoryManagement/StockTake/StockTakeMessages</core:displayTitleMessageBase>
+                <core:displayTitleMessageId>COUNT_NOT_PERFORMED_ALERT_TITLE</core:displayTitleMessageId>
+                <core:priority>5</core:priority>
+                <core:peopleGroupEvaluator>{http://www.enactor.com/task}SimpleUserEvaluator</core:peopleGroupEvaluator>
+                <core:peopleGroupParameters>
+                    <core:parameter name="userId">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>#{requestedByUserId}</core:value>
+                    </core:parameter>
+                </core:peopleGroupParameters>
+            </core:value>
+            <core:index>9</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:EndProcessActivity">
+                <core:activityId>EndNotPerformed</core:activityId>
+                <core:name>End Not Performed</core:name>
+                <core:activityTypeId>Generic/EndProcessActivityType</core:activityTypeId>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>906</core:x>
+                        <core:y>113</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 2</tools:swimLaneId>
+                </core:uiSettings>
+                <core:discard>false</core:discard>
+            </core:value>
+            <core:index>10</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:HTActivity">
+                <core:activityId>CountCancelledAlert</core:activityId>
+                <core:name>Count Cancelled Alert</core:name>
+                <core:activityTypeId>InventoryManagement/ShowMessageActivityType</core:activityTypeId>
+                <core:activityOutcome name="OK">
+                    <core:toActivity>EndNotPerformed</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:suspendActivityOutcome name="Suspended">
+                    <core:toActivity>CountCancelledAlert</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:suspendActivityOutcome>
+                <core:parameters>
+                    <core:parameter name="enactor.coreUI.MessageBasename">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>InventoryManagement/StockTake/StockTakeMessages</core:value>
+                    </core:parameter>
+                    <core:parameter name="enactor.inventoryManagement.DisallowRetry">
+                        <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                        <core:value>true</core:value>
+                    </core:parameter>
+                    <core:parameter name="enactor.coreUI.MessageId">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>COUNT_CANCELLED_ALERT_MESSAGE</core:value>
+                    </core:parameter>
+                </core:parameters>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>496</core:x>
+                        <core:y>253</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 2</tools:swimLaneId>
+                    <tools:style>7</tools:style>
+                </core:uiSettings>
+                <core:metaData>
+                    <core:inputs>
+                        <core:input name="enactor.inventoryManagement.StockTakeId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input name="enactor.mfc.LocationId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.coreUI.MessageId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.coreUI.MessageBasename">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.inventoryManagement.DisallowRetry">
+                            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                        </core:input>
+                    </core:inputs>
+                </core:metaData>
+                <core:jobType>Stock Take</core:jobType>
+                <core:jobHeader>Count Cancelled Alert (Stock Take ID: #{stockTakeId})</core:jobHeader>
+                <core:displayTitleMessageBase>InventoryManagement/StockTake/StockTakeMessages</core:displayTitleMessageBase>
+                <core:displayTitleMessageId>COUNT_CANCELLED_ALERT_TITLE</core:displayTitleMessageId>
+                <core:priority>5</core:priority>
+                <core:peopleGroupEvaluator>{http://www.enactor.com/task}SimpleUserEvaluator</core:peopleGroupEvaluator>
+                <core:peopleGroupParameters>
+                    <core:parameter name="userId">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>#{requestedByUserId}</core:value>
+                    </core:parameter>
+                </core:peopleGroupParameters>
+            </core:value>
+            <core:index>11</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:HTActivity">
+                <core:activityId>RejectionNotification</core:activityId>
+                <core:name>Rejection Notification</core:name>
+                <core:activityTypeId>InventoryManagement/ShowMessageActivityType</core:activityTypeId>
+                <core:activityOutcome name="OK">
+                    <core:toActivity>End</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:suspendActivityOutcome name="Suspended">
+                    <core:toActivity>RejectionNotification</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:suspendActivityOutcome>
+                <core:parameters>
+                    <core:parameter name="enactor.inventoryManagement.DisallowRetry">
+                        <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                        <core:value>true</core:value>
+                    </core:parameter>
+                    <core:parameter name="enactor.inventoryManagement.DisallowSuspend">
+                        <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                        <core:value>false</core:value>
+                    </core:parameter>
+                    <core:parameter name="enactor.inventoryManagement.DisallowOK">
+                        <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                        <core:value>false</core:value>
+                    </core:parameter>
+                    <core:parameter name="enactor.coreUI.MessageBasename">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>InventoryManagement/StockTake/StockTakeMessages</core:value>
+                    </core:parameter>
+                    <core:parameter name="enactor.coreUI.MessageId">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>REJECTION_NOTIFICTATION_MESSAGE</core:value>
+                    </core:parameter>
+                </core:parameters>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>2076</core:x>
+                        <core:y>35</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 2</tools:swimLaneId>
+                </core:uiSettings>
+                <core:metaData>
+                    <core:inputs>
+                        <core:input required="true" name="enactor.inventoryManagement.StockTakeId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input name="enactor.mfc.LocationId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input name="enactor.inventoryManagement.DisallowSuspend">
+                            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                        </core:input>
+                        <core:input name="enactor.inventoryManagement.DisallowOK">
+                            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.coreUI.MessageId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.coreUI.MessageBasename">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.inventoryManagement.DisallowRetry">
+                            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                        </core:input>
+                    </core:inputs>
+                </core:metaData>
+                <core:jobType>Stock Take</core:jobType>
+                <core:jobHeader>Rejection Notification (Stock Take ID: #{stockTakeId})</core:jobHeader>
+                <core:displayTitleMessageBase>InventoryManagement/StockTake/StockTakeMessages</core:displayTitleMessageBase>
+                <core:displayTitleMessageId>REJECTION_NOTIFICTATION_TITLE</core:displayTitleMessageId>
+                <core:priority>5</core:priority>
+                <core:peopleGroupEvaluator>{http://www.enactor.com/task}SimpleUserEvaluator</core:peopleGroupEvaluator>
+                <core:peopleGroupParameters>
+                    <core:parameter name="userId">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>#{requestedByUserId}</core:value>
+                    </core:parameter>
+                </core:peopleGroupParameters>
+            </core:value>
+            <core:index>12</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:CallProcessActivity">
+                <core:activityId>RejectCount</core:activityId>
+                <core:name>Reject Count</core:name>
+                <core:activityTypeId>InventoryManagement/UpdateStockTakeStatusToRejectedActivityType</core:activityTypeId>
+                <core:activityOutcome name="Success">
+                    <core:toActivity>RejectionNotification</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>2196</core:x>
+                        <core:y>684</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 1</tools:swimLaneId>
+                </core:uiSettings>
+                <core:metaData>
+                    <core:inputs>
+                        <core:input required="true" name="enactor.inventoryManagement.StockTakeId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                    </core:inputs>
+                    <core:outputs>
+                        <core:output name="enactor.core.ErrorDetails">
+                            <core:interfaceName>com.enactor.core.application.process.IErrorDetails</core:interfaceName>
+                        </core:output>
+                    </core:outputs>
+                </core:metaData>
+            </core:value>
+            <core:index>13</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:CallProcessActivity">
+                <core:activityId>GenerateStockTakeSummaryPDF</core:activityId>
+                <core:name>Generate Stock Take Summary PDF</core:name>
+                <core:description>Server process to generate stock take summary PDF, which may be printed by a separate process</core:description>
+                <core:activityTypeId>InventoryManagement/GenerateStockTakeSummaryPDFActivityType</core:activityTypeId>
+                <core:activityOutcome name="Success">
+                    <core:toActivity>UpdateDocumentHistory</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:suspendActivityOutcome name="Suspended">
+                    <core:toActivity>GenerateStockTakeSummaryPDF</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:suspendActivityOutcome>
+                <core:activityOutcome name="Skipped">
+                    <core:toActivity>AcceptCount</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:catchAllOutcome xsi:type="core:ActivityOutcome" name="Error">
+                    <core:toActivity>GenerateStockTakeSummaryPDFError</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:catchAllOutcome>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>1329</core:x>
+                        <core:y>440</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 1</tools:swimLaneId>
+                </core:uiSettings>
+                <core:metaData>
+                    <core:inputs>
+                        <core:input required="true" name="enactor.inventoryManagement.StockTakeId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                    </core:inputs>
+                    <core:outputs>
+                        <core:output required="true" name="enactor.coreReporting.ReportDataFilename">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:output>
+                        <core:output name="enactor.coreReporting.PrintDocument">
+                            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                        </core:output>
+                        <core:output name="enactor.core.ErrorDetails">
+                            <core:interfaceName>com.enactor.core.application.process.IErrorDetails</core:interfaceName>
+                        </core:output>
+                    </core:outputs>
+                </core:metaData>
+            </core:value>
+            <core:index>14</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:CallProcessActivity">
+                <core:activityId>UpdateDocumentHistory</core:activityId>
+                <core:name>Update Document History</core:name>
+                <core:activityTypeId>InventoryManagement/UpdateDocumentHistoryActivityType</core:activityTypeId>
+                <core:activityOutcome name="Success">
+                    <core:toActivity>IfPrintDocument</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:catchAllOutcome xsi:type="core:ActivityOutcome" name="Error">
+                    <core:toActivity>UpdateDocumentHistoryError</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:catchAllOutcome>
+                <core:parameters>
+                    <core:parameter name="enactor.inventoryManagement.HeaderId">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>#{stockTakeId}</core:value>
+                    </core:parameter>
+                    <core:parameter name="enactor.coreUI.EntityName">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>stockTakeHeader</core:value>
+                    </core:parameter>
+                    <core:parameter name="enactor.coreUI.EntityNamespace">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>http://www.enactor.com/retail</core:value>
+                    </core:parameter>
+                    <core:parameter name="enactor.inventoryManagement.DocumentIdPrefix">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>StockTakeSummary</core:value>
+                    </core:parameter>
+                </core:parameters>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>1528</core:x>
+                        <core:y>440</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 1</tools:swimLaneId>
+                </core:uiSettings>
+                <core:metaData>
+                    <core:inputs>
+                        <core:input required="true" name="enactor.coreReporting.ReportDataFilename">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.inventoryManagement.HeaderId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.coreUI.EntityNamespace">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.coreUI.EntityName">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.inventoryManagement.DocumentIdPrefix">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                    </core:inputs>
+                    <core:outputs>
+                        <core:output name="enactor.core.ErrorDetails">
+                            <core:interfaceName>com.enactor.core.application.process.IErrorDetails</core:interfaceName>
+                        </core:output>
+                    </core:outputs>
+                </core:metaData>
+            </core:value>
+            <core:index>15</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:CallProcessActivity">
+                <core:activityId>PrintPDFFile</core:activityId>
+                <core:name>Print PDF File</core:name>
+                <core:description>Server process to print PDF File</core:description>
+                <core:activityTypeId>InventoryManagement/PrintPDFFileActivityType</core:activityTypeId>
+                <core:activityOutcome name="Success">
+                    <core:toActivity>AcceptCount</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:catchAllOutcome xsi:type="core:ActivityOutcome" name="Error">
+                    <core:toActivity>PrintPDFError</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:catchAllOutcome>
+                <core:parameters>
+                    <core:parameter name="enactor.inventoryManagement.FunctionId">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>PrintStockTakeSummary</core:value>
+                    </core:parameter>
+                    <core:parameter name="enactor.inventoryManagement.HeaderId">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>#{stockTakeId}</core:value>
+                    </core:parameter>
+                </core:parameters>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>1851</core:x>
+                        <core:y>448</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 1</tools:swimLaneId>
+                </core:uiSettings>
+                <core:metaData>
+                    <core:inputs>
+                        <core:input required="true" name="enactor.coreReporting.ReportDataFilename">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.inventoryManagement.CreatedAtLocationId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input name="enactor.inventoryManagement.HeaderId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.inventoryManagement.FunctionId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                    </core:inputs>
+                    <core:outputs>
+                        <core:output name="enactor.core.ErrorDetails">
+                            <core:interfaceName>com.enactor.core.application.process.IErrorDetails</core:interfaceName>
+                        </core:output>
+                    </core:outputs>
+                </core:metaData>
+            </core:value>
+            <core:index>16</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:CallProcessActivity">
+                <core:activityId>UpdateStockTakeStatusToCounted</core:activityId>
+                <core:name>Update Stock Take Status To Counted</core:name>
+                <core:activityTypeId>InventoryManagement/UpdateStockTakeStatusToCountedActivityType</core:activityTypeId>
+                <core:activityOutcome name="Success">
+                    <core:toActivity>CalculateDiscrepancies</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>967</core:x>
+                        <core:y>440</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 1</tools:swimLaneId>
+                </core:uiSettings>
+                <core:metaData>
+                    <core:inputs>
+                        <core:input required="true" name="enactor.inventoryManagement.StockTakeId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                    </core:inputs>
+                    <core:outputs>
+                        <core:output name="enactor.core.ErrorDetails">
+                            <core:interfaceName>com.enactor.core.application.process.IErrorDetails</core:interfaceName>
+                        </core:output>
+                    </core:outputs>
+                </core:metaData>
+            </core:value>
+            <core:index>17</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:CallProcessActivity">
+                <core:activityId>CancelStockTake</core:activityId>
+                <core:name>Cancel Stock Take</core:name>
+                <core:description></core:description>
+                <core:activityTypeId>InventoryManagement/UpdateStockTakeStatusToCancelledActivityType</core:activityTypeId>
+                <core:activityOutcome name="Success">
+                    <core:toActivity>CountCancelledAlert</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>332</core:x>
+                        <core:y>537</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 1</tools:swimLaneId>
+                </core:uiSettings>
+                <core:metaData>
+                    <core:inputs>
+                        <core:input required="true" name="enactor.inventoryManagement.StockTakeId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                    </core:inputs>
+                    <core:outputs>
+                        <core:output name="enactor.core.ErrorDetails">
+                            <core:interfaceName>com.enactor.core.application.process.IErrorDetails</core:interfaceName>
+                        </core:output>
+                    </core:outputs>
+                </core:metaData>
+            </core:value>
+            <core:index>18</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:CallProcessActivity">
+                <core:activityId>ExpireStockTake</core:activityId>
+                <core:name>Expire Stock Take</core:name>
+                <core:description></core:description>
+                <core:activityTypeId>InventoryManagement/UpdateStockTakeStatusToExpiredActivityType</core:activityTypeId>
+                <core:activityOutcome name="Success">
+                    <core:toActivity>CountNotPerformedAlert</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>523</core:x>
+                        <core:y>537</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 1</tools:swimLaneId>
+                </core:uiSettings>
+                <core:metaData>
+                    <core:inputs>
+                        <core:input required="true" name="enactor.inventoryManagement.StockTakeId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                    </core:inputs>
+                    <core:outputs>
+                        <core:output name="enactor.core.ErrorDetails">
+                            <core:interfaceName>com.enactor.core.application.process.IErrorDetails</core:interfaceName>
+                        </core:output>
+                    </core:outputs>
+                </core:metaData>
+            </core:value>
+            <core:index>19</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:HTActivity">
+                <core:activityId>StartAdHocStockTake</core:activityId>
+                <core:name>Start Ad Hoc Stock Take</core:name>
+                <core:activityTypeId>InventoryManagement/StartAdHocStockTakeActivityType</core:activityTypeId>
+                <core:activityOutcome name="StartStockTake">
+                    <core:toActivity>GenerateSnapshot</core:toActivity>
+                    <core:proceedImmediately>false</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:activityOutcome name="Cancel">
+                    <core:toActivity>StockTakeCancelledNoHistory</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:parameters>
+                    <core:parameter name="enactor.inventoryManagement.DisallowSuspend">
+                        <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                        <core:value>true</core:value>
+                    </core:parameter>
+                    <core:parameter name="enactor.inventoryManagement.DisallowBack">
+                        <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                        <core:value>true</core:value>
+                    </core:parameter>
+                </core:parameters>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>61</core:x>
+                        <core:y>56</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 2</tools:swimLaneId>
+                </core:uiSettings>
+                <core:metaData>
+                    <core:inputs>
+                        <core:input name="enactor.inventoryManagement.DisallowSuspend">
+                            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                        </core:input>
+                        <core:input name="enactor.inventoryManagement.DisallowBack">
+                            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                        </core:input>
+                    </core:inputs>
+                    <core:outputs>
+                        <core:output required="true" name="enactor.inventoryManagement.StockTakeRequestId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:output>
+                        <core:output required="true" name="enactor.inventoryManagement.StockTakeLatestCountCompletionDate">
+                            <core:interfaceName>java.util.Date</core:interfaceName>
+                        </core:output>
+                        <core:output required="true" name="enactor.inventoryManagement.RequestedByUserId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:output>
+                        <core:output required="true" name="enactor.mfc.LocationId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:output>
+                    </core:outputs>
+                </core:metaData>
+                <core:jobType>Stock Take</core:jobType>
+                <core:jobHeader>Start Ad Hoc Stock Take</core:jobHeader>
+                <core:displayTitleMessageBase>InventoryManagement/StockTake/StockTakeMessages</core:displayTitleMessageBase>
+                <core:displayTitleMessageId>START_AD_HOC_STOCK_TAKE_TITLE</core:displayTitleMessageId>
+                <core:priority>5</core:priority>
+                <core:peopleGroupEvaluator>{http://www.enactor.com/task}SimpleUserEvaluator</core:peopleGroupEvaluator>
+            </core:value>
+            <core:index>20</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:EndProcessActivity">
+                <core:activityId>StockTakeCancelledNoHistory</core:activityId>
+                <core:name>Stock Take Cancelled No History</core:name>
+                <core:activityTypeId>Generic/EndProcessActivityType</core:activityTypeId>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>97</core:x>
+                        <core:y>343</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 2</tools:swimLaneId>
+                </core:uiSettings>
+                <core:discard>true</core:discard>
+            </core:value>
+            <core:index>21</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:CallProcessActivity">
+                <core:activityId>ImportStockTakeCSV</core:activityId>
+                <core:name>Import Stock Take CSV</core:name>
+                <core:activityTypeId>InventoryManagement/ImportStockTakeCSVActivityType</core:activityTypeId>
+                <core:activityOutcome name="Success">
+                    <core:toActivity>UpdateStockTakeStatusToCounted</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:activityOutcome name="Fail">
+                    <core:toActivity>ShowImportError</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>736</core:x>
+                        <core:y>444</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 1</tools:swimLaneId>
+                </core:uiSettings>
+                <core:metaData>
+                    <core:inputs>
+                        <core:input required="true" name="enactor.inventoryManagement.ImportFilename">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.inventoryManagement.StockTakeId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                    </core:inputs>
+                    <core:outputs>
+                        <core:output name="enactor.core.ErrorDetails">
+                            <core:interfaceName>com.enactor.core.application.process.IErrorDetails</core:interfaceName>
+                        </core:output>
+                    </core:outputs>
+                </core:metaData>
+            </core:value>
+            <core:index>22</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:HTActivity">
+                <core:activityId>ShowImportError</core:activityId>
+                <core:name>Show Import Error</core:name>
+                <core:activityTypeId>InventoryManagement/ShowMessageActivityType</core:activityTypeId>
+                <core:activityOutcome name="Retry">
+                    <core:toActivity>AwaitHHT</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:parameters>
+                    <core:parameter name="enactor.coreProcessing.scheduledJob.ExecuteProcessId">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>Task/InitiateBusinessProcess</core:value>
+                    </core:parameter>
+                    <core:parameter name="enactor.inventoryManagement.DisallowOK">
+                        <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                        <core:value>true</core:value>
+                    </core:parameter>
+                    <core:parameter name="enactor.inventoryManagement.DisallowRetry">
+                        <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                        <core:value>false</core:value>
+                    </core:parameter>
+                    <core:parameter name="enactor.inventoryManagement.DisallowSuspend">
+                        <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                        <core:value>true</core:value>
+                    </core:parameter>
+                </core:parameters>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>735</core:x>
+                        <core:y>663</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 1</tools:swimLaneId>
+                    <tools:style>7</tools:style>
+                </core:uiSettings>
+                <core:metaData>
+                    <core:inputs>
+                        <core:input name="enactor.core.ErrorDetails">
+                            <core:interfaceName>com.enactor.core.application.process.IErrorDetails</core:interfaceName>
+                        </core:input>
+                        <core:input name="enactor.inventoryManagement.DisallowOK">
+                            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                        </core:input>
+                        <core:input name="enactor.inventoryManagement.DisallowRetry">
+                            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.inventoryManagement.DisallowSuspend">
+                            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                        </core:input>
+                    </core:inputs>
+                </core:metaData>
+                <core:jobType>Stock Take</core:jobType>
+                <core:jobHeader>Import Stock Take CSV Error</core:jobHeader>
+                <core:displayDescriptionMessageBase>#{errorDetails.messageBase}</core:displayDescriptionMessageBase>
+                <core:displayDescriptionMessageId>#{errorDetails.messageId}</core:displayDescriptionMessageId>
+                <core:displayTitleMessageBase>#{errorDetails.messageBase}</core:displayTitleMessageBase>
+                <core:priority>5</core:priority>
+                <core:peopleGroupEvaluator>{http://www.enactor.com/task}LocationPrivilegeEvaluator</core:peopleGroupEvaluator>
+                <core:peopleGroupParameters>
+                    <core:parameter name="privilegeId">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>enactor.inventoryManagement.StockTake.Run</core:value>
+                    </core:parameter>
+                    <core:parameter name="locationId">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>#{destinationLocation.locationId}</core:value>
+                    </core:parameter>
+                </core:peopleGroupParameters>
+            </core:value>
+            <core:index>23</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:HTActivity">
+                <core:activityId>PrintPDFError</core:activityId>
+                <core:name>Print PDF Error</core:name>
+                <core:activityTypeId>InventoryManagement/ShowMessageActivityType</core:activityTypeId>
+                <core:suspendActivityOutcome name="Suspended">
+                    <core:toActivity>PrintPDFError</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:suspendActivityOutcome>
+                <core:activityOutcome name="OK">
+                    <core:toActivity>AcceptCount</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:activityOutcome name="Retry">
+                    <core:toActivity>PrintPDFFile</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:catchAllOutcome xsi:type="core:ActivityOutcome" name="Error">
+                    <core:toActivity></core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:catchAllOutcome>
+                <core:parameters>
+                    <core:parameter name="enactor.coreUI.MessageBasename">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>InventoryManagement/StockTake/StockTakeMessages</core:value>
+                    </core:parameter>
+                    <core:parameter name="enactor.inventoryManagement.DisallowSuspend">
+                        <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                        <core:value>false</core:value>
+                    </core:parameter>
+                    <core:parameter name="enactor.inventoryManagement.DisallowRetry">
+                        <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                        <core:value>false</core:value>
+                    </core:parameter>
+                    <core:parameter name="enactor.inventoryManagement.DisallowOK">
+                        <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                        <core:value>false</core:value>
+                    </core:parameter>
+                    <core:parameter name="enactor.coreUI.MessageId">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>PRINT_STOCK_TAKE_PDF_ERROR</core:value>
+                    </core:parameter>
+                </core:parameters>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>1854</core:x>
+                        <core:y>682</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 1</tools:swimLaneId>
+                    <tools:style>7</tools:style>
+                </core:uiSettings>
+                <core:metaData>
+                    <core:inputs>
+                        <core:input name="enactor.coreUI.MessageBasename">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input name="enactor.inventoryManagement.DisallowSuspend">
+                            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                        </core:input>
+                        <core:input name="enactor.inventoryManagement.DisallowRetry">
+                            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                        </core:input>
+                        <core:input name="enactor.inventoryManagement.DisallowOK">
+                            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                        </core:input>
+                        <core:input name="enactor.coreUI.MessageId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.core.ErrorDetails">
+                            <core:interfaceName>com.enactor.core.application.process.IErrorDetails</core:interfaceName>
+                        </core:input>
+                    </core:inputs>
+                </core:metaData>
+                <core:jobType>Stock Take</core:jobType>
+                <core:jobHeader>Print Stock Take Error (Stock Take ID: #{stockTakeId})</core:jobHeader>
+                <core:displayTitleMessageBase>InventoryManagement/StockTake/StockTakeMessages</core:displayTitleMessageBase>
+                <core:displayTitleMessageId>PRINT_STOCK_TAKE_ERROR_TITLE</core:displayTitleMessageId>
+                <core:priority>5</core:priority>
+                <core:peopleGroupEvaluator>{http://www.enactor.com/mfc}LocationPrivilegeEvaluator</core:peopleGroupEvaluator>
+                <core:peopleGroupParameters>
+                    <core:parameter name="privilegeId">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>enactor.inventoryManagement.StockTake.Run</core:value>
+                    </core:parameter>
+                    <core:parameter name="locationId">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>#{locationId}</core:value>
+                    </core:parameter>
+                </core:peopleGroupParameters>
+            </core:value>
+            <core:index>24</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:IfActionActivity">
+                <core:activityId>IfPrintDocument</core:activityId>
+                <core:name>If Should Print Document</core:name>
+                <core:activityTypeId>Generic/IfActionActivityType</core:activityTypeId>
+                <core:activityOutcome name="Yes">
+                    <core:toActivity>PrintPDFFile</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:activityOutcome name="No">
+                    <core:toActivity>AcceptCount</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>1728</core:x>
+                        <core:y>467</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 1</tools:swimLaneId>
+                </core:uiSettings>
+                <core:conditionalExpression>#{printDocument}</core:conditionalExpression>
+            </core:value>
+            <core:index>25</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:HTActivity">
+                <core:activityId>ShowSnapshotError</core:activityId>
+                <core:name>Show Snapshot Error</core:name>
+                <core:activityTypeId>InventoryManagement/ShowMessageActivityType</core:activityTypeId>
+                <core:activityOutcome name="Retry">
+                    <core:toActivity>GenerateSnapshot</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:suspendActivityOutcome name="Suspended">
+                    <core:toActivity>ShowSnapshotError</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:suspendActivityOutcome>
+                <core:activityOutcome name="OK">
+                    <core:toActivity>EndNotPerformed</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:parameters>
+                    <core:parameter name="enactor.coreProcessing.scheduledJob.ExecuteProcessId">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>Task/InitiateBusinessProcess</core:value>
+                    </core:parameter>
+                    <core:parameter name="enactor.inventoryManagement.DisallowSuspend">
+                        <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                        <core:value>false</core:value>
+                    </core:parameter>
+                    <core:parameter name="enactor.inventoryManagement.DisallowOK">
+                        <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                        <core:value>false</core:value>
+                    </core:parameter>
+                    <core:parameter name="enactor.inventoryManagement.DisallowRetry">
+                        <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                        <core:value>false</core:value>
+                    </core:parameter>
+                    <core:parameter name="enactor.coreUI.MessageId">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>GENERATE_STOCK_TAKE_SNAPSHOT_ERROR</core:value>
+                    </core:parameter>
+                    <core:parameter name="enactor.coreUI.MessageBasename">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>InventoryManagement/StockTake/StockTakeMessages</core:value>
+                    </core:parameter>
+                </core:parameters>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>266</core:x>
+                        <core:y>51</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 2</tools:swimLaneId>
+                    <tools:style>7</tools:style>
+                </core:uiSettings>
+                <core:metaData>
+                    <core:inputs>
+                        <core:input name="enactor.core.ErrorDetails">
+                            <core:interfaceName>com.enactor.core.application.process.IErrorDetails</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.inventoryManagement.DisallowOK">
+                            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.inventoryManagement.DisallowRetry">
+                            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.inventoryManagement.DisallowSuspend">
+                            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                        </core:input>
+                        <core:input name="enactor.mfc.LocationId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input name="enactor.coreUI.MessageId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input name="enactor.coreUI.MessageBasename">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                    </core:inputs>
+                </core:metaData>
+                <core:jobType>Stock Take</core:jobType>
+                <core:jobHeader>Generate Snapshot Error (Stock Take Request ID: #{stockTakeRequestId})</core:jobHeader>
+                <core:displayTitleMessageBase>InventoryManagement/StockTake/StockTakeMessages</core:displayTitleMessageBase>
+                <core:displayTitleMessageId>GENERATE_STOCK_TAKE_SNAPSHOT_ERROR_TITLE</core:displayTitleMessageId>
+                <core:priority>5</core:priority>
+                <core:peopleGroupEvaluator>{http://www.enactor.com/task}SimpleUserEvaluator</core:peopleGroupEvaluator>
+                <core:peopleGroupParameters>
+                    <core:parameter name="userId">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>#{requestedByUserId}</core:value>
+                    </core:parameter>
+                </core:peopleGroupParameters>
+            </core:value>
+            <core:index>26</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:HTActivity">
+                <core:activityId>GenerateStockTakeSummaryPDFError</core:activityId>
+                <core:name>Generate Stock Take Summary PDF Error</core:name>
+                <core:activityTypeId>InventoryManagement/ShowMessageActivityType</core:activityTypeId>
+                <core:suspendActivityOutcome name="Suspended">
+                    <core:toActivity>GenerateStockTakeSummaryPDFError</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:suspendActivityOutcome>
+                <core:activityOutcome name="OK">
+                    <core:toActivity>AcceptCount</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:activityOutcome name="Retry">
+                    <core:toActivity>GenerateStockTakeSummaryPDF</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:catchAllOutcome xsi:type="core:ActivityOutcome" name="Error">
+                    <core:toActivity></core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:catchAllOutcome>
+                <core:parameters>
+                    <core:parameter name="enactor.coreUI.MessageBasename">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>InventoryManagement/StockTake/StockTakeMessages</core:value>
+                    </core:parameter>
+                    <core:parameter name="enactor.inventoryManagement.DisallowSuspend">
+                        <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                        <core:value>false</core:value>
+                    </core:parameter>
+                    <core:parameter name="enactor.inventoryManagement.DisallowRetry">
+                        <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                        <core:value>false</core:value>
+                    </core:parameter>
+                    <core:parameter name="enactor.inventoryManagement.DisallowOK">
+                        <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                        <core:value>false</core:value>
+                    </core:parameter>
+                    <core:parameter name="enactor.coreUI.MessageId">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>GENERATE_STOCK_TAKE_SUMMARY_PDF_ERROR</core:value>
+                    </core:parameter>
+                </core:parameters>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>1330</core:x>
+                        <core:y>682</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 1</tools:swimLaneId>
+                    <tools:style>7</tools:style>
+                </core:uiSettings>
+                <core:metaData>
+                    <core:inputs>
+                        <core:input name="enactor.coreUI.MessageBasename">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input name="enactor.inventoryManagement.DisallowRetry">
+                            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                        </core:input>
+                        <core:input name="enactor.inventoryManagement.DisallowOK">
+                            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                        </core:input>
+                        <core:input name="enactor.inventoryManagement.DisallowSuspend">
+                            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                        </core:input>
+                        <core:input name="enactor.coreUI.MessageId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.core.ErrorDetails">
+                            <core:interfaceName>com.enactor.core.application.process.IErrorDetails</core:interfaceName>
+                        </core:input>
+                    </core:inputs>
+                </core:metaData>
+                <core:jobType>Stock Take</core:jobType>
+                <core:jobHeader>Generate Stock Take Summary PDF Error (Stock Take ID: #{stockTakeId})</core:jobHeader>
+                <core:displayTitleMessageBase>InventoryManagement/StockTake/StockTakeMessages</core:displayTitleMessageBase>
+                <core:displayTitleMessageId>GENERATE_STOCK_TAKE_SUMMARY_PDF_ERROR_TITLE</core:displayTitleMessageId>
+                <core:priority>5</core:priority>
+                <core:peopleGroupEvaluator>{http://www.enactor.com/mfc}LocationPrivilegeEvaluator</core:peopleGroupEvaluator>
+                <core:peopleGroupParameters>
+                    <core:parameter name="privilegeId">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>enactor.inventoryManagement.StockTake.Run</core:value>
+                    </core:parameter>
+                    <core:parameter name="locationId">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>#{locationId}</core:value>
+                    </core:parameter>
+                </core:peopleGroupParameters>
+            </core:value>
+            <core:index>27</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:HTActivity">
+                <core:activityId>UpdateDocumentHistoryError</core:activityId>
+                <core:name>Update Document History Error</core:name>
+                <core:activityTypeId>InventoryManagement/ShowMessageActivityType</core:activityTypeId>
+                <core:suspendActivityOutcome name="Suspended">
+                    <core:toActivity>UpdateDocumentHistoryError</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:suspendActivityOutcome>
+                <core:activityOutcome name="OK">
+                    <core:toActivity>AcceptCount</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:activityOutcome name="Retry">
+                    <core:toActivity>UpdateDocumentHistory</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:catchAllOutcome xsi:type="core:ActivityOutcome" name="Error">
+                    <core:toActivity></core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:catchAllOutcome>
+                <core:parameters>
+                    <core:parameter name="enactor.coreUI.MessageBasename">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>InventoryManagement/StockTake/StockTakeMessages</core:value>
+                    </core:parameter>
+                    <core:parameter name="enactor.inventoryManagement.DisallowSuspend">
+                        <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                        <core:value>false</core:value>
+                    </core:parameter>
+                    <core:parameter name="enactor.inventoryManagement.DisallowRetry">
+                        <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                        <core:value>false</core:value>
+                    </core:parameter>
+                    <core:parameter name="enactor.inventoryManagement.DisallowOK">
+                        <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                        <core:value>false</core:value>
+                    </core:parameter>
+                    <core:parameter name="enactor.coreUI.MessageId">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>UPDATE_STOCK_TAKE_DOCUMENT_HISTORY_ERROR</core:value>
+                    </core:parameter>
+                </core:parameters>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>1532</core:x>
+                        <core:y>680</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 1</tools:swimLaneId>
+                    <tools:style>7</tools:style>
+                </core:uiSettings>
+                <core:metaData>
+                    <core:inputs>
+                        <core:input name="enactor.coreUI.MessageBasename">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input name="enactor.inventoryManagement.DisallowSuspend">
+                            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                        </core:input>
+                        <core:input name="enactor.inventoryManagement.DisallowRetry">
+                            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                        </core:input>
+                        <core:input name="enactor.inventoryManagement.DisallowOK">
+                            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                        </core:input>
+                        <core:input name="enactor.coreUI.MessageId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.core.ErrorDetails">
+                            <core:interfaceName>com.enactor.core.application.process.IErrorDetails</core:interfaceName>
+                        </core:input>
+                    </core:inputs>
+                </core:metaData>
+                <core:jobType>Stock Take</core:jobType>
+                <core:jobHeader>Update Stock Take Document History Error (Stock Take ID: #{stockTakeId})</core:jobHeader>
+                <core:displayTitleMessageBase>InventoryManagement/StockTake/StockTakeMessages</core:displayTitleMessageBase>
+                <core:displayTitleMessageId>UPDATE_STOCK_TAKE_DOCUMENT_HISTORY_ERROR_TITLE</core:displayTitleMessageId>
+                <core:priority>5</core:priority>
+                <core:peopleGroupEvaluator>{http://www.enactor.com/mfc}LocationPrivilegeEvaluator</core:peopleGroupEvaluator>
+                <core:peopleGroupParameters>
+                    <core:parameter name="privilegeId">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>enactor.inventoryManagement.StockTake.Run</core:value>
+                    </core:parameter>
+                    <core:parameter name="locationId">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>#{locationId}</core:value>
+                    </core:parameter>
+                </core:peopleGroupParameters>
+            </core:value>
+            <core:index>28</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:HTActivity">
+                <core:activityId>ApplyCountError</core:activityId>
+                <core:name>Apply Count Error</core:name>
+                <core:activityTypeId>InventoryManagement/ShowMessageActivityType</core:activityTypeId>
+                <core:suspendActivityOutcome name="Suspended">
+                    <core:toActivity>ApplyCountError</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:suspendActivityOutcome>
+                <core:activityOutcome name="Retry">
+                    <core:toActivity>ApplyCount</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:activityOutcome name="OK">
+                    <core:toActivity>CancelStockTake</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:catchAllOutcome xsi:type="core:ActivityOutcome" name="Error">
+                    <core:toActivity></core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:catchAllOutcome>
+                <core:parameters>
+                    <core:parameter name="enactor.coreUI.MessageBasename">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>InventoryManagement/StockTake/StockTakeMessages</core:value>
+                    </core:parameter>
+                    <core:parameter name="enactor.inventoryManagement.DisallowSuspend">
+                        <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                        <core:value>false</core:value>
+                    </core:parameter>
+                    <core:parameter name="enactor.inventoryManagement.DisallowRetry">
+                        <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                        <core:value>false</core:value>
+                    </core:parameter>
+                    <core:parameter name="enactor.inventoryManagement.DisallowOK">
+                        <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                        <core:value>false</core:value>
+                    </core:parameter>
+                    <core:parameter name="enactor.coreUI.MessageId">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>APPLY_COUNT_ERROR</core:value>
+                    </core:parameter>
+                </core:parameters>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>2426</core:x>
+                        <core:y>683</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 1</tools:swimLaneId>
+                    <tools:style>7</tools:style>
+                </core:uiSettings>
+                <core:metaData>
+                    <core:inputs>
+                        <core:input name="enactor.coreUI.MessageBasename">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input name="enactor.inventoryManagement.DisallowSuspend">
+                            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                        </core:input>
+                        <core:input name="enactor.inventoryManagement.DisallowRetry">
+                            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                        </core:input>
+                        <core:input name="enactor.inventoryManagement.DisallowOK">
+                            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                        </core:input>
+                        <core:input name="enactor.coreUI.MessageId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.core.ErrorDetails">
+                            <core:interfaceName>com.enactor.core.application.process.IErrorDetails</core:interfaceName>
+                        </core:input>
+                    </core:inputs>
+                </core:metaData>
+                <core:jobType>Stock Take</core:jobType>
+                <core:jobHeader>Apply Stock Take Error (Stock Take ID: #{stockTakeId})</core:jobHeader>
+                <core:displayTitleMessageBase>InventoryManagement/StockTake/StockTakeMessages</core:displayTitleMessageBase>
+                <core:displayTitleMessageId>APPLY_COUNT_ERROR_TITLE</core:displayTitleMessageId>
+                <core:priority>5</core:priority>
+                <core:peopleGroupEvaluator>{http://www.enactor.com/mfc}LocationPrivilegeEvaluator</core:peopleGroupEvaluator>
+                <core:peopleGroupParameters>
+                    <core:parameter name="privilegeId">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>enactor.inventoryManagement.StockTake.Run</core:value>
+                    </core:parameter>
+                    <core:parameter name="locationId">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>#{locationId}</core:value>
+                    </core:parameter>
+                </core:peopleGroupParameters>
+            </core:value>
+            <core:index>29</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:HTActivity">
+                <core:activityId>RecordCount</core:activityId>
+                <core:name>Record Count</core:name>
+                <core:activityTypeId>InventoryManagement/RecordCountActivityType</core:activityTypeId>
+                <core:suspendActivityOutcome name="Suspended">
+                    <core:toActivity>RecordCount</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:suspendActivityOutcome>
+                <core:activityOutcome name="Cancelled">
+                    <core:toActivity>AwaitHHT</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:activityOutcome name="Submitted">
+                    <core:toActivity>SubmitRecordCount</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:activityOutcome name="Timeout">
+                    <core:toActivity>ExpireStockTake</core:toActivity>
+                    <core:proceedImmediately>false</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:activityOutcome name="NotCounting">
+                    <core:toActivity>EndCount</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>1147</core:x>
+                        <core:y>9</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 1</tools:swimLaneId>
+                    <tools:style>7</tools:style>
+                </core:uiSettings>
+                <core:metaData>
+                    <core:inputs>
+                        <core:input required="true" name="enactor.inventoryManagement.StockTakeRecordCountId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.inventoryManagement.StockTakeLatestCountCompletionDate">
+                            <core:interfaceName>java.util.Date</core:interfaceName>
+                        </core:input>
+                    </core:inputs>
+                </core:metaData>
+                <core:timeoutDateTimeExpression>#{stockTakeLatestCountCompletionDate}</core:timeoutDateTimeExpression>
+                <core:jobType>Stock Take</core:jobType>
+                <core:jobHeader>Record Count (Stock Take ID: #{stockTakeId})</core:jobHeader>
+                <core:displayTitleMessageBase>InventoryManagement/StockTake/RecordCountMessages</core:displayTitleMessageBase>
+                <core:displayTitleMessageId>TITLE</core:displayTitleMessageId>
+            </core:value>
+            <core:index>30</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:CallProcessActivity">
+                <core:activityId>CreateRecordCount</core:activityId>
+                <core:name>Create Record Count</core:name>
+                <core:activityTypeId>InventoryManagement/CreateRecordCountActivityType</core:activityTypeId>
+                <core:activityOutcome name="Success">
+                    <core:toActivity>RecordCount</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:catchAllOutcome xsi:type="core:ActivityOutcome" name="Error">
+                    <core:toActivity>CreateRecordCountError</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:catchAllOutcome>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>965</core:x>
+                        <core:y>7</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 1</tools:swimLaneId>
+                </core:uiSettings>
+                <core:metaData>
+                    <core:inputs>
+                        <core:input required="true" name="enactor.inventoryManagement.StockTakeId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.mfc.LocationId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.inventoryManagement.RequestedByUserId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                    </core:inputs>
+                    <core:outputs>
+                        <core:output name="enactor.core.ErrorDetails">
+                            <core:interfaceName>com.enactor.core.application.process.IErrorDetails</core:interfaceName>
+                        </core:output>
+                        <core:output name="enactor.inventoryManagement.StockTakeRecordCountId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:output>
+                    </core:outputs>
+                </core:metaData>
+            </core:value>
+            <core:index>31</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:HTActivity">
+                <core:activityId>CreateRecordCountError</core:activityId>
+                <core:name>Create Record Count Error</core:name>
+                <core:activityTypeId>InventoryManagement/ShowMessageActivityType</core:activityTypeId>
+                <core:activityOutcome name="OK">
+                    <core:toActivity>AwaitHHT</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:parameters>
+                    <core:parameter name="enactor.coreProcessing.scheduledJob.ExecuteProcessId">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>Task/InitiateBusinessProcess</core:value>
+                    </core:parameter>
+                    <core:parameter name="enactor.inventoryManagement.DisallowOK">
+                        <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                        <core:value>false</core:value>
+                    </core:parameter>
+                    <core:parameter name="enactor.inventoryManagement.DisallowRetry">
+                        <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                        <core:value>true</core:value>
+                    </core:parameter>
+                    <core:parameter name="enactor.inventoryManagement.DisallowSuspend">
+                        <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                        <core:value>true</core:value>
+                    </core:parameter>
+                </core:parameters>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>967</core:x>
+                        <core:y>226</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 1</tools:swimLaneId>
+                    <tools:style>7</tools:style>
+                </core:uiSettings>
+                <core:metaData>
+                    <core:inputs>
+                        <core:input name="enactor.core.ErrorDetails">
+                            <core:interfaceName>com.enactor.core.application.process.IErrorDetails</core:interfaceName>
+                        </core:input>
+                        <core:input name="enactor.inventoryManagement.DisallowOK">
+                            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                        </core:input>
+                        <core:input name="enactor.inventoryManagement.DisallowRetry">
+                            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.inventoryManagement.DisallowSuspend">
+                            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                        </core:input>
+                    </core:inputs>
+                </core:metaData>
+                <core:jobType>Stock Take</core:jobType>
+                <core:jobHeader>Create Record Count Error</core:jobHeader>
+                <core:displayDescriptionMessageBase>#{errorDetails.messageBase}</core:displayDescriptionMessageBase>
+                <core:displayDescriptionMessageId>#{errorDetails.messageId}</core:displayDescriptionMessageId>
+                <core:displayTitleMessageBase>#{errorDetails.messageBase}</core:displayTitleMessageBase>
+                <core:priority>5</core:priority>
+                <core:peopleGroupEvaluator>{http://www.enactor.com/task}LocationPrivilegeEvaluator</core:peopleGroupEvaluator>
+                <core:peopleGroupParameters>
+                    <core:parameter name="privilegeId">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>enactor.inventoryManagement.StockTake.Run</core:value>
+                    </core:parameter>
+                    <core:parameter name="locationId">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>#{destinationLocation.locationId}</core:value>
+                    </core:parameter>
+                </core:peopleGroupParameters>
+            </core:value>
+            <core:index>32</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:EndProcessActivity">
+                <core:activityId>EndCount</core:activityId>
+                <core:name>End Count</core:name>
+                <core:activityTypeId>Generic/EndProcessActivityType</core:activityTypeId>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>1511</core:x>
+                        <core:y>9</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 1</tools:swimLaneId>
+                    <tools:style>1</tools:style>
+                </core:uiSettings>
+                <core:discard>true</core:discard>
+            </core:value>
+            <core:index>33</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:CallProcessActivity">
+                <core:activityId>SubmitRecordCount</core:activityId>
+                <core:name>Submit Record Count</core:name>
+                <core:activityTypeId>InventoryManagement/SubmitRecordCountActivityType</core:activityTypeId>
+                <core:activityOutcome name="Success">
+                    <core:toActivity>AwaitHHT</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:catchAllOutcome xsi:type="core:ActivityOutcome" name="Error">
+                    <core:toActivity>SubmitRecordCountError</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:catchAllOutcome>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>1328</core:x>
+                        <core:y>10</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 1</tools:swimLaneId>
+                </core:uiSettings>
+                <core:metaData>
+                    <core:inputs>
+                        <core:input required="true" name="enactor.inventoryManagement.StockTakeRecordCountId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                    </core:inputs>
+                    <core:outputs>
+                        <core:output name="enactor.core.ErrorDetails">
+                            <core:interfaceName>com.enactor.core.application.process.IErrorDetails</core:interfaceName>
+                        </core:output>
+                    </core:outputs>
+                </core:metaData>
+            </core:value>
+            <core:index>34</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:HTActivity">
+                <core:activityId>SubmitRecordCountError</core:activityId>
+                <core:name>Submit Record Count Error</core:name>
+                <core:activityTypeId>InventoryManagement/ShowMessageActivityType</core:activityTypeId>
+                <core:suspendActivityOutcome name="Suspended">
+                    <core:toActivity>SubmitRecordCountError</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:suspendActivityOutcome>
+                <core:activityOutcome name="Retry">
+                    <core:toActivity>SubmitRecordCount</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:parameters>
+                    <core:parameter name="enactor.coreProcessing.scheduledJob.ExecuteProcessId">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>Task/InitiateBusinessProcess</core:value>
+                    </core:parameter>
+                    <core:parameter name="enactor.inventoryManagement.DisallowOK">
+                        <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                        <core:value>true</core:value>
+                    </core:parameter>
+                    <core:parameter name="enactor.inventoryManagement.DisallowRetry">
+                        <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                        <core:value>false</core:value>
+                    </core:parameter>
+                    <core:parameter name="enactor.inventoryManagement.DisallowSuspend">
+                        <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                        <core:value>false</core:value>
+                    </core:parameter>
+                </core:parameters>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>1331</core:x>
+                        <core:y>194</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 1</tools:swimLaneId>
+                    <tools:style>7</tools:style>
+                </core:uiSettings>
+                <core:metaData>
+                    <core:inputs>
+                        <core:input name="enactor.core.ErrorDetails">
+                            <core:interfaceName>com.enactor.core.application.process.IErrorDetails</core:interfaceName>
+                        </core:input>
+                        <core:input name="enactor.inventoryManagement.DisallowOK">
+                            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                        </core:input>
+                        <core:input name="enactor.inventoryManagement.DisallowRetry">
+                            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.inventoryManagement.DisallowSuspend">
+                            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                        </core:input>
+                    </core:inputs>
+                </core:metaData>
+                <core:jobType>Stock Take</core:jobType>
+                <core:jobHeader>Create Record Count Error</core:jobHeader>
+                <core:displayDescriptionMessageBase>#{errorDetails.messageBase}</core:displayDescriptionMessageBase>
+                <core:displayDescriptionMessageId>#{errorDetails.messageId}</core:displayDescriptionMessageId>
+                <core:displayTitleMessageBase>#{errorDetails.messageBase}</core:displayTitleMessageBase>
+                <core:priority>5</core:priority>
+                <core:peopleGroupEvaluator>{http://www.enactor.com/task}LocationPrivilegeEvaluator</core:peopleGroupEvaluator>
+                <core:peopleGroupParameters>
+                    <core:parameter name="privilegeId">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>enactor.inventoryManagement.StockTake.Run</core:value>
+                    </core:parameter>
+                    <core:parameter name="locationId">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>#{destinationLocation.locationId}</core:value>
+                    </core:parameter>
+                </core:peopleGroupParameters>
+            </core:value>
+            <core:index>35</core:index>
+        </core:listElement>
+        <core:listImplClass>java.util.LinkedList</core:listImplClass>
+    </core:activities>
+    <core:defaultStartActivityId>StartAdHocStockTake</core:defaultStartActivityId>
+    <core:defaultOutcomes/>
+</core:simpleActivityFlowBusinessProcess>

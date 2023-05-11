@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<retail:posPromptPage xmlns:core="http://www.enactor.com/core" xmlns:retail="http://www.enactor.com/retail" xmlns:ns4="http://www.enactor.com/crm" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803" xmlns:ns6="http://www.apis-it.hr/fin/2012/types/f73" xmlns:ns7="http://www.w3.org/2000/09/xmldsig#" xmlns:ns8="http://www.enactor.com/retail/storedRetailTransaction/service" xmlns:ns9="http://www.fu.gov.si/" xmlns:ns10="http://www.enactor.com/addressLookup/service" xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:ns14="http://www.enactor.com/crm/customerLoyalty/service" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" allowResize="true" allowMove="true" allowClose="true" height="600" width="800" transparentBackground="true" messageBase="POSInventoryManagement/ItemEntry/ItemEntryMessages" url="POSInventoryManagement/ItemEntry/EnterQuantity">
+    <core:elements>
+        <core:hidden id="TotalLabel"/>
+        <core:panel id="DialogPanel">
+            <core:elements>
+                <core:label messageId="#{isAdd ? 'ADD_ITEM_TITLE' : 'EDIT_ITEM_TITLE'}" styleClass="posPageHeading" id="EDIT_ITEM_TITLE">
+                    <core:boundsConstraint height="28" width="200" y="8" x="5"/>
+                </core:label>
+                <core:label messageId="#{isRecordCount ? 'STOCK_TAKE_ID' : (isAdjustment ? 'ADJUSTMENT_ID_LABEL': 'DISPATCH_ID_LABEL')}" styleClass="formFieldLabel" id="ADJUSTMENT_ID_LABEL">
+                    <core:boundsConstraint height="28" width="200" y="44" x="22"/>
+                </core:label>
+                <core:inputText editable="false" styleClass="formFieldInputText" id="ADJUSTMENT_ID">
+                    <core:boundsConstraint height="32" width="200" y="42" x="255"/>
+                    <core:text>#{inventoryHeaderId}</core:text>
+                </core:inputText>
+                <core:label messageId="PRODUCT_ID_LABEL" styleClass="formFieldLabel" id="PRODUCT_ID_LABEL">
+                    <core:boundsConstraint height="28" width="200" y="80" x="22"/>
+                </core:label>
+                <core:inputText editable="false" styleClass="formFieldInputText" id="PRODUCT_ID">
+                    <core:boundsConstraint height="32" width="200" y="78" x="255"/>
+                    <core:text>#{merchandiseProduct.productId}</core:text>
+                </core:inputText>
+                <core:label styleClass="formDescriptionLabel" id="DESCRIPTION">
+                    <core:boundsConstraint height="28" width="224" y="80" x="485"/>
+                    <core:text>#{length(merchandiseProduct.productDescription.string) &gt; 30 ? concat(strings:substring(merchandiseProduct.productDescription.string,0,30),'...') : merchandiseProduct.productDescription.string}</core:text>
+                </core:label>
+                <core:label messageId="STYLE_LABEL" styleClass="formFieldLabel" id="STYLE_ID_LABEL">
+                    <core:boundsConstraint height="28" width="200" y="116" x="22"/>
+                </core:label>
+                <core:inputText editable="false" styleClass="formFieldInputText" id="STYLE_ID">
+                    <core:boundsConstraint height="32" width="200" y="114" x="255"/>
+                    <core:text>#{merchandiseProduct.styleId}</core:text>
+                </core:inputText>
+                <core:label styleClass="formDescriptionLabel" id="STYLE_DESCRIPTION">
+                    <core:boundsConstraint height="28" width="224" y="116" x="485"/>
+                    <core:text>#{length(parentStyleProduct.productDescription.string) &gt; 30 ? concat(strings:substring(parentStyleProduct.productDescription.string,0,30),'...') : parentStyleProduct.productDescription.string}</core:text>
+                </core:label>
+                <core:label messageId="SIZE_LABEL" styleClass="formFieldLabel" id="SIZE_ID_LABEL">
+                    <core:boundsConstraint height="28" width="200" y="152" x="22"/>
+                </core:label>
+                <core:inputText editable="false" styleClass="formFieldInputText" id="SIZE_ID">
+                    <core:boundsConstraint height="32" width="200" y="150" x="255"/>
+                    <core:text>#{sizeDescription}</core:text>
+                </core:inputText>
+                <core:label messageId="COLOUR_LABEL" styleClass="formFieldLabel" id="COLOR_ID_LABEL">
+                    <core:boundsConstraint height="28" width="200" y="188" x="22"/>
+                </core:label>
+                <core:inputText editable="false" styleClass="formFieldInputText" id="COLOR_ID">
+                    <core:boundsConstraint height="32" width="200" y="186" x="255"/>
+                    <core:text>#{colourDescription}</core:text>
+                </core:inputText>
+                <core:label messageId="MMG_LABEL" styleClass="formFieldLabel" id="MMG_LABEL">
+                    <core:boundsConstraint height="28" width="200" y="224" x="22"/>
+                </core:label>
+                <core:inputText editable="false" styleClass="formFieldInputText" id="MMG_GROUP_ID">
+                    <core:boundsConstraint height="32" width="200" y="222" x="255"/>
+                    <core:text>#{length(mMGroupId) &gt; 20 ? concat(strings:substring(mMGroupId,0,20),'...') : mMGroupId}</core:text>
+                </core:inputText>
+                <core:label styleClass="formDescriptionLabel" id="MMG_GROUP_NAME">
+                    <core:boundsConstraint height="28" width="224" y="224" x="485"/>
+                    <core:text>#{length(mMGroupName) &gt; 30 ? concat(strings:substring(mMGroupName,0,30),'...') : mMGroupName}</core:text>
+                </core:label>
+                <core:label messageId="ACTUAL_STOCK_AMOUNT" styleClass="formDescriptionLabel" visibility="#{notEmpty(actualStockAmount)}" visible="true" id="ACTUAL_STOCK_AMOUNT">
+                    <core:boundsConstraint height="18" width="238" y="265" x="360"/>
+                </core:label>
+                <core:errorLabel messageId="ENTER_SERIAL_NUMBER_ERROR" styleClass="formErrorLabel" visibility="#{enableSerialNumberCapture &amp;&amp; isSerialTrackedProduct &amp;&amp; quantity == null}" id="ENTER_SERIAL_NUMBER_ERROR">
+                    <core:boundsConstraint height="20" width="301" y="189" x="256"/>
+                    <core:text>Please enter item serial numbers.</core:text>
+                </core:errorLabel>
+                <core:label messageId="QUANTITY_LABEL" styleClass="formFieldLabel" id="QUANTITY_LABEL">
+                    <core:boundsConstraint height="28" width="200" y="260" x="22"/>
+                </core:label>
+                <core:inputText edit="#{!enableSerialNumberCapture || !isSerialTrackedProduct}" focusOrder="1" styleClass="formFieldInputText" transparentBackground="false" id="QUANTITY">
+                    <core:boundsConstraint height="32" width="100" y="258" x="255"/>
+                    <core:text>#{quantity}</core:text>
+                    <core:textElementEvents enterEvent="AddPressed"/>
+                    <core:validationData>
+                        <core:integerFieldValidationData>
+                            <core:type>Integer</core:type>
+                            <core:allowNulls>false</core:allowNulls>
+                            <core:inputMask></core:inputMask>
+                            <core:validationClassname></core:validationClassname>
+                            <core:maxValue>99999</core:maxValue>
+                            <core:minValue>0</core:minValue>
+                        </core:integerFieldValidationData>
+                    </core:validationData>
+                </core:inputText>
+                <core:errorLabel errorFieldId="QUANTITY" styleClass="formFieldLabel" id="QUANTITY_ERROR">
+                    <core:boundsConstraint height="18" width="301" y="264" x="356"/>
+                </core:errorLabel>
+                <core:label messageId="NOTES_LABEL" styleClass="formFieldLabel" id="NOTES_LABEL">
+                    <core:boundsConstraint height="28" width="200" y="296" x="22"/>
+                </core:label>
+                <core:inputText allowWrap="true" type="textArea" styleClass="formInputTextMultiLine" transparentBackground="false" id="NOTES">
+                    <core:boundsConstraint height="69" width="417" y="294" x="255"/>
+                    <core:text>#{itemNotes}</core:text>
+                </core:inputText>
+                <core:label messageId="RETAIL_PRICE_LABEL" styleClass="formFieldLabel" id="RETAIL_PRICE_LABEL">
+                    <core:boundsConstraint height="28" width="200" y="369" x="22"/>
+                </core:label>
+                <core:inputText editable="false" styleClass="formFieldInputText" id="RETAIL_PRICE">
+                    <core:boundsConstraint height="32" width="200" y="367" x="255"/>
+                    <core:text>#{format:formatCurrency(productPrice.price )}</core:text>
+                </core:inputText>
+                <core:label messageId="ASSIGN_TO_CONTAINER_LABEL" styleClass="formFieldLabel" visibility="#{ ! (isAdjustment || isRecordCount) &amp;&amp; showContainers}" id="ASSIGN_TO_CONTAINER_LABEL">
+                    <core:boundsConstraint height="28" width="200" y="405" x="22"/>
+                </core:label>
+                <core:inputText editable="false" styleClass="formFieldInputText" transparentBackground="false" visibility="#{ ! (isAdjustment || isRecordCount)  &amp;&amp; showContainers}" id="CONTAINER_ID">
+                    <core:boundsConstraint height="32" width="100" y="403" x="255"/>
+                    <core:text>#{containerId}</core:text>
+                </core:inputText>
+                <core:button messageId="SELECT_CONTAINER_BUTTON_LABEL" focusOrder="4" styleClass="buttonLight" visibility="#{containerMode!='ReadOnly' &amp;&amp; ! (isAdjustment || isRecordCount) &amp;&amp; showContainers}" id="SELECT_CONTAINER_BUTTON">
+                    <core:boundsConstraint height="30" width="180" y="405" x="370"/>
+                    <core:text>SelectContainerPressed</core:text>
+                </core:button>
+            </core:elements>
+        </core:panel>
+        <core:hidden id="Receipt"/>
+        <core:button messageId="UPDATE_BUTTON_LABEL" id="Button1">
+            <core:text>AddPressed</core:text>
+        </core:button>
+        <core:button messageId="CANCEL_BUTTON_LABEL" id="Button8">
+            <core:text>CancelPressed</core:text>
+        </core:button>
+        <core:hidden id="InputBox"/>
+        <core:text messageId="ENTER_DETAILS_FOR_CONTAINER_ITEM" id="Prompt"/>
+        <core:button messageId="ADD_SERIAL_NUMBERS_BUTTON_LABEL" visibility="#{enableSerialNumberCapture &amp;&amp; isSerialTrackedProduct}" id="Button4">
+            <core:boundsConstraint height="100" width="100" y="325" x="928"/>
+            <core:text>ModifyItemPressed</core:text>
+        </core:button>
+    </core:elements>
+    <core:templateURL>Pos/FullScreenTraditionalPosTemplate</core:templateURL>
+    <core:events>
+        <core:event destination="CANCEL" event="key.KeyCode27Pressed"></core:event>
+    </core:events>
+    <core:validationEvents>
+        <core:event>AddPressed</core:event>
+    </core:validationEvents>
+    <core:preferredConstraintType>BOUNDS</core:preferredConstraintType>
+    <core:variables>
+        <core:variable name="enactor.inventoryManagement.Quantity">
+            <core:interfaceName>java.lang.Integer</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.inventoryManagement.EnableSerialNumberCapture">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.inventoryManagement.IsSerialTrackedProduct">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.mfc.ProductPrice">
+            <core:interfaceName>com.enactor.mfc.productPrice.IProductPrice</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.mfc.MMGroupName">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.mfc.MerchandiseProduct">
+            <core:interfaceName>com.enactor.mfc.product.IMerchandiseProduct</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.mfc.SizeDescription">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.mfc.ColourDescription">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.mfc.Device">
+            <core:interfaceName>com.enactor.mfc.device.IDevice</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.mfc.User">
+            <core:interfaceName>com.enactor.mfc.user.IUser</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.mfc.ItemNotes">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.mfc.MMGroupId">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.mfc.TotalAdjustmentCost">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.mfc.InventoryHeaderId">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.mfc.ActualStockAmount">
+            <core:interfaceName>java.lang.Integer</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="FormErrors">
+            <core:interfaceName>com.enactor.coreUI.processes.IFormErrors</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.mfc.ParentStyleProduct">
+            <core:interfaceName>com.enactor.mfc.product.IStyleSizeProduct</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.inventoryManagement.isRecordCount">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.inventoryManagement.ContainerMode">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.inventoryManagement.ContainerId">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.inventoryManagement.isAdjustment">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.inventoryManagement.isAdd">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.inventoryManagement.ShowContainers">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:variable>
+    </core:variables>
+    <core:scannerEnabled>true</core:scannerEnabled>
+    <core:scannerDataName>#{scannerData}</core:scannerDataName>
+</retail:posPromptPage>

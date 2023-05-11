@@ -1,0 +1,1738 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<core:process xmlns:core="http://www.enactor.com/core" xmlns:retail="http://www.enactor.com/retail" xmlns:ns4="http://www.enactor.com/crm" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803" xmlns:ns6="http://www.apis-it.hr/fin/2012/types/f73" xmlns:ns7="http://www.w3.org/2000/09/xmldsig#" xmlns:ns8="http://www.enactor.com/retail/storedRetailTransaction/service" xmlns:ns9="http://www.fu.gov.si/" xmlns:ns10="http://www.enactor.com/addressLookup/service" xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:ns14="http://www.enactor.com/crm/customerLoyalty/service" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <core:processID>Pos/SplitBill/SplitBill</core:processID>
+    <core:version>1.0</core:version>
+    <core:name></core:name>
+    <core:defaultMessageBaseName></core:defaultMessageBaseName>
+    <core:firstStateID>Start</core:firstStateID>
+    <core:className></core:className>
+    <core:uiHints>
+        <entry>
+            <key>com.enactor.tools.editor.process.style</key>
+            <value>1023</value>
+        </entry>
+        <entry>
+            <key>com.enactor.tools.editor.process.xloc</key>
+            <value>-1935</value>
+        </entry>
+        <entry>
+            <key>com.enactor.tools.editor.process.yloc</key>
+            <value>30</value>
+        </entry>
+    </core:uiHints>
+    <core:metaData>
+        <core:inputs>
+            <core:input required="true" name="PrimaryPrinter">
+                <core:interfaceName>com.enactor.coreUI.peripherals.printer.IPrinter</core:interfaceName>
+            </core:input>
+            <core:input required="true" name="enactor.coreUI.AuthorisingUser">
+                <core:interfaceName>com.enactor.core.signOn.ISignedOnUser</core:interfaceName>
+            </core:input>
+            <core:input required="true" name="enactor.coreUI.User">
+                <core:interfaceName>com.enactor.core.signOn.ISignedOnUser</core:interfaceName>
+            </core:input>
+            <core:input required="true" name="enactor.coreUI.UserLocale">
+                <core:interfaceName>com.enactor.core.localisation.ILocale</core:interfaceName>
+            </core:input>
+            <core:input required="true" name="enactor.mfc.Device">
+                <core:interfaceName>com.enactor.mfc.device.IDevice</core:interfaceName>
+            </core:input>
+            <core:input required="true" name="enactor.mfc.Location">
+                <core:interfaceName>com.enactor.mfc.location.ILocation</core:interfaceName>
+            </core:input>
+            <core:input required="true" name="enactor.mfc.PosTerminal">
+                <core:interfaceName>com.enactor.mfc.posTerminal.POSTerminal</core:interfaceName>
+            </core:input>
+            <core:input required="true" name="enactor.mfc.TransactionHandler">
+                <core:interfaceName>com.enactor.mfc.retail.transaction.IRetailTransactionHandler</core:interfaceName>
+            </core:input>
+            <core:input name="enactor.pos.PassedInCardTrack2">
+                <core:interfaceName>java.lang.String</core:interfaceName>
+            </core:input>
+            <core:input required="false" name="Cashdrawer">
+                <core:interfaceName>com.enactor.coreUI.peripherals.cashdrawer.ICashdrawer</core:interfaceName>
+            </core:input>
+            <core:input required="false" name="enactor.pos.CurrentlyInTrainingMode">
+                <core:interfaceName>java.lang.Boolean</core:interfaceName>
+            </core:input>
+        </core:inputs>
+        <core:outputs>
+            <core:output required="true" name="enactor.mfc.TransactionHandler">
+                <core:interfaceName>com.enactor.mfc.retail.transaction.IRetailTransactionHandler</core:interfaceName>
+            </core:output>
+            <core:output required="true" name="enactor.coreUI.NewEvent">
+                <core:interfaceName>com.enactor.core.events.IEvent</core:interfaceName>
+            </core:output>
+        </core:outputs>
+        <stateDataTypes>
+            <stateDataType required="true" name="enactor.mfc.Basket">
+                <core:interfaceName>com.enactor.mfc.basket.IBasket</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.pos.NumberOfCustomers">
+                <core:interfaceName>java.lang.Integer</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="UnpaidSplits">
+                <core:interfaceName>java.lang.Integer</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.mfc.PosTerminal">
+                <core:interfaceName>com.enactor.mfc.posTerminal.POSTerminal</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.coreUI.AuthorisingUser">
+                <core:interfaceName>com.enactor.core.signOn.ISignedOnUser</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.coreUI.UserLocale">
+                <core:interfaceName>com.enactor.core.localisation.ILocale</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="false" name="enactor.pos.CurrentlyInTrainingMode">
+                <core:interfaceName>java.lang.Boolean</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.mfc.Location">
+                <core:interfaceName>com.enactor.mfc.location.ILocation</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.mfc.basket.BillSplit">
+                <core:interfaceName>com.enactor.mfc.basket.items.IBillSplit</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.mfc.TransactionHandler">
+                <core:interfaceName>com.enactor.mfc.retail.transaction.IRetailTransactionHandler</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.pos.BillSplitFunctionsMenu">
+                <core:interfaceName>com.enactor.mfc.menu.IMenu</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="false" name="Cashdrawer">
+                <core:interfaceName>com.enactor.coreUI.peripherals.cashdrawer.ICashdrawer</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.pos.TenderMenu">
+                <core:interfaceName>com.enactor.mfc.menu.IMenu</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.coreUI.User">
+                <core:interfaceName>com.enactor.core.signOn.ISignedOnUser</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.mfc.SelectedSplitNumber">
+                <core:interfaceName>java.lang.Integer</core:interfaceName>
+            </stateDataType>
+            <stateDataType name="enactor.pos.PassedInCardTrack2">
+                <core:interfaceName>java.lang.String</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="PrimaryPrinter">
+                <core:interfaceName>com.enactor.coreUI.peripherals.printer.IPrinter</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.mfc.RestaurantSaleTransaction">
+                <core:interfaceName>com.enactor.mfc.retail.transaction.IRestaurantSaleTransaction</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.mfc.Device">
+                <core:interfaceName>com.enactor.mfc.device.IDevice</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.coreUI.NewEvent">
+                <core:interfaceName>com.enactor.core.events.IEvent</core:interfaceName>
+            </stateDataType>
+        </stateDataTypes>
+    </core:metaData>
+    <core:endProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>EndProcessSuccess</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIEndProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1158</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>274</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData/>
+        <core:comment>Process is complete, basket balance is zero.</core:comment>
+        <core:typeId>enactor.types.EndProcess</core:typeId>
+        <core:outcome>Success</core:outcome>
+        <core:defaultProcessId></core:defaultProcessId>
+    </core:endProcessAction>
+    <core:endProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>EndProcessFail</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIEndProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>-225</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>29</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData/>
+        <core:typeId>enactor.types.EndProcess</core:typeId>
+        <core:outcome>Fail</core:outcome>
+        <core:defaultProcessId></core:defaultProcessId>
+    </core:endProcessAction>
+    <core:endProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>EndProcessCancel</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIEndProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>-1114</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>29</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData/>
+        <core:typeId>enactor.types.EndProcess</core:typeId>
+        <core:outcome>Cancel</core:outcome>
+        <core:defaultProcessId></core:defaultProcessId>
+    </core:endProcessAction>
+    <core:executeProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>HasUnpaidSplits</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UICallProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>27</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>6</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>517</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.Basket">
+                    <core:interfaceName>com.enactor.mfc.basket.IBasket</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="true" name="UnpaidSplits">
+                    <core:interfaceName>java.lang.Integer</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="True"/>
+                <core:outcome name="False"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.CallProcess</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>RecalculateSplits</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>True</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID>Payments</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>False</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>3</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>CallSplitBillFullPayment</core:toActionID>
+            <core:condition>isEmpty(process.basket.billSplits)</core:condition>
+            <core:outcome>False</core:outcome>
+        </core:outcomeLink>
+        <core:executeProcessId>/Pos/SplitBill/HasUnpaidSplits</core:executeProcessId>
+    </core:executeProcessAction>
+    <core:endProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>ReturnToSales</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIEndProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1158</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>497</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData/>
+        <core:typeId>enactor.types.EndProcess</core:typeId>
+        <core:outcome>ReturnToSales</core:outcome>
+        <core:defaultProcessId></core:defaultProcessId>
+    </core:endProcessAction>
+    <core:endProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>SignOn</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIEndProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1158</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>606</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData/>
+        <core:typeId>enactor.types.EndProcess</core:typeId>
+        <core:outcome>SignOn</core:outcome>
+        <core:defaultProcessId></core:defaultProcessId>
+    </core:endProcessAction>
+    <core:endProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>EndProcessForceEndTransaction</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIEndProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1158</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>704</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData/>
+        <core:typeId>enactor.types.EndProcess</core:typeId>
+        <core:outcome>ForceEndTransaction</core:outcome>
+        <core:defaultProcessId></core:defaultProcessId>
+    </core:endProcessAction>
+    <core:endProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>EndProcessNewTransaction</core:actionID>
+        <core:name>New Transaction</core:name>
+        <core:className>com.enactor.coreUI.actions.UIEndProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1158</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>805</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData/>
+        <core:typeId>enactor.types.EndProcess</core:typeId>
+        <core:outcome>NewTransaction</core:outcome>
+        <core:defaultProcessId></core:defaultProcessId>
+    </core:endProcessAction>
+    <core:executeProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>CallLoadMenu</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UICallProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>27</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>-810</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>511</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="RESTAURANT_BILL_SPLIT_MENU" name="enactor.mfc.menu.MenuId">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input name="enactor.mfc.menu.MenuId">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="true" name="enactor.mfc.menu.Menu">
+                    <core:interfaceName>com.enactor.mfc.menu.IMenu</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+                <core:outcome name="Fail"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.CallProcess</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>LoadTenderMenu</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Fail</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>LoadTenderMenu</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:executeProcessId>Pos/Menu/LoadMenu</core:executeProcessId>
+    </core:executeProcessAction>
+    <core:assignAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>GetRestaurantTransaction</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIAssignAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>2047</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>-1116</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>511</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.TransactionHandler">
+                    <core:interfaceName>com.enactor.mfc.retail.transaction.IRetailTransactionHandler</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.RestaurantSaleTransaction">
+                    <core:interfaceName>com.enactor.mfc.retail.transaction.IRestaurantSaleTransaction</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="true" name="enactor.mfc.RestaurantSaleTransaction">
+                    <core:interfaceName>com.enactor.mfc.retail.transaction.IRestaurantSaleTransaction</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.Assign</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>CallLoadMenu</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:dataAssignment toExpression="restaurantSaleTransaction" fromExpression="transactionHandler.transaction"/>
+    </core:assignAction>
+    <core:executeProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>LoadTenderMenu</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UICallProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>27</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>-523</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>512</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="TENDER" name="enactor.mfc.menu.MenuId">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input name="enactor.mfc.menu.MenuId">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="true" name="enactor.mfc.menu.Menu">
+                    <core:interfaceName>com.enactor.mfc.menu.IMenu</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+                <core:outcome name="Fail"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.CallProcess</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID>TestSplits</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Fail</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID>TestSplits</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:executeProcessId>Pos/Menu/LoadMenu</core:executeProcessId>
+    </core:executeProcessAction>
+    <core:executeProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>CallSplitBillTender</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UICallProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>27</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>580</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>502</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.pos.BillSplitFunctionsMenu">
+                    <core:interfaceName>com.enactor.mfc.menu.IMenu</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.Basket">
+                    <core:interfaceName>com.enactor.mfc.basket.IBasket</core:interfaceName>
+                </core:input>
+                <core:input required="false" name="enactor.mfc.PosTerminal">
+                    <core:interfaceName>com.enactor.mfc.posTerminal.POSTerminal</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.pos.TenderMenu">
+                    <core:interfaceName>com.enactor.mfc.menu.IMenu</core:interfaceName>
+                </core:input>
+                <core:input required="false" name="Cashdrawer">
+                    <core:interfaceName>com.enactor.coreUI.peripherals.cashdrawer.ICashdrawer</core:interfaceName>
+                </core:input>
+                <core:input required="false" name="enactor.coreUI.User">
+                    <core:interfaceName>com.enactor.core.signOn.ISignedOnUser</core:interfaceName>
+                </core:input>
+                <core:input required="false" name="enactor.coreUI.AuthorisingUser">
+                    <core:interfaceName>com.enactor.core.signOn.ISignedOnUser</core:interfaceName>
+                </core:input>
+                <core:input required="false" name="enactor.coreUI.UserLocale">
+                    <core:interfaceName>com.enactor.core.localisation.ILocale</core:interfaceName>
+                </core:input>
+                <core:input required="false" name="enactor.pos.PassedInCardTrack2">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input required="false" name="enactor.pos.CurrentlyInTrainingMode">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+                <core:input required="false" name="enactor.mfc.Location">
+                    <core:interfaceName>com.enactor.mfc.location.ILocation</core:interfaceName>
+                </core:input>
+                <core:input required="false" name="PrimaryPrinter">
+                    <core:interfaceName>com.enactor.coreUI.peripherals.printer.IPrinter</core:interfaceName>
+                </core:input>
+                <core:input required="false" name="enactor.mfc.TransactionHandler">
+                    <core:interfaceName>com.enactor.mfc.retail.transaction.IRetailTransactionHandler</core:interfaceName>
+                </core:input>
+                <core:input required="false" name="enactor.mfc.Device">
+                    <core:interfaceName>com.enactor.mfc.device.IDevice</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output name="enactor.coreUI.OutputEvent">
+                    <core:interfaceName>com.enactor.core.events.IEvent</core:interfaceName>
+                </core:output>
+                <core:output required="false" name="enactor.mfc.TransactionHandler">
+                    <core:interfaceName>com.enactor.mfc.retail.transaction.IRetailTransactionHandler</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="NewTransaction"/>
+                <core:outcome name="SignOn"/>
+                <core:outcome name="Cancel"/>
+                <core:outcome name="Success"/>
+                <core:outcome name="ForceEndTransaction"/>
+                <core:outcome name="Fail"/>
+                <core:outcome name="ReturnToSales"/>
+                <core:outcome name="RefundRequired"/>
+                <core:outcome name="ExitWithEvent"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.CallProcess</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>3</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>ReturnToSales</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>ReturnToSales</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>5</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>EndProcessNewTransaction</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>NewTransaction</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>6</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>EndProcessForceEndTransaction</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>ForceEndTransaction</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>7</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>SignOn</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>SignOn</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>4</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>UpdateBasket</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>8</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>EndProcessRefundRequired</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>RefundRequired</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>ReturnToSales</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Cancel</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>EndProcessFail</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Fail</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>9</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>EndProcessExitWithEvent</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>ExitWithEvent</core:outcome>
+        </core:outcomeLink>
+        <core:executeProcessId>Pos/Tender/SplitBillTender</core:executeProcessId>
+    </core:executeProcessAction>
+    <core:endProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>EndProcessRefundRequired</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIEndProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1158</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>389</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData/>
+        <core:comment>A partial refund has completed but further refunds are required (not used).</core:comment>
+        <core:typeId>enactor.types.EndProcess</core:typeId>
+        <core:outcome>RefundRequired</core:outcome>
+        <core:defaultProcessId></core:defaultProcessId>
+    </core:endProcessAction>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>TestBasketBalance</core:actionID>
+        <core:name>Test Basket Balance</core:name>
+        <core:className>com.enactor.pos.packages.tender.processes.TestBasketBalance</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>11</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>6</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>311</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.TransactionHandler">
+                    <core:interfaceName>com.enactor.mfc.retail.transaction.IRetailTransactionHandler</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outcomes>
+                <core:outcome name="enactor.pos.TenderRequired"/>
+                <core:outcome name="enactor.pos.RefundRequired"/>
+                <core:outcome name="enactor.pos.BasketEmpty"/>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>HasUnpaidSplits</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>enactor.pos.TenderRequired</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>EndProcessSuccess</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>3</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>EndProcessRefundRequired</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>enactor.pos.RefundRequired</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>4</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>EndProcessSuccess</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>enactor.pos.BasketEmpty</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>CheckOutoutEvent</core:actionID>
+        <core:name>CheckEventAction</core:name>
+        <core:className>com.enactor.coreUI.actions.CheckEventAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>27</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>580</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>996</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.coreUI.CurrentEvent">
+                    <core:interfaceName>com.enactor.core.events.IEvent</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output name="enactor.coreUI.CurrentEvent">
+                    <core:interfaceName>com.enactor.core.events.IEvent</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="SplitTransactionLoyalty"/>
+                <core:outcome name="Unknown"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>EndProcessSuccess</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Unknown</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>UIGetViewDataAction</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>SplitTransactionLoyalty</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>RecalculateSplits</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.pos.packages.splitBill.processes.RecalculateItemSplitsAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>27</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>6</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>717</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.Basket">
+                    <core:interfaceName>com.enactor.mfc.basket.IBasket</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output name="enactor.mfc.Basket">
+                    <core:interfaceName>com.enactor.mfc.basket.IBasket</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+                <core:outcome name="DoCustomerSplits"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:comment>Recalculate splits totals in case we are used following a split by value action.</core:comment>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>ClearUnpaidSplitsForRecalculate</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>DoCustomerSplits</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID>Payments</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:executeProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>CallSplitByRelatedParty</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UICallProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>6</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>974</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="BY_CUSTOMER" name="enactor.pos.SplitType">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.Basket">
+                    <core:interfaceName>com.enactor.mfc.basket.IBasket</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.TransactionHandler">
+                    <core:interfaceName>com.enactor.mfc.retail.transaction.IRetailTransactionHandler</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.pos.SplitType">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outcomes>
+                <core:outcome name="Cancel"/>
+                <core:outcome name="Success"/>
+                <core:outcome name="Fail"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.CallProcess</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID>Payments</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Cancel</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID>Payments</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Fail</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>3</core:linkID>
+            <core:toStateID>Payments</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:executeProcessId>Pos/SplitBill/SplitByRelatedParty</core:executeProcessId>
+    </core:executeProcessAction>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>ClearUnpaidSplitsForRecalculate</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.pos.packages.splitBill.processes.ClearUnpaidSplitsAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>6</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>902</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.Basket">
+                    <core:interfaceName>com.enactor.mfc.basket.IBasket</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="true" name="enactor.mfc.Basket">
+                    <core:interfaceName>com.enactor.mfc.basket.IBasket</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>CallSplitByRelatedParty</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:executeProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>CallSplitBillFullPayment</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UICallProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>11</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>327</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>295</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="FULL" name="enactor.pos.SplitType">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.Basket">
+                    <core:interfaceName>com.enactor.mfc.basket.IBasket</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.TransactionHandler">
+                    <core:interfaceName>com.enactor.mfc.retail.transaction.IRetailTransactionHandler</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.pos.SplitType">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outcomes>
+                <core:outcome name="Cancel"/>
+                <core:outcome name="Success"/>
+                <core:outcome name="Fail"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.CallProcess</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID>Payments</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID>Payments</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Fail</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>3</core:linkID>
+            <core:toStateID>Payments</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Cancel</core:outcome>
+        </core:outcomeLink>
+        <core:executeProcessId>Pos/SplitBill/SplitBillFullPayment</core:executeProcessId>
+    </core:executeProcessAction>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>UIGetViewDataAction</core:actionID>
+        <core:name>UIGetViewDataAction</core:name>
+        <core:className>com.enactor.coreUI.actions.UIGetViewDataAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>2047</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>-1408</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>800</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:outputs>
+                <core:output required="true" name="enactor.mfc.TransactionHandler">
+                    <core:interfaceName>com.enactor.mfc.retail.transaction.IRetailTransactionHandler</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>SetBasket</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:assignAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>UpdateBasket</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIAssignAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>2047</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>836</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>935</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.Basket">
+                    <core:interfaceName>com.enactor.mfc.basket.IBasket</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.TransactionHandler">
+                    <core:interfaceName>com.enactor.mfc.retail.transaction.IRetailTransactionHandler</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="true" name="enactor.mfc.Basket">
+                    <core:interfaceName>com.enactor.mfc.basket.IBasket</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.Assign</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>CheckOutoutEvent</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:dataAssignment toExpression="basket" fromExpression="transactionHandler.model.basket"/>
+    </core:assignAction>
+    <core:assignAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>SetBasket</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIAssignAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>2047</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>-1402</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>507</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.Basket">
+                    <core:interfaceName>com.enactor.mfc.basket.IBasket</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.TransactionHandler">
+                    <core:interfaceName>com.enactor.mfc.retail.transaction.IRetailTransactionHandler</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="true" name="enactor.mfc.Basket">
+                    <core:interfaceName>com.enactor.mfc.basket.IBasket</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.Assign</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>GetRestaurantTransaction</core:toActionID>
+            <core:condition>instanceOf(process.transactionHandler.transaction, 'com.enactor.mfc.retail.transaction.IRestaurantSaleTransaction')</core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>CallLoadMenu</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:dataAssignment toExpression="basket" fromExpression="transactionHandler.model.basket"/>
+    </core:assignAction>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>LogException</core:actionID>
+        <core:name>UILogMessageAction</core:name>
+        <core:className>com.enactor.coreUI.actions.UILogMessageAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>2047</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>-1654</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>44</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="Error in Split Bill" name="enactor.coreUI.LogMessage">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input name="enactor.coreUI.LogMessage">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID>ProcessError</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID>ProcessError</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Exception</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:endProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>EndProcessExitWithEvent</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIEndProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1157</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>168</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData/>
+        <core:outcome>ExitWithEvent</core:outcome>
+        <core:defaultProcessId></core:defaultProcessId>
+    </core:endProcessAction>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>RaiseEvent</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UISendEventAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>-1723</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>959</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="enactor.pos.TenderingStarted" name="enactor.coreUI.EventName">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:param value="true" required="false" name="enactor.coreUI.EventForwardAllViews">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="false" name="enactor.coreUI.EventName">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input required="false" name="enactor.coreUI.EventForwardAllViews">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>SetBasket</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>RaiseTransactionStateChangedEvent</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UISendEventAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>11</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>-1721</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>803</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="enactor.pos.TransactionStateChanged" name="enactor.coreUI.EventName">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:param value="true" required="false" name="enactor.coreUI.EventForwardAllViews">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="false" name="enactor.coreUI.EventName">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input required="false" name="enactor.coreUI.EventForwardAllViews">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>RaiseEvent</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>SetTransactionState</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UISetViewDataAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>11</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>-1714</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>638</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="Transaction" name="enactor.coreUI.SessionName">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:param value="Tendering" name="enactor.pos.TransactionState">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input name="enactor.pos.TransactionState">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.SessionName">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>RaiseTransactionStateChangedEvent</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:executeProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>CallProcessRedrawBasket</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UICallProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>3</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>327</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>649</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:outcomes>
+                <core:outcome name="Fail"/>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.CallProcess</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>CallSplitBillTender</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Fail</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>CallSplitBillTender</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:executeProcessId>Pos/Basket/RedrawBasket</core:executeProcessId>
+    </core:executeProcessAction>
+    <core:eventLink>
+        <core:linkID>1</core:linkID>
+        <core:toStateID></core:toStateID>
+        <core:toActionID>LogException</core:toActionID>
+        <core:condition></core:condition>
+        <core:event>Exception</core:event>
+    </core:eventLink>
+    <core:state>
+        <core:url></core:url>
+        <core:stateID>Start</core:stateID>
+        <core:name></core:name>
+        <core:className></core:className>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>-1711</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>553</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <handledEvents>
+                <handledEvent name="StateEntered"/>
+            </handledEvents>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicState</core:typeId>
+        <core:singleInstance>false</core:singleInstance>
+        <core:respondToViewEvents>false</core:respondToViewEvents>
+        <core:actionInputMappings/>
+        <core:actionOutputMappings>
+            <core:actionMapping>
+                <core:actionID>LoadTenderMenu</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.menu.Menu">
+<core:interfaceName>com.enactor.mfc.menu.IMenu</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.pos.TenderMenu">
+<core:interfaceName>com.enactor.mfc.menu.IMenu</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings/>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>CallLoadMenu</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.menu.Menu">
+<core:interfaceName>com.enactor.mfc.menu.IMenu</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.pos.BillSplitFunctionsMenu">
+<core:interfaceName>com.enactor.mfc.menu.IMenu</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings/>
+                </core:mappings>
+            </core:actionMapping>
+        </core:actionOutputMappings>
+        <core:eventLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>SetTransactionState</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>StateEntered</core:event>
+        </core:eventLink>
+    </core:state>
+    <core:state>
+        <core:url></core:url>
+        <core:stateID>TestSplits</core:stateID>
+        <core:name></core:name>
+        <core:className></core:className>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>6</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>233</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <handledEvents>
+                <handledEvent name="StateEntered"/>
+            </handledEvents>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicState</core:typeId>
+        <core:singleInstance>false</core:singleInstance>
+        <core:respondToViewEvents>false</core:respondToViewEvents>
+        <core:actionInputMappings/>
+        <core:actionOutputMappings/>
+        <core:eventLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>TestBasketBalance</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>StateEntered</core:event>
+        </core:eventLink>
+    </core:state>
+    <core:messageState>
+        <core:url>/Message/ModalOK</core:url>
+        <core:stateID>TooManySplits</core:stateID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.states.UIMessageState</core:className>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>580</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>389</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <handledEvents>
+                <handledEvent name="OKPressed"/>
+            </handledEvents>
+        </core:metaData>
+        <core:typeId>enactor.types.MessageState</core:typeId>
+        <core:singleInstance>false</core:singleInstance>
+        <core:respondToViewEvents>false</core:respondToViewEvents>
+        <core:actionInputMappings/>
+        <core:actionOutputMappings/>
+        <core:keepPromptOpen>false</core:keepPromptOpen>
+        <core:keepPreviousPromptOpen>false</core:keepPreviousPromptOpen>
+        <core:promptTimeout>0</core:promptTimeout>
+        <core:hideOpenPrompt>false</core:hideOpenPrompt>
+        <core:allowDatabasePromptLookup>false</core:allowDatabasePromptLookup>
+        <core:messageBase>Pos/Tender/TenderMessages</core:messageBase>
+        <core:messageId>TOO_MANY_SPLITS</core:messageId>
+        <core:messageText></core:messageText>
+    </core:messageState>
+    <core:state>
+        <core:url></core:url>
+        <core:stateID>Payments</core:stateID>
+        <core:name></core:name>
+        <core:className></core:className>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>37</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>327</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>502</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <handledEvents>
+                <handledEvent name="StateEntered"/>
+            </handledEvents>
+            <stateDataTypes>
+                <stateDataType required="false" name="enactor.coreUI.OutputEvent">
+                    <core:interfaceName>com.enactor.core.events.IEvent</core:interfaceName>
+                </stateDataType>
+            </stateDataTypes>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicState</core:typeId>
+        <core:singleInstance>false</core:singleInstance>
+        <core:respondToViewEvents>false</core:respondToViewEvents>
+        <core:actionInputMappings>
+            <core:actionMapping>
+                <core:actionID>CheckOutoutEvent</core:actionID>
+                <core:mappings>
+                    <core:processMappings/>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="false" name="enactor.coreUI.OutputEvent">
+<core:interfaceName>com.enactor.core.events.IEvent</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.coreUI.CurrentEvent">
+<core:interfaceName>com.enactor.core.events.IEvent</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+        </core:actionInputMappings>
+        <core:actionOutputMappings>
+            <core:actionMapping>
+                <core:actionID>CheckOutoutEvent</core:actionID>
+                <core:mappings>
+                    <core:processMappings/>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:sourceDataType name="enactor.coreUI.CurrentEvent">
+<core:interfaceName>com.enactor.core.events.IEvent</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="false" name="enactor.coreUI.OutputEvent">
+<core:interfaceName>com.enactor.core.events.IEvent</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>CallSplitBillTender</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="false" name="enactor.mfc.TransactionHandler">
+<core:interfaceName>com.enactor.mfc.retail.transaction.IRetailTransactionHandler</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.TransactionHandler">
+<core:interfaceName>com.enactor.mfc.retail.transaction.IRetailTransactionHandler</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType name="enactor.coreUI.OutputEvent">
+<core:interfaceName>com.enactor.core.events.IEvent</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.coreUI.NewEvent">
+<core:interfaceName>com.enactor.core.events.IEvent</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:sourceDataType name="enactor.coreUI.OutputEvent">
+<core:interfaceName>com.enactor.core.events.IEvent</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="false" name="enactor.coreUI.OutputEvent">
+<core:interfaceName>com.enactor.core.events.IEvent</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+        </core:actionOutputMappings>
+        <core:eventLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>CallProcessRedrawBasket</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>StateEntered</core:event>
+        </core:eventLink>
+    </core:state>
+    <core:messageState>
+        <core:url>/Error/Error</core:url>
+        <core:stateID>ProcessError</core:stateID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.states.UIErrorState</core:className>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>-1399</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>43</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <handledEvents>
+                <handledEvent name="OKPressed"/>
+            </handledEvents>
+        </core:metaData>
+        <core:typeId>PosErrorMessage</core:typeId>
+        <core:singleInstance>false</core:singleInstance>
+        <core:respondToViewEvents>false</core:respondToViewEvents>
+        <core:actionInputMappings/>
+        <core:actionOutputMappings/>
+        <core:eventLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>EndProcessFail</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>OKPressed</core:event>
+        </core:eventLink>
+        <core:eventLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>EndProcessFail</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>Exception</core:event>
+        </core:eventLink>
+        <core:eventLink>
+            <core:linkID>3</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>EndProcessFail</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>Default</core:event>
+        </core:eventLink>
+        <core:keepPromptOpen>false</core:keepPromptOpen>
+        <core:keepPreviousPromptOpen>false</core:keepPreviousPromptOpen>
+        <core:promptTimeout>0</core:promptTimeout>
+        <core:hideOpenPrompt>false</core:hideOpenPrompt>
+        <core:allowDatabasePromptLookup>false</core:allowDatabasePromptLookup>
+        <core:messageBase>Pos/Tender/TenderMessages</core:messageBase>
+        <core:messageId>GENERAL_ERROR</core:messageId>
+        <core:messageText></core:messageText>
+    </core:messageState>
+    <core:stateTransitions/>
+</core:process>

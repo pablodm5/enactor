@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<htd:humanInteractions targetNamespace="http://www.enactor.com/crm" xmlns:retail="http://www.enactor.com/retail" xmlns:ns4="http://www.enactor.com/bpel/1_1/activity" xmlns:bpel20="http://docs.oasis-open.org/wsbpel/2.0/process/executable" xmlns:coreui="http://www.enactor.com/coreui" xmlns:core="http://www.enactor.com/core" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803" xmlns:bpel11="http://schemas.xmlsoap.org/ws/2003/03/business-process/" xmlns:ns5="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:ns12="http://maven.apache.org/POM/4.0.0" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:b4p="http://docs.oasis-open.org/ns/bpel4people/bpel4people/200803" xmlns:ns11="tools" xmlns:ns9="http://www.enactor.com/tools/bpel/wb/" xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:tools="http://www.enactor.com/tools" xmlns:task="http://www.enactor.com/task">
+    <htd:import importType="http://schemas.xmlsoap.org/wsdl/" location="CRM/ContactCustomer/ContactCustomerTask.wsdl" namespace="http://www.enactor.com/crm/contactCustomer"/>
+    <htd:import importType="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" location="CRM/CRMPeople.htd" namespace="http://www.enactor.com/crm"/>
+	<htd:tasks>
+        <htd:task name="BasicCustomerProcessTask">
+            <task:activationTime>
+                <task:until>string(htd:getInput()/core:taskData/core:activationTime)</task:until>
+			</task:activationTime>
+            <task:activationTime>
+                <task:for>string(htd:getInput()/core:taskData/core:activationDelay)</task:for>
+			</task:activationTime>			
+            <htd:interface operation="callCustomer" portType="ns17:ContactCustomerPT" xmlns:ns17="http://www.enactor.com/sample/crm/ContactCustomer"/>
+            <htd:priority>number(htd:getInput()/core:taskData/core:priority)</htd:priority>
+            <htd:peopleAssignments>
+                <htd:potentialOwners>
+                    <htd:from logicalPeopleGroup="task:GenericEvaluator">
+                        <htd:argument name="evaluatorName">string(htd:getInput()/core:taskData/core:peopleGroupEvaluator)
+						</htd:argument>
+                        <htd:argument name="customerId">string(htd:getInput()/retail:customerId)</htd:argument>
+                        <htd:argument name="costCentreId">string(htd:getInput()/retail:costCentreId)</htd:argument>
+                        <htd:argument name="salespersonId">string(htd:getInput()/retail:salespersonId)</htd:argument>
+					</htd:from>
+                </htd:potentialOwners>
+                <htd:businessAdministrators>
+                    <htd:from>
+                        <htd:literal>
+                            <htd:organizationalEntity>
+                                <htd:users>
+                                    <htd:user>ADMIN</htd:user>
+                                    <htd:user>BPEL_RT_SYSTEM</htd:user>
+                                </htd:users>
+                            </htd:organizationalEntity>
+						</htd:literal>
+					</htd:from>
+                </htd:businessAdministrators>
+            </htd:peopleAssignments>
+            <htd:presentationElements>
+                <core:messageResourceRef>CRM/ContactCustomer/ContactCustomerMessages</core:messageResourceRef>
+                <task:presentationData>
+                    <task:applicationWorkflowId>${applicationWorkflowId}</task:applicationWorkflowId>
+                </task:presentationData>
+                <htd:name xml:lang="*">{$jobType}</htd:name>
+                <htd:presentationParameters>
+                    <htd:presentationParameter name="customerName">string(htd:getInput()/retail:customerName)
+					</htd:presentationParameter>
+                    <htd:presentationParameter name="jobHeader">string(htd:getInput()/core:taskData/core:jobHeader)
+					</htd:presentationParameter>
+                    <htd:presentationParameter name="jobType">string(htd:getInput()/core:taskData/core:jobType)
+					</htd:presentationParameter>
+                    <htd:presentationParameter name="jobDescription">string(htd:getInput()/core:taskData/core:jobDescription)
+					</htd:presentationParameter>
+                    <htd:presentationParameter name="applicationWorkflowId">string(htd:getInput()/core:taskData/core:applicationProcessId)
+					</htd:presentationParameter>
+                </htd:presentationParameters>
+                <htd:subject xml:lang="*">{$jobHeader}-{$customerName}</htd:subject>
+                <htd:description xml:lang="*">{$jobDescription}</htd:description>
+            </htd:presentationElements>
+            <htd:deadlines>
+                <htd:completionDeadline>
+                    <htd:documentation xml:lang="en-GB">If not completed before the given duration expires, do a custom business process escalation
+					</htd:documentation>
+                    <htd:for>string(htd:getInput()/core:taskData/core:timeoutDuration)</htd:for>
+                    <htd:escalation name="CallTimeOutProcess">
+                        <task:taskEscalationHandler businessProcessId="string(htd:getInput()/core:processId)" finalState="OBSOLETE"/>
+                    </htd:escalation>
+                </htd:completionDeadline>
+                <htd:completionDeadline>
+                    <htd:documentation xml:lang="en-GB">If not completed by the given deadline, do a custom business process escalation
+					</htd:documentation>
+                    <htd:until>string(htd:getInput()/core:taskData/core:timeoutDeadline)</htd:until>
+                    <htd:escalation name="CallTimeOutProcess">
+                        <task:taskEscalationHandler businessProcessId="string(htd:getInput()/core:processId)" finalState="OBSOLETE"/>
+                    </htd:escalation>
+                </htd:completionDeadline>
+            </htd:deadlines>
+        </htd:task>
+    </htd:tasks>
+</htd:humanInteractions>

@@ -1,0 +1,280 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<core:documentTemplate xmlns:core="http://www.enactor.com/core" xmlns:retail="http://www.enactor.com/retail" xmlns:ns4="http://www.enactor.com/crm" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:ns6="http://www.apis-it.hr/fin/2012/types/f73" xmlns:ns7="http://www.w3.org/2000/09/xmldsig#" xmlns:ns8="http://www.fu.gov.si/" xmlns:ns9="http://www.enactor.com/addressLookup/service" xmlns:ns10="http://www.enactor.com/retail/storedRetailTransaction/service" xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:ns14="http://www.enactor.com/crm/customerLoyalty/service" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" pageHeaderId="Header" paginated="false" width="44" messageBase="Pos/Order/DeliveryOptionsMessages" title="Delivery Option List Entry Template" url="Pos/Order/Delivery/DeliveryOptionListEntryTemplate">
+    <core:elements>
+        <core:tableTemplate list="#{deliveryOptionsSelectionList}">
+            <core:formatElement applicableEntityName="listHeader" formatId="Header"/>
+            <core:formatElement applicableClassName="com.enactor.customerOrders.pos.delivery.DeliveryOptionListEntry" formatId="DeliveryOptionListEntry"/>
+            <core:formatElement applicableEntityName="listFooter"/>
+        </core:tableTemplate>
+    </core:elements>
+    <core:variables>
+        <core:variable required="true" name="DeliveryOptionsSelectionList">
+            <core:interfaceName>java.util.List</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="item">
+            <core:interfaceName>com.enactor.customerOrders.pos.delivery.DeliveryOptionListEntry</core:interfaceName>
+        </core:variable>
+    </core:variables>
+    <core:columnDefs>
+        <core:columnDef id="FullWidth" end="100" startPos="0" endPos="0"/>
+        <core:columnDef id="CollectionType" start="12" end="60" startPos="0" endPos="0"/>
+        <core:columnDef id="Date" start="60" end="80" startPos="0" endPos="0"/>
+        <core:columnDef id="Charge" start="80" end="95" startPos="0" endPos="0" align="RIGHT"/>
+        <core:columnDef id="Selected" end="9" startPos="0" endPos="0"/>
+    </core:columnDefs>
+    <core:formatEntry id="Header">
+        <core:elements>
+            <core:row>
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="Charge">
+                            <core:elements>
+<core:text messageId="CHARGE"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="Date">
+                            <core:elements>
+<core:text messageId="DELIVERY_DATE"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="CollectionType">
+                            <core:elements>
+<core:text messageId="DELIVERY_TYPE"/>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="DeliveryOptionListEntry">
+        <core:elements/>
+    </core:formatEntry>
+    <core:formatEntry id="ProductDetail">
+        <core:elements>
+            <core:row>
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="FullWidth">
+                            <core:elements>
+<core:text>
+    <core:text>#{getLocalisedString(product.productDescription,userLocale)}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+        <core:entityReferences>
+            <core:entityReference interfaceName="com.enactor.mfc.product.IProduct" name="product" keyValue="item.productDeliveryOptions.productKey" entityName="product" entityNamespace="http://www.enactor.com/retail">
+                <core:keyProperty name="productId" value="item.product"/>
+            </core:entityReference>
+        </core:entityReferences>
+    </core:formatEntry>
+    <core:formatEntry id="LocationDeliveryDetails">
+        <core:elements>
+            <core:row>
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="Selected">
+                            <core:elements>
+<core:text messageId="SELECTED" visibility="#{item.deliveryOption.selected}" colour="RED"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="Charge">
+                            <core:elements>
+<core:text>
+    <core:formatters>
+        <core:formatCurrencyAmount/>
+    </core:formatters>
+    <core:text>#{item.deliveryOption.deliverySlot.deliveryCharge}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="Date">
+                            <core:elements>
+<core:text messageId="COLLECT_NOW" visibility="#{item.deliveryOption.deliverySlot.deliveryDate == null}"/>
+<core:text visibility="#{item.deliveryOption.deliverySlot.deliveryDate != null}">
+    <core:formatters>
+        <core:formatDate pattern="shortdate"/>
+    </core:formatters>
+    <core:text>#{item.deliveryOption.deliverySlot.deliveryDate}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="CollectionType">
+                            <core:elements>
+<core:text messageId="TRANSFER_FROM_STORE"/>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+        <core:entityReferences>
+            <core:entityReference interfaceName="com.enactor.mfc.location.ILocation" name="location" keyValue="item.deliveryOption.locationKey" entityName="location" entityNamespace="http://www.enactor.com/retail"/>
+        </core:entityReferences>
+    </core:formatEntry>
+    <core:formatEntry id="SupplierDeliveryDetails">
+        <core:elements>
+            <core:row>
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="Selected">
+                            <core:elements>
+<core:text messageId="SELECTED" visibility="#{item.deliveryOption.selected}" colour="RED"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="Charge">
+                            <core:elements>
+<core:text>
+    <core:formatters>
+        <core:formatCurrencyAmount/>
+    </core:formatters>
+    <core:text>#{item.deliveryOption.deliverySlot.deliveryCharge}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="Date">
+                            <core:elements>
+<core:text messageId="COLLECT_NOW" visibility="#{item.deliveryOption.deliverySlot.deliveryDate == null}"/>
+<core:text visibility="#{item.deliveryOption.deliverySlot.deliveryDate != null}">
+    <core:formatters>
+        <core:formatDate pattern="shortdate"/>
+    </core:formatters>
+    <core:text>#{item.deliveryOption.deliverySlot.deliveryDate}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="CollectionType">
+                            <core:elements>
+<core:text messageId="DELIVER_TO_CUSTOMER"/>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="Footer">
+        <core:elements/>
+    </core:formatEntry>
+    <core:formatEntry id="CancelDelivery">
+        <core:elements>
+            <core:row>
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="Selected">
+                            <core:elements>
+<core:text messageId="SELECTED" visibility="#{item.deliveryOption.selected}" colour="RED"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="CollectionType">
+                            <core:elements>
+<core:text messageId="CANCEL_ORDER_ITEM"/>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="BackOrderDelivery">
+        <core:elements>
+            <core:row>
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="Selected">
+                            <core:elements>
+<core:text messageId="SELECTED" visibility="#{item.deliveryOption.selected}" colour="RED"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="CollectionType">
+                            <core:elements>
+<core:text messageId="BACK_ORDER_ITEM"/>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="LocationReservationDetails">
+        <core:elements>
+            <core:row>
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="Charge">
+                            <core:elements>
+<core:text>
+    <core:formatters>
+        <core:formatCurrencyAmount/>
+    </core:formatters>
+    <core:text>#{item.deliveryOption.deliverySlot.deliveryCharge}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="Date">
+                            <core:elements>
+<core:text messageId="COLLECT_NOW" visibility="#{item.deliveryOption.deliverySlot.deliveryDate == null}"/>
+<core:text visibility="#{item.deliveryOption.deliverySlot.deliveryDate != null}">
+    <core:text>#{item.deliveryOption.deliverySlot.deliveryDate}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="CollectionType">
+                            <core:elements>
+<core:text messageId="COLLECT_FROM_STORE"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="Selected">
+                            <core:elements>
+<core:text messageId="SELECTED" visibility="#{item.deliveryOption.selected}" colour="RED"/>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+        <core:entityReferences>
+            <core:entityReference interfaceName="com.enactor.mfc.location.ILocation" name="location" keyValue="item.deliveryOption.locationKey" entityName="location" entityNamespace="http://www.enactor.com/retail"/>
+        </core:entityReferences>
+    </core:formatEntry>
+    <core:formatEntry id="customerCollectionDetails">
+        <core:elements>
+            <core:row>
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="CollectionType">
+                            <core:elements>
+<core:formatElement formatId="fulfilByLocation" visibility="#{instanceOf(item.deliveryOption.fulfilmentOption, 'com.enactor.customerOrders.retail.deliveryOption.ILocationStockFulfilment') &amp;&amp; !empty(item.deliveryOption.fulfilmentOption.locationKey)}"/>
+<core:formatElement formatId="fulfilBySupplier" visibility="#{instanceOf(item.deliveryOption.fulfilmentOption, 'com.enactor.customerOrders.retail.deliveryOption.ISupplierFulfilment')}"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="Selected">
+                            <core:elements>
+<core:text messageId="SELECTED" visibility="#{item.deliveryOption.selected}" colour="RED"/>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="fulfilByLocation">
+        <core:elements>
+            <core:text messageId="COLLECTION_TAKE_NOW" visibility="#{strings:compareStrings(item.deliveryOption.fulfilmentOption.locationKey.locationId, localLocationId) &amp;&amp; strings:compareStrings(item.deliveryOption.fulfilmentOption.inventoryTypeKey.inventoryType, availableInventoryType)}"/>
+            <core:text messageId="COLLECTION_FULFILLED_BY_STORE" visibility="#{strings:compareStrings(item.deliveryOption.fulfilmentOption.locationKey.locationId, localLocationId) &amp;&amp; strings:compareStrings(item.deliveryOption.fulfilmentOption.inventoryTypeKey.inventoryType, inTransitInventoryType)}"/>
+            <core:text messageId="COLLECTION_FULFILLED_BY_LOCATION" visibility="#{!strings:compareStrings(item.deliveryOption.fulfilmentOption.locationKey.locationId, localLocationId) &amp;&amp; strings:compareStrings(item.deliveryOption.fulfilmentOption.inventoryTypeKey.inventoryType, availableInventoryType)}"/>
+        </core:elements>
+        <core:entityReferences>
+            <core:entityReference interfaceName="com.enactor.mfc.location.ILocation" name="fulfilLocation" keyValue="item.deliveryOption.fulfilmentOption.locationKey" entityName="location" entityNamespace="http://www.enactor.com/retail"/>
+        </core:entityReferences>
+    </core:formatEntry>
+    <core:formatEntry id="fulfilBySupplier">
+        <core:elements>
+            <core:text messageId="COLLECTION_FULFILLED_BY_SUPPLIER"/>
+        </core:elements>
+    </core:formatEntry>
+</core:documentTemplate>

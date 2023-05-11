@@ -1,0 +1,1459 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<core:process xmlns:core="http://www.enactor.com/core" xmlns:retail="http://www.enactor.com/retail" xmlns:ns4="http://www.enactor.com/crm" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803" xmlns:ns6="http://www.apis-it.hr/fin/2012/types/f73" xmlns:ns7="http://www.w3.org/2000/09/xmldsig#" xmlns:ns8="http://www.enactor.com/retail/storedRetailTransaction/service" xmlns:ns9="http://www.fu.gov.si/" xmlns:ns10="http://www.enactor.com/addressLookup/service" xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:ns14="http://www.enactor.com/crm/customerLoyalty/service" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <core:processID>CardPayment/CompleteICCTransaction</core:processID>
+    <core:version>1.0</core:version>
+    <core:name>Update ICC Transaction</core:name>
+    <core:defaultMessageBaseName></core:defaultMessageBaseName>
+    <core:firstStateID>Start</core:firstStateID>
+    <core:className></core:className>
+    <core:uiHints>
+        <entry>
+            <key>com.enactor.tools.editor.process.style</key>
+            <value>127</value>
+        </entry>
+        <entry>
+            <key>com.enactor.tools.editor.process.xloc</key>
+            <value>8</value>
+        </entry>
+        <entry>
+            <key>com.enactor.tools.editor.process.yloc</key>
+            <value>8</value>
+        </entry>
+    </core:uiHints>
+    <core:metaData>
+        <core:inputs>
+            <core:input required="true" name="enactor.mfc.CardTenderItem">
+                <core:interfaceName>com.enactor.mfc.basket.items.ICardTenderItem</core:interfaceName>
+            </core:input>
+            <core:input required="false" name="ICCReader">
+                <core:interfaceName>com.enactor.coreUI.peripherals.icc.IICCReader</core:interfaceName>
+            </core:input>
+            <core:input required="true" name="enactor.mfc.PaymentCardType">
+                <core:interfaceName>com.enactor.mfc.cardType.IPaymentCardType</core:interfaceName>
+            </core:input>
+            <core:input name="enactor.mfc.Acquirer">
+                <core:interfaceName>com.enactor.mfc.acquirer.IAcquirer</core:interfaceName>
+            </core:input>
+            <core:input name="enactor.pos.AuthAndCapture">
+                <core:interfaceName>java.lang.Boolean</core:interfaceName>
+            </core:input>
+        </core:inputs>
+        <core:outputs>
+            <core:output required="false" name="enactor.pos.FallbackFlag">
+                <core:interfaceName>java.lang.Boolean</core:interfaceName>
+            </core:output>
+            <core:output required="true" name="enactor.mfc.CardTenderItem">
+                <core:interfaceName>com.enactor.mfc.basket.items.ICardTenderItem</core:interfaceName>
+            </core:output>
+        </core:outputs>
+        <stateDataTypes>
+            <stateDataType name="enactor.pos.FallbackFlag">
+                <core:interfaceName>java.lang.Boolean</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.mfc.CardTenderItem">
+                <core:interfaceName>com.enactor.mfc.basket.items.ICardTenderItem</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.pos.SavedCryptogram">
+                <core:interfaceName>java.lang.String</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="false" name="enactor.coreUI.deviceEvent.ICCReaderStatus">
+                <core:interfaceName>com.enactor.coreUI.peripherals.IDeviceEvent</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.pos.SavedCryptogramType">
+                <core:interfaceName>java.lang.String</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="false" name="ICCReader">
+                <core:interfaceName>com.enactor.coreUI.peripherals.icc.IICCReader</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.mfc.PaymentCardType">
+                <core:interfaceName>com.enactor.mfc.cardType.IPaymentCardType</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="false" name="enactor.coreUI.deviceEvent.ICCTransactionComplete">
+                <core:interfaceName>com.enactor.coreUI.peripherals.IDeviceEvent</core:interfaceName>
+            </stateDataType>
+            <stateDataType name="enactor.mfc.Acquirer">
+                <core:interfaceName>com.enactor.mfc.acquirer.IAcquirer</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.pos.SavedIssuerApplicationData">
+                <core:interfaceName>java.lang.String</core:interfaceName>
+            </stateDataType>
+            <stateDataType name="enactor.pos.AuthAndCapture">
+                <core:interfaceName>java.lang.Boolean</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.pos.OnlinePIN">
+                <core:interfaceName>java.lang.Boolean</core:interfaceName>
+            </stateDataType>
+        </stateDataTypes>
+    </core:metaData>
+    <core:notes>
+        <core:processNote>
+            <core:noteId>Note0</core:noteId>
+            <core:description>Visa SCA Online PIN is handled by VIPA which causes OnlinePINRequired to be set. For Mastercard this doesn't seem to happen, so force it here if online pin is enabled and host response code is 70.</core:description>
+            <core:constraint>
+                <core:x>1382</core:x>
+                <core:y>1479</core:y>
+                <core:height>95</core:height>
+                <core:width>273</core:width>
+            </core:constraint>
+        </core:processNote>
+        <core:processNote>
+            <core:noteId>Note1</core:noteId>
+            <core:description>Sets online PIN required due to SCA and sets reason in FallForwardReason so we can flag later when resending auth request.</core:description>
+            <core:constraint>
+                <core:x>1710</core:x>
+                <core:y>1560</core:y>
+                <core:height>75</core:height>
+                <core:width>244</core:width>
+            </core:constraint>
+        </core:processNote>
+    </core:notes>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>SetOnlineAuthResult</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.cardPayment.processes.card.icc.SetOnlineAuthResult</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>127</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>276</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>179</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="ICCReader">
+                    <core:interfaceName>com.enactor.coreUI.peripherals.icc.IICCReader</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.CardTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.ICardTenderItem</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.mfc.Acquirer">
+                    <core:interfaceName>com.enactor.mfc.acquirer.IAcquirer</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output name="enactor.mfc.CardTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.ICardTenderItem</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID>ICCAwaitTransactionComplete</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>SetReferralResult</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.cardPayment.processes.card.icc.SetReferralResult</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>127</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>284</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>686</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="ICCReader">
+                    <core:interfaceName>com.enactor.coreUI.peripherals.icc.IICCReader</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.CardTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.ICardTenderItem</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output name="enactor.mfc.CardTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.ICardTenderItem</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID>ICCAwaitTransactionComplete</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:endProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>End Process Authorised</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIEndProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>78</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>1226</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData/>
+        <core:typeId>enactor.types.EndProcess</core:typeId>
+        <core:outcome>Authorised</core:outcome>
+        <core:defaultProcessId></core:defaultProcessId>
+    </core:endProcessAction>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>DetermineFallbackRequirement</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.cardPayment.processes.card.icc.DetermineFallbackRequirement</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>127</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1156</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>947</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.CardTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.ICardTenderItem</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.PaymentCardType">
+                    <core:interfaceName>com.enactor.mfc.cardType.IPaymentCardType</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output name="enactor.pos.FallbackFlag">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Declined"/>
+                <core:outcome name="Fallback"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>AddCardDeclinedVoidReason</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Declined</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>AddProcessingErrorVoidReason</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Fallback</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:endProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>End Process Fallback</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIEndProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1996</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>950</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData/>
+        <core:typeId>enactor.types.EndProcess</core:typeId>
+        <core:outcome>Fallback</core:outcome>
+        <core:defaultProcessId></core:defaultProcessId>
+    </core:endProcessAction>
+    <core:executeProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>ICCRemoveCardForFallback</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UICallProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>127</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1715</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>1075</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="true" required="false" name="enactor.pos.WaitForCardRemoval">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:param>
+        <core:param value="RemoveCardFallback" required="false" name="enactor.pos.PromptTextVisibilityID">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="false" name="enactor.pos.WaitForCardRemoval">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+                <core:input required="false" name="enactor.pos.PromptTextVisibilityID">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.mfc.CardTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.ICardTenderItem</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outcomes>
+                <core:outcome name="Cancel"/>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.CallProcess</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>End Process Fallback</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>End Process Cancel</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Cancel</core:outcome>
+        </core:outcomeLink>
+        <core:executeProcessId>Pos/Tender/ICCRemoveCard</core:executeProcessId>
+    </core:executeProcessAction>
+    <core:executeProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>ICCRemoveCardDeclined</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UICallProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>127</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1631</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>727</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="RemoveCardDeclined" required="false" name="enactor.pos.PromptTextVisibilityID">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:param value="true" required="false" name="enactor.pos.WaitForCardRemoval">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:param>
+        <core:param value="false" name="enactor.pos.ShowCancelButton">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input name="enactor.mfc.CardTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.ICardTenderItem</core:interfaceName>
+                </core:input>
+                <core:input required="false" name="enactor.pos.PromptTextVisibilityID">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input required="false" name="enactor.pos.WaitForCardRemoval">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.pos.ShowCancelButton">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outcomes>
+                <core:outcome name="Cancel"/>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.CallProcess</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>End Process Cancel</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Cancel</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>End Process Cancel</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:executeProcessId>Pos/Tender/ICCRemoveCard</core:executeProcessId>
+    </core:executeProcessAction>
+    <core:endProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>End Process Cancel</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIEndProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1996</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>378</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData/>
+        <core:typeId>enactor.types.EndProcess</core:typeId>
+        <core:outcome>Cancel</core:outcome>
+        <core:defaultProcessId></core:defaultProcessId>
+    </core:endProcessAction>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>HandleICCTransactionCompleteEvent</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.cardPayment.processes.card.icc.HandleICCTransactionCompleteEvent</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>127</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>909</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>855</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.CardTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.ICardTenderItem</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.coreUI.deviceEvent.ICCTransactionComplete">
+                    <core:interfaceName>com.enactor.coreUI.peripherals.IDeviceEvent</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output name="enactor.mfc.CardTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.ICardTenderItem</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Authorised"/>
+                <core:outcome name="Declined"/>
+                <core:outcome name="FallbackAllowed"/>
+                <core:outcome name="Cancel"/>
+                <core:outcome name="CancelledByCustomer"/>
+            </core:outcomes>
+            <core:sessionManagementType>NONE</core:sessionManagementType>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>AddCancelledVoidReason</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Cancel</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>TestForceNoCVMToSignature</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Authorised</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>3</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>TestContactlessFallForward</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Declined</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>4</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>DetermineFallbackRequirement</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>FallbackAllowed</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>5</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>OverrideICCResult</core:toActionID>
+            <core:condition>!process.cardTenderItem.cardDetails.contactless &amp;&amp; !process.authAndCapture &amp;&amp; (process.cardTenderItem.forceAuthorised || (process.cardTenderItem.ICCTransactionData.input.manualAuthRequired &amp;&amp; !process.cardTenderItem.cardReferred)  || process.cardTenderItem.authorisationError == 'ForcedOutOfService')
+</core:condition>
+            <core:comment>Authorisation forced by configured action after online auth failure or we are performing voice referral so the ICC outcome is ignored.
+But never if Auth &amp; Settle and never if Contactless.</core:comment>
+            <core:outcome>Declined</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>6</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>AddCustomerCancelledVoidReason</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>CancelledByCustomer</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>7</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>RestoreSavedCryptogram</core:toActionID>
+            <core:condition>process.cardTenderItem.isRefund &amp;&amp; process.cardTenderItem.cardDetails.contactless</core:condition>
+            <core:comment>Ignore expected Declined outcome for contactless refund</core:comment>
+            <core:outcome>Declined</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>8</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>TestSCAOnlinePIn</core:toActionID>
+            <core:condition>process.cardTenderItem.cardDetails.contactless &amp;&amp; !process.cardTenderItem.isRefund 
+&amp;&amp; process.cardTenderItem.hostDeclined &amp;&amp; process.cardTenderItem.acquirerResponseCode == 70 
+</core:condition>
+            <core:outcome>Declined</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:assignAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>ForceSignatureRequired</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIAssignAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>314</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>1117</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.CardTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.ICardTenderItem</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="true" name="enactor.mfc.CardTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.ICardTenderItem</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.Assign</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>End Process Authorised</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:dataAssignment toExpression="cardTenderItem.signatureRequired" fromExpression="true"/>
+    </core:assignAction>
+    <core:assignAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>RestoreSavedCryptogram</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIAssignAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1023</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>576</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>1010</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.CardTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.ICardTenderItem</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.pos.SavedCryptogram">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.pos.SavedCryptogramType">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.pos.SavedIssuerApplicationData">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="true" name="enactor.mfc.CardTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.ICardTenderItem</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:comment>We are forcing approval when actually the ICC declined.  So restore the saved ARQC.</core:comment>
+        <core:typeId>enactor.types.Assign</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>TestForceNoCVMToSignature</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:dataAssignment toExpression="cardTenderItem.ICCResults.applicationCryptogram" fromExpression="savedCryptogram"/>
+        <core:dataAssignment toExpression="cardTenderItem.ICCResults.cryptogramInformationData" fromExpression="savedCryptogramType"/>
+        <core:dataAssignment toExpression="cardTenderItem.ICCResults.issuerApplicationData" fromExpression="savedIssuerApplicationData"/>
+    </core:assignAction>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>AddCardDeclinedVoidReason</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.cardPayment.processes.card.AddToVoidReasons</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1408</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>877</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="CARD_DECLINED" name="enactor.pos.VoidReason">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.CardTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.ICardTenderItem</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.pos.VoidReason">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output name="enactor.mfc.CardTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.ICardTenderItem</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+            <core:sessionManagementType>NONE</core:sessionManagementType>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>ICCRemoveCardDeclined</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>AddCancelledVoidReason</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.cardPayment.processes.card.AddToVoidReasons</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1408</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>586</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="OPERATOR_CANCELLED" name="enactor.pos.VoidReason">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.CardTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.ICardTenderItem</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.pos.VoidReason">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output name="enactor.mfc.CardTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.ICardTenderItem</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+            <core:sessionManagementType>NONE</core:sessionManagementType>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>End Process Cancel</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>AddCustomerCancelledVoidReason</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.cardPayment.processes.card.AddToVoidReasons</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1408</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>719</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="CUSTOMER_CANCELLED" name="enactor.pos.VoidReason">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.CardTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.ICardTenderItem</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.pos.VoidReason">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output name="enactor.mfc.CardTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.ICardTenderItem</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+            <core:sessionManagementType>NONE</core:sessionManagementType>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>End Process Cancel</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>AddProcessingErrorVoidReason</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.cardPayment.processes.card.AddToVoidReasons</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1408</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>1075</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="PROCESSING_ERROR" name="enactor.pos.VoidReason">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.CardTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.ICardTenderItem</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.pos.VoidReason">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output name="enactor.mfc.CardTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.ICardTenderItem</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+            <core:sessionManagementType>NONE</core:sessionManagementType>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>ICCRemoveCardForFallback</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:assignAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>SetManualAuthRequired</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIAssignAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>576</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>1279</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.CardTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.ICardTenderItem</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="true" name="enactor.mfc.CardTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.ICardTenderItem</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.Assign</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>RestoreSavedCryptogram</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:dataAssignment toExpression="cardTenderItem.ICCTransactionData.input.manualAuthRequired" fromExpression="true"/>
+    </core:assignAction>
+    <core:assignAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>SaveARQCryptogram &amp; Set Value</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIAssignAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1023</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>723</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>111</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.CardTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.ICardTenderItem</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.pos.AuthAndCapture">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.PaymentCardType">
+                    <core:interfaceName>com.enactor.mfc.cardType.IPaymentCardType</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="true" name="enactor.pos.SavedCryptogram">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:output>
+                <core:output required="true" name="enactor.pos.SavedCryptogramType">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:output>
+                <core:output required="true" name="enactor.pos.SavedIssuerApplicationData">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:output>
+                <core:output required="true" name="enactor.pos.AuthAndCapture">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:output>
+                <core:output required="true" name="enactor.pos.OnlinePIN">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:comment>Save the  authorisation request cryptogram  in case we want to force authorisation even if the ICC declines.</core:comment>
+        <core:typeId>enactor.types.Assign</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID>ICCAwaitTransactionComplete</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:dataAssignment toExpression="savedCryptogram" fromExpression="cardTenderItem.ICCResults.applicationCryptogram"/>
+        <core:dataAssignment toExpression="savedCryptogramType" fromExpression="cardTenderItem.ICCResults.cryptogramInformationData"/>
+        <core:dataAssignment toExpression="savedIssuerApplicationData" fromExpression="cardTenderItem.ICCResults.issuerApplicationData"/>
+        <core:dataAssignment toExpression="authAndCapture" fromExpression="authAndCapture == null ? false : authAndCapture"/>
+        <core:dataAssignment toExpression="onlinePIN" fromExpression="paymentCardType.onlinePIN != null &amp;&amp; (enumEquals(paymentCardType.onlinePIN, 'OnlinePIN') || enumEquals(paymentCardType.onlinePIN, 'OnlinePINAndSignature'))"/>
+    </core:assignAction>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>OverrideICCResult</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UINullAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>799</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>1220</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.NullAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>RestoreSavedCryptogram</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>SetManualAuthRequired</core:toActionID>
+            <core:condition>process.cardTenderItem.authorisationError == 'ForcedOutOfService' &amp;&amp; !process.cardTenderItem.forceAuthorised</core:condition>
+            <core:comment>If offline mode authorisation error and action is not not forcing authorised, then default to voice referral.</core:comment>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:executeProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>TestContactlessFallForward</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UICallProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1023</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1156</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>1241</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.CardTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.ICardTenderItem</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.PaymentCardType">
+                    <core:interfaceName>com.enactor.mfc.cardType.IPaymentCardType</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="true" name="enactor.mfc.CardTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.ICardTenderItem</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Cancel"/>
+                <core:outcome name="FallForward"/>
+                <core:outcome name="Decline"/>
+                <core:outcome name="ContactlessRetap"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.CallProcess</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>AddCardDeclinedVoidReason</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Decline</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>AddCancelledVoidReason</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Cancel</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>3</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>EndProcessFallForward</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>FallForward</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>4</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>EndProcessContactlessRetap</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>ContactlessRetap</core:outcome>
+        </core:outcomeLink>
+        <core:executeProcessId>CardPayment/TestContactlessFallForward</core:executeProcessId>
+    </core:executeProcessAction>
+    <core:endProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>EndProcessFallForward</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIEndProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1996</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>1327</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData/>
+        <core:typeId>enactor.types.EndProcess</core:typeId>
+        <core:outcome>FallForward</core:outcome>
+        <core:defaultProcessId></core:defaultProcessId>
+    </core:endProcessAction>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>TestForceNoCVMToSignature</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UINullAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>78</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>1015</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.NullAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>End Process Authorised</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>ForceSignatureRequired</core:toActionID>
+            <core:condition>!process.cardTenderItem.ICCResults.PINVerified 
+&amp;&amp; !process.cardTenderItem.signatureRequired 
+&amp;&amp; !process.cardTenderItem.cardDetails.contactless
+&amp;&amp; notEmpty(process.iCCReader.config)
+&amp;&amp; process.iCCReader.config.forceNoCVMToSignature</core:condition>
+            <core:comment>Force No CVM to Signature if specified in ICC reader configuration</core:comment>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:endProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>EndProcessContactlessRetap</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIEndProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1996</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>1412</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData/>
+        <core:typeId>enactor.types.EndProcess</core:typeId>
+        <core:outcome>ContactlessRetap</core:outcome>
+        <core:defaultProcessId></core:defaultProcessId>
+    </core:endProcessAction>
+    <core:endProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>EndProcessCtlsSCAOnlinePIN</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIEndProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1996</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>1489</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData/>
+        <core:typeId>enactor.types.EndProcess</core:typeId>
+        <core:outcome>CtlsSCARequestOnlinePIN</core:outcome>
+        <core:defaultProcessId></core:defaultProcessId>
+    </core:endProcessAction>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>TestSCAOnlinePIn</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UINullAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.notes</key>
+                <value>Note0</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1415</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>1241</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.NullAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>SetOnlinePinRequired</core:toActionID>
+            <core:condition>process.cardTenderItem.ICCResults.onlinePINRequired 
+ || (&quot;02&quot; == process.cardTenderItem.ICCResults.contactlessType &amp;&amp; process.paymentCardType.onlinePIN != null)
+ || (&quot;07&quot; == process.cardTenderItem.ICCResults.contactlessType &amp;&amp; process.paymentCardType.onlinePIN != null) </core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>TestContactlessFallForward</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:assignAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>SetOnlinePinRequired</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIAssignAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.notes</key>
+                <value>Note1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1776</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>1489</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.CardTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.ICardTenderItem</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="true" name="enactor.mfc.CardTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.ICardTenderItem</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.Assign</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>EndProcessCtlsSCAOnlinePIN</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:dataAssignment toExpression="cardTenderItem.ICCResults.onlinePINRequired" fromExpression="true"/>
+        <core:dataAssignment toExpression="cardTenderItem.cardDetails.ICCFallForwardReason" fromExpression="enumValue('com.enactor.mfc.basket.items.ICardDetails$FallForwardReason', 'HOST_FORCED_SCA_ONLINE_PIN')"/>
+    </core:assignAction>
+    <core:state>
+        <core:url></core:url>
+        <core:stateID>Start</core:stateID>
+        <core:name></core:name>
+        <core:className></core:className>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>507</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>34</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <handledEvents>
+                <handledEvent name="StateEntered"/>
+            </handledEvents>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicState</core:typeId>
+        <core:singleInstance>false</core:singleInstance>
+        <core:respondToViewEvents>false</core:respondToViewEvents>
+        <core:actionInputMappings/>
+        <core:actionOutputMappings/>
+        <core:eventLink>
+            <core:linkID>3</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>SaveARQCryptogram &amp; Set Value</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>StateEntered</core:event>
+        </core:eventLink>
+    </core:state>
+    <core:promptState>
+        <core:url>Pos/Tender/ICCAwaitTransactionComplete</core:url>
+        <core:stateID>ICCAwaitTransactionComplete</core:stateID>
+        <core:name>ICC Await Transaction Complete</core:name>
+        <core:className>com.enactor.coreUI.states.UIPromptState</core:className>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>63</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>726</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>416</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="false" name="enactor.pos.ShowCancelButton">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="false" name="enactor.mfc.CardTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.ICardTenderItem</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.pos.ShowCancelButton">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="false" name="enactor.coreUI.deviceEvent.ICCReaderStatus">
+                    <core:interfaceName>com.enactor.coreUI.peripherals.IDeviceEvent</core:interfaceName>
+                </core:output>
+                <core:output required="false" name="enactor.coreUI.deviceEvent.ICCTransactionComplete">
+                    <core:interfaceName>com.enactor.coreUI.peripherals.IDeviceEvent</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <handledEvents>
+                <handledEvent name="CancelPressed"/>
+                <handledEvent name="CardRemoved"/>
+                <handledEvent name="ICCReaderStatus"/>
+                <handledEvent name="ICCTransactionComplete"/>
+                <handledEvent name="StateEntered"/>
+                <handledEvent name="PromptTimeout"/>
+            </handledEvents>
+            <stateDataTypes>
+                <stateDataType required="false" name="enactor.coreUI.deviceEvent.ICCReaderStatus">
+                    <core:interfaceName>com.enactor.coreUI.peripherals.IDeviceEvent</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="false" name="enactor.coreUI.deviceEvent.ICCTransactionComplete">
+                    <core:interfaceName>com.enactor.coreUI.peripherals.IDeviceEvent</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="true" name="enactor.mfc.CardTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.ICardTenderItem</core:interfaceName>
+                </stateDataType>
+                <stateDataType name="enactor.pos.ShowCancelButton">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </stateDataType>
+            </stateDataTypes>
+        </core:metaData>
+        <core:typeId>enactor.types.PromptState</core:typeId>
+        <core:singleInstance>false</core:singleInstance>
+        <core:respondToViewEvents>true</core:respondToViewEvents>
+        <core:actionInputMappings/>
+        <core:actionOutputMappings/>
+        <core:eventLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>HandleICCTransactionCompleteEvent</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>ICCTransactionComplete</core:event>
+        </core:eventLink>
+        <core:eventLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID>ICCAwaitTransactionComplete</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:event>ICCReaderStatus</core:event>
+        </core:eventLink>
+        <core:eventLink>
+            <core:linkID>3</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>AddCancelledVoidReason</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>CancelPressed</core:event>
+        </core:eventLink>
+        <core:eventLink>
+            <core:linkID>4</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>AddCustomerCancelledVoidReason</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>CardRemoved</core:event>
+        </core:eventLink>
+        <core:eventLink>
+            <core:linkID>5</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>SetOnlineAuthResult</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>StateEntered</core:event>
+        </core:eventLink>
+        <core:eventLink>
+            <core:linkID>7</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>SetReferralResult</core:toActionID>
+            <core:condition>process.cardTenderItem.cardReferred</core:condition>
+            <core:event>StateEntered</core:event>
+        </core:eventLink>
+        <core:eventLink>
+            <core:linkID>6</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>AddCancelledVoidReason</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>PromptTimeout</core:event>
+        </core:eventLink>
+        <core:keepPromptOpen>false</core:keepPromptOpen>
+        <core:closeOnNextPrompt>false</core:closeOnNextPrompt>
+        <core:keepPreviousPromptOpen>false</core:keepPreviousPromptOpen>
+        <core:promptTimeout>30</core:promptTimeout>
+        <core:hideOpenPrompt>false</core:hideOpenPrompt>
+        <core:allowDatabasePromptLookup>false</core:allowDatabasePromptLookup>
+    </core:promptState>
+    <core:stateTransitions/>
+</core:process>

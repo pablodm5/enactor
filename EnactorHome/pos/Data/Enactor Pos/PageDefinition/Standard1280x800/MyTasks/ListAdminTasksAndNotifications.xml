@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<core:window xmlns:core="http://www.enactor.com/core" xmlns:retail="http://www.enactor.com/retail" xmlns:ns4="http://www.enactor.com/crm" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803" xmlns:ns6="http://www.apis-it.hr/fin/2012/types/f73" xmlns:ns7="http://www.w3.org/2000/09/xmldsig#" xmlns:ns8="http://www.enactor.com/retail/storedRetailTransaction/service" xmlns:ns9="http://www.fu.gov.si/" xmlns:ns10="http://www.enactor.com/addressLookup/service" xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:ns14="http://www.enactor.com/crm/customerLoyalty/service" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" hasBorders="DEFAULT" allowClose="true" windowtype="view-panel" height="0" width="0" updateMode="REDRAW_PAGE" transparentBackground="true" messageBase="Maintenance/TaskClientMessages" titleId="TASK_CLIENT" url="Standard1280x800/MyTasks/ListAdminTasksAndNotifications">
+    <core:elements>
+        <core:hidden id="InputBox"/>
+        <core:hidden id="TotalLabel"/>
+        <core:hidden id="Receipt"/>
+        <core:hidden id="SelectionList"/>
+        <core:panel namingContainer="true" id="PagePanel">
+            <core:elements>
+                <core:text lineHeight="0" messageId="TASK_CLIENT_ADMIN" id="Prompt"/>
+                <core:listBox lazyLoad="false" listSelectionMethod="DEFAULT" documentTemplateUrl="MyTasks/ListAdminTasksListTemplate" selectedIndex="0" id="listBox">
+                    <core:elements/>
+                    <core:listExpression>#{list}</core:listExpression>
+                    <core:listingElementEvents>
+                        <core:selectionEvent>page.PagePanel.listBox.changed</core:selectionEvent>
+                    </core:listingElementEvents>
+                </core:listBox>
+                <core:button lineHeight="0" messageId="BUTTON_OPEN_TASK" visibility="#{notEmpty(page['PagePanel.listBox'].selectedItem)}" id="Button1">
+                    <core:updateTriggers>
+                        <core:element>listBox</core:element>
+                    </core:updateTriggers>
+                    <core:text>enactor.maintenance.View</core:text>
+                    <core:data>
+                        <core:expression value="#{page['PagePanel.listBox'].selectedItem.key}" javaInterfaceName="com.enactor.core.entities.IEntityKey" name="enactor.UISelectionState.SelectedKey"/>
+                        <core:expression value="#{page['PagePanel.listBox'].selectedItem}" javaInterfaceName="com.enactor.core.entities.IEntity" name="enactor.UISelectionState.SelectedListElement"/>
+                    </core:data>
+                </core:button>
+                <core:button lineHeight="0" messageId="BUTTON_OTHER_OPTIONS" id="Button3">
+                    <core:text>OtherOptionsPressed</core:text>
+                </core:button>
+                <core:button lineHeight="0" messageId="BUTTON_UP" visibility="#{page['PagePanel.listBox'].visible &amp;&amp; page['PagePanel.listBox'].moveUp}" id="Button4">
+                    <core:updateTriggers>
+                        <core:element>listBox</core:element>
+                    </core:updateTriggers>
+                    <core:text>page.PagePanel.listBox.up</core:text>
+                </core:button>
+                <core:button lineHeight="0" messageId="BUTTON_DOWN" visibility="#{page['PagePanel.listBox'].visible &amp;&amp; page['PagePanel.listBox'].moveDown}" id="Button5">
+                    <core:updateTriggers>
+                        <core:element>listBox</core:element>
+                    </core:updateTriggers>
+                    <core:text>page.PagePanel.listBox.down</core:text>
+                </core:button>
+                <core:button lineHeight="0" messageId="#{notEmpty(alternativeButtons) &amp;&amp; alternativeButtons ? 'BUTTON_PREVIOUS_PAGE' : 'BUTTON_PENDING'}" visibility="#{notEmpty(alternativeButtons) &amp;&amp; alternativeButtons ? (list.currentRowOffset &gt; 0) : (showOtherTab)}" id="Button6">
+                    <core:updateTriggers>
+                        <core:element>listBox</core:element>
+                    </core:updateTriggers>
+                    <core:text>#{notEmpty(alternativeButtons) &amp;&amp; alternativeButtons ? 'PreviousPage' : 'enactor.task.maintenance.SelectPendingTasksTab'}</core:text>
+                </core:button>
+                <core:button lineHeight="0" messageId="#{alternativeButtons ? 'BUTTON_NEXT_PAGE' : 'BUTTON_COMPLETED'}" visibility="#{alternativeButtons ? (list.currentRowOffset + list.rowsPerPage &lt; list.totalRows) : (showOtherTab)}" id="Button7">
+                    <core:updateTriggers>
+                        <core:element>listBox</core:element>
+                    </core:updateTriggers>
+                    <core:text>#{notEmpty(alternativeButtons) &amp;&amp; alternativeButtons ? 'NextPage' : 'enactor.task.maintenance.SelectCompletedTasksTab'}</core:text>
+                </core:button>
+                <core:button lineHeight="0" messageId="BUTTON_BACK" id="Button8">
+                    <core:text>Back</core:text>
+                </core:button>
+            </core:elements>
+        </core:panel>
+    </core:elements>
+    <core:templateURL>Standard1280x800/TaskMaintenance/FullPagePanelTemplate</core:templateURL>
+    <core:events>
+        <core:event destination="PagePanel.Button4" event="key.UpPressed">press</core:event>
+        <core:event destination="PagePanel.Button5" event="key.DownPressed">press</core:event>
+    </core:events>
+    <core:preferredConstraintType>BOUNDS</core:preferredConstraintType>
+    <core:variables>
+        <core:variable required="true" name="enactor.coreUI.List">
+            <core:interfaceName>java.util.List</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.coreUI.ListCriteria">
+            <core:interfaceName>com.enactor.core.servers.IListCriteria</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.coreUI.PageSize">
+            <core:interfaceName>java.lang.Integer</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.coreUI.ListFiltersMap">
+            <core:interfaceName>java.util.Map</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.task.AutomaticallyOpenAfterClaim">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.coreUI.UserLocale">
+            <core:interfaceName>com.enactor.core.localisation.ILocale</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.task.maintenance.ShowBPDetailsOption">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.task.maintenance.ShowAdminTab">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.task.maintenance.ShowOtherTab">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.coreUI.TabId">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.maintenance.AlternativeButtons">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:variable>
+    </core:variables>
+    <core:previewStyleSheets>
+        <core:path>default.css</core:path>
+    </core:previewStyleSheets>
+</core:window>

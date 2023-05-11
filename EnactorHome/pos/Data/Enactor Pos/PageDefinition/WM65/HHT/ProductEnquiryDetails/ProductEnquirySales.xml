@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<core:peripheralSupportWindow xmlns:core="http://www.enactor.com/core" xmlns:retail="http://www.enactor.com/retail" xmlns:ns4="http://www.enactor.com/crm" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803" xmlns:ns6="http://www.apis-it.hr/fin/2012/types/f73" xmlns:ns7="http://www.w3.org/2000/09/xmldsig#" xmlns:ns8="http://www.enactor.com/retail/storedRetailTransaction/service" xmlns:ns9="http://www.fu.gov.si/" xmlns:ns10="http://www.enactor.com/addressLookup/service" xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:ns14="http://www.enactor.com/crm/customerLoyalty/service" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" hasBorders="FALSE" height="320" width="320" messageBase="HHT/ProductEnquiry/ProductEnquiryMessages" titleId="PRODUCT_SEARCH_PAGE_TITLE" url="WM65/HHT/ProductEnquiryDetails/ProductEnquirySales">
+    <core:elements>
+        <core:panel styleClass="mainPanel" id="MAIN_PANEL">
+            <core:boundsConstraint height="230" width="320" y="35" x="0"/>
+            <core:elements>
+                <core:label messageId="PRODUCT_ID_LABEL" styleClass="fieldLabel" id="PRODUCT_ID_LABEL">
+                    <core:boundsConstraint height="17" width="100" y="0" x="5"/>
+                </core:label>
+                <core:text styleClass="message" id="PRODUCT_ID">
+                    <core:boundsConstraint height="17" width="161" y="0" x="89"/>
+                    <core:text>#{ length(productDetail.productId) &gt; 15 ? concat(strings:substring(productDetail.productId,0,15),'...') : productDetail.productId}</core:text>
+                </core:text>
+                <core:text styleClass="message" id="PRODUCT_DESCRIPTION">
+                    <core:boundsConstraint height="17" width="250" y="24" x="5"/>
+                    <core:text>#{length(productDetail.description) &gt; 45 ? concat(strings:substring(productDetail.description,0,45),'...') : productDetail.description}</core:text>
+                </core:text>
+                <core:text id="SELECT_COLOUR_INPUT_BOX">
+                    <core:boundsConstraint height="17" width="70" y="45" x="110"/>
+                    <core:text>#{notEmpty(selectedColour)?(length(dynamicMap[selectedColour].description) &gt; 6 ? concat(strings:substring(dynamicMap[selectedColour].description,0,6),'...') : dynamicMap[selectedColour].description):&quot;&quot;}</core:text>
+                </core:text>
+                <core:button messageId="SELECT_BUTTON" styleClass="button" visibility="#{!isEmpty(colourList)}" enable="#{!instanceOf(product, 'com.enactor.mfc.product.ISKUProduct')}" id="SELECT_COLOUR_BUTTON">
+                    <core:boundsConstraint height="17" width="60" y="45" x="185"/>
+                    <core:text>SelectSaleColourPressed</core:text>
+                </core:button>
+                <core:label messageId="COLOUR_LABEL" id="COLOUR_LABEL">
+                    <core:boundsConstraint height="17" width="100" y="45" x="5"/>
+                </core:label>
+                <core:label messageId="START_DATE_LABEL" id="START_DATE_LABEL">
+                    <core:boundsConstraint height="17" width="100" y="65" x="5"/>
+                </core:label>
+                <core:label messageId="END_DATE_LABEL" id="END_DATE_LABEL">
+                    <core:boundsConstraint height="17" width="100" y="85" x="5"/>
+                </core:label>
+                <core:inputText id="START_DATE_INPUT_BOX">
+                    <core:boundsConstraint height="17" width="100" y="65" x="185"/>
+                    <core:text>#{startDateString}</core:text>
+                    <core:textElementEvents enterEvent="RefreshSalesPage"/>
+                </core:inputText>
+                <core:inputText id="END_DATE_INPUT_BOX">
+                    <core:boundsConstraint height="17" width="100" y="85" x="185"/>
+                    <core:text>#{endDateString}</core:text>
+                    <core:textElementEvents enterEvent="RefreshSalesPage"/>
+                </core:inputText>
+                <core:panel styleClass="tablePanel" id="DATA_PANEL">
+                    <core:boundsConstraint height="86" width="308" y="105" x="5"/>
+                    <core:elements>
+                        <core:dataTable selectedRowClass="selectedRow" rowSelection="true" var="row" data="#{productSalesPagedList}" borderSize="1" borderStyle="None" styleClass="tableNoSpacing" id="ITEMS_TABLE">
+                            <core:flowConstraint width="304"/>
+                            <core:headerRow id="ITEMS_TABLE_HEADER">
+<core:cell styleClass="left" id="HEADER">
+    <core:elements>
+        <core:label messageId="STORE_LABEL" styleClass="columnHeading" id="STORE_LABEL">
+            <core:flowConstraint/>
+        </core:label>
+    </core:elements>
+</core:cell>
+<core:cell styleClass="left" id="TABLE_CELL_1">
+    <core:elements>
+        <core:label messageId="SIZE_LABEL" styleClass="columnHeading left" id="SIZE_LABEL">
+            <core:flowConstraint/>
+        </core:label>
+    </core:elements>
+</core:cell>
+<core:cell styleClass="left" visibility="#{instanceOf(product, 'com.enactor.mfc.product.IStyleColourSizeProduct')}" id="TABLE_CELL_3">
+    <core:elements>
+        <core:label messageId="COLOUR_LABEL" id="COLOUR_LABEL">
+            <core:flowConstraint/>
+        </core:label>
+    </core:elements>
+</core:cell>
+<core:cell styleClass="left" id="TABLE_CELL_2">
+    <core:elements>
+        <core:label messageId="SALES_LABEL" styleClass="columnHeading left" id="SALES_LABEL">
+            <core:flowConstraint/>
+        </core:label>
+    </core:elements>
+</core:cell>
+                            </core:headerRow>
+                            <core:cell styleClass="left" id="TABLE_CELL_1">
+<core:elements>
+    <core:text styleClass="columnValue" id="STORE_NAME">
+        <core:flowConstraint/>
+        <core:text>#{row.locationDescription}</core:text>
+    </core:text>
+</core:elements>
+                            </core:cell>
+                            <core:cell id="TABLE_CELL_2">
+<core:elements>
+    <core:label styleClass="columnValue" id="SIZE_VALUE">
+        <core:flowConstraint/>
+        <core:text>#{notEmpty(row.sizeId) ? ProductEnquiryBean:getSizeDescription(row.sizeId, styleColourSizeProduct.sizeRangeKey.sizeRangeId, dynamicMap) : '-'}</core:text>
+    </core:label>
+</core:elements>
+                            </core:cell>
+                            <core:cell styleClass="left" visibility="#{instanceOf(product, 'com.enactor.mfc.product.IStyleColourSizeProduct')}" id="TABLE_CELL_4">
+<core:elements>
+    <core:label styleClass="columnValue" id="SKU_PRODUCT_COLOUR">
+        <core:flowConstraint/>
+        <core:text>#{notEmpty(row.colourId) ? ProductEnquiryBean:getColourDescription(row.colourId,styleColourSizeProduct.colourRangeKey.colourRangeId , dynamicMap) : '-'}</core:text>
+    </core:label>
+</core:elements>
+                            </core:cell>
+                            <core:cell id="TABLE_CELL_3">
+<core:elements>
+    <core:label styleClass="columnValue" id="SALES_AMOUNT_VALUE">
+        <core:flowConstraint/>
+        <core:text>#{row.salesQuantity}</core:text>
+    </core:label>
+</core:elements>
+                            </core:cell>
+                        </core:dataTable>
+                    </core:elements>
+                </core:panel>
+                <core:label messageId="DATE_FORMAT" styleClass="message" id="DATE_FORMAT_LABEL_1">
+                    <core:boundsConstraint height="17" width="70" y="65" x="110"/>
+                    <core:text>DDMMYY</core:text>
+                </core:label>
+                <core:label messageId="DATE_FORMAT" styleClass="message" id="DATE_FORMAT_LABEL_2">
+                    <core:boundsConstraint height="17" width="70" y="85" x="110"/>
+                    <core:text>DDMMYY</core:text>
+                </core:label>
+                <core:panel id="PAGE_CONTROL_PANEL_2">
+                    <core:boundsConstraint height="30" width="304" y="195" x="5"/>
+                    <core:elements>
+                        <core:pageElementRef pageDefinitionURL="HHT/Common/HHTPageControl" id="PAGE_CONTROLS">
+                            <core:boundsConstraint height="30" width="304" y="0" x="0"/>
+                            <core:elements/>
+                            <core:parameter value="#{productSalesPagedList}" name="enactor.coreUI.List">
+<core:interfaceName>java.util.List</core:interfaceName>
+                            </core:parameter>
+                        </core:pageElementRef>
+                    </core:elements>
+                </core:panel>
+                <core:button messageId="CLEAR_BUTTON" styleClass="button" visibility="#{!isEmpty(colourList)}" enable="#{!instanceOf(product, 'com.enactor.mfc.product.ISKUProduct')}" id="CLEAR_SALE_COLOUR_BUTTON">
+                    <core:boundsConstraint height="17" width="32" y="45" x="249"/>
+                    <core:text>ClearSalesHistoryColourSelected</core:text>
+                </core:button>
+            </core:elements>
+        </core:panel>
+    </core:elements>
+    <core:templateURL>HHT/HHTPage</core:templateURL>
+    <core:events>
+        <core:event destination="AMEND" event="key.KeyCode27Pressed"></core:event>
+    </core:events>
+    <core:preferredConstraintType>BOUNDS</core:preferredConstraintType>
+    <core:variables>
+        <core:variable required="true" name="enactor.productCatalogue.ProductDetail">
+            <core:interfaceName>com.enactor.productCatalogueSearchMessages.productCatalogueSearch.IProductSearchDetail</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.hht.SelectedSize">
+            <core:interfaceName>com.enactor.mfc.product.ISKUProduct</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="com.enactor.mfc.product.StyleColourSizeProduct">
+            <core:interfaceName>com.enactor.mfc.product.IStyleColourSizeProduct</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.dynamicMap.DynamicSizeMap">
+            <core:interfaceName>com.enactor.core.utilities.DynamicMap</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.hht.AlternateSizeList">
+            <core:interfaceName>java.util.List</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.mfc.Product">
+            <core:interfaceName>com.enactor.mfc.product.IProduct</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.dynamicMap.DynamicMap">
+            <core:interfaceName>com.enactor.core.utilities.DynamicMap</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.hht.SelectedColour">
+            <core:interfaceName>com.enactor.mfc.product.colour.IColourKey</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.mfc.ColourList">
+            <core:interfaceName>java.util.List</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.mfc.ProductSalesPagedList">
+            <core:interfaceName>java.util.List</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.mfc.EndDateString">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.mfc.StartDateString">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:variable>
+    </core:variables>
+    <core:functionLibraries>
+        <core:functionLibrary name="ProductEnquiryBean" path="com.enactor.storeInventoryManagement.productEnquiry.ProductEnquiryBean">
+            <core:type>CLASS</core:type>
+        </core:functionLibrary>
+    </core:functionLibraries>
+    <core:scannerEnabled>false</core:scannerEnabled>
+    <core:scannerDataName></core:scannerDataName>
+</core:peripheralSupportWindow>

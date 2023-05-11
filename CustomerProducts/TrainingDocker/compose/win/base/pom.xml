@@ -1,0 +1,92 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.enactor.training.docker</groupId>
+	<artifactId>win-base-compose</artifactId>
+	<packaging>pom</packaging>
+	<name>Training - Windows Base Compose Files</name>
+	<parent>
+		<groupId>com.enactor.training.docker</groupId>
+		<artifactId>win-compose-parent-pom</artifactId>
+		<version>TRUNK-SNAPSHOT</version>
+		<relativePath>..</relativePath>
+	</parent>	
+	<properties>
+		<skip-copy-resources>false</skip-copy-resources>
+		<skip-create-zipped-config>false</skip-create-zipped-config>		
+		<docker.os>win</docker.os>
+		<env.base>${project.build.directory}</env.base>
+		<env.dir>${env.base}/env</env.dir>
+		<db.port>1433</db.port>
+		<db.schema>enactorEM</db.schema>
+		<db.schema.cm>enactorCM</db.schema.cm>
+		<db.schema.om>enactorEM</db.schema.om>
+		<db.schema.sso>enactorSSO</db.schema.sso>
+		<db.schema.pdp>enactorPDP</db.schema.pdp>
+		<db.schema.ss>enactorSS</db.schema.ss>
+		<db.schema.pdp1>enactorPDP1_base</db.schema.pdp1>
+		<db.schema.pdp2>enactorPDP2_base</db.schema.pdp2>
+		<db.schema.pdp3>enactorPDP3_base</db.schema.pdp3>			
+		<db.schema.ss1>enactorSS1_base</db.schema.ss1>	
+		<db.schema.ss2>enactorSS2_base</db.schema.ss2>			
+		<db.hostname>172.24.1.1:1</db.hostname>
+	</properties>
+	<profiles>
+		<profile>
+			<id>env-docker-compose</id>		
+			<build>
+				<plugins>
+					<plugin>
+						<artifactId>maven-antrun-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>Update env.env and run.ps1 tokens</id>
+								<phase>process-resources</phase>
+								<goals>
+									<goal>run</goal>
+								</goals>
+								<configuration>
+									<tasks>
+										<!-- Environment base - compose and .env  -->
+										<replace dir="${env.base}" includes="*.env"  token="REPLACE_DOCKER_REPO" value="${docker.repo.url}" />
+										<replace dir="${env.base}" includes="*.env"  token="REPLACE_DOCKER_BASE" value="${docker.baselocation}" />								
+										<replace dir="${env.base}" includes="*.env"  token="REPLACE_DOCKER_TAG" value="${docker.tag}"  />
+										<replace dir="${env.base}" includes="*.env"  token="REPLACE_DB_PORT" value="${db.port}"  />
+										<replace dir="${env.base}" includes="*.env"  token="REPLACE_OS" value="${docker.os}"  />
+										<replace dir="${env.dir}" includes="*.env"  token="REPLACE_DB_PORT" value="${db.port}"  />
+										<replace dir="${env.dir}" includes="*.env"  token="REPLACE_DB_IP_EM" value="${db.hostname}"  />
+										<replace dir="${env.dir}" includes="*.env"  token="REPLACE_DB_IP_CM" value="${db.hostname}"  />
+										<replace dir="${env.dir}" includes="*.env"  token="REPLACE_DB_IP_OM" value="${db.hostname}"  />
+										<replace dir="${env.dir}" includes="*.env"  token="REPLACE_DB_SCHEMA_EM" value="${db.schema}"  />
+										<replace dir="${env.dir}" includes="*.env"  token="REPLACE_DB_SCHEMA_CM" value="${db.schema.cm}"  />
+										<replace dir="${env.dir}" includes="*.env"  token="REPLACE_DB_SCHEMA_OM" value="${db.schema.om}"  />
+										<replace dir="${env.dir}" includes="*.env"  token="REPLACE_DB_SCHEMA_PDP" value="${db.schema.pdp}"  />
+										<replace dir="${env.dir}" includes="*.env"  token="REPLACE_DB_SCHEMA_SSO" value="${db.schema.sso}"  />
+										<replace dir="${env.dir}" includes="*.env"  token="REPLACE_DB_SCHEMA_SS" value="${db.schema.ss}"  />
+										<replace dir="${env.dir}" includes="*.env"  token="REPLACE_DB_SCHEMA_PDP1" value="${db.schema.pdp1}"  />
+										<replace dir="${env.dir}" includes="*.env"  token="REPLACE_DB_SCHEMA_PDP2" value="${db.schema.pdp2}"  />
+										<replace dir="${env.dir}" includes="*.env"  token="REPLACE_DB_SCHEMA_PDP3" value="${db.schema.pdp3}"  />								
+										<replace dir="${env.dir}" includes="*.env"  token="REPLACE_DB_SCHEMA_SS1" value="${db.schema.ss1}"  />	
+										<replace dir="${env.dir}" includes="*.env"  token="REPLACE_DB_SCHEMA_SS2" value="${db.schema.ss2}"  />	
+										<replace dir="${env.dir}" includes="*.env"  token="REPLACE_SOLR_DOCKER_TAG" value="${solr.docker.tag}"  />	
+										<copy todir="${project.build.directory}/config">
+											<fileset dir="${project.build.directory}">
+												<include name="*.yml"/>
+												<include name=".env"/>
+											</fileset>
+										</copy>
+										<copy todir="${project.build.directory}/config/env">
+											<fileset dir="${project.build.directory}/env">
+												<include name="*"/>
+											</fileset>
+										</copy>								
+									</tasks>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+</project>

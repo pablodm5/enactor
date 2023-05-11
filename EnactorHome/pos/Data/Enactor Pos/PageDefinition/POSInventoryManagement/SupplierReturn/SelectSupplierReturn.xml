@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<retail:posPromptPage xmlns:core="http://www.enactor.com/core" xmlns:retail="http://www.enactor.com/retail" xmlns:ns4="http://www.enactor.com/crm" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803" xmlns:ns6="http://www.apis-it.hr/fin/2012/types/f73" xmlns:ns7="http://www.w3.org/2000/09/xmldsig#" xmlns:ns8="http://www.enactor.com/retail/storedRetailTransaction/service" xmlns:ns9="http://www.fu.gov.si/" xmlns:ns10="http://www.enactor.com/addressLookup/service" xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:ns14="http://www.enactor.com/crm/customerLoyalty/service" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" messageBase="POSInventoryManagement/SupplierReturn/SupplierReturnMessages" url="POSInventoryManagement/SupplierReturn/SelectSupplierReturn">
+    <core:elements>
+        <core:hidden id="Receipt"/>
+        <core:hidden id="SelectionList"/>
+        <core:hidden id="InputBox"/>
+        <core:text id="Prompt">
+            <core:uiMessage messageId="SELECT_DISPATCH_TO_PROGRESS" applicability="!historyFlag"/>
+            <core:uiMessage messageId="SELECT_RETURN_TO_VIEW_DETAILS" applicability="historyFlag"/>
+        </core:text>
+        <core:hidden id="TotalLabel"/>
+        <core:button messageBase="POSInventoryManagement/Common/GeneralMessages" messageId="SELECT_BUTTON_LABEL" visibility="#{notEmpty(supplierReturnHeadersList)}" enable="#{!enactor:empty(supplierReturnHeadersList) &amp;&amp; size(supplierReturnHeadersList) &gt; 0}" id="Button1">
+            <core:text>SelectPressed</core:text>
+        </core:button>
+        <core:button messageBase="POSInventoryManagement/Common/GeneralMessages" messageId="UP_BUTTON_LABEL" visibility="#{page['PagingSelectionListPanel.PagingSelectionListBoxTall'].visible &amp;&amp; page['PagingSelectionListPanel.PagingSelectionListBoxTall'].moveUp}" id="Button2">
+            <core:updateTriggers>
+                <core:element>PagingSelectionListBoxTall</core:element>
+            </core:updateTriggers>
+            <core:text>page.PagingSelectionListPanel.PagingSelectionListBoxTall.up</core:text>
+        </core:button>
+        <core:button messageBase="POSInventoryManagement/Common/GeneralMessages" messageId="DOWN_BUTTON_LABEL" visibility="#{page['PagingSelectionListPanel.PagingSelectionListBoxTall'].visible &amp;&amp; page['PagingSelectionListPanel.PagingSelectionListBoxTall'].moveDown}" id="Button3">
+            <core:updateTriggers>
+                <core:element>PagingSelectionListBoxTall</core:element>
+            </core:updateTriggers>
+            <core:text>page.PagingSelectionListPanel.PagingSelectionListBoxTall.down</core:text>
+        </core:button>
+        <core:button messageBase="POSInventoryManagement/Common/GeneralMessages" messageId="NEW_BUTTON_LABEL" visibility="#{!historyFlag}" id="Button5">
+            <core:text>NewPressed</core:text>
+        </core:button>
+        <core:button messageBase="POSInventoryManagement/Common/GeneralMessages" messageId="HISTORY_BUTTON_LABEL" visibility="#{!historyFlag}" id="Button6">
+            <core:text>HistoryPressed</core:text>
+        </core:button>
+        <core:button messageBase="POSInventoryManagement/Common/GeneralMessages" messageId="CANCEL_BUTTON_LABEL" id="Button8">
+            <core:text>CancelPressed</core:text>
+        </core:button>
+        <core:button messageBase="POSInventoryManagement/Common/GeneralMessages" messageId="BACK_BUTTON_LABEL" visibility="#{historyFlag}" id="Button7">
+            <core:text>BackPressed</core:text>
+        </core:button>
+        <core:panel id="PagingSelectionListPanel">
+            <core:elements>
+                <core:label messageId="SELECT_SUPPLIER_RETURN_TITLE" styleClass="posPageHeading" id="SELECT_TRANSFER_OUT_TITLE">
+                    <core:boundsConstraint height="30" width="350" y="8" x="5"/>
+                </core:label>
+                <core:listBox lazyLoad="false" listSelectionMethod="DEFAULT" documentTemplateUrl="POSInventoryManagement/SupplierReturn/SupplierReturnListTemplate" selectedIndex="0" styleClass="dataListBox" id="PagingSelectionListBoxTall">
+                    <core:elements/>
+                    <core:listExpression>#{supplierReturnHeadersList}</core:listExpression>
+                    <core:dataExpression>item</core:dataExpression>
+                    <core:selectedIndices>
+                        <item>0</item>
+                    </core:selectedIndices>
+                </core:listBox>
+                <core:panel id="PagingSelectionPageControlsPanel">
+                    <core:elements>
+                        <core:panel hAlign="CENTRE" id="PagingSelectionPageControlsReferencePanel">
+                            <core:flowConstraint width="100%" height="100%"/>
+                            <core:elements>
+<core:pageElementRef pageDefinitionURL="POSInventoryManagement/Common/POSInventoryManagementPageControl" id="PAGE_CONTROLS">
+    <core:flowConstraint/>
+    <core:elements/>
+    <core:parameter value="#{supplierReturnHeadersList}" name="enactor.coreUI.List">
+        <core:interfaceName>com.enactor.core.database.list.IPagedList</core:interfaceName>
+    </core:parameter>
+</core:pageElementRef>
+                            </core:elements>
+                        </core:panel>
+                    </core:elements>
+                </core:panel>
+            </core:elements>
+        </core:panel>
+    </core:elements>
+    <core:templateURL>Standard1024x768/Pos/FullScreenTraditionalPosTemplate</core:templateURL>
+    <core:events>
+        <core:event destination="Button1" event="key.EnterPressed">press</core:event>
+        <core:event destination="Button2" event="key.UpPressed">press</core:event>
+        <core:event destination="Button3" event="key.DownPressed">press</core:event>
+        <core:event destination="Button8" event="key.KeyCode27Pressed">press</core:event>
+    </core:events>
+    <core:variables>
+        <core:variable required="true" name="enactor.inventoryManagement.local.SupplierReturnHeadersList">
+            <core:interfaceName>java.util.List</core:interfaceName>
+        </core:variable>
+        <core:variable required="false" name="enactor.dynamicMap.DynamicMap">
+            <core:interfaceName>com.enactor.core.utilities.DynamicMap</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.coreUI.ItemCountMap">
+            <core:interfaceName>java.util.Map</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.inventoryManagement.HistoryFlag">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.coreUI.PageSize">
+            <core:interfaceName>java.lang.Integer</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.inventoryManagement.SelectedSupplierReturnHeaderRow">
+            <core:interfaceName>com.enactor.core.database.list.IKeyedListElement</core:interfaceName>
+        </core:variable>
+    </core:variables>
+</retail:posPromptPage>

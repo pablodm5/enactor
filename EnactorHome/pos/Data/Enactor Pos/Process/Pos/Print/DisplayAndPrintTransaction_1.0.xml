@@ -1,0 +1,3662 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<core:process xmlns:core="http://www.enactor.com/core" xmlns:retail="http://www.enactor.com/retail" xmlns:ns4="http://www.enactor.com/crm" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803" xmlns:ns6="http://www.apis-it.hr/fin/2012/types/f73" xmlns:ns7="http://www.w3.org/2000/09/xmldsig#" xmlns:ns8="http://www.enactor.com/retail/storedRetailTransaction/service" xmlns:ns9="http://www.fu.gov.si/" xmlns:ns10="http://www.enactor.com/addressLookup/service" xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:ns14="http://www.enactor.com/crm/customerLoyalty/service" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <core:processID>Pos/Print/DisplayAndPrintTransaction</core:processID>
+    <core:version>1.0</core:version>
+    <core:name>Display a transaction and allow print on receipt</core:name>
+    <core:defaultMessageBaseName></core:defaultMessageBaseName>
+    <core:firstStateID>Start</core:firstStateID>
+    <core:className></core:className>
+    <core:uiHints>
+        <entry>
+            <key>com.enactor.tools.editor.process.style</key>
+            <value>127</value>
+        </entry>
+        <entry>
+            <key>com.enactor.tools.editor.process.xloc</key>
+            <value>8</value>
+        </entry>
+        <entry>
+            <key>com.enactor.tools.editor.process.yloc</key>
+            <value>8</value>
+        </entry>
+    </core:uiHints>
+    <core:metaData>
+        <core:inputs>
+            <core:input name="messageBaseOK">
+                <core:interfaceName>java.lang.String</core:interfaceName>
+            </core:input>
+            <core:input name="enactor.pos.SuppressPrinterSelection">
+                <core:interfaceName>java.lang.Boolean</core:interfaceName>
+            </core:input>
+            <core:input required="true" name="enactor.mfc.Transaction">
+                <core:interfaceName>com.enactor.core.transaction.ITransaction</core:interfaceName>
+            </core:input>
+            <core:input required="true" name="enactor.mfc.PosTerminal">
+                <core:interfaceName>com.enactor.mfc.posTerminal.IPOSTerminal</core:interfaceName>
+            </core:input>
+            <core:input required="true" name="enactor.mfc.Location">
+                <core:interfaceName>com.enactor.mfc.location.ILocation</core:interfaceName>
+            </core:input>
+            <core:input name="enactor.pos.BackButtonOnly">
+                <core:interfaceName>java.lang.Boolean</core:interfaceName>
+            </core:input>
+            <core:input name="enactor.pos.AllowPagePrinter">
+                <core:interfaceName>java.lang.Boolean</core:interfaceName>
+            </core:input>
+            <core:input required="true" name="enactor.mfc.TransactionHandler">
+                <core:interfaceName>com.enactor.mfc.retail.transaction.IRetailTransactionHandler</core:interfaceName>
+            </core:input>
+            <core:input name="enactor.pos.DisablePrintGiftReceipt">
+                <core:interfaceName>java.lang.Boolean</core:interfaceName>
+            </core:input>
+            <core:input name="enactor.pos.AlternateMessages">
+                <core:interfaceName>java.lang.Boolean</core:interfaceName>
+            </core:input>
+            <core:input name="messageIdCancel">
+                <core:interfaceName>java.lang.String</core:interfaceName>
+            </core:input>
+            <core:input required="true" name="enactor.coreUI.User">
+                <core:interfaceName>com.enactor.core.signOn.ISignedOnUser</core:interfaceName>
+            </core:input>
+            <core:input name="messageBaseCancel">
+                <core:interfaceName>java.lang.String</core:interfaceName>
+            </core:input>
+            <core:input name="enactor.pos.DisplayOnly">
+                <core:interfaceName>java.lang.Boolean</core:interfaceName>
+            </core:input>
+            <core:input name="enactor.pos.DisablePrintReceipt">
+                <core:interfaceName>java.lang.Boolean</core:interfaceName>
+            </core:input>
+            <core:input name="messageBase">
+                <core:interfaceName>java.lang.String</core:interfaceName>
+            </core:input>
+            <core:input name="messageIdOK">
+                <core:interfaceName>java.lang.String</core:interfaceName>
+            </core:input>
+            <core:input name="messageId">
+                <core:interfaceName>java.lang.String</core:interfaceName>
+            </core:input>
+            <core:input name="enactor.pos.EnablePrintCardVouchers">
+                <core:interfaceName>java.lang.Boolean</core:interfaceName>
+            </core:input>
+            <core:input required="false" name="enactor.pos.DisablePrintTaxReceipt">
+                <core:interfaceName>java.lang.Boolean</core:interfaceName>
+            </core:input>
+            <core:input required="false" name="PrimaryPrinter">
+                <core:interfaceName>com.enactor.coreUI.peripherals.printer.IPrinter</core:interfaceName>
+            </core:input>
+            <core:input name="enactor.pos.ForceReceiptLocaleSelection">
+                <core:interfaceName>java.lang.Boolean</core:interfaceName>
+            </core:input>
+            <core:input name="enactor.pos.IsReprint">
+                <core:interfaceName>java.lang.Boolean</core:interfaceName>
+            </core:input>
+        </core:inputs>
+        <core:outputs>
+            <core:output required="true" name="enactor.coreUI.PrintGiftReceipt">
+                <core:interfaceName>java.lang.Boolean</core:interfaceName>
+            </core:output>
+        </core:outputs>
+        <stateDataTypes>
+            <stateDataType required="false" name="PrimaryPrinter">
+                <core:interfaceName>com.enactor.coreUI.peripherals.printer.IPrinter</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="SelectedPrinter">
+                <core:interfaceName>com.enactor.coreUI.peripherals.printer.IPrinter</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.mfc.Basket">
+                <core:interfaceName>com.enactor.mfc.basket.IBasket</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.mfc.BasketItem">
+                <core:interfaceName>com.enactor.mfc.basket.items.IBasketItem</core:interfaceName>
+            </stateDataType>
+            <stateDataType name="enactor.pos.DisablePrintReceipt">
+                <core:interfaceName>java.lang.Boolean</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.mfc.TransactionHandler">
+                <core:interfaceName>com.enactor.mfc.retail.transaction.IRetailTransactionHandler</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.coreUI.GiftReceiptPrint">
+                <core:interfaceName>java.lang.Boolean</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.coreUI.PrintGiftReceipt">
+                <core:interfaceName>java.lang.Boolean</core:interfaceName>
+            </stateDataType>
+            <stateDataType name="messageId">
+                <core:interfaceName>java.lang.String</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.mfc.Location">
+                <core:interfaceName>com.enactor.mfc.location.ILocation</core:interfaceName>
+            </stateDataType>
+            <stateDataType name="enactor.pos.AlternateMessages">
+                <core:interfaceName>java.lang.Boolean</core:interfaceName>
+            </stateDataType>
+            <stateDataType name="messageIdOK">
+                <core:interfaceName>java.lang.String</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.mfc.PosTerminal">
+                <core:interfaceName>com.enactor.mfc.posTerminal.IPOSTerminal</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.mfc.SavedTransactionHandler">
+                <core:interfaceName>com.enactor.mfc.retail.transaction.IRetailTransactionHandler</core:interfaceName>
+            </stateDataType>
+            <stateDataType name="messageBaseOK">
+                <core:interfaceName>java.lang.String</core:interfaceName>
+            </stateDataType>
+            <stateDataType name="enactor.pos.DisablePrintGiftReceipt">
+                <core:interfaceName>java.lang.Boolean</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="false" name="enactor.pos.DisablePrintTaxReceipt">
+                <core:interfaceName>java.lang.Boolean</core:interfaceName>
+            </stateDataType>
+            <stateDataType name="messageIdCancel">
+                <core:interfaceName>java.lang.String</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.coreUI.User">
+                <core:interfaceName>com.enactor.core.signOn.ISignedOnUser</core:interfaceName>
+            </stateDataType>
+            <stateDataType name="messageBaseCancel">
+                <core:interfaceName>java.lang.String</core:interfaceName>
+            </stateDataType>
+            <stateDataType name="enactor.pos.EnablePrintCardVouchers">
+                <core:interfaceName>java.lang.Boolean</core:interfaceName>
+            </stateDataType>
+            <stateDataType name="enactor.pos.BackButtonOnly">
+                <core:interfaceName>java.lang.Boolean</core:interfaceName>
+            </stateDataType>
+            <stateDataType name="enactor.pos.DisplayOnly">
+                <core:interfaceName>java.lang.Boolean</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.mfc.Transaction">
+                <core:interfaceName>com.enactor.core.transaction.ITransaction</core:interfaceName>
+            </stateDataType>
+            <stateDataType name="messageBase">
+                <core:interfaceName>java.lang.String</core:interfaceName>
+            </stateDataType>
+            <stateDataType name="enactor.pos.SuppressPrinterSelection">
+                <core:interfaceName>java.lang.Boolean</core:interfaceName>
+            </stateDataType>
+            <stateDataType name="enactor.pos.AllowPagePrinter">
+                <core:interfaceName>java.lang.Boolean</core:interfaceName>
+            </stateDataType>
+            <stateDataType name="enactor.pos.ForceReceiptLocaleSelection">
+                <core:interfaceName>java.lang.Boolean</core:interfaceName>
+            </stateDataType>
+            <stateDataType name="enactor.pos.IsReprint">
+                <core:interfaceName>java.lang.Boolean</core:interfaceName>
+            </stateDataType>
+        </stateDataTypes>
+    </core:metaData>
+    <core:typeId>GenericAction</core:typeId>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>WriteNewHandlerToView</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UISetViewDataAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>11</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1345</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>695</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.TransactionHandler">
+                    <core:interfaceName>com.enactor.mfc.retail.transaction.IRetailTransactionHandler</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>RaiseBasketChangedEvent</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>RaiseBasketChangedEvent</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UISendEventAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>47</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1657</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>695</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="enactor.pos.BasketChanged" required="false" name="enactor.coreUI.EventName">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:param value="true" required="false" name="enactor.coreUI.EventForwardAllViews">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:param>
+        <core:param value="true" name="enactor.pos.DisableAudit">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="false" name="enactor.coreUI.EventForwardAllViews">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+                <core:input required="false" name="enactor.coreUI.EventName">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.pos.DisableAudit">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID>ConfirmPrintTransaction</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>DisplayOnly</core:toActionID>
+            <core:condition>notEmpty(process.displayOnly) &amp;&amp; process.displayOnly</core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>InitRecalledEmployeeTransaction</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.pos.packages.storeRecall.processes.InitRecalledEmployeeTransactionAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>63</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1034</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>978</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.TransactionHandler">
+                    <core:interfaceName>com.enactor.mfc.retail.transaction.IRetailTransactionHandler</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="true" name="enactor.mfc.EmployeeSaleReason">
+                    <core:interfaceName>com.enactor.mfc.reason.IEmployeeSaleReason</core:interfaceName>
+                </core:output>
+                <core:output required="true" name="enactor.pos.EmployeeDiscountItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.IEmployeeSaleTransactionDiscountItem</core:interfaceName>
+                </core:output>
+                <core:output required="true" name="enactor.pos.EmployeeNumber">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="InvalidEmployeeReason"/>
+                <core:outcome name="InvalidEmployeeTransactionHandler"/>
+                <core:outcome name="MissingDiscountItem"/>
+                <core:outcome name="MissingEmployeeReason"/>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+            <core:sessionManagementType>MAKE_SESSION_IF_NO_CURRENT</core:sessionManagementType>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>WriteNewHandlerToView</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>InvalidEmployeeReason</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>WriteNewHandlerToView</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>MissingDiscountItem</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>3</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>WriteNewHandlerToView</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>InvalidEmployeeTransactionHandler</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>4</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>WriteNewHandlerToView</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>MissingEmployeeReason</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>5</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>WriteNewHandlerToView</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:executeProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>ReprintReceipt</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UICallProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>47</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2909</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>1248</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="true" name="enactor.pos.SuppressPrinterSuccessPrompt">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="false" name="PrimaryPrinter">
+                    <core:interfaceName>com.enactor.coreUI.peripherals.printer.IPrinter</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.coreUI.User">
+                    <core:interfaceName>com.enactor.core.signOn.ISignedOnUser</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.Transaction">
+                    <core:interfaceName>com.enactor.core.transaction.ITransaction</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.Location">
+                    <core:interfaceName>com.enactor.mfc.location.ILocation</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.Basket">
+                    <core:interfaceName>com.enactor.mfc.basket.IBasket</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.Model">
+                    <core:interfaceName>com.enactor.core.entities.IEntity</core:interfaceName>
+                </core:input>
+                <core:input required="false" name="enactor.pos.SuppressPrinterSuccessPrompt">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.pos.AllowPagePrinter">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.pos.ForceReceiptLocaleSelection">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.mfc.PosTerminal">
+                    <core:interfaceName>com.enactor.mfc.posTerminal.IPOSTerminal</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outcomes>
+                <core:outcome name="Fail"/>
+                <core:outcome name="NotPrintable"/>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.CallProcess</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>SendReprintNormalReceiptEvent</core:toActionID>
+            <core:condition>process.isReprint == true</core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID>ConfirmPrintTransaction</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Fail</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>3</core:linkID>
+            <core:toStateID>TransactionNotPrintable</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>NotPrintable</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>4</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>PrintReceiptsExternal</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:executeProcessId>Pos/Print/ReprintReceipt</core:executeProcessId>
+    </core:executeProcessAction>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>RestoreOldHandlerToViewCancel</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UISetViewDataAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>11</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>3166</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>954</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.TransactionHandler">
+                    <core:interfaceName>com.enactor.mfc.retail.transaction.IRetailTransactionHandler</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>RaiseBasketChangedEventCancel</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>RaiseBasketChangedEventCancel</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UISendEventAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>47</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>3458</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>954</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="enactor.pos.BasketChanged" required="false" name="enactor.coreUI.EventName">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:param value="true" required="false" name="enactor.coreUI.EventForwardAllViews">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="false" name="enactor.coreUI.EventName">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input required="false" name="enactor.coreUI.EventForwardAllViews">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>EndProcessCancel</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>RestoreOldHandlerToViewBack</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UISetViewDataAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>11</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2588</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>695</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.TransactionHandler">
+                    <core:interfaceName>com.enactor.mfc.retail.transaction.IRetailTransactionHandler</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>RaiseBasketChangedEventBack</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>RaiseBasketChangedEventBack</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UISendEventAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>47</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2880</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>695</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="enactor.pos.BasketChanged" required="false" name="enactor.coreUI.EventName">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:param value="true" required="false" name="enactor.coreUI.EventForwardAllViews">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="false" name="enactor.coreUI.EventName">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input required="false" name="enactor.coreUI.EventForwardAllViews">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>EndProcessBack</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:endProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>EndProcessCancel</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIEndProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>3747</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>954</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData/>
+        <core:typeId>EndProcessSuccess</core:typeId>
+        <core:outcome>Cancel</core:outcome>
+        <core:defaultProcessId></core:defaultProcessId>
+    </core:endProcessAction>
+    <core:endProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>EndProcessBack</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIEndProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>3169</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>696</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData/>
+        <core:typeId>EndProcessSuccess</core:typeId>
+        <core:outcome>Back</core:outcome>
+        <core:defaultProcessId></core:defaultProcessId>
+    </core:endProcessAction>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>RestoreOldHandlerToViewPrinted</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UISetViewDataAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>11</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>3817</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>1248</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.TransactionHandler">
+                    <core:interfaceName>com.enactor.mfc.retail.transaction.IRetailTransactionHandler</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>RaiseBasketChangedEventPrinted</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>RaiseBasketChangedEventPrinted</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UISendEventAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>47</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>4102</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>1248</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="enactor.pos.BasketChanged" required="false" name="enactor.coreUI.EventName">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:param value="true" required="false" name="enactor.coreUI.EventForwardAllViews">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="false" name="enactor.coreUI.EventName">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input required="false" name="enactor.coreUI.EventForwardAllViews">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>ShowPrintSuccessConfirmation</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:endProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>EndProcessPrinted</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIEndProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>4960</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>1248</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData/>
+        <core:typeId>EndProcessSuccess</core:typeId>
+        <core:outcome>Printed</core:outcome>
+        <core:defaultProcessId></core:defaultProcessId>
+    </core:endProcessAction>
+    <core:assignAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>SavedHandler</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIAssignAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>27</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>425</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>695</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.TransactionHandler">
+                    <core:interfaceName>com.enactor.mfc.retail.transaction.IRetailTransactionHandler</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="true" name="enactor.mfc.SavedTransactionHandler">
+                    <core:interfaceName>com.enactor.mfc.retail.transaction.IRetailTransactionHandler</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.Assign</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>CreateHandler</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:dataAssignment toExpression="savedTransactionHandler" fromExpression="transactionHandler"/>
+    </core:assignAction>
+    <core:executeProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>CreateHandler</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UICallProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>27</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>746</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>695</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.Transaction">
+                    <core:interfaceName>com.enactor.core.transaction.ITransaction</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="true" name="enactor.mfc.TransactionHandler">
+                    <core:interfaceName>com.enactor.mfc.retail.transaction.IRetailTransactionHandler</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+                <core:outcome name="UnexpectedTransactionType"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.CallProcess</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID>UnexpectedTransactionTypeError</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>UnexpectedTransactionType</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>InitRecalledEmployeeTransaction</core:toActionID>
+            <core:condition>instanceOf(process.transaction, 'com.enactor.mfc.retail.transaction.IEmployeeRetailSaleTransaction')</core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>3</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>WriteNewHandlerToView</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:executeProcessId>Pos/Transaction/CreateHandlerForLoadedTransaction</core:executeProcessId>
+    </core:executeProcessAction>
+    <core:assignAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>RestoreHandlerBack</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIAssignAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>27</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2299</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>695</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.SavedTransactionHandler">
+                    <core:interfaceName>com.enactor.mfc.retail.transaction.IRetailTransactionHandler</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="true" name="enactor.mfc.TransactionHandler">
+                    <core:interfaceName>com.enactor.mfc.retail.transaction.IRetailTransactionHandler</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.Assign</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>RestoreOldHandlerToViewBack</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:dataAssignment toExpression="transactionHandler" fromExpression="savedTransactionHandler"/>
+    </core:assignAction>
+    <core:assignAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>RestoreHandlerCancel</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIAssignAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>27</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2877</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>954</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.SavedTransactionHandler">
+                    <core:interfaceName>com.enactor.mfc.retail.transaction.IRetailTransactionHandler</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="true" name="enactor.mfc.TransactionHandler">
+                    <core:interfaceName>com.enactor.mfc.retail.transaction.IRetailTransactionHandler</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.Assign</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>RestoreOldHandlerToViewCancel</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:dataAssignment toExpression="transactionHandler" fromExpression="savedTransactionHandler"/>
+    </core:assignAction>
+    <core:assignAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>RestoreHandlerPrinted</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIAssignAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>27</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>3532</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>1509</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.SavedTransactionHandler">
+                    <core:interfaceName>com.enactor.mfc.retail.transaction.IRetailTransactionHandler</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="true" name="enactor.mfc.TransactionHandler">
+                    <core:interfaceName>com.enactor.mfc.retail.transaction.IRetailTransactionHandler</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.Assign</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>RestoreOldHandlerToViewPrinted</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:dataAssignment toExpression="transactionHandler" fromExpression="savedTransactionHandler"/>
+    </core:assignAction>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>DisplayOnly</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UINullAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>3</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1455</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>433</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID>DisplayTransaction</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID>DisplayTransactionWithMSGConfig</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition>notEmpty(process.alternateMessages) &amp;&amp; process.alternateMessages</core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:endProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>EndProcessSuccess</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIEndProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>3162</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>456</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData/>
+        <core:typeId>EndProcessSuccess</core:typeId>
+        <core:outcome>Success</core:outcome>
+        <core:defaultProcessId></core:defaultProcessId>
+    </core:endProcessAction>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>RaiseBasketChangedEventSuccess</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UISendEventAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>47</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2873</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>455</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="enactor.pos.BasketChanged" required="false" name="enactor.coreUI.EventName">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:param value="true" required="false" name="enactor.coreUI.EventForwardAllViews">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="false" name="enactor.coreUI.EventName">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input required="false" name="enactor.coreUI.EventForwardAllViews">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>EndProcessSuccess</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>RestoreOldHandlerToViewSuccess</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UISetViewDataAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>11</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2581</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>455</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.TransactionHandler">
+                    <core:interfaceName>com.enactor.mfc.retail.transaction.IRetailTransactionHandler</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>RaiseBasketChangedEventSuccess</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:assignAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>RestoreHandlerSuccess</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIAssignAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>27</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2292</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>455</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.SavedTransactionHandler">
+                    <core:interfaceName>com.enactor.mfc.retail.transaction.IRetailTransactionHandler</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="true" name="enactor.mfc.TransactionHandler">
+                    <core:interfaceName>com.enactor.mfc.retail.transaction.IRetailTransactionHandler</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.Assign</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>RestoreOldHandlerToViewSuccess</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:dataAssignment toExpression="transactionHandler" fromExpression="savedTransactionHandler"/>
+    </core:assignAction>
+    <core:executeProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>CallRequestGiftReceiptAtTotal</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UICallProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1023</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1740</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>1731</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.coreUI.User">
+                    <core:interfaceName>com.enactor.core.signOn.ISignedOnUser</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.TransactionHandler">
+                    <core:interfaceName>com.enactor.mfc.retail.transaction.IRetailTransactionHandler</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outcomes>
+                <core:outcome name="Cancel"/>
+                <core:outcome name="Success"/>
+                <core:outcome name="Fail"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.CallProcess</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID>ConfirmPrintTransaction</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Cancel</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>SelectPrinterCondition</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>3</core:linkID>
+            <core:toStateID>ConfirmPrintTransaction</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Fail</core:outcome>
+        </core:outcomeLink>
+        <core:executeProcessId>Pos/GiftReceipt/RequestGiftReceiptAtTotal</core:executeProcessId>
+    </core:executeProcessAction>
+    <core:executeProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>CallPrintGiftReceipt</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UICallProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>943</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2909</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>1784</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="trunk" name="enactor.pos.SuppressPrinterSuccessPrompt">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="false" name="PrimaryPrinter">
+                    <core:interfaceName>com.enactor.coreUI.peripherals.printer.IPrinter</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.coreUI.User">
+                    <core:interfaceName>com.enactor.core.signOn.ISignedOnUser</core:interfaceName>
+                </core:input>
+                <core:input required="false" name="enactor.pos.SuppressPrinterSuccessPrompt">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.Transaction">
+                    <core:interfaceName>com.enactor.core.transaction.ITransaction</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.Location">
+                    <core:interfaceName>com.enactor.mfc.location.ILocation</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.Basket">
+                    <core:interfaceName>com.enactor.mfc.basket.IBasket</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.Model">
+                    <core:interfaceName>com.enactor.core.entities.IEntity</core:interfaceName>
+                </core:input>
+                <core:input required="false" name="enactor.pos.ForceReceiptLocaleSelection">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+                <core:input required="false" name="enactor.mfc.PosTerminal">
+                    <core:interfaceName>com.enactor.mfc.posTerminal.IPOSTerminal</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+                <core:outcome name="Fail"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.CallProcess</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID>ConfirmPrintTransaction</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Fail</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>SendReprintGiftReceiptEvent</core:toActionID>
+            <core:condition>process.isReprint == true</core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>3</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>RestoreHandlerPrinted</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:executeProcessId>Pos/Print/PrintGiftReceipt</core:executeProcessId>
+    </core:executeProcessAction>
+    <core:assignAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>Exception:RestoreHandler</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIAssignAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>27</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>313</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>114</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.SavedTransactionHandler">
+                    <core:interfaceName>com.enactor.mfc.retail.transaction.IRetailTransactionHandler</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="true" name="enactor.mfc.TransactionHandler">
+                    <core:interfaceName>com.enactor.mfc.retail.transaction.IRetailTransactionHandler</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.Assign</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>Exception:RestoreOldHandlerToView</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:dataAssignment toExpression="transactionHandler" fromExpression="savedTransactionHandler"/>
+    </core:assignAction>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>Exception:RestoreOldHandlerToView</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UISetViewDataAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>11</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>602</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>114</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.TransactionHandler">
+                    <core:interfaceName>com.enactor.mfc.retail.transaction.IRetailTransactionHandler</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>Exception:RaiseBasketChangedEvent</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>Exception:RaiseBasketChangedEvent</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UISendEventAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>47</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>894</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>114</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="enactor.pos.BasketChanged" required="false" name="enactor.coreUI.EventName">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:param value="true" required="false" name="enactor.coreUI.EventForwardAllViews">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="false" name="enactor.coreUI.EventName">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input required="false" name="enactor.coreUI.EventForwardAllViews">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>Exception:EndProcessCancel</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:endProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>Exception:EndProcessCancel</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIEndProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1183</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>114</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData/>
+        <core:typeId>EndProcessSuccess</core:typeId>
+        <core:outcome>Cancel</core:outcome>
+        <core:defaultProcessId></core:defaultProcessId>
+    </core:endProcessAction>
+    <core:executeProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>PrintReceiptsExternal</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UICallProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>11</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>3532</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>1248</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="true" name="enactor.pos.Reprint">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input name="enactor.pos.Reprint">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+                <core:outcome name="Fail"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.CallProcess</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>RestoreHandlerPrinted</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>RestoreHandlerPrinted</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Fail</core:outcome>
+        </core:outcomeLink>
+        <core:executeProcessId>Pos/Print/External/PrintReceiptsExternal</core:executeProcessId>
+    </core:executeProcessAction>
+    <core:executeProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>ReprintCardVouchers</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UICallProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>47</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2588</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>1248</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="true" name="enactor.pos.SuppressPrinterSuccessPrompt">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.coreUI.User">
+                    <core:interfaceName>com.enactor.core.signOn.ISignedOnUser</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.Basket">
+                    <core:interfaceName>com.enactor.mfc.basket.IBasket</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.Location">
+                    <core:interfaceName>com.enactor.mfc.location.ILocation</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.Model">
+                    <core:interfaceName>com.enactor.core.entities.IEntity</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.Transaction">
+                    <core:interfaceName>com.enactor.core.transaction.ITransaction</core:interfaceName>
+                </core:input>
+                <core:input required="false" name="PrimaryPrinter">
+                    <core:interfaceName>com.enactor.coreUI.peripherals.printer.IPrinter</core:interfaceName>
+                </core:input>
+                <core:input required="false" name="enactor.pos.SuppressPrinterSuccessPrompt">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+                <core:input required="false" name="enactor.pos.ForceReceiptLocaleSelection">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+                <core:input required="false" name="enactor.mfc.PosTerminal">
+                    <core:interfaceName>com.enactor.mfc.posTerminal.IPOSTerminal</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outcomes>
+                <core:outcome name="NothingToPrint"/>
+                <core:outcome name="Success"/>
+                <core:outcome name="Fail"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.CallProcess</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID>NoCardVouchers</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>NothingToPrint</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID>TransactionNotPrintable</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Fail</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>3</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>ReprintReceipt</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:executeProcessId>Pos/Print/ReprintCardVouchers</core:executeProcessId>
+    </core:executeProcessAction>
+    <core:assignAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>SetGiftReceiptRequested</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIAssignAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>27</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1519</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>1731</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.TransactionHandler">
+                    <core:interfaceName>com.enactor.mfc.retail.transaction.IRetailTransactionHandler</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.RetailSaleTransaction">
+                    <core:interfaceName>com.enactor.mfc.retail.transaction.IRetailSaleTransaction</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="true" name="enactor.coreUI.PrintGiftReceipt">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:output>
+                <core:output required="true" name="enactor.mfc.RetailSaleTransaction">
+                    <core:interfaceName>com.enactor.mfc.retail.transaction.IRetailSaleTransaction</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.Assign</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>CallRequestGiftReceiptAtTotal</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:dataAssignment toExpression="retailSaleTransaction" fromExpression="transactionHandler.transaction"/>
+        <core:dataAssignment toExpression="retailSaleTransaction.giftReceiptRequested" fromExpression="true"/>
+        <core:dataAssignment toExpression="printGiftReceipt" fromExpression="true"/>
+    </core:assignAction>
+    <core:assignAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>SetTaxReceiptRequested</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIAssignAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>959</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2588</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>1509</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.TransactionHandler">
+                    <core:interfaceName>com.enactor.mfc.retail.transaction.IRetailTransactionHandler</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.RetailSaleTransaction">
+                    <core:interfaceName>com.enactor.mfc.retail.transaction.IRetailSaleTransaction</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="true" name="enactor.mfc.RetailSaleTransaction">
+                    <core:interfaceName>com.enactor.mfc.retail.transaction.IRetailSaleTransaction</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.Assign</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>PrintTaxReceipt</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:dataAssignment toExpression="retailSaleTransaction" fromExpression="transactionHandler.transaction"/>
+        <core:dataAssignment toExpression="retailSaleTransaction.receiptDetails.taxReceiptRequested" fromExpression="true"/>
+    </core:assignAction>
+    <core:executeProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>PrintTaxReceipt</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UICallProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>47</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2909</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>1509</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="trunk" name="enactor.pos.SuppressPrinterSuccessPrompt">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.coreUI.User">
+                    <core:interfaceName>com.enactor.core.signOn.ISignedOnUser</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.Transaction">
+                    <core:interfaceName>com.enactor.core.transaction.ITransaction</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.Location">
+                    <core:interfaceName>com.enactor.mfc.location.ILocation</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.Basket">
+                    <core:interfaceName>com.enactor.mfc.basket.IBasket</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.Model">
+                    <core:interfaceName>com.enactor.core.entities.IEntity</core:interfaceName>
+                </core:input>
+                <core:input required="false" name="PrimaryPrinter">
+                    <core:interfaceName>com.enactor.coreUI.peripherals.printer.IPrinter</core:interfaceName>
+                </core:input>
+                <core:input required="false" name="enactor.pos.SuppressPrinterSuccessPrompt">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+                <core:input required="false" name="enactor.pos.ForceReceiptLocaleSelection">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+                <core:input required="false" name="enactor.mfc.PosTerminal">
+                    <core:interfaceName>com.enactor.mfc.posTerminal.IPOSTerminal</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outcomes>
+                <core:outcome name="Fail"/>
+                <core:outcome name="NotPrintable"/>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.CallProcess</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>SendReprintTaxReceiptEvent</core:toActionID>
+            <core:condition>process.isReprint == true</core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID>ConfirmPrintTransaction</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Fail</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>3</core:linkID>
+            <core:toStateID>TransactionNotPrintable</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>NotPrintable</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>4</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>PrintReceiptsExternal</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:executeProcessId>Pos/Print/ReprintReceipt</core:executeProcessId>
+    </core:executeProcessAction>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>SelectPrinterCondition</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UINullAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2003</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>1307</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.NullAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>SelectPrinter</core:toActionID>
+            <core:condition>notEmpty(process.posTerminal) &amp;&amp; process.posTerminal.offerPrinterSelection &amp;&amp; (empty(process.suppressPrinterSelection) || !process.suppressPrinterSelection)</core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>SelectPrinterCheckEvent</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:executeProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>SelectPrinter</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UICallProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>27</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2094</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>1461</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input name="PrimaryPrinter">
+                    <core:interfaceName>com.enactor.coreUI.peripherals.printer.IPrinter</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="false" name="SelectedPrinter">
+                    <core:interfaceName>com.enactor.coreUI.peripherals.printer.IPrinter</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Cancel"/>
+                <core:outcome name="Success"/>
+                <core:outcome name="NoPrinterConfigured"/>
+                <core:outcome name="Fail"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.CallProcess</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID>ConfirmPrintTransaction</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Cancel</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID>ConfirmPrintTransaction</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Fail</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>3</core:linkID>
+            <core:toStateID>NoPrintersConfigured</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>NoPrinterConfigured</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>4</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>SelectPrinterCheckEvent</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:executeProcessId>Pos/Print/SelectPrinter</core:executeProcessId>
+    </core:executeProcessAction>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>SelectPrinterCheckEvent</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.CheckEventAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>3</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2292</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>1307</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.coreUI.CurrentEvent">
+                    <core:interfaceName>com.enactor.core.events.IEvent</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output name="enactor.coreUI.CurrentEvent">
+                    <core:interfaceName>com.enactor.core.events.IEvent</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Unknown"/>
+                <core:outcome name="PrintGiftPressed"/>
+                <core:outcome name="PrintPressed"/>
+                <core:outcome name="PrintWithCardVouchersPressed"/>
+                <core:outcome name="PrintTaxPressed"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID>ConfirmPrintTransaction</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Unknown</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>SetTaxReceiptRequested</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>PrintTaxPressed</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>3</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>ReprintCardVouchers</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>PrintWithCardVouchersPressed</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>4</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>ReprintReceipt</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>PrintPressed</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>5</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>CallPrintGiftReceipt</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>PrintGiftPressed</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>ShowPrintSuccessConfirmation</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.CheckPrivilegesAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>67</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>4387</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>1248</value>
+            </entry>
+        </core:uiHints>
+        <core:privileges>enactor.pos.ReceiptDestinationSelectionShowPrintSuccessConfirmation</core:privileges>
+        <core:metaData>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+                <core:outcome name="Fail"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID>ReceiptPrintSucess</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>EndProcessPrinted</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Fail</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:executeProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>RequestGiftReceipt</core:actionID>
+        <core:name>Request Gift Receipt</core:name>
+        <core:className>com.enactor.coreUI.actions.UICallProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>11</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1345</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>1307</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.coreUI.User">
+                    <core:interfaceName>com.enactor.core.signOn.ISignedOnUser</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.TransactionHandler">
+                    <core:interfaceName>com.enactor.mfc.retail.transaction.IRetailTransactionHandler</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.Basket">
+                    <core:interfaceName>com.enactor.mfc.basket.IBasket</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.Transaction">
+                    <core:interfaceName>com.enactor.core.transaction.ITransaction</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outcomes>
+                <core:outcome name="Cancel"/>
+                <core:outcome name="Fail"/>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.CallProcess</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID>ConfirmPrintTransaction</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Cancel</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID>ConfirmPrintTransaction</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Fail</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>3</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>SelectPrinterCondition</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:executeProcessId>Pos/GiftReceipt/RequestGiftReceipt</core:executeProcessId>
+    </core:executeProcessAction>
+    <core:assignAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>SetRetailSaleTransaction</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIAssignAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>27</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1345</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>1104</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.TransactionHandler">
+                    <core:interfaceName>com.enactor.mfc.retail.transaction.IRetailTransactionHandler</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.RetailSaleTransaction">
+                    <core:interfaceName>com.enactor.mfc.retail.transaction.IRetailSaleTransaction</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="true" name="enactor.coreUI.PrintGiftReceipt">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:output>
+                <core:output required="true" name="enactor.mfc.RetailSaleTransaction">
+                    <core:interfaceName>com.enactor.mfc.retail.transaction.IRetailSaleTransaction</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.Assign</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>RequestGiftReceipt</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:dataAssignment toExpression="retailSaleTransaction" fromExpression="transactionHandler.transaction"/>
+        <core:dataAssignment toExpression="retailSaleTransaction.giftReceiptRequested" fromExpression="true"/>
+        <core:dataAssignment toExpression="printGiftReceipt" fromExpression="true"/>
+    </core:assignAction>
+    <core:executeProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>GiftReceiptPrintOptions</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UICallProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>959</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1646</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>916</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:outputs>
+                <core:output required="true" name="enactor.pos.GiftReceiptPrintOptions">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.CallProcess</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>SetRetailSaleTransaction</core:toActionID>
+            <core:condition>notEmpty(state.giftReceiptPrintOptions) &amp;&amp; strings:compareStrings(state.giftReceiptPrintOptions, 'ItemSelection')</core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>SetGiftReceiptRequested</core:toActionID>
+            <core:condition>notEmpty(state.giftReceiptPrintOptions) &amp;&amp; strings:compareStrings(state.giftReceiptPrintOptions, 'All')</core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:executeProcessId>Pos/Print/GiftReceiptPrintOptions</core:executeProcessId>
+    </core:executeProcessAction>
+    <core:executeProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>PrintProductNotes</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UICallProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>943</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2588</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>859</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input name="enactor.mfc.Basket">
+                    <core:interfaceName>com.enactor.mfc.basket.IBasket</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.mfc.BasketItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.IBasketItem</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.mfc.Location">
+                    <core:interfaceName>com.enactor.mfc.location.ILocation</core:interfaceName>
+                </core:input>
+                <core:input name="PrimaryPrinter">
+                    <core:interfaceName>com.enactor.coreUI.peripherals.printer.IPrinter</core:interfaceName>
+                </core:input>
+                <core:input name="SelectedPrinter">
+                    <core:interfaceName>com.enactor.coreUI.peripherals.printer.IPrinter</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.mfc.TransactionHandler">
+                    <core:interfaceName>com.enactor.mfc.retail.transaction.IRetailTransactionHandler</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.User">
+                    <core:interfaceName>com.enactor.core.signOn.ISignedOnUser</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outcomes>
+                <core:outcome name="Fail"/>
+                <core:outcome name="Success"/>
+                <core:outcome name="NotFound"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.CallProcess</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID>ConfirmPrintTransaction</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Fail</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID>ConfirmPrintTransaction</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>NotFound</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>3</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>SendReprintProductNotesEvent</core:toActionID>
+            <core:condition>process.isReprint == true</core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>4</core:linkID>
+            <core:toStateID>ConfirmPrintTransaction</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:executeProcessId>Pos/Print/PrintProductNotes</core:executeProcessId>
+    </core:executeProcessAction>
+    <core:executeProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>SendReprintTaxReceiptEvent</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UICallProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>11</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>3247</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>1509</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="TaxReceipt" name="enactor.mfc.ReprintReceiptType">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.Transaction">
+                    <core:interfaceName>com.enactor.core.transaction.ITransaction</core:interfaceName>
+                </core:input>
+                <core:input required="false" name="enactor.mfc.ReprintReceiptType">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.CallProcess</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>PrintReceiptsExternal</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:executeProcessId>Pos/Print/SendReprintReceiptEvent</core:executeProcessId>
+    </core:executeProcessAction>
+    <core:executeProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>SendReprintNormalReceiptEvent</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UICallProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>11</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>3247</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>1248</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.Transaction">
+                    <core:interfaceName>com.enactor.core.transaction.ITransaction</core:interfaceName>
+                </core:input>
+                <core:input required="false" name="enactor.mfc.ReprintReceiptType">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.CallProcess</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>PrintReceiptsExternal</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:executeProcessId>Pos/Print/SendReprintReceiptEvent</core:executeProcessId>
+    </core:executeProcessAction>
+    <core:executeProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>SendReprintGiftReceiptEvent</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UICallProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>11</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>3247</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>1784</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="GiftReceipt" name="enactor.mfc.ReprintReceiptType">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.Transaction">
+                    <core:interfaceName>com.enactor.core.transaction.ITransaction</core:interfaceName>
+                </core:input>
+                <core:input required="false" name="enactor.mfc.ReprintReceiptType">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.CallProcess</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>RestoreHandlerPrinted</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:executeProcessId>Pos/Print/SendReprintReceiptEvent</core:executeProcessId>
+    </core:executeProcessAction>
+    <core:executeProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>SendReprintProductNotesEvent</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UICallProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>11</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2299</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>919</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="ProductNotes" name="enactor.mfc.ReprintReceiptType">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.Transaction">
+                    <core:interfaceName>com.enactor.core.transaction.ITransaction</core:interfaceName>
+                </core:input>
+                <core:input required="false" name="enactor.mfc.ReprintReceiptType">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.CallProcess</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID>ConfirmPrintTransaction</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:executeProcessId>Pos/Print/SendReprintReceiptEvent</core:executeProcessId>
+    </core:executeProcessAction>
+    <core:eventLink>
+        <core:linkID>1</core:linkID>
+        <core:toStateID></core:toStateID>
+        <core:toActionID>Exception:RestoreHandler</core:toActionID>
+        <core:condition></core:condition>
+        <core:event>Exception</core:event>
+    </core:eventLink>
+    <core:state>
+        <core:url></core:url>
+        <core:stateID>Start</core:stateID>
+        <core:name></core:name>
+        <core:className></core:className>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>5</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>312</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>464</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <handledEvents>
+                <handledEvent name="StateEntered"/>
+            </handledEvents>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicState</core:typeId>
+        <core:singleInstance>false</core:singleInstance>
+        <core:respondToViewEvents>false</core:respondToViewEvents>
+        <core:actionInputMappings/>
+        <core:actionOutputMappings>
+            <core:actionMapping>
+                <core:actionID>InitRecalledEmployeeTransaction</core:actionID>
+                <core:mappings>
+                    <core:processMappings/>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.EmployeeSaleReason">
+<core:interfaceName>com.enactor.mfc.reason.IEmployeeSaleReason</core:interfaceName>
+                            </core:sourceDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.pos.EmployeeNumber">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:sourceDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.pos.EmployeeDiscountItem">
+<core:interfaceName>com.enactor.mfc.basket.items.IEmployeeSaleTransactionDiscountItem</core:interfaceName>
+                            </core:sourceDataType>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+        </core:actionOutputMappings>
+        <core:eventLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>SavedHandler</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>StateEntered</core:event>
+        </core:eventLink>
+    </core:state>
+    <core:messageState>
+        <core:url>/ErrorMessage/ModalOK</core:url>
+        <core:stateID>UnexpectedTransactionTypeError</core:stateID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.states.UIErrorState</core:className>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1345</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>978</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <handledEvents>
+                <handledEvent name="OKPressed"/>
+            </handledEvents>
+        </core:metaData>
+        <core:typeId>enactor.types.MessageState</core:typeId>
+        <core:singleInstance>false</core:singleInstance>
+        <core:respondToViewEvents>false</core:respondToViewEvents>
+        <core:actionInputMappings/>
+        <core:actionOutputMappings/>
+        <core:eventLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>EndProcessBack</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>OKPressed</core:event>
+        </core:eventLink>
+        <core:keepPromptOpen>false</core:keepPromptOpen>
+        <core:keepPreviousPromptOpen>false</core:keepPreviousPromptOpen>
+        <core:promptTimeout>0</core:promptTimeout>
+        <core:hideOpenPrompt>false</core:hideOpenPrompt>
+        <core:allowDatabasePromptLookup>false</core:allowDatabasePromptLookup>
+        <core:messageBase>Pos/Print/DisplayAndPrintTransactionMessages</core:messageBase>
+        <core:messageId>UNEXPECTED_TRANSACTION_TYPE</core:messageId>
+        <core:messageText></core:messageText>
+    </core:messageState>
+    <core:messageState>
+        <core:url>/ErrorMessage/ModalOK</core:url>
+        <core:stateID>TransactionNotPrintable</core:stateID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.states.UIErrorState</core:className>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2292</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>1100</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <handledEvents>
+                <handledEvent name="OKPressed"/>
+            </handledEvents>
+        </core:metaData>
+        <core:typeId>enactor.types.MessageState</core:typeId>
+        <core:singleInstance>false</core:singleInstance>
+        <core:respondToViewEvents>false</core:respondToViewEvents>
+        <core:actionInputMappings/>
+        <core:actionOutputMappings/>
+        <core:eventLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID>ConfirmPrintTransaction</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:event>OKPressed</core:event>
+        </core:eventLink>
+        <core:keepPromptOpen>false</core:keepPromptOpen>
+        <core:keepPreviousPromptOpen>false</core:keepPreviousPromptOpen>
+        <core:promptTimeout>0</core:promptTimeout>
+        <core:hideOpenPrompt>false</core:hideOpenPrompt>
+        <core:allowDatabasePromptLookup>false</core:allowDatabasePromptLookup>
+        <core:messageBase>Pos/Print/DisplayAndPrintTransactionMessages</core:messageBase>
+        <core:messageId>NOT_PRINTABLE</core:messageId>
+        <core:messageText></core:messageText>
+    </core:messageState>
+    <core:promptState>
+        <core:url>Pos/Print/ConfirmPrintTransaction</core:url>
+        <core:stateID>ConfirmPrintTransaction</core:stateID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.states.UIPromptState</core:className>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>45</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1977</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>695</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input name="enactor.pos.DisablePrintGiftReceipt">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.pos.AllowGiftReceipt">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.pos.DisablePrintTaxReceipt">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.pos.BasketData">
+                    <core:interfaceName>com.enactor.mfc.basket.IBasketData</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.pos.EnablePrintCardVouchers">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.pos.DisablePrintReceipt">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.pos.BackButtonOnly">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <handledEvents>
+                <handledEvent name="BackPressed"/>
+                <handledEvent name="PrintGiftPressed"/>
+                <handledEvent name="CancelPressed"/>
+                <handledEvent name="PrintPressed"/>
+                <handledEvent name="PrintTaxPressed"/>
+                <handledEvent name="PrintWithCardVouchersPressed"/>
+                <handledEvent name="PrintProductNotesPressed"/>
+            </handledEvents>
+            <stateDataTypes>
+                <stateDataType name="enactor.pos.DisablePrintGiftReceipt">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="true" name="enactor.pos.DisablePrintTaxReceipt">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="true" name="enactor.pos.BasketData">
+                    <core:interfaceName>com.enactor.mfc.basket.IBasketData</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="true" name="enactor.pos.GiftReceiptPrintOptions">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </stateDataType>
+                <stateDataType name="enactor.pos.EnablePrintCardVouchers">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </stateDataType>
+                <stateDataType name="enactor.pos.DisablePrintReceipt">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </stateDataType>
+                <stateDataType name="enactor.pos.BackButtonOnly">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="true" name="enactor.coreUI.CurrentEvent">
+                    <core:interfaceName>com.enactor.core.events.IEvent</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="true" name="enactor.mfc.RetailSaleTransaction">
+                    <core:interfaceName>com.enactor.mfc.retail.transaction.IRetailSaleTransaction</core:interfaceName>
+                </stateDataType>
+                <stateDataType name="enactor.pos.AllowGiftReceipt">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </stateDataType>
+            </stateDataTypes>
+        </core:metaData>
+        <core:typeId>enactor.types.PromptState</core:typeId>
+        <core:singleInstance>false</core:singleInstance>
+        <core:respondToViewEvents>false</core:respondToViewEvents>
+        <core:stateInputMappings>
+            <core:mappings>
+                <core:sourceDataType name="enactor.pos.BackButtonOnly">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:sourceDataType>
+                <core:targetDataType name="enactor.pos.BackButtonOnly">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:targetDataType>
+            </core:mappings>
+            <core:mappings>
+                <core:sourceDataType name="enactor.pos.DisablePrintReceipt">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:sourceDataType>
+                <core:targetDataType name="enactor.pos.DisablePrintReceipt">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:targetDataType>
+            </core:mappings>
+            <core:mappings>
+                <core:sourceDataType required="true" name="enactor.mfc.TransactionHandler">
+                    <core:interfaceName>com.enactor.mfc.retail.transaction.IRetailTransactionHandler</core:interfaceName>
+                </core:sourceDataType>
+                <core:targetDataType required="true" name="enactor.pos.BasketData">
+                    <core:interfaceName>com.enactor.mfc.basket.IBasketData</core:interfaceName>
+                </core:targetDataType>
+                <core:expression>transactionHandler.transaction</core:expression>
+            </core:mappings>
+            <core:mappings>
+                <core:sourceDataType name="enactor.pos.EnablePrintCardVouchers">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:sourceDataType>
+                <core:targetDataType name="enactor.pos.EnablePrintCardVouchers">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:targetDataType>
+            </core:mappings>
+            <core:mappings>
+                <core:sourceDataType name="enactor.pos.DisablePrintGiftReceipt">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:sourceDataType>
+                <core:targetDataType name="enactor.pos.DisablePrintGiftReceipt">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:targetDataType>
+            </core:mappings>
+            <core:mappings>
+                <core:sourceDataType required="false" name="enactor.pos.DisablePrintTaxReceipt">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:sourceDataType>
+                <core:targetDataType name="enactor.pos.DisablePrintTaxReceipt">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:targetDataType>
+            </core:mappings>
+            <core:mappings>
+                <core:sourceDataType required="true" name="enactor.mfc.PosTerminal">
+                    <core:interfaceName>com.enactor.mfc.posTerminal.IPOSTerminal</core:interfaceName>
+                </core:sourceDataType>
+                <core:targetDataType name="enactor.pos.AllowGiftReceipt">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:targetDataType>
+                <core:expression>notEmpty(posTerminal) &amp;&amp; notEmpty(posTerminal.offerGiftReceipts) &amp;&amp; posTerminal.offerGiftReceipts</core:expression>
+            </core:mappings>
+        </core:stateInputMappings>
+        <core:actionInputMappings>
+            <core:actionMapping>
+                <core:actionID>ReprintReceipt</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.TransactionHandler">
+<core:interfaceName>com.enactor.mfc.retail.transaction.IRetailTransactionHandler</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.Model">
+<core:interfaceName>com.enactor.core.entities.IEntity</core:interfaceName>
+                            </core:targetDataType>
+                            <core:expression>transactionHandler.model</core:expression>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.TransactionHandler">
+<core:interfaceName>com.enactor.mfc.retail.transaction.IRetailTransactionHandler</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.Transaction">
+<core:interfaceName>com.enactor.core.transaction.ITransaction</core:interfaceName>
+                            </core:targetDataType>
+                            <core:expression>transactionHandler.transaction</core:expression>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="false" name="PrimaryPrinter">
+<core:interfaceName>com.enactor.coreUI.peripherals.printer.IPrinter</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="false" name="PrimaryPrinter">
+<core:interfaceName>com.enactor.coreUI.peripherals.printer.IPrinter</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.Location">
+<core:interfaceName>com.enactor.mfc.location.ILocation</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.Location">
+<core:interfaceName>com.enactor.mfc.location.ILocation</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.coreUI.User">
+<core:interfaceName>com.enactor.core.signOn.ISignedOnUser</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.coreUI.User">
+<core:interfaceName>com.enactor.core.signOn.ISignedOnUser</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType name="enactor.pos.AllowPagePrinter">
+<core:interfaceName>java.lang.Boolean</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType name="enactor.pos.AllowPagePrinter">
+<core:interfaceName>java.lang.Boolean</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType name="enactor.pos.ForceReceiptLocaleSelection">
+<core:interfaceName>java.lang.Boolean</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType name="enactor.pos.ForceReceiptLocaleSelection">
+<core:interfaceName>java.lang.Boolean</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.PosTerminal">
+<core:interfaceName>com.enactor.mfc.posTerminal.IPOSTerminal</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType name="enactor.mfc.PosTerminal">
+<core:interfaceName>com.enactor.mfc.posTerminal.IPOSTerminal</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.pos.BasketData">
+<core:interfaceName></core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.Basket">
+<core:interfaceName>com.enactor.mfc.basket.IBasket</core:interfaceName>
+                            </core:targetDataType>
+                            <core:expression>basketData.basket</core:expression>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>CallPrintGiftReceipt</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.TransactionHandler">
+<core:interfaceName>com.enactor.mfc.retail.transaction.IRetailTransactionHandler</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.Model">
+<core:interfaceName>com.enactor.core.entities.IEntity</core:interfaceName>
+                            </core:targetDataType>
+                            <core:expression>transactionHandler.model</core:expression>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="false" name="PrimaryPrinter">
+<core:interfaceName>com.enactor.coreUI.peripherals.printer.IPrinter</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="false" name="PrimaryPrinter">
+<core:interfaceName>com.enactor.coreUI.peripherals.printer.IPrinter</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.Location">
+<core:interfaceName>com.enactor.mfc.location.ILocation</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.Location">
+<core:interfaceName>com.enactor.mfc.location.ILocation</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.coreUI.User">
+<core:interfaceName>com.enactor.core.signOn.ISignedOnUser</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.coreUI.User">
+<core:interfaceName>com.enactor.core.signOn.ISignedOnUser</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType name="enactor.pos.ForceReceiptLocaleSelection">
+<core:interfaceName>java.lang.Boolean</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="false" name="enactor.pos.ForceReceiptLocaleSelection">
+<core:interfaceName>java.lang.Boolean</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.PosTerminal">
+<core:interfaceName>com.enactor.mfc.posTerminal.IPOSTerminal</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="false" name="enactor.mfc.PosTerminal">
+<core:interfaceName>com.enactor.mfc.posTerminal.IPOSTerminal</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.RetailSaleTransaction">
+<core:interfaceName>com.enactor.mfc.retail.transaction.IRetailSaleTransaction</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.Basket">
+<core:interfaceName>com.enactor.mfc.basket.IBasket</core:interfaceName>
+                            </core:targetDataType>
+                            <core:expression>retailSaleTransaction.basket</core:expression>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.RetailSaleTransaction">
+<core:interfaceName>com.enactor.mfc.retail.transaction.IRetailSaleTransaction</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.Transaction">
+<core:interfaceName>com.enactor.core.transaction.ITransaction</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>ReprintCardVouchers</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.TransactionHandler">
+<core:interfaceName>com.enactor.mfc.retail.transaction.IRetailTransactionHandler</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.Model">
+<core:interfaceName>com.enactor.core.entities.IEntity</core:interfaceName>
+                            </core:targetDataType>
+                            <core:expression>transactionHandler.model</core:expression>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.TransactionHandler">
+<core:interfaceName>com.enactor.mfc.retail.transaction.IRetailTransactionHandler</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.Transaction">
+<core:interfaceName>com.enactor.core.transaction.ITransaction</core:interfaceName>
+                            </core:targetDataType>
+                            <core:expression>transactionHandler.transaction</core:expression>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="false" name="PrimaryPrinter">
+<core:interfaceName>com.enactor.coreUI.peripherals.printer.IPrinter</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="false" name="PrimaryPrinter">
+<core:interfaceName>com.enactor.coreUI.peripherals.printer.IPrinter</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.Location">
+<core:interfaceName>com.enactor.mfc.location.ILocation</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.Location">
+<core:interfaceName>com.enactor.mfc.location.ILocation</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.coreUI.User">
+<core:interfaceName>com.enactor.core.signOn.ISignedOnUser</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.coreUI.User">
+<core:interfaceName>com.enactor.core.signOn.ISignedOnUser</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType name="enactor.pos.ForceReceiptLocaleSelection">
+<core:interfaceName>java.lang.Boolean</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="false" name="enactor.pos.ForceReceiptLocaleSelection">
+<core:interfaceName>java.lang.Boolean</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.PosTerminal">
+<core:interfaceName>com.enactor.mfc.posTerminal.IPOSTerminal</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="false" name="enactor.mfc.PosTerminal">
+<core:interfaceName>com.enactor.mfc.posTerminal.IPOSTerminal</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.pos.BasketData">
+<core:interfaceName>com.enactor.mfc.basket.IBasketData</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.Basket">
+<core:interfaceName>com.enactor.mfc.basket.IBasket</core:interfaceName>
+                            </core:targetDataType>
+                            <core:expression>basketData.basket</core:expression>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>SetGiftReceiptRequested</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.TransactionHandler">
+<core:interfaceName>com.enactor.mfc.retail.transaction.IRetailTransactionHandler</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.TransactionHandler">
+<core:interfaceName>com.enactor.mfc.retail.transaction.IRetailTransactionHandler</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.RetailSaleTransaction">
+<core:interfaceName>com.enactor.mfc.retail.transaction.IRetailSaleTransaction</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.RetailSaleTransaction">
+<core:interfaceName>com.enactor.mfc.retail.transaction.IRetailSaleTransaction</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>PrintTaxReceipt</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.TransactionHandler">
+<core:interfaceName>com.enactor.mfc.retail.transaction.IRetailTransactionHandler</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.Model">
+<core:interfaceName>com.enactor.core.entities.IEntity</core:interfaceName>
+                            </core:targetDataType>
+                            <core:expression>transactionHandler.model</core:expression>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="false" name="PrimaryPrinter">
+<core:interfaceName>com.enactor.coreUI.peripherals.printer.IPrinter</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="false" name="PrimaryPrinter">
+<core:interfaceName>com.enactor.coreUI.peripherals.printer.IPrinter</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.Location">
+<core:interfaceName>com.enactor.mfc.location.ILocation</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.Location">
+<core:interfaceName>com.enactor.mfc.location.ILocation</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.coreUI.User">
+<core:interfaceName>com.enactor.core.signOn.ISignedOnUser</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.coreUI.User">
+<core:interfaceName>com.enactor.core.signOn.ISignedOnUser</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType name="enactor.pos.ForceReceiptLocaleSelection">
+<core:interfaceName>java.lang.Boolean</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="false" name="enactor.pos.ForceReceiptLocaleSelection">
+<core:interfaceName>java.lang.Boolean</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.PosTerminal">
+<core:interfaceName>com.enactor.mfc.posTerminal.IPOSTerminal</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="false" name="enactor.mfc.PosTerminal">
+<core:interfaceName>com.enactor.mfc.posTerminal.IPOSTerminal</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.pos.BasketData">
+<core:interfaceName>com.enactor.mfc.basket.IBasketData</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.Basket">
+<core:interfaceName>com.enactor.mfc.basket.IBasket</core:interfaceName>
+                            </core:targetDataType>
+                            <core:expression>basketData.basket</core:expression>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.RetailSaleTransaction">
+<core:interfaceName>com.enactor.mfc.retail.transaction.IRetailSaleTransaction</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.Transaction">
+<core:interfaceName>com.enactor.core.transaction.ITransaction</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>RequestGiftReceipt</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.Transaction">
+<core:interfaceName>com.enactor.core.transaction.ITransaction</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.Transaction">
+<core:interfaceName>com.enactor.core.transaction.ITransaction</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.TransactionHandler">
+<core:interfaceName>com.enactor.mfc.retail.transaction.IRetailTransactionHandler</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.TransactionHandler">
+<core:interfaceName>com.enactor.mfc.retail.transaction.IRetailTransactionHandler</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.coreUI.User">
+<core:interfaceName>com.enactor.core.signOn.ISignedOnUser</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.coreUI.User">
+<core:interfaceName>com.enactor.core.signOn.ISignedOnUser</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.pos.BasketData">
+<core:interfaceName>com.enactor.mfc.basket.IBasketData</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.Basket">
+<core:interfaceName>com.enactor.mfc.basket.IBasket</core:interfaceName>
+                            </core:targetDataType>
+                            <core:expression>basketData.basket</core:expression>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>SendReprintTaxReceiptEvent</core:actionID>
+                <core:mappings>
+                    <core:processMappings/>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.RetailSaleTransaction">
+<core:interfaceName>com.enactor.mfc.retail.transaction.IRetailSaleTransaction</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.Transaction">
+<core:interfaceName>com.enactor.core.transaction.ITransaction</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>SendReprintGiftReceiptEvent</core:actionID>
+                <core:mappings>
+                    <core:processMappings/>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.RetailSaleTransaction">
+<core:interfaceName>com.enactor.mfc.retail.transaction.IRetailSaleTransaction</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.Transaction">
+<core:interfaceName>com.enactor.core.transaction.ITransaction</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>SendReprintProductNotesEvent</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.TransactionHandler">
+<core:interfaceName>com.enactor.mfc.retail.transaction.IRetailTransactionHandler</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.Transaction">
+<core:interfaceName>com.enactor.core.transaction.ITransaction</core:interfaceName>
+                            </core:targetDataType>
+                            <core:expression>transactionHandler.transaction</core:expression>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings/>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>SendReprintNormalReceiptEvent</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.TransactionHandler">
+<core:interfaceName>com.enactor.mfc.retail.transaction.IRetailTransactionHandler</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.Transaction">
+<core:interfaceName>com.enactor.core.transaction.ITransaction</core:interfaceName>
+                            </core:targetDataType>
+                            <core:expression>transactionHandler.transaction</core:expression>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.coreUI.CurrentEvent">
+<core:interfaceName>com.enactor.core.events.IEvent</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="false" name="enactor.mfc.ReprintReceiptType">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:targetDataType>
+                            <core:expression>strings:compareStrings('PrintWithCardVouchersPressed', currentEvent.eventName) ? 'WithCardVoucher' : null</core:expression>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+        </core:actionInputMappings>
+        <core:actionOutputMappings>
+            <core:actionMapping>
+                <core:actionID>SetGiftReceiptRequested</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.coreUI.PrintGiftReceipt">
+<core:interfaceName>java.lang.Boolean</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.coreUI.PrintGiftReceipt">
+<core:interfaceName>java.lang.Boolean</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.RetailSaleTransaction">
+<core:interfaceName>com.enactor.mfc.retail.transaction.IRetailSaleTransaction</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.RetailSaleTransaction">
+<core:interfaceName>com.enactor.mfc.retail.transaction.IRetailSaleTransaction</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>SelectPrinter</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="false" name="SelectedPrinter">
+<core:interfaceName>com.enactor.coreUI.peripherals.printer.IPrinter</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="false" name="PrimaryPrinter">
+<core:interfaceName>com.enactor.coreUI.peripherals.printer.IPrinter</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings/>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>RequestGiftReceipt</core:actionID>
+                <core:mappings>
+                    <core:processMappings/>
+                    <core:stateMappings/>
+                </core:mappings>
+            </core:actionMapping>
+        </core:actionOutputMappings>
+        <core:eventLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>RestoreHandlerCancel</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>CancelPressed</core:event>
+        </core:eventLink>
+        <core:eventLink>
+            <core:linkID>3</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>RestoreHandlerBack</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>BackPressed</core:event>
+        </core:eventLink>
+        <core:eventLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>SelectPrinterCondition</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>PrintPressed</core:event>
+        </core:eventLink>
+        <core:eventLink>
+            <core:linkID>4</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>SelectPrinterCondition</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>PrintWithCardVouchersPressed</core:event>
+        </core:eventLink>
+        <core:eventLink>
+            <core:linkID>6</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>SelectPrinterCondition</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>PrintTaxPressed</core:event>
+        </core:eventLink>
+        <core:eventLink>
+            <core:linkID>5</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>GiftReceiptPrintOptions</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>PrintGiftPressed</core:event>
+        </core:eventLink>
+        <core:eventLink>
+            <core:linkID>7</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>PrintProductNotes</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>PrintProductNotesPressed</core:event>
+        </core:eventLink>
+        <core:keepPromptOpen>false</core:keepPromptOpen>
+        <core:keepPreviousPromptOpen>false</core:keepPreviousPromptOpen>
+        <core:promptTimeout>0</core:promptTimeout>
+        <core:hideOpenPrompt>false</core:hideOpenPrompt>
+        <core:allowDatabasePromptLookup>false</core:allowDatabasePromptLookup>
+    </core:promptState>
+    <core:promptState>
+        <core:url>Pos/Print/DisplayTransaction</core:url>
+        <core:stateID>DisplayTransaction</core:stateID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.states.UIPromptState</core:className>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>5</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1972</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>516</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <handledEvents>
+                <handledEvent name="BackPressed"/>
+            </handledEvents>
+        </core:metaData>
+        <core:typeId>enactor.types.PromptState</core:typeId>
+        <core:singleInstance>false</core:singleInstance>
+        <core:respondToViewEvents>false</core:respondToViewEvents>
+        <core:stateInputMappings/>
+        <core:actionInputMappings/>
+        <core:actionOutputMappings/>
+        <core:eventLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>RestoreHandlerBack</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>BackPressed</core:event>
+        </core:eventLink>
+        <core:keepPromptOpen>false</core:keepPromptOpen>
+        <core:keepPreviousPromptOpen>false</core:keepPreviousPromptOpen>
+        <core:promptTimeout>0</core:promptTimeout>
+        <core:hideOpenPrompt>false</core:hideOpenPrompt>
+        <core:allowDatabasePromptLookup>false</core:allowDatabasePromptLookup>
+    </core:promptState>
+    <core:promptState>
+        <core:url>Pos/Transaction/DisplayTransaction</core:url>
+        <core:stateID>DisplayTransactionWithMSGConfig</core:stateID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.states.UIPromptState</core:className>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>45</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1977</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>19</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="true" name="enactor.pos.ReceiptItemNotSelectable">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input name="enactor.pos.ReceiptItemNotSelectable">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="messageBase">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="messageBaseCancel">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="messageBaseOK">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="messageId">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="messageIdCancel">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="messageIdOK">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.TransactionHandler">
+                    <core:interfaceName>com.enactor.mfc.retail.transaction.IRetailTransactionHandler</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <handledEvents>
+                <handledEvent name="CancelPressed"/>
+                <handledEvent name="*"/>
+                <handledEvent name="OKPressed"/>
+            </handledEvents>
+            <stateDataTypes>
+                <stateDataType required="true" name="enactor.coreUI.CurrentEvent">
+                    <core:interfaceName>com.enactor.core.events.IEvent</core:interfaceName>
+                </stateDataType>
+                <stateDataType name="messageBase">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="true" name="messageBaseCancel">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </stateDataType>
+                <stateDataType name="messageBaseOK">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </stateDataType>
+                <stateDataType name="messageId">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="true" name="messageIdCancel">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </stateDataType>
+                <stateDataType name="messageIdOK">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </stateDataType>
+                <stateDataType name="enactor.pos.ReceiptItemNotSelectable">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="true" name="enactor.mfc.TransactionHandler">
+                    <core:interfaceName>com.enactor.mfc.retail.transaction.IRetailTransactionHandler</core:interfaceName>
+                </stateDataType>
+            </stateDataTypes>
+        </core:metaData>
+        <core:typeId>enactor.types.PromptState</core:typeId>
+        <core:singleInstance>false</core:singleInstance>
+        <core:respondToViewEvents>false</core:respondToViewEvents>
+        <core:actionInputMappings/>
+        <core:actionOutputMappings/>
+        <core:eventLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>RestoreHandlerCancel</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>CancelPressed</core:event>
+        </core:eventLink>
+        <core:eventLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>RestoreHandlerSuccess</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>OKPressed</core:event>
+        </core:eventLink>
+        <core:eventLink>
+            <core:linkID>3</core:linkID>
+            <core:toStateID>DisplayTransactionWithMSGConfig</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:event>*</core:event>
+        </core:eventLink>
+        <core:keepPromptOpen>false</core:keepPromptOpen>
+        <core:keepPreviousPromptOpen>false</core:keepPreviousPromptOpen>
+        <core:promptTimeout>0</core:promptTimeout>
+        <core:hideOpenPrompt>false</core:hideOpenPrompt>
+        <core:allowDatabasePromptLookup>false</core:allowDatabasePromptLookup>
+    </core:promptState>
+    <core:messageState>
+        <core:url>/ErrorMessage/ModalOK</core:url>
+        <core:stateID>NoCardVouchers</core:stateID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.states.UIErrorState</core:className>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2292</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>1167</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <handledEvents>
+                <handledEvent name="OKPressed"/>
+            </handledEvents>
+        </core:metaData>
+        <core:typeId>enactor.types.MessageState</core:typeId>
+        <core:singleInstance>false</core:singleInstance>
+        <core:respondToViewEvents>false</core:respondToViewEvents>
+        <core:actionInputMappings/>
+        <core:actionOutputMappings/>
+        <core:eventLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID>ConfirmPrintTransaction</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:event>OKPressed</core:event>
+        </core:eventLink>
+        <core:keepPromptOpen>false</core:keepPromptOpen>
+        <core:keepPreviousPromptOpen>false</core:keepPreviousPromptOpen>
+        <core:promptTimeout>0</core:promptTimeout>
+        <core:hideOpenPrompt>false</core:hideOpenPrompt>
+        <core:allowDatabasePromptLookup>false</core:allowDatabasePromptLookup>
+        <core:messageBase>Pos/Print/DisplayAndPrintTransactionMessages</core:messageBase>
+        <core:messageId>NO_CARD_VOUCHERS</core:messageId>
+        <core:messageText></core:messageText>
+    </core:messageState>
+    <core:messageState>
+        <core:url>/ErrorMessage/ModalOK</core:url>
+        <core:stateID>NoPrintersConfigured</core:stateID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.states.UIErrorState</core:className>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1794</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>1220</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <handledEvents>
+                <handledEvent name="OKPressed"/>
+            </handledEvents>
+            <stateDataTypes/>
+        </core:metaData>
+        <core:typeId>enactor.types.ErrorState</core:typeId>
+        <core:singleInstance>false</core:singleInstance>
+        <core:respondToViewEvents>false</core:respondToViewEvents>
+        <core:actionInputMappings/>
+        <core:actionOutputMappings/>
+        <core:eventLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID>ConfirmPrintTransaction</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:event>OKPressed</core:event>
+        </core:eventLink>
+        <core:keepPromptOpen>false</core:keepPromptOpen>
+        <core:keepPreviousPromptOpen>false</core:keepPreviousPromptOpen>
+        <core:promptTimeout>0</core:promptTimeout>
+        <core:hideOpenPrompt>false</core:hideOpenPrompt>
+        <core:allowDatabasePromptLookup>false</core:allowDatabasePromptLookup>
+        <core:messageBase>Pos/Print/PrintMessages</core:messageBase>
+        <core:messageId>NO_PRINTERS_CONFIGURED</core:messageId>
+        <core:messageText></core:messageText>
+    </core:messageState>
+    <core:messageState>
+        <core:url>/Message/Prompt</core:url>
+        <core:stateID>ReceiptPrintSucess</core:stateID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.states.UIMessageState</core:className>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>4672</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>1248</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="Pos/Email/EmailMessages" name="enactor.pos.TitleMessageBase">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:param value="RECEIPT_PRINTED" name="enactor.pos.TitleMessageId">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input name="enactor.pos.TitleMessageId">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.pos.TitleMessageBase">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <handledEvents>
+                <handledEvent name="OKPressed"/>
+            </handledEvents>
+            <stateDataTypes>
+                <stateDataType name="enactor.pos.TitleMessageId">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </stateDataType>
+                <stateDataType name="enactor.pos.TitleMessageBase">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </stateDataType>
+            </stateDataTypes>
+        </core:metaData>
+        <core:typeId>enactor.types.MessageState</core:typeId>
+        <core:singleInstance>false</core:singleInstance>
+        <core:respondToViewEvents>false</core:respondToViewEvents>
+        <core:actionInputMappings/>
+        <core:actionOutputMappings/>
+        <core:eventLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>EndProcessPrinted</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>OKPressed</core:event>
+        </core:eventLink>
+        <core:keepPromptOpen>false</core:keepPromptOpen>
+        <core:keepPreviousPromptOpen>false</core:keepPreviousPromptOpen>
+        <core:promptTimeout>0</core:promptTimeout>
+        <core:hideOpenPrompt>false</core:hideOpenPrompt>
+        <core:allowDatabasePromptLookup>false</core:allowDatabasePromptLookup>
+        <core:messageBase>Pos/Email/EmailMessages</core:messageBase>
+        <core:messageId>RECEIPT_PRINTED_SUCCESSFULLY</core:messageId>
+        <core:messageText></core:messageText>
+    </core:messageState>
+    <core:stateTransitions/>
+</core:process>

@@ -1,0 +1,328 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<retail:posPromptPage xmlns:core="http://www.enactor.com/core" xmlns:retail="http://www.enactor.com/retail" xmlns:ns4="http://www.enactor.com/crm" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803" xmlns:ns6="http://www.apis-it.hr/fin/2012/types/f73" xmlns:ns7="http://www.w3.org/2000/09/xmldsig#" xmlns:ns8="http://www.enactor.com/retail/storedRetailTransaction/service" xmlns:ns9="http://www.fu.gov.si/" xmlns:ns10="http://www.enactor.com/addressLookup/service" xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:ns14="http://www.enactor.com/crm/customerLoyalty/service" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" allowResize="true" allowMove="true" allowClose="true" height="1080" width="1920" messageBase="POSInventoryManagement/TransferOut/TransferOutMessages" url="NextGen1920x1080/POSInventoryManagement/TransferOut/TransferOutDataCapture">
+    <core:elements>
+        <core:hidden id="Receipt"/>
+        <core:hidden id="SelectionList"/>
+        <core:hidden id="InputBox"/>
+        <core:hidden id="TotalLabel"/>
+        <core:hidden id="EmptyBasketPanel"/>
+        <core:panel id="DialogPanel">
+            <core:elements>
+                <core:panel id="MainPanel">
+                    <core:boundsConstraint height="700" width="1050" y="0" x="0"/>
+                    <core:elements>
+                        <core:panel transparentBackground="true" id="TitlePanel">
+                            <core:flowConstraint width="1050" height="77"/>
+                            <core:elements>
+<core:label messageId="TRANSFER_OUT_DATA_CAPTURE_TITLE" styleClass="posPageHeading" id="TRANSFER_OUT_DATA_CAPTURE_TITLE">
+    <core:boundsConstraint height="27" width="500" y="8" x="22"/>
+</core:label>
+<core:label fontStyle="BOLD" fontSize="16" lineHeight="0" messageId="CUSTOMER_PICK_STOCK_DATA_CAPTURE_TITLE" styleClass="formFieldLabel" visibility="#{notEmpty(transferOutAddress) &amp;&amp; transferOutHeader.status == 'PICKING'}" id="CUSTOMER_PICK_STOCK_DATA_CAPTURE_TITLE">
+    <core:boundsConstraint height="22" width="396" y="50" x="22"/>
+</core:label>
+<core:label fontStyle="BOLD" fontSize="16" lineHeight="0" messageId="CUSTOMER_AUTHORISE_STOCK_DATA_CAPTURE_TITLE" styleClass="formFieldLabel" visibility="#{notEmpty(transferOutAddress) &amp;&amp; transferOutHeader.status == 'CREATED'}" id="CUSTOMER_AUTHORISE_STOCK_DATA_CAPTURE_TITLE">
+    <core:boundsConstraint height="22" width="396" y="50" x="22"/>
+</core:label>
+                            </core:elements>
+                        </core:panel>
+                        <core:panel transparentBackground="true" id="DispatchIdPanel">
+                            <core:flowConstraint width="1050" height="45"/>
+                            <core:elements>
+<core:label fontSize="12" lineHeight="0" messageId="DISPATCH_ID_LABEL" styleClass="formFieldLabel" id="DISPATCH_ID_LABEL">
+    <core:boundsConstraint height="28" width="260" y="6" x="24"/>
+</core:label>
+<core:inputText editable="false" lineHeight="0" styleClass="formFieldInputText" enabled="true" id="DISPATCH_ID">
+    <core:boundsConstraint height="35" width="340" y="4" x="309"/>
+    <core:text>#{transferOutHeader.transferOutHeaderId}</core:text>
+</core:inputText>
+                            </core:elements>
+                        </core:panel>
+                        <core:panel transparentBackground="true" id="RequestIdPanel">
+                            <core:flowConstraint width="1050" height="45"/>
+                            <core:elements>
+<core:label fontSize="12" lineHeight="0" messageId="REQUEST_ID_LABEL" styleClass="formFieldLabel" id="REQUEST_ID_LABEL">
+    <core:boundsConstraint height="28" width="260" y="6" x="24"/>
+</core:label>
+<core:inputText editable="false" lineHeight="0" styleClass="formFieldInputText" id="REQUEST_ID">
+    <core:boundsConstraint height="35" width="340" y="4" x="309"/>
+    <core:text>#{transferOutHeader.distributionOrderId}</core:text>
+</core:inputText>
+                            </core:elements>
+                        </core:panel>
+                        <core:panel transparentBackground="true" id="ReasonPanel">
+                            <core:flowConstraint width="1050" height="45"/>
+                            <core:elements>
+<core:label lineHeight="0" messageId="REASON_LABEL" styleClass="formFieldLabel" id="REASON_LABEL">
+    <core:boundsConstraint height="28" width="260" y="6" x="24"/>
+</core:label>
+<core:inputText editable="false" lineHeight="0" styleClass="formFieldInputText" enabled="true" id="REASON">
+    <core:boundsConstraint height="35" width="340" y="4" x="309"/>
+    <core:text>#{getLocalisedString(reason.description, userLocale)}</core:text>
+</core:inputText>
+<core:button lineHeight="0" messageId="SELECT_REASON_BUTTON_LABEL" styleClass="buttonLight" visibility="#{displaySelectReasonButton}" id="SELECT_REASON_BUTTON">
+    <core:boundsConstraint height="34" width="181" y="7" x="813"/>
+    <core:text>ReasonPressed</core:text>
+</core:button>
+<core:errorLabel errorFieldId="REASON" lineHeight="0" styleClass="formErrorLabel" id="REASON_ERROR">
+    <core:boundsConstraint height="20" width="150" y="9" x="660"/>
+    <core:text>#{formErrors != null ? formErrors['REASON'] : null}</core:text>
+</core:errorLabel>
+                            </core:elements>
+                        </core:panel>
+                        <core:panel renderedExpression="#{priv:checkPrivilege('enactor.inventoryManagement.pos.TransferOut.AllowSourceLocationChange')}" transparentBackground="true" id="SourceLocationPanel">
+                            <core:flowConstraint width="1050" height="45"/>
+                            <core:elements>
+<core:label lineHeight="0" messageId="SOURCE_LABEL" styleClass="formFieldLabel" visibility="priv:checkPrivilege('enactor.inventoryManagement.pos.TransferOut.AllowSourceLocationChange')}" id="SOURCE_LABEL">
+    <core:boundsConstraint height="28" width="260" y="6" x="24"/>
+</core:label>
+<core:inputText editable="false" lineHeight="0" styleClass="formFieldInputText" visibility="#{empty(transferOutSourceAddress) &amp;&amp; priv:checkPrivilege('enactor.inventoryManagement.pos.TransferOut.AllowSourceLocationChange')}" enabled="true" id="SOURCE">
+    <core:boundsConstraint height="35" width="236" y="4" x="309"/>
+    <core:text>#{sourceLocation.locationId}</core:text>
+</core:inputText>
+<core:button lineHeight="0" messageId="SELECT_LOCATION_BUTTON_LABEL" styleClass="buttonLight" visibility="#{empty(transferOutSourceAddress) &amp;&amp; priv:checkPrivilege('enactor.inventoryManagement.pos.TransferOut.AllowSourceLocationChange') &amp;&amp; (allowItemAmendment || transferOutHeader.adHoc)}" id="SELECT_SOURCE_LOCATION_BUTTON">
+    <core:boundsConstraint height="34" width="181" y="7" x="813"/>
+    <core:text>SourceLocationPressed</core:text>
+</core:button>
+<core:errorLabel errorFieldId="SOURCE" lineHeight="0" styleClass="formErrorLabel" id="SOURCE_ERROR">
+    <core:boundsConstraint height="20" width="84" y="9" x="555"/>
+    <core:text>#{formErrors != null ? formErrors['SOURCE'] : null}</core:text>
+</core:errorLabel>
+<core:label lineHeight="0" styleClass="formDescriptionLabel" visibility="#{allowItemAmendment}" id="SOURCE_LOCATION_DESCRIPTION">
+    <core:boundsConstraint height="28" width="200" y="4" x="555"/>
+    <core:text>#{sourceLocation.description}</core:text>
+</core:label>
+<core:label lineHeight="0" styleClass="formDescriptionLabel" visibility="#{!allowItemAmendment}" id="SOURCE_LOCATION_DESCRIPTION_LONG">
+    <core:boundsConstraint height="28" width="294" y="4" x="555"/>
+    <core:text>#{sourceLocation.description}</core:text>
+</core:label>
+                            </core:elements>
+                        </core:panel>
+                        <core:panel transparentBackground="true" id="DestinationPanel">
+                            <core:flowConstraint width="1050" height="45"/>
+                            <core:elements>
+<core:label lineHeight="0" messageId="DESTINATION_LABEL" styleClass="formFieldLabel" visibility="#{empty(transferOutDeliveryAddress)}" id="DESTINATION_LABEL">
+    <core:boundsConstraint height="28" width="260" y="6" x="24"/>
+</core:label>
+<core:inputText editable="false" lineHeight="0" styleClass="formFieldInputText" visibility="#{empty(transferOutDeliveryAddress)}" enabled="true" id="DESTINATION">
+    <core:boundsConstraint height="35" width="236" y="4" x="309"/>
+    <core:text>#{location.locationId}</core:text>
+</core:inputText>
+<core:button lineHeight="0" messageId="SELECT_LOCATION_BUTTON_LABEL" styleClass="buttonLight" visibility="#{empty(transferOutDeliveryAddress) &amp;&amp; (allowItemAmendment || transferOutHeader.adHoc)}" id="SELECT_LOCATION_BUTTON">
+    <core:boundsConstraint height="34" width="181" y="7" x="813"/>
+    <core:text>LocationPressed</core:text>
+</core:button>
+<core:errorLabel errorFieldId="DESTINATION" lineHeight="0" styleClass="formErrorLabel" id="DESTINATION_ERROR">
+    <core:boundsConstraint height="20" width="150" y="9" x="555"/>
+    <core:text>#{formErrors != null ? formErrors['DESTINATION'] : null}</core:text>
+</core:errorLabel>
+<core:label lineHeight="0" styleClass="formDescriptionLabel" visibility="#{allowItemAmendment}" id="LOCATION_DESCRIPTION">
+    <core:boundsConstraint height="28" width="200" y="4" x="555"/>
+    <core:text>#{location.description}</core:text>
+</core:label>
+<core:label lineHeight="0" styleClass="formDescriptionLabel" visibility="#{!allowItemAmendment}" id="LOCATION_DESCRIPTION_LONG">
+    <core:boundsConstraint height="28" width="294" y="4" x="555"/>
+    <core:text>#{location.description}</core:text>
+</core:label>
+                            </core:elements>
+                        </core:panel>
+                        <core:panel renderedExpression="#{priv:checkPrivilege('enactor.inventoryManagement.pos.TransferOut.AllowCarrierTypeChange')}" transparentBackground="true" id="CarrierTypePanel">
+                            <core:flowConstraint width="1050" height="45"/>
+                            <core:elements>
+<core:label lineHeight="0" messageId="CARRIER_LABEL" styleClass="formFieldLabel" id="CARRIER_LABEL">
+    <core:boundsConstraint height="28" width="260" y="6" x="24"/>
+</core:label>
+<core:comboBox manualDropDownDisabled="false" lazyLoad="false" editable="true" lineHeight="0" styleClass="formCombo" id="CARRIER_TYPE">
+    <core:boundsConstraint height="35" width="340" y="4" x="309"/>
+    <core:text>#{selectedCarrierTypeKey}</core:text>
+    <core:textElementEvents/>
+    <core:listExpression>#{carrierTypesSelectList}</core:listExpression>
+    <core:listingElementEvents>
+        <core:selectionEvent>CarrierTypeChanged</core:selectionEvent>
+    </core:listingElementEvents>
+</core:comboBox>
+<core:comboBox manualDropDownDisabled="false" lazyLoad="false" lineHeight="0" styleClass="formCombo" id="CARRIER_ID">
+    <core:boundsConstraint height="35" width="340" y="4" x="663"/>
+    <core:text>#{selectedCarrierKey}</core:text>
+    <core:listExpression>#{carriersSelectList}</core:listExpression>
+    <core:listingElementEvents>
+        <core:selectionEvent>CarrierChanged</core:selectionEvent>
+    </core:listingElementEvents>
+</core:comboBox>
+                            </core:elements>
+                        </core:panel>
+                        <core:panel renderedExpression="#{priv:checkPrivilege('enactor.inventoryManagement.pos.TransferOut.AllowParcelRefChange')}" transparentBackground="true" id="ParcelRefPanel">
+                            <core:flowConstraint width="1050" height="45"/>
+                            <core:elements>
+<core:label lineHeight="0" messageId="PARCEL_REF_LABEL" styleClass="formFieldLabel" id="PARCEL_REF_LABEL">
+    <core:boundsConstraint height="28" width="260" y="6" x="24"/>
+</core:label>
+<core:inputText lineHeight="0" styleClass="formFieldInputText" id="PARCEL_REF">
+    <core:boundsConstraint height="35" width="340" y="4" x="309"/>
+    <core:text>#{transferOutHeader.carrierReference}</core:text>
+</core:inputText>
+                            </core:elements>
+                        </core:panel>
+                        <core:panel transparentBackground="true" id="InstructionPanel">
+                            <core:flowConstraint width="1050" height="95"/>
+                            <core:elements>
+<core:label lineHeight="0" messageId="INSTRUCTIONS_LABEL" styleClass="formFieldLabel" id="INSTRUCTIONS_LABEL">
+    <core:boundsConstraint height="28" width="260" y="6" x="24"/>
+</core:label>
+<core:inputText lineHeight="0" type="textArea" styleClass="formInputTextMultiLine" id="INSTRUCTIONS">
+    <core:boundsConstraint height="80" width="700" y="4" x="309"/>
+    <core:text>#{transferOutHeader.notes}</core:text>
+</core:inputText>
+                            </core:elements>
+                        </core:panel>
+                        <core:panel transparentBackground="true" id="CustomerDetailsPanel">
+                            <core:flowConstraint width="1050" height="225"/>
+                            <core:elements>
+<core:label allowWrap="true" lineHeight="0" messageId="SUMMARY_ORDER_ID_LABEL" styleClass="formFieldLabel" visibility="#{instanceOf(transferOutHeader,'com.enactor.storeInventoryManagement.local.transferOut.ICustomerTransferOutHeader')}" id="CUSTOMER_ORDER_ID_LABEL">
+    <core:boundsConstraint height="22" width="225" y="37" x="24"/>
+</core:label>
+<core:label allowWrap="true" lineHeight="0" messageId="SUMMARY_CUSTOMER_NUMBER_LABEL" styleClass="formFieldLabel" visibility="#{instanceOf(transferOutHeader,'com.enactor.storeInventoryManagement.local.transferOut.ICustomerTransferOutHeader')}" id="CUSTOMER_NUMBER_LABEL">
+    <core:boundsConstraint height="22" width="225" y="71" x="24"/>
+</core:label>
+<core:label allowWrap="true" lineHeight="0" messageId="SUMMARY_NAME_LABEL" styleClass="formFieldLabel" visibility="#{notEmpty(transferOutAddress)}" id="CUSTOMER_CONTACT_NAME_LABEL">
+    <core:boundsConstraint height="22" width="225" y="105" x="25"/>
+</core:label>
+<core:label allowWrap="true" lineHeight="0" messageId="SUMMARY_PHONE_LABEL" styleClass="formFieldLabel" visibility="#{notEmpty(transferOutAddress)}" id="CUSTOMER_CONTACT_PHONE_LABEL">
+    <core:boundsConstraint height="22" width="225" y="139" x="25"/>
+</core:label>
+<core:label allowWrap="true" lineHeight="0" messageId="SUMMARY_EMAIL_LABEL" styleClass="formFieldLabel" visibility="#{notEmpty(transferOutAddress)}" id="CUSTOMER_CONTACT_EMAIL_LABEL">
+    <core:boundsConstraint height="22" width="225" y="173" x="25"/>
+</core:label>
+<core:label lineHeight="0" renderedExpression="#{instanceOf(transferOutHeader,'com.enactor.storeInventoryManagement.local.transferOut.ICustomerTransferOutHeader')}" styleClass="formDescriptionLabel" id="CUSTOMER_ORDER_ID">
+    <core:boundsConstraint height="28" width="199" y="34" x="309"/>
+    <core:text>#{transferOutHeader.customerOrderId}</core:text>
+</core:label>
+<core:label lineHeight="0" renderedExpression="#{instanceOf(transferOutHeader,'com.enactor.storeInventoryManagement.local.transferOut.ICustomerTransferOutHeader')}" styleClass="formDescriptionLabel" id="CUSTOMER_NUMBER">
+    <core:boundsConstraint height="28" width="199" y="68" x="309"/>
+    <core:text>#{transferOutHeader.customerNumber}</core:text>
+</core:label>
+<core:label lineHeight="0" styleClass="formDescriptionLabel" visibility="#{notEmpty(transferOutAddress)}" id="CUSTOMER_CONTACT_NAME">
+    <core:boundsConstraint height="28" width="199" y="105" x="309"/>
+    <core:text>#{concat(concat(transferOutAddress.name.forename, ' '), transferOutAddress.name.surname)}</core:text>
+</core:label>
+<core:label lineHeight="0" styleClass="formDescriptionLabel" visibility="#{notEmpty(transferOutAddress)}" id="CUSTOMER_CONTACT_PHONE">
+    <core:boundsConstraint height="28" width="199" y="139" x="309"/>
+    <core:text>#{transferOutAddress.address.phone1}</core:text>
+</core:label>
+<core:label lineHeight="0" styleClass="formDescriptionLabel" visibility="#{notEmpty(transferOutAddress)}" id="CUSTOMER_CONTACT_EMAIL">
+    <core:boundsConstraint height="28" width="284" y="173" x="309"/>
+    <core:text>#{transferOutAddress.address.email}</core:text>
+</core:label>
+<core:label allowWrap="true" lineHeight="0" messageId="SUMMARY_ADDRESS_LABEL" styleClass="formFieldLabel" visibility="#{notEmpty(transferOutAddress)}" id="CUSTOMER_CONTACT_ADDRESS_LABEL">
+    <core:boundsConstraint height="28" width="138" y="37" x="565"/>
+</core:label>
+<core:label lineHeight="0" styleClass="formDescriptionLabel" visibility="#{notEmpty(transferOutAddress)}" id="CUSTOMER_CONTACT_STREET1">
+    <core:boundsConstraint height="28" width="280" y="37" x="665"/>
+    <core:text>#{concat(concat(transferOutAddress.address.street1, ' '), transferOutAddress.address.street2)}</core:text>
+</core:label>
+<core:label lineHeight="0" styleClass="formDescriptionLabel" visibility="#{notEmpty(transferOutAddress)}" id="CUSTOMER_CONTACT_TOWN">
+    <core:boundsConstraint height="28" width="280" y="71" x="665"/>
+    <core:text>#{transferOutAddress.address.town}</core:text>
+</core:label>
+<core:label lineHeight="0" styleClass="formDescriptionLabel" visibility="#{notEmpty(transferOutAddress)}" id="CUSTOMER_CONTACT_COUNTY">
+    <core:boundsConstraint height="28" width="280" y="105" x="665"/>
+    <core:text>#{transferOutAddress.address.county}</core:text>
+</core:label>
+<core:label lineHeight="0" styleClass="formDescriptionLabel" visibility="#{notEmpty(transferOutAddress)}" id="CUSTOMER_CONTACT_POST_CODE">
+    <core:boundsConstraint height="28" width="280" y="139" x="665"/>
+    <core:text>#{transferOutAddress.address.postCode}</core:text>
+</core:label>
+<core:label fontStyle="BOLD" lineHeight="0" messageId="CUSTOMER_DETAILS" styleClass="formFieldLabel" visibility="#{instanceOf(transferOutHeader,'com.enactor.storeInventoryManagement.local.transferOut.ICustomerTransferOutHeader') &amp;&amp; notEmpty(transferOutAddress)}" id="CUSTOMER_DETAILS">
+    <core:boundsConstraint height="22" width="273" y="3" x="24"/>
+</core:label>
+                            </core:elements>
+                        </core:panel>
+                    </core:elements>
+                </core:panel>
+            </core:elements>
+        </core:panel>
+        <core:text lineHeight="0" messageId="PLEASE_ENTER_INSTRUCTIONS" id="Prompt"/>
+        <core:button lineHeight="0" messageBase="POSInventoryManagement/TransferOut/TransferOutMessages" messageId="CONTINUE_BUTTON_LABEL" id="Button1">
+            <core:text>ConfirmPressed</core:text>
+        </core:button>
+        <core:button lineHeight="0" messageBase="POSInventoryManagement/Common/GeneralMessages" messageId="EDIT_ITEMS_BUTTON_LABEL" visibility="#{allowItemAmendment &amp;&amp; (isEmpty(fromSelectItems) || isEmpty(reason) ||  !fromSelectItems ||(instanceOf(reason,'com.enactor.mfc.reason.IInterStoreTransferReason') &amp;&amp; reason.allowLooseItemsTransfer))}" id="Button2">
+            <core:boundsConstraint height="100" width="100" y="0" x="0"/>
+            <core:text>EditItemsPressed</core:text>
+        </core:button>
+        <core:button lineHeight="0" messageBase="POSInventoryManagement/Common/GeneralMessages" messageId="BACK_BUTTON_LABEL" visibility="#{isEmpty(isTask) || (notEmpty(isTask) &amp;&amp; isTask == false)}" id="Button7">
+            <core:text>BackPressed</core:text>
+        </core:button>
+        <core:button lineHeight="0" messageBase="POSInventoryManagement/TransferOut/TransferOutMessages" messageId="REMOVE_BUTTON_LABEL" visibility="#{isEmpty(isTask) || (notEmpty(isTask) &amp;&amp; isTask == false)}" id="Button8">
+            <core:text>CancelPressed</core:text>
+        </core:button>
+        <core:button lineHeight="0" messageBase="POSInventoryManagement/Common/GeneralMessages" messageId="SUSPEND_BUTTON_LABEL" visibility="#{priv:checkPrivilege('enactor.inventoryManagement.pos.TransferOut.AllowTransferOutSuspend') &amp;&amp; (isEmpty(historyFlag) || historyFlag == false)}" id="Button4">
+            <core:text>SuspendPressed</core:text>
+        </core:button>
+        <core:button lineHeight="0" messageBase="POSInventoryManagement/Common/GeneralMessages" messageId="DELIVERY_INSTRUCTIONS_BUTTON_LABEL" visibility="#{(notEmpty(reason) &amp;&amp; instanceOf(reason,'com.enactor.mfc.reason.IInterStoreTransferReason') &amp;&amp; reason.showDeliveryInstructions) &amp;&amp; ( isEmpty(historyFlag) || historyFlag == false)}" id="Button3">
+            <core:text>DeliveryInstructionsPressed</core:text>
+        </core:button>
+    </core:elements>
+    <core:templateURL>NextGen1920x1080/Pos/FullScreenTraditionalPosTemplate</core:templateURL>
+    <core:events>
+        <core:event destination="Button1" event="key.EnterPressed">press</core:event>
+        <core:event destination="Button8" event="key.KeyCode27Pressed">press</core:event>
+    </core:events>
+    <core:validationEvents>
+        <core:event>ConfirmPressed</core:event>
+    </core:validationEvents>
+    <core:variables>
+        <core:variable required="true" name="enactor.mfc.Device">
+            <core:interfaceName>com.enactor.mfc.device.IDevice</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.inventoryManagement.TransferOutAddress">
+            <core:interfaceName>com.enactor.storeInventoryManagement.local.transferOut.transferOutAddress.TransferOutAddress</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.inventoryManagement.TransferOutDeliveryAddress">
+            <core:interfaceName>com.enactor.storeInventoryManagement.local.transferOut.transferOutAddress.TransferOutAddress</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.inventoryManagement.AllowItemAmendment">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.coreui.User">
+            <core:interfaceName>com.enactor.core.signOn.ISignedOnUser</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.inventoryManagement.local.TransferOutHeader">
+            <core:interfaceName>com.enactor.storeInventoryManagement.local.transferOut.ITransferOutHeader</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.coreUI.UserLocale">
+            <core:interfaceName>com.enactor.core.localisation.ILocale</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.mfc.Reason">
+            <core:interfaceName>com.enactor.mfc.reason.Reason</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.mfc.Location">
+            <core:interfaceName>com.enactor.mfc.location.ILocation</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.mfc.SourceLocation">
+            <core:interfaceName>com.enactor.mfc.location.ILocation</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.mfc.SelectedCarrierTypeKey">
+            <core:interfaceName>com.enactor.storeInventoryManagement.local.carrier.ICarrierTypeKey</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.storeInventoryManagement.local.CarrierTypesSelectList">
+            <core:interfaceName>java.util.List</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.storeInventoryManagement.local.CarriersSelectList">
+            <core:interfaceName>java.util.List</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.mfc.SelectedCarrierKey">
+            <core:interfaceName>com.enactor.storeInventoryManagement.local.carrier.ICarrierKey</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="FormErrors">
+            <core:interfaceName>com.enactor.coreUI.processes.IFormErrors</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.inventoryManagement.IsTask">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.inventoryManagement.HistoryFlag">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.inventoryManagement.DisplaySelectReasonButton">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:variable>
+    </core:variables>
+</retail:posPromptPage>

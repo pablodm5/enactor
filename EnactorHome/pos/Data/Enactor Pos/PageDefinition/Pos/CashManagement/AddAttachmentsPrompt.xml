@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<retail:posPromptPage xmlns:core="http://www.enactor.com/core" xmlns:retail="http://www.enactor.com/retail" xmlns:ns4="http://www.enactor.com/crm" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803" xmlns:ns6="http://www.apis-it.hr/fin/2012/types/f73" xmlns:ns7="http://www.w3.org/2000/09/xmldsig#" xmlns:ns8="http://www.enactor.com/retail/storedRetailTransaction/service" xmlns:ns9="http://www.fu.gov.si/" xmlns:ns10="http://www.enactor.com/addressLookup/service" xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:ns14="http://www.enactor.com/crm/customerLoyalty/service" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" allowResize="true" allowMove="true" allowClose="true" windowtype="view-panel" height="609" width="833" messageBase="Pos/CashManagement/CashManagementMessages" title="Enter Notes Prompt" url="Pos/CashManagement/AddAttachmentsPrompt">
+    <core:elements>
+        <core:text id="Prompt">
+            <core:uiMessage messageId="UPLOAD_ATTACHMENTS" applicability="#{!viewingValues}"/>
+        </core:text>
+        <core:button messageBase="Pos/General/PosMessages" messageId="BUTTON_OK" id="Button1">
+            <core:text>OKPressed</core:text>
+        </core:button>
+        <core:button messageBase="Pos/General/PosMessages" messageId="BUTTON_CANCEL" id="Button2">
+            <core:text>CancelPressed</core:text>
+        </core:button>
+        <core:button messageId="DOCUMENT_ATTACHMENTS_ADD_REMOTE_BUTTON_LABEL" visibility="#{!viewingValues &amp;&amp; (documentAttachmentReason.maximumDocumentCaptured == 0 || (size(documentAttachmentList) &lt; documentAttachmentReason.maximumDocumentCaptured)) &amp;&amp; priv:checkPrivilege('enactor.cashManagement.AllowRemoteDocumentAttachments')}" id="Button3">
+            <core:text>AttachRemoteDocuments</core:text>
+        </core:button>
+        <core:panel id="DialogPanel">
+            <core:elements>
+                <core:panel id="InnerDialogPanel">
+                    <core:flowConstraint width="720" height="490"/>
+                    <core:elements>
+                        <core:panel backgroundColour="WHITE" id="AttachmentControlsPanel">
+                            <core:flowConstraint width="720" height="70"/>
+                            <core:elements>
+<core:panel id="AttachmentLabelsPanel">
+    <core:flowConstraint width="70%" height="60"/>
+    <core:elements>
+        <core:label messageId="#{!viewingValues &amp;&amp; size(documentAttachmentList) &gt; 0 ? 'DOCUMENT_ATTACHMENTS' : 'DOCUMENT_ATTACHMENTS_NONE'}" id="LABEL_ATTACHMENTS">
+            <core:flowConstraint width="100%" height="30"/>
+        </core:label>
+        <core:label messageId="DOCUMENT_ATTACHMENTS_REQUIRED" visibility="#{!viewingValues &amp;&amp; (documentAttachmentReason.maximumDocumentCaptured &gt; 0 &amp;&amp; documentAttachmentReason.minimumDocumentCaptured &gt; 0)}" id="LABEL_REQUIRED_ATTACHMENTS">
+            <core:flowConstraint width="100%" height="30"/>
+        </core:label>
+        <core:label messageId="DOCUMENT_ATTACHMENTS_REQUIRED_NO_MIN" visibility="#{!viewingValues &amp;&amp; (documentAttachmentReason.maximumDocumentCaptured &gt; 0 &amp;&amp; documentAttachmentReason.minimumDocumentCaptured == 0)}" id="LABEL_REQUIRED_ATTACHMENTS_NO_MIN">
+            <core:flowConstraint width="100%" height="30"/>
+        </core:label>
+        <core:label messageId="DOCUMENT_ATTACHMENTS_REQUIRED_NO_MAX" visibility="#{!viewingValues &amp;&amp; (documentAttachmentReason.maximumDocumentCaptured == 0 &amp;&amp; documentAttachmentReason.minimumDocumentCaptured &gt; 0)}" id="LABEL_REQUIRED_ATTACHMENTS_NO_MAX">
+            <core:flowConstraint width="100%" height="30"/>
+        </core:label>
+    </core:elements>
+</core:panel>
+<core:fileUpload addButtonMessageId="DOCUMENT_ATTACHMENTS_ADD_LOCAL_BUTTON_LABEL" visibility="#{!viewingValues &amp;&amp; (documentAttachmentReason.maximumDocumentCaptured == 0 || (size(documentAttachmentList) &lt; documentAttachmentReason.maximumDocumentCaptured)) &amp;&amp; priv:checkPrivilege('enactor.cashManagement.AllowLocalDocumentAttachments')}" id="UPLOAD_ATTACHMENTS">
+    <core:flowConstraint width="30%" height="60"/>
+    <core:resourceTypes/>
+    <core:selectedResources>#{newAttachmentList}</core:selectedResources>
+</core:fileUpload>
+                            </core:elements>
+                        </core:panel>
+                        <core:listBox lazyLoad="false" listSelectionMethod="DEFAULT" documentTemplateUrl="Pos/CashManagement/AttachmentListTemplate" styleClass="tenderSelectionList" visibility="#{notEmpty(documentAttachmentList)}" enabled="true" id="DOCUMENT_ATTACHMENT_LIST">
+                            <core:flowConstraint width="720" height="420"/>
+                            <core:elements/>
+                            <core:listExpression>#{documentAttachmentList}</core:listExpression>
+                        </core:listBox>
+                    </core:elements>
+                </core:panel>
+            </core:elements>
+        </core:panel>
+        <core:hidden id="Receipt"/>
+        <core:hidden id="InputBox"/>
+        <core:hidden id="TotalLabel"/>
+    </core:elements>
+    <core:templateURL>Pos/StandardPosFormTemplate</core:templateURL>
+    <core:variables>
+        <core:variable name="enactor.core.DocumentAttachmentList">
+            <core:interfaceName>java.util.List</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.cashManagement.NewAttachmentList">
+            <core:interfaceName>java.util.List</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.cashManagement.ViewingValues">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.cashManagement.DocumentAttachmentReason">
+            <core:interfaceName>com.enactor.mfc.reason.IDocumentAttachmentReason</core:interfaceName>
+        </core:variable>
+    </core:variables>
+</retail:posPromptPage>

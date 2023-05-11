@@ -1,0 +1,1111 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<core:process xmlns:core="http://www.enactor.com/core" xmlns:retail="http://www.enactor.com/retail" xmlns:ns4="http://www.enactor.com/crm" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803" xmlns:ns6="http://www.apis-it.hr/fin/2012/types/f73" xmlns:ns7="http://www.w3.org/2000/09/xmldsig#" xmlns:ns8="http://www.enactor.com/retail/storedRetailTransaction/service" xmlns:ns9="http://www.fu.gov.si/" xmlns:ns10="http://www.enactor.com/addressLookup/service" xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:ns14="http://www.enactor.com/crm/customerLoyalty/service" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <core:processID>CoreProcessing/ScheduledJobs/FeedScheduledJobQueue</core:processID>
+    <core:version>1.0</core:version>
+    <core:name></core:name>
+    <core:defaultMessageBaseName></core:defaultMessageBaseName>
+    <core:firstStateID>ProcessQueuedJobs</core:firstStateID>
+    <core:className></core:className>
+    <core:uiHints>
+        <entry>
+            <key>com.enactor.tools.editor.process.style</key>
+            <value>2047</value>
+        </entry>
+        <entry>
+            <key>com.enactor.tools.editor.process.xloc</key>
+            <value>8</value>
+        </entry>
+        <entry>
+            <key>com.enactor.tools.editor.process.yloc</key>
+            <value>8</value>
+        </entry>
+    </core:uiHints>
+    <core:metaData>
+        <core:inputs>
+            <core:input required="true" name="enactor.coreUI.ControlService">
+                <core:interfaceName>com.enactor.core.services.IControlService</core:interfaceName>
+            </core:input>
+            <core:input required="true" name="enactor.coreUI.LoggingLocale">
+                <core:interfaceName>java.util.Locale</core:interfaceName>
+            </core:input>
+            <core:input required="true" name="enactor.coreUI.QueueWriter">
+                <core:interfaceName>com.enactor.core.queues.IQueueWriter</core:interfaceName>
+            </core:input>
+            <core:input required="true" name="enactor.coreUI.Queue">
+                <core:interfaceName>com.enactor.core.queues.IQueue</core:interfaceName>
+            </core:input>
+            <core:input required="true" name="enactor.coreUI.ServiceType">
+                <core:interfaceName>com.enactor.core.services.types.IServiceType</core:interfaceName>
+            </core:input>
+        </core:inputs>
+        <stateDataTypes>
+            <stateDataType required="true" name="enactor.coreUI.ControlService">
+                <core:interfaceName>com.enactor.core.services.IControlService</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.coreUI.LoggingLocale">
+                <core:interfaceName>java.util.Locale</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.coreUI.QueueWriter">
+                <core:interfaceName>com.enactor.core.queues.IQueueWriter</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.coreUI.Queue">
+                <core:interfaceName>com.enactor.core.queues.IQueue</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.coreUI.ServiceType">
+                <core:interfaceName>com.enactor.core.services.types.IServiceType</core:interfaceName>
+            </stateDataType>
+        </stateDataTypes>
+    </core:metaData>
+    <core:action>
+        <core:defaultNextStateID>LoopQueuedJobs</core:defaultNextStateID>
+        <core:actionID>ListRetryJobs</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreProcessing.scheduledJob.actions.ListScheduledJobsAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>63</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>480</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>139</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="#{now()}" required="false" name="enactor.coreProcessing.LatestRunAtDateTime">
+            <core:interfaceName>java.util.Date</core:interfaceName>
+        </core:param>
+        <core:param value="#{enumValue(&quot;com.enactor.coreProcessing.scheduledJob.ScheduledJobStatus&quot;,&quot;QUEUED_FOR_RETRY&quot;)}" name="enactor.coreProcessing.JobStatus">
+            <core:interfaceName>com.enactor.coreProcessing.scheduledJob.ScheduledJobStatus</core:interfaceName>
+        </core:param>
+        <core:param value="${Service.DeviceID}" name="enactor.coreProcessing.scheduledJob.RunAtDeviceId">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.coreProcessing.JobStatus">
+                    <core:interfaceName>com.enactor.coreProcessing.scheduledJob.ScheduledJobStatus</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.coreProcessing.LatestRunAtDateTime">
+                    <core:interfaceName>java.util.Date</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.coreProcessing.scheduledJob.RunAtDeviceId">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.coreProcessing.scheduledJob.RuntimeContext">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="false" name="enactor.coreProcessing.ScheduledJobsList">
+                    <core:interfaceName>java.util.List</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>ListQueuedJobs</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>LogListJobsFailed</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Exception</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID>LoopQueuedJobs</core:defaultNextStateID>
+        <core:actionID>ListQueuedJobs</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreProcessing.scheduledJob.actions.ListScheduledJobsAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>63</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>702</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>139</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="${Service.DeviceID}" name="enactor.coreProcessing.scheduledJob.RunAtDeviceId">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:param value="#{now()}" required="false" name="enactor.coreProcessing.LatestRunAtDateTime">
+            <core:interfaceName>java.util.Date</core:interfaceName>
+        </core:param>
+        <core:param value="#{enumValue(&quot;com.enactor.coreProcessing.scheduledJob.ScheduledJobStatus&quot;,&quot;QUEUED&quot;)}" required="false" name="enactor.coreProcessing.JobStatus">
+            <core:interfaceName>com.enactor.coreProcessing.scheduledJob.ScheduledJobStatus</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.coreProcessing.scheduledJob.RunAtDeviceId">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.coreProcessing.LatestRunAtDateTime">
+                    <core:interfaceName>java.util.Date</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.coreProcessing.JobStatus">
+                    <core:interfaceName>com.enactor.coreProcessing.scheduledJob.ScheduledJobStatus</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.coreProcessing.scheduledJob.RuntimeContext">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="false" name="enactor.coreProcessing.ScheduledJobsList">
+                    <core:interfaceName>java.util.List</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>LogListJobsFailed</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Exception</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>AddToCollectionAction</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID>LoopQueuedJobs</core:defaultNextStateID>
+        <core:actionID>AddToCollectionAction</core:actionID>
+        <core:name>AddToCollectionAction</core:name>
+        <core:className>com.enactor.coreUI.actions.AddToCollectionAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1023</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>928</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>139</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input name="enactor.coreUI.ReplaceDuplicates">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.MergeCollections">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.Collection">
+                    <core:interfaceName>java.util.Collection</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.CollectionClass">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.Index">
+                    <core:interfaceName>java.lang.Integer</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.coreUI.Object">
+                    <core:interfaceName>java.lang.Object</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output name="enactor.coreUI.Collection">
+                    <core:interfaceName>java.util.Collection</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID>LoopQueuedJobs</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>WriteIdleActivity-NoJobs</core:toActionID>
+            <core:condition>isEmpty(state.scheduledJobsList)</core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>WriteCurrentActivity</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.SetControlServiceCurrentActivityAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>11</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1369</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>139</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="CoreProcessing/ScheduledJobs/ScheduledJobMessages" name="enactor.coreUI.MessageBasename">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:param value="PROCESSING" name="enactor.coreUI.MessageId">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.coreUI.ControlService">
+                    <core:interfaceName>com.enactor.core.services.IControlService</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.Message">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.MessageBasename">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.MessageId">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.MessageLocale">
+                    <core:interfaceName>java.util.Locale</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>QueueJob</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:executeProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>QueueJob</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UICallProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>47</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1369</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>375</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="false" name="enactor.coreUI.Queue">
+                    <core:interfaceName>com.enactor.core.queues.IQueue</core:interfaceName>
+                </core:input>
+                <core:input required="false" name="enactor.coreUI.QueueWriter">
+                    <core:interfaceName>com.enactor.core.queues.IQueueWriter</core:interfaceName>
+                </core:input>
+                <core:input required="false" name="enactor.coreProcessing.ScheduledJobKey">
+                    <core:interfaceName>com.enactor.coreProcessing.scheduledJob.IScheduledJobKey</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+                <core:outcome name="Fail"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.CallProcess</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID>LoopQueuedJobs</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>WriteBusyRetryActivity</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Fail</core:outcome>
+        </core:outcomeLink>
+        <core:executeProcessId>CoreProcessing/ScheduledJobs/ScheduledJobQueueJob</core:executeProcessId>
+    </core:executeProcessAction>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>WriteBusyRetryActivity</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.SetControlServiceCurrentActivityAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>11</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1369</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>587</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="CoreProcessing/ScheduledJobs/ScheduledJobMessages" name="enactor.coreUI.MessageBasename">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:param value="BUSY_RETRY" name="enactor.coreUI.MessageId">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.coreUI.ControlService">
+                    <core:interfaceName>com.enactor.core.services.IControlService</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.Message">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.MessageBasename">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.MessageId">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.MessageLocale">
+                    <core:interfaceName>java.util.Locale</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>Busy</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>WriteIdleActivity-NoJobs</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.SetControlServiceCurrentActivityAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>928</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>513</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="CoreProcessing/ScheduledJobs/ScheduledJobMessages" name="enactor.coreUI.MessageBasename">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:param value="IDLE" name="enactor.coreUI.MessageId">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.coreUI.ControlService">
+                    <core:interfaceName>com.enactor.core.services.IControlService</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.Message">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.MessageBasename">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.MessageId">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.MessageLocale">
+                    <core:interfaceName>java.util.Locale</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>Empty</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>LogListJobsFailed</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UILogMessageAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>11</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>702</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>403</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="ScheduledJobFeeder: Error Listing Queued Jobs" name="enactor.coreUI.LogMessage">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:param value="10" name="enactor.coreUI.logging.InitialMax">
+            <core:interfaceName>java.lang.Integer</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input name="enactor.coreUI.LogMessage">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.logging.InitialMax">
+                    <core:interfaceName>java.lang.Integer</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>WriteErrorRetryActivity</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>WriteErrorRetryActivity</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Exception</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>WriteErrorRetryActivity</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.SetControlServiceCurrentActivityAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>11</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>480</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>403</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="CoreProcessing/ScheduledJobs/ScheduledJobMessages" name="enactor.coreUI.MessageBasename">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:param value="ERROR_RETRY" name="enactor.coreUI.MessageId">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.coreUI.ControlService">
+                    <core:interfaceName>com.enactor.core.services.IControlService</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.Message">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.MessageBasename">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.MessageId">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.MessageLocale">
+                    <core:interfaceName>java.util.Locale</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>Error</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:endProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>Error</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIEndProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>270</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>398</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData/>
+        <core:typeId>enactor.types.EndProcess</core:typeId>
+        <core:outcome>Error</core:outcome>
+        <core:defaultProcessId></core:defaultProcessId>
+    </core:endProcessAction>
+    <core:endProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>Busy</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIEndProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1119</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>597</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData/>
+        <core:typeId>enactor.types.EndProcess</core:typeId>
+        <core:outcome>Busy</core:outcome>
+        <core:defaultProcessId></core:defaultProcessId>
+    </core:endProcessAction>
+    <core:endProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>Empty</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIEndProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>920</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>602</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData/>
+        <core:typeId>enactor.types.EndProcess</core:typeId>
+        <core:outcome>Empty</core:outcome>
+        <core:defaultProcessId></core:defaultProcessId>
+    </core:endProcessAction>
+    <core:endProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>Success</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIEndProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1151</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>74</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData/>
+        <core:typeId>enactor.types.EndProcess</core:typeId>
+        <core:outcome>Success</core:outcome>
+        <core:defaultProcessId></core:defaultProcessId>
+    </core:endProcessAction>
+    <core:state>
+        <core:url></core:url>
+        <core:stateID>ProcessQueuedJobs</core:stateID>
+        <core:name></core:name>
+        <core:className></core:className>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>49</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>260</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>139</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="true" required="false" name="enactor.coreUI.LoopControl">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:outputs>
+                <core:output required="false" name="enactor.coreProcessing.ScheduledJobsList">
+                    <core:interfaceName>java.util.List</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <handledEvents>
+                <handledEvent name="StateEntered"/>
+            </handledEvents>
+            <stateDataTypes>
+                <stateDataType required="false" name="enactor.coreProcessing.ScheduledJobsList">
+                    <core:interfaceName>java.util.List</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="true" name="enactor.coreProcessing.QueuedJobsList">
+                    <core:interfaceName>java.util.List</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="true" name="enactor.coreProcessing.RetryJobsList">
+                    <core:interfaceName>java.util.List</core:interfaceName>
+                </stateDataType>
+            </stateDataTypes>
+        </core:metaData>
+        <core:typeId>enactor.types.SelectionState</core:typeId>
+        <core:singleInstance>false</core:singleInstance>
+        <core:respondToViewEvents>false</core:respondToViewEvents>
+        <core:actionInputMappings>
+            <core:actionMapping>
+                <core:actionID>ListRetryJobs</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.coreUI.ServiceType">
+<core:interfaceName>com.enactor.core.services.types.IServiceType</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.coreProcessing.scheduledJob.RuntimeContext">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:targetDataType>
+                            <core:expression>serviceType.runtimeContext</core:expression>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings/>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>ListQueuedJobs</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.coreUI.ServiceType">
+<core:interfaceName>com.enactor.core.services.types.IServiceType</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.coreProcessing.scheduledJob.RuntimeContext">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:targetDataType>
+                            <core:expression>serviceType.runtimeContext</core:expression>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings/>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>WriteErrorRetryActivity</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="false" name="enactor.coreUI.ControlService">
+<core:interfaceName>com.enactor.core.services.IControlService</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.coreUI.ControlService">
+<core:interfaceName>com.enactor.core.services.IControlService</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.coreUI.LoggingLocale">
+<core:interfaceName>java.util.Locale</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType name="enactor.coreUI.MessageLocale">
+<core:interfaceName>java.util.Locale</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.coreUI.Message">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>WriteIdleActivity-NoJobs</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="false" name="enactor.coreUI.ControlService">
+<core:interfaceName>com.enactor.core.services.IControlService</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.coreUI.ControlService">
+<core:interfaceName>com.enactor.core.services.IControlService</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.coreUI.LoggingLocale">
+<core:interfaceName>java.util.Locale</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType name="enactor.coreUI.MessageLocale">
+<core:interfaceName>java.util.Locale</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.coreUI.Message">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>AddToCollectionAction</core:actionID>
+                <core:mappings>
+                    <core:processMappings/>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.coreProcessing.RetryJobsList">
+<core:interfaceName>java.util.List</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType name="enactor.coreUI.Collection">
+<core:interfaceName>java.util.Collection</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.coreProcessing.QueuedJobsList">
+<core:interfaceName>java.util.List</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.coreUI.Object">
+<core:interfaceName>java.lang.Object</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.coreUI.ReplaceDuplicates">
+<core:interfaceName>java.lang.Boolean</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.coreUI.MergeCollections">
+<core:interfaceName>java.lang.Boolean</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.coreUI.Index">
+<core:interfaceName>java.lang.Integer</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.coreUI.CollectionClass">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+        </core:actionInputMappings>
+        <core:actionOutputMappings>
+            <core:actionMapping>
+                <core:actionID>ListRetryJobs</core:actionID>
+                <core:mappings>
+                    <core:processMappings/>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="false" name="enactor.coreProcessing.ScheduledJobsList">
+<core:interfaceName>java.util.List</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.coreProcessing.RetryJobsList">
+<core:interfaceName>java.util.List</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>ListQueuedJobs</core:actionID>
+                <core:mappings>
+                    <core:processMappings/>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="false" name="enactor.coreProcessing.ScheduledJobsList">
+<core:interfaceName>java.util.List</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.coreProcessing.QueuedJobsList">
+<core:interfaceName>java.util.List</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>AddToCollectionAction</core:actionID>
+                <core:mappings>
+                    <core:processMappings/>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:sourceDataType name="enactor.coreUI.Collection">
+<core:interfaceName>java.util.Collection</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="false" name="enactor.coreProcessing.ScheduledJobsList">
+<core:interfaceName>java.util.List</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+        </core:actionOutputMappings>
+        <core:eventLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>ListRetryJobs</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>StateEntered</core:event>
+        </core:eventLink>
+    </core:state>
+    <core:state>
+        <core:url></core:url>
+        <core:stateID>LoopQueuedJobs</core:stateID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.states.UIIteratorState</core:className>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>127</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1152</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>139</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="true" required="false" name="enactor.coreUI.LoopControl">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="false" name="enactor.coreUI.LoopControl">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+                <core:input required="false" name="enactor.coreUI.Iterable">
+                    <core:interfaceName>java.lang.Object</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <handledEvents>
+                <handledEvent name="Completed"/>
+                <handledEvent name="Execute"/>
+            </handledEvents>
+            <stateDataTypes>
+                <stateDataType required="false" name="enactor.coreUI.LoopControl">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="false" name="enactor.coreUI.IteratorItem">
+                    <core:interfaceName>com.enactor.core.database.list.IKeyedListElement</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="false" name="enactor.coreUI.Iterator">
+                    <core:interfaceName>java.util.Iterator</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="false" name="enactor.coreUI.Iterable">
+                    <core:interfaceName>java.lang.Object</core:interfaceName>
+                </stateDataType>
+            </stateDataTypes>
+        </core:metaData>
+        <core:typeId>Iterator</core:typeId>
+        <core:singleInstance>false</core:singleInstance>
+        <core:respondToViewEvents>false</core:respondToViewEvents>
+        <core:actionInputMappings>
+            <core:actionMapping>
+                <core:actionID>WriteCurrentActivity</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="false" name="enactor.coreUI.ControlService">
+<core:interfaceName>com.enactor.core.services.IControlService</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.coreUI.ControlService">
+<core:interfaceName>com.enactor.core.services.IControlService</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.coreUI.LoggingLocale">
+<core:interfaceName>java.util.Locale</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType name="enactor.coreUI.MessageLocale">
+<core:interfaceName>java.util.Locale</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.coreUI.Message">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>QueueJob</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="false" name="enactor.coreUI.Queue">
+<core:interfaceName>com.enactor.core.queues.IQueue</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="false" name="enactor.coreUI.Queue">
+<core:interfaceName>com.enactor.core.queues.IQueue</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="false" name="enactor.coreUI.QueueWriter">
+<core:interfaceName>com.enactor.core.queues.IQueueWriter</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="false" name="enactor.coreUI.QueueWriter">
+<core:interfaceName>com.enactor.core.queues.IQueueWriter</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="false" name="enactor.coreUI.IteratorItem">
+<core:interfaceName>com.enactor.core.database.list.IKeyedListElement</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="false" name="enactor.coreProcessing.ScheduledJobKey">
+<core:interfaceName>com.enactor.coreProcessing.scheduledJob.IScheduledJobKey</core:interfaceName>
+                            </core:targetDataType>
+                            <core:expression>iteratorItem.key</core:expression>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>WriteBusyRetryActivity</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="false" name="enactor.coreUI.ControlService">
+<core:interfaceName>com.enactor.core.services.IControlService</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.coreUI.ControlService">
+<core:interfaceName>com.enactor.core.services.IControlService</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.coreUI.LoggingLocale">
+<core:interfaceName>java.util.Locale</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType name="enactor.coreUI.MessageLocale">
+<core:interfaceName>java.util.Locale</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.coreUI.Message">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+        </core:actionInputMappings>
+        <core:actionOutputMappings/>
+        <core:eventLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>WriteCurrentActivity</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>Execute</core:event>
+        </core:eventLink>
+        <core:eventLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>Success</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>Completed</core:event>
+        </core:eventLink>
+    </core:state>
+    <core:stateTransitions>
+        <core:stateTransition>
+            <core:key>
+                <core:sourceStateID>ProcessQueuedJobs</core:sourceStateID>
+                <core:targetStateID>LoopQueuedJobs</core:targetStateID>
+            </core:key>
+            <core:mappings>
+                <core:mappings>
+                    <core:sourceDataType required="false" name="enactor.coreProcessing.ScheduledJobsList">
+                        <core:interfaceName>java.util.List</core:interfaceName>
+                    </core:sourceDataType>
+                    <core:targetDataType required="false" name="enactor.coreUI.Iterable">
+                        <core:interfaceName>java.lang.Object</core:interfaceName>
+                    </core:targetDataType>
+                </core:mappings>
+            </core:mappings>
+        </core:stateTransition>
+    </core:stateTransitions>
+</core:process>

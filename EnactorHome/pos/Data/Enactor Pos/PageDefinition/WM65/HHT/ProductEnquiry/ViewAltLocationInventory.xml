@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<core:peripheralSupportWindow xmlns:core="http://www.enactor.com/core" xmlns:retail="http://www.enactor.com/retail" xmlns:ns4="http://www.enactor.com/crm" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803" xmlns:ns6="http://www.apis-it.hr/fin/2012/types/f73" xmlns:ns7="http://www.w3.org/2000/09/xmldsig#" xmlns:ns8="http://www.enactor.com/retail/storedRetailTransaction/service" xmlns:ns9="http://www.fu.gov.si/" xmlns:ns10="http://www.enactor.com/addressLookup/service" xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:ns14="http://www.enactor.com/crm/customerLoyalty/service" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" hasBorders="FALSE" height="320" width="320" messageBase="HHT/ProductEnquiry/ProductEnquiryMessages" titleId="ALT_INV_PAGE_TITLE" url="WM65/HHT/ProductEnquiry/ViewAltLocationInventory">
+    <core:elements>
+        <core:panel styleClass="mainPanel" id="MAIN_PANEL">
+            <core:boundsConstraint height="320" width="320" y="0" x="0"/>
+            <core:elements>
+                <core:label messageId="ALT_INV_TITLE" styleClass="title" id="TITLE">
+                    <core:boundsConstraint height="18" width="312" y="8" x="8"/>
+                </core:label>
+                <core:panel id="PAGE_CONTROL_PANEL">
+                    <core:boundsConstraint height="30" width="304" y="228" x="9"/>
+                    <core:elements>
+                        <core:pageElementRef pageDefinitionURL="HHT/Common/HHTPageControl" id="PAGE_CONTROLS">
+                            <core:boundsConstraint height="30" width="304" y="0" x="0"/>
+                            <core:elements/>
+                            <core:parameter value="#{pagedList}" name="enactor.coreUI.List">
+<core:interfaceName>java.util.List</core:interfaceName>
+                            </core:parameter>
+                        </core:pageElementRef>
+                    </core:elements>
+                </core:panel>
+                <core:pageElementRef pageDefinitionURL="HHT/Common/Footer" id="STANDARD_FOOTER">
+                    <core:boundsConstraint height="18" width="320" y="300" x="0"/>
+                    <core:elements/>
+                    <core:parameter value="#{device}" name="enactor.mfc.Device">
+                        <core:interfaceName>com.enactor.mfc.device.IDevice</core:interfaceName>
+                    </core:parameter>
+                </core:pageElementRef>
+                <core:button messageBase="HHT/General/SelectListElementMessages" messageId="BACK_BUTTON" focusOrder="1" styleClass="bottomRightButton" id="BACK_BUTTON">
+                    <core:boundsConstraint height="30" width="70" y="264" x="8"/>
+                    <core:text>BackPressed</core:text>
+                </core:button>
+                <core:panel styleClass="tablePanel" id="DATA_PANEL">
+                    <core:boundsConstraint height="185" width="304" y="32" x="8"/>
+                    <core:elements>
+                        <core:dataTable rowSelection="true" var="rowStock" data="#{!useAlternateSizeList ?  pagedList  : (notEmpty(selectedSize) ? (ProductEnquiryBean:getSizeInventoryLevelList(selectedSize.productId, pagedList)) : pagedList)}" borderSize="1" borderStyle="None" styleClass="tableNoSpacing" id="ITEMS_TABLE">
+                            <core:flowConstraint width="304"/>
+                            <core:headerRow id="ITEMS_TABLE_HEADER">
+<core:cell styleClass="left" id="TABLE_CELL_1">
+    <core:elements>
+        <core:label messageId="LOCATION_LABEL" styleClass="columnHeading" id="LOCATION_LABEL">
+            <core:flowConstraint/>
+        </core:label>
+    </core:elements>
+</core:cell>
+<core:cell styleClass="left" id="TABLE_CELL_2">
+    <core:elements>
+        <core:label messageId="SIZE_LABEL" styleClass="columnHeading left" id="SIZE_LABEL">
+            <core:flowConstraint/>
+        </core:label>
+    </core:elements>
+</core:cell>
+<core:cell styleClass="left" id="TABLE_CELL_3">
+    <core:elements>
+        <core:label messageId="QUANTITY_LABEL" id="STOCK_LABEL">
+            <core:flowConstraint/>
+        </core:label>
+    </core:elements>
+</core:cell>
+                            </core:headerRow>
+                            <core:cell styleClass="left" id="TABLE_CELL_1">
+<core:elements>
+    <core:text id="LOCATION">
+        <core:flowConstraint/>
+        <core:text>#{length(rowStock.locationName) &gt; 15 ? concat(strings:substring(rowStock.locationName,0,15),'...') : rowStock.locationName}</core:text>
+    </core:text>
+</core:elements>
+                            </core:cell>
+                            <core:cell styleClass="left" id="TABLE_CELL_2">
+<core:elements>
+    <core:text id="SIZE">
+        <core:flowConstraint/>
+        <core:text>#{instanceOf(rowStock, 'com.enactor.inventoryManagement.itemInventoryLevel.ISKUProductLocationInventoryLevel') &amp;&amp; notEmpty(rowStock.sizeId) ? ProductEnquiryBean:getSizeDescription(rowStock.sizeId, styleColourSizeProduct.sizeRangeKey.sizeRangeId, dynamicMap) : ''}</core:text>
+    </core:text>
+</core:elements>
+                            </core:cell>
+                            <core:cell styleClass="left" id="TABLE_CELL_3">
+<core:elements>
+    <core:text id="STOCK">
+        <core:flowConstraint/>
+        <core:text>#{rowStock.value}</core:text>
+    </core:text>
+</core:elements>
+                            </core:cell>
+                        </core:dataTable>
+                    </core:elements>
+                </core:panel>
+            </core:elements>
+            <core:variables/>
+        </core:panel>
+    </core:elements>
+    <core:templateURL>HHT/HHTPage</core:templateURL>
+    <core:events>
+        <core:event destination="EDIT" event="key.EnterPressed"></core:event>
+        <core:event destination="SUSPEND" event="key.KeyCode27Pressed"></core:event>
+        <core:event destination="ITEMS_TABLE" event="key.UpPressed"></core:event>
+        <core:event destination="ITEMS_TABLE" event="key.DownPressed"></core:event>
+    </core:events>
+    <core:preferredConstraintType>BOUNDS</core:preferredConstraintType>
+    <core:variables>
+        <core:variable required="true" name="enactor.coreUI.PagedList">
+            <core:interfaceName>java.util.List</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.hht.SelectedSize">
+            <core:interfaceName>com.enactor.mfc.product.ISKUProduct</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.dynamicMap.DynamicMap">
+            <core:interfaceName>com.enactor.core.utilities.DynamicMap</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.mfc.StyleColourSizeProduct">
+            <core:interfaceName>com.enactor.mfc.product.IStyleColourSizeProduct</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.hht.TextEntry">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.hht.UseAlternateSizeList">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:variable>
+    </core:variables>
+    <core:functionLibraries>
+        <core:functionLibrary name="ProductEnquiryBean" path="com.enactor.storeInventoryManagement.productEnquiry.ProductEnquiryBean">
+            <core:type>CLASS</core:type>
+        </core:functionLibrary>
+    </core:functionLibraries>
+    <core:scannerEnabled>true</core:scannerEnabled>
+    <core:scannerDataName>#{scannerData}</core:scannerDataName>
+</core:peripheralSupportWindow>

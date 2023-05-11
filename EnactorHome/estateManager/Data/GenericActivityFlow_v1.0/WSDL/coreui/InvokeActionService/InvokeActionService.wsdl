@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:plnk="http://schemas.xmlsoap.org/ws/2003/05/partner-link/" xmlns:java="http://schemas.xmlsoap.org/wsdl/java/"
+	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:format="http://schemas.xmlsoap.org/wsdl/formatbinding/"
+	xmlns:mjstring="com.enactor.tools.core.util.JavaCodeGenUtils" name="InvokeActionService"
+	targetNamespace="http://www.enactor.com/coreui/InvokeActionService"
+	xmlns:service="http://www.enactor.com/coreui/InvokeActionService"
+	xmlns:serviceTypes="http://www.enactor.com/coreui/InvokeActionService/Types"
+	xmlns:core="http://www.enactor.com/core"
+	xmlns:coreui="http://www.enactor.com/coreui">
+	<wsdl:types>
+		<xsd:schema>
+			<xsd:import namespace="http://www.enactor.com/coreui" schemaLocation="coreui/coreui.xsd" />
+			<xsd:import namespace="http://www.enactor.com/core" schemaLocation="Core/Core.xsd" />
+		</xsd:schema>
+	</wsdl:types>
+	<wsdl:message name="invokeActionRequestMessage">
+		<wsdl:part name="parameters" element="core:invokeAction" />
+	</wsdl:message>
+	<wsdl:message name="invokeActionResponseMessage">
+		<wsdl:part name="parameters" element="core:invokeActionResponse" />
+	</wsdl:message>
+	<wsdl:message name="applicationProcessException">
+		<wsdl:part name="parameters" element="core:applicationProcessException"
+			xmlns:core="http://www.enactor.com/core" />
+	</wsdl:message>
+	<wsdl:message name="uiProcessException">
+		<wsdl:part name="parameters" element="coreui:uiProcessException" xmlns:coreui="http://www.enactor.com/coreui" />
+	</wsdl:message>
+	<wsdl:portType name="InvokeActionServicePT">
+		<wsdl:operation name="invokeAction">
+			<wsdl:input message="service:invokeActionRequestMessage" name="invokeActionRequestMessage" />
+			<wsdl:output message="service:invokeActionResponseMessage" name="invokeActionResponseMessage" />
+			<wsdl:fault message="service:applicationProcessException" name="applicationProcessException" />
+			<wsdl:fault message="service:uiProcessException" name="uiProcessException" />
+		</wsdl:operation>
+	</wsdl:portType>
+	<wsdl:binding name="SOAPBinding" type="service:InvokeActionServicePT">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+		<wsdl:operation name="invokeAction">
+			<soap:operation
+				soapAction="http://www.enactor.com/coreui/InvokeActionService/InvokeActionService/soapAction" />
+			<wsdl:input name="invokeActionRequestMessage">
+				<soap:body use="literal" parts="parameters" />
+			</wsdl:input>
+			<wsdl:output name="invokeActionResponseMessage">
+				<soap:body use="literal" parts="parameters" />
+			</wsdl:output>
+			<wsdl:fault name="applicationProcessException">
+				<soap:fault use="literal" name="applicationProcessException" />
+			</wsdl:fault>
+			<wsdl:fault name="uiProcessException">
+				<soap:fault use="literal" name="uiProcessException" />
+			</wsdl:fault>
+		</wsdl:operation>
+	</wsdl:binding>
+	<wsdl:binding name="JavaBinding" type="service:InvokeActionServicePT">
+		<java:binding />
+		<format:typeMapping encoding="Java" style="Java">
+			<format:typeMap typeName="xsd:string" formatType="java.lang.String" />
+			<format:typeMap elementName="core:applicationProcessData"
+				formatType="com.enactor.core.application.process.IApplicationProcessData" xmlns:core="http://www.enactor.com/core" />
+			<format:typeMap elementName="core:applicationProcessException"
+				formatType="com.enactor.core.application.process.ApplicationProcessException"
+				xmlns:core="http://www.enactor.com/core" />
+			<format:typeMap elementName="coreui:uiProcessException"
+				formatType="com.enactor.coreUI.processes.UIProcessException" xmlns:coreui="http://www.enactor.com/coreui" />
+			<format:typeMap elementName="core:invokeAction"
+				formatType="com.enactor.core.entities.IEntity" xmlns:core="http://www.enactor.com/core" />
+			<format:typeMap elementName="core:invokeActionResponse"
+				formatType="com.enactor.core.entities.IEntity" xmlns:coreui="http://www.enactor.com/core" />
+		</format:typeMapping>
+		<wsdl:operation name="invokeAction">
+			<java:operation methodType="instance" methodName="invokeAction" />
+			<wsdl:input />
+			<wsdl:output />
+			<wsdl:fault name="applicationProcessException" />
+			<wsdl:fault name="uiProcessException" />
+		</wsdl:operation>
+	</wsdl:binding>
+	<wsdl:service name="InvokeActionService">
+		<wsdl:port name="SOAPPort" binding="service:SOAPBinding">
+			<soap:address location="http://localhost:8080/axis2/InvokeActionService" />
+		</wsdl:port>
+		<wsdl:port name="JavaPort" binding="service:JavaBinding">
+			<java:address className="com.enactor.coreUI.actions.service.InvokeActionService" />
+		</wsdl:port>
+	</wsdl:service>
+	<plnk:partnerLinkType name="InvokeActionServicePLT">
+		<plnk:role name="InvokeActionServiceImpl">
+			<plnk:portType name="service:InvokeActionServicePT" />
+		</plnk:role>
+	</plnk:partnerLinkType>
+</wsdl:definitions>

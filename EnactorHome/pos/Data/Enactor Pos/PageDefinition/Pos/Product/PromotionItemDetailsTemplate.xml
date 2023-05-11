@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<core:documentTemplate xmlns:core="http://www.enactor.com/core" xmlns:retail="http://www.enactor.com/retail" xmlns:ns4="http://www.enactor.com/crm" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803" xmlns:ns6="http://www.apis-it.hr/fin/2012/types/f73" xmlns:ns7="http://www.w3.org/2000/09/xmldsig#" xmlns:ns8="http://www.enactor.com/retail/storedRetailTransaction/service" xmlns:ns9="http://www.fu.gov.si/" xmlns:ns10="http://www.enactor.com/addressLookup/service" xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:ns14="http://www.enactor.com/crm/customerLoyalty/service" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" paginated="false" width="100" messageBase="Pos/Product/PromotionItemDetailsMessages" title="Promotion Item Details" url="Pos/Product/PromotionItemDetailsTemplate">
+    <core:elements>
+        <core:tableTemplate listVariableName="item" list="basketItem.modifiers" id="modifiers">
+            <core:formatElement applicableEntityName="listHeader" formatId="promotionItemDetails"/>
+            <core:formatElement applicableEntityName="listFooter"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IPromotionModifier" formatId="promotionModifier"/>
+            <core:formatElement/>
+        </core:tableTemplate>
+    </core:elements>
+    <core:columnDefs>
+        <core:columnDef id="H1" start="2" end="30"/>
+        <core:columnDef id="H2" start="35" end="80"/>
+        <core:columnDef id="1" start="5" end="20"/>
+        <core:columnDef id="2" start="20" end="40"/>
+        <core:columnDef id="3" start="40" end="80"/>
+        <core:columnDef id="4" start="80" end="95" align="RIGHT"/>
+        <core:columnDef id="5" start="2" end="95"/>
+    </core:columnDefs>
+    <core:formatEntry id="promotionItemDetails">
+        <core:elements>
+            <core:row>
+                <core:rowLine>
+                    <core:elements/>
+                </core:rowLine>
+                <core:rowLine visibility="#{instanceOf(basketItem, 'com.enactor.mfc.basket.items.ISalesItem')}">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="H1">
+                            <core:elements>
+<core:text messageId="PRODUCT_ID"/>
+<core:text>
+    <core:text> #{basketItem.productID}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="H2">
+                            <core:elements>
+<core:text>
+    <core:text>#{basketItem.description}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="H1" visibility="#{instanceOf(basketItem, 'com.enactor.mfc.basket.items.ISalesItem') &amp;&amp; notEmpty(basketItem.sellingCode)}">
+                            <core:elements>
+<core:text messageId="SELLING_CODE"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="H2">
+                            <core:elements>
+<core:text>
+    <core:text>#{basketItem.sellingCode}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="H1">
+                            <core:elements>
+<core:text messageId="VALUE"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="H2">
+                            <core:elements>
+<core:text>
+    <core:formatters>
+        <core:formatCurrencyAmount/>
+    </core:formatters>
+    <core:text>#{basketItem.netValue}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine visibility="#{instanceOf(basketItem, 'com.enactor.mfc.basket.items.IMerchandiseItem')}">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="H1">
+                            <core:elements>
+<core:text messageId="MMGROUP"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="H2" visibility="#{notEmpty(basketItem.MMGroupId)}">
+                            <core:elements>
+<core:text visibility="#{notEmpty(department)}">
+    <core:text>#{department.name}</core:text>
+</core:text>
+<core:text visibility="#{enactor:empty(department)}">
+    <core:text>#{basketItem.MMGroupId}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+        <core:entityReferences>
+            <core:entityReference name="department" entityName="group" entityNamespace="http://www.enactor.com/core">
+                <core:keyProperty name="groupTypeId" value="#{'mmGroup'}"/>
+                <core:keyProperty name="groupId" value="#{basketItem.MMGroupId}"/>
+                <core:keyProperty name="groupHierarchyId" value="#{basketItem.MMGroupHierarchyId}"/>
+                <core:keyProperty name="variantGroupTypeId" value="#{'region'}"/>
+                <core:keyProperty name="variantGroupId" value="#{transaction.originatedBy.regionKey.groupId}"/>
+                <core:keyProperty name="variantGroupHierarchyId" value="#{transaction.originatedBy.regionKey.groupHierarchyId}"/>
+            </core:entityReference>
+        </core:entityReferences>
+    </core:formatEntry>
+    <core:formatEntry id="promotionModifier">
+        <core:elements>
+            <core:row>
+                <core:rowLine>
+                    <core:elements/>
+                </core:rowLine>
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="5">
+                            <core:elements>
+<core:text messageId="PROMOTION_DESCRIPTION" style="BOLD"/>
+<core:text>
+    <core:text> #{item.promotionItem.promotionDescription}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+            <core:formatElement applicability="#{instanceOf(item.promotionItem, 'com.enactor.mfc.promotion.calculation.IPromotionSavingItem')}" formatId="promotionSavingItems"/>
+            <core:formatElement applicability="#{instanceOf(item.promotionItem, 'com.enactor.mfc.promotion.calculation.IPromotionPointsItem')}" formatId="promotionPointsItems"/>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="promotionSavingItems">
+        <core:elements>
+            <core:row>
+                <core:rowLine style="ITALIC">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="5">
+                            <core:elements>
+<core:text messageId="PROMOTION_RELATED_ITEMS"/>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+            <core:tableTemplate listVariableName="savingItem" list="#{item.promotionItem.distributedSavingsCollection}" id="PromotionSavingItem">
+                <core:formatElement applicability="#{savingItem.modifiedItem != basketItem}" formatId="promotionSavingItem"/>
+                <core:formatElement/>
+            </core:tableTemplate>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="promotionSavingItem">
+        <core:elements>
+            <core:row>
+                <core:rowLine style="ITALIC">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="1" visibility="#{instanceOf(savingItem.modifiedItem, 'com.enactor.mfc.basket.items.ISalesItem')}">
+                            <core:elements>
+<core:text>
+    <core:text>#{savingItem.modifiedItem.productID}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="2" visibility="#{instanceOf(savingItem.modifiedItem, 'com.enactor.mfc.basket.items.ISalesItem') &amp;&amp; notEmpty(savingItem.modifiedItem.sellingCode)}">
+                            <core:elements>
+<core:text>
+    <core:text>#{savingItem.modifiedItem.sellingCode}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="3">
+                            <core:elements>
+<core:text>
+    <core:text>#{savingItem.modifiedItem.description}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="4">
+                            <core:elements>
+<core:text>
+    <core:formatters>
+        <core:formatCurrencyAmount/>
+    </core:formatters>
+    <core:text>#{savingItem.modifiedItem.netValue}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="promotionPointsItems">
+        <core:elements>
+            <core:row>
+                <core:rowLine style="ITALIC">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="5">
+                            <core:elements>
+<core:text messageId="PROMOTION_RELATED_ITEMS"/>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+            <core:tableTemplate listVariableName="pointsItem" list="#{item.promotionItem.distributedPointsCollection}" id="PromotionPointsItem">
+                <core:formatElement applicability="#{pointsItem.modifiedItem != basketItem}" formatId="promotionPointsItem"/>
+                <core:formatElement/>
+            </core:tableTemplate>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="promotionPointsItem">
+        <core:elements>
+            <core:row>
+                <core:rowLine style="ITALIC">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="1" visibility="#{instanceOf(pointsItem.modifiedItem, 'com.enactor.mfc.basket.items.ISalesItem')}">
+                            <core:elements>
+<core:text>
+    <core:text>#{pointsItem.modifiedItem.productID}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="2" visibility="#{instanceOf(pointsItem.modifiedItem, 'com.enactor.mfc.basket.items.ISalesItem') &amp;&amp; notEmpty(pointsItem.modifiedItem.sellingCode)}">
+                            <core:elements>
+<core:text>
+    <core:text>#{pointsItem.modifiedItem.sellingCode}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="3">
+                            <core:elements>
+<core:text>
+    <core:text>#{pointsItem.modifiedItem.description}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="4">
+                            <core:elements>
+<core:text>
+    <core:formatters>
+        <core:formatCurrencyAmount/>
+    </core:formatters>
+    <core:text>#{pointsItem.modifiedItem.netValue}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+</core:documentTemplate>

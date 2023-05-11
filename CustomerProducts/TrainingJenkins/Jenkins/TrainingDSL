@@ -1,0 +1,153 @@
+job('Training-Trunk-Continuous') {
+    description('Perform continuous build of Training Trunk')
+    logRotator {
+        daysToKeep(14)
+    }
+    parameters {
+        choiceParam('MVN_GOALS', 
+                   ['clean deploy -Penv-code, env-create-entity-schemas,env-create-deployment-archives -T 1.5C -U -Penv-check-vulnerabilities (default)',
+ 'clean deploy -Penv-installers -U',
+ 'clean deploy -Penv-docker-standard -U',
+ 'clean deploy -Penv-docker-compose -U',
+ 'clean deploy -Penv-deploy,copy-release-artifacts,delete-release-artifacts -U'],
+ 'The goals to run when performing the build')
+
+	stringParam('ADDITIONAL_GOALS', '', 'Additional goals to add when performing the build')
+
+	booleanParam('RUN_SONAR', false, 'Whether to run SonarQube analysis on this build')
+
+	stringParam('BUILD_DESCRIPTION', '', '(Optional) The build description to set')
+
+    }
+    scm {
+        svn {
+            location('https://dev.enactor.co.uk:83/svn/dev/CustomerProducts/Training/trunk/'){
+		       credentials('72771537-75b6-4838-a194-752f342c71ae')
+	        }
+
+            checkoutStrategy(SvnCheckoutStrategy.UPDATE_WITH_CLEAN)
+           		
+            
+            
+        }
+    }
+    
+    triggers {
+        scm('H/5 * * * 1-5')
+    }
+    wrappers {
+        credentialsBinding {
+      		usernamePassword('ARTIFACTORY_USERNAME','ARTIFACTORY_PASSWORD','72771537-75b6-4838-a194-752f342c71ae')
+    	}
+    }
+    steps {
+	conditionalSteps {
+		condition {
+			booleanCondition('${RUN_SONAR}')
+		}
+		runner('Fail')
+            steps {
+                maven{
+					mavenInstallation('Apache Maven 3.6.0')
+					mavenOpts('-Xmx2048m')
+					providedSettings('a223a531-c26f-4f17-8b78-2ba05f93f21c')
+					localRepository(LocalRepositoryLocation.LOCAL_TO_WORKSPACE)
+					goals('$SONAR_MAVEN_GOAL -Dsonar.host.url=$SONAR_HOST_URL -fn')
+				}
+            }
+	}
+        maven{
+		mavenInstallation('Apache Maven 3.6.0')
+		mavenOpts('-Xmx1024m -Dsun.zip.disableMemoryMapping=true')
+		providedSettings('a223a531-c26f-4f17-8b78-2ba05f93f21c')
+		localRepository(LocalRepositoryLocation.LOCAL_TO_WORKSPACE)
+		goals('clean install')
+	}
+    }
+} 
+
+pipelineJob('Training-Trunk-Release') {
+    description('Performs a Training release of Trunk, optionally updating the development version.This job has a number of fixed/hidden       parameters. When setting up a new job ensure these are updated.')
+
+    parameters {
+	stringParam('DEVELOPMENT_VERSION', 'TRUNK-SNAPSHOT', 'The version the development branch should have after the release is taken')
+	
+	listTagsParam('PLATFORM_VERSION', 'https://dev.enactor.co.uk/svn/dev/Products/All/tags/2.4') {
+            credentialsId('72771537-75b6-4838-a194-752f342c71ae')
+	    maxTagsToDisplay(20)
+            sortNewestFirst()
+        }
+
+	stringParam('BRANCH_VERSION', 'trunk', 'The version this job operates on. You will need to include "branches/" if this is not trunk.') 
+
+	stringParam('TAG_FOLDER', '1.0', 'Hidden Parameter. The directory to store the tags for this release.For non-trunk branches this should be the version from the branch (for example "1.0")') 
+
+	stringParam('COMPONENT_NAME', 'Training', '')
+
+	credentialsParam('SVN_CREDENTIAL') {
+            type('com.cloudbees.plugins.credentials.CredentialsParameterDefinition')
+            required()
+            defaultValue('72771537-75b6-4838-a194-752f342c71ae')
+            description('SVN credentials')
+        }
+
+	stringParam('ISSUE_ID', '#INF-1323', 'Issue id for this task')
+
+	stringParam('AUTH_CODE', '@tMJbQPLz9CuRGPFwxOj2ag==', 'Auth code must be provided to perform this operation. Please refer INF-1323.')
+
+    }
+    definition {
+        cpsScm {
+            scm {
+        	 svn {
+            		location('https://dev.enactor.co.uk/svn/dev/CustomerProducts/Training/trunk/TrainingJenkins/Jenkins'){
+		       			credentials('72771537-75b6-4838-a194-752f342c71ae')
+	        	}
+
+            		checkoutStrategy(SvnCheckoutStrategy.CHECKOUT)
+			scriptPath('Jenkinsfile')
+		}
+           		
+      	    }
+            
+        }
+    }
+}
+job('Training-Push-Release-to-Windows-Server') {
+    description('Generate and push config files (docker-compose) to a Windows server and restart docker containers')
+    parameters {
+         stringParam('DOCKER_TAG', '1.0.x', 'Image tag to release')
+         choiceParam('SCRIPT_ENVIRONMENT',['base'],'')
+         stringParam('DOCKER_REPO_URL', 'enactordev-on.azurecr.io', 'Docker Repository Url to use - Required for docker-compose source')
+     	 stringParam('MVN_GOALS', 'clean package', '')
+         stringParam('REMOTE_DIR', 'C:\\Docker-Compose', 'Remote server directory name used to upload configs')
+         stringParam('LOCAL_DIR', '${WORKSPACE}/compose/win/${SCRIPT_ENVIRONMENT}/target/config/', 'Jenkins server directory name consists of configs')
+     	 stringParam('REMOTE_HOST', '40.121.5.20', 'Remote Windows server IP address')
+         stringParam('GROUP_NAME', 'windows_dev', 'Group name for remote server')
+    }
+    scm {
+        svn {
+            location('https://dev.enactor.co.uk/svn/dev/CustomerProducts/Training/trunk/TrainingDocker'){
+		       credentials('72771537-75b6-4838-a194-752f342c71ae')
+	        }
+
+            checkoutStrategy(SvnCheckoutStrategy.UPDATE_WITH_CLEAN)
+        }
+    }
+    
+    wrappers {
+        credentialsBinding {
+      		usernamePassword('OS_USERNAME','OS_PASSWORD','4833fbbc-bccd-4823-9204-6ecebb484042')
+    	}
+    }
+    steps{
+        maven{
+			mavenInstallation('Apache Maven 3.6.0')
+			mavenOpts('-Xmx1024m -Dsun.zip.disableMemoryMapping=true')
+			providedSettings('a223a531-c26f-4f17-8b78-2ba05f93f21c')
+			localRepository(LocalRepositoryLocation.LOCAL_TO_WORKSPACE)
+			goals('${MVN_GOALS} -Ddocker.tag=${DOCKER_TAG} -Ddocker.repo.docker=${DOCKER_WIN_REPO_URL} -Ddocker.repo.azure=${DOCKER_WIN_REPO_URL} -Ddocker.os=win -P env-docker-compose -f ./compose/win/${SCRIPT_ENVIRONMENT}/pom.xml')
+		}
+        shell('ansible-playbook /playbooks/push-release-to-windows_server.yml --extra-var "remoteDir=$REMOTE_DIR groupName=$GROUP_NAME localDir=$LOCAL_DIR hostName=$REMOTE_HOST usrName=$OS_USERNAME pwd=$OS_PASSWORD"')
+    }
+}

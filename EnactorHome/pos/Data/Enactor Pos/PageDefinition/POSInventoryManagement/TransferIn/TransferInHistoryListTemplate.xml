@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<core:documentTemplate xmlns:core="http://www.enactor.com/core" xmlns:retail="http://www.enactor.com/retail" xmlns:ns4="http://www.enactor.com/crm" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803" xmlns:ns6="http://www.apis-it.hr/fin/2012/types/f73" xmlns:ns7="http://www.w3.org/2000/09/xmldsig#" xmlns:ns8="http://www.enactor.com/retail/storedRetailTransaction/service" xmlns:ns9="http://www.fu.gov.si/" xmlns:ns10="http://www.enactor.com/addressLookup/service" xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:ns14="http://www.enactor.com/crm/customerLoyalty/service" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" paginated="false" width="100" title="Transfer In List Template" url="POSInventoryManagement/TransferIn/TransferInHistoryListTemplate">
+    <core:elements>
+        <core:tableTemplate listVariableName="item" list="deliveryReceiptHeadersPagedList" id="DELIVERY_RECEIPT_HEADERS_PAGED_LIST">
+            <core:formatElement applicableEntityName="listHeader" formatId="TransferInHeader"/>
+            <core:formatElement applicableEntityName="listFooter"/>
+            <core:formatElement formatId="TransferInItemRow"/>
+        </core:tableTemplate>
+    </core:elements>
+    <core:variables>
+        <core:variable name="enactor.inventoryManagement.local.DeliveryReceiptHeadersList">
+            <core:interfaceName>java.util.List</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.coreUI.ItemCountMap">
+            <core:interfaceName>java.util.Map</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.coreui.LocationKeyMap">
+            <core:interfaceName>java.util.Map</core:interfaceName>
+        </core:variable>
+    </core:variables>
+    <core:columnDefs>
+        <core:columnDef id="Column1" end="30" startPos="0" endPos="0"/>
+        <core:columnDef id="Column2" start="16" end="48" startPos="0" endPos="0"/>
+        <core:columnDef id="Column3" start="30" end="43" startPos="0" endPos="0"/>
+        <core:columnDef id="Column4" start="43" end="59" startPos="0" endPos="0" align="CENTRE"/>
+        <core:columnDef id="Column5" start="59" end="74" startPos="0" endPos="0"/>
+        <core:columnDef id="Column6" start="74" end="100" startPos="0" endPos="0"/>
+        <core:columnDef id="Column7" start="2" end="20" startPos="0" endPos="0"/>
+        <core:columnDef id="ColumnOrderRowLine" start="16" end="100" startPos="0" endPos="0"/>
+        <core:columnDef id="LineSeparator" start="0" end="100" endPos="0"/>
+    </core:columnDefs>
+    <core:formatEntry id="TransferInItemRow">
+        <core:elements>
+            <core:row>
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="Column1">
+                            <core:elements>
+<core:text lineHeight="0" messageBase="POSInventoryManagement/TransferIn/TransferInMessages" styleClass="inventoryItemLabel">
+    <core:text>#{notEmpty(item.deliveryId) ? item.deliveryId : instanceOf(item, 'com.enactor.storeInventoryManagement.local.transferIn.ITransferInHeader') ? item.transferInHeaderId : item.supplierDeliveryReceiptHeaderId}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="Column6">
+                            <core:elements>
+<core:text lineHeight="0" messageBase="POSInventoryManagement/TransferIn/TransferInMessages" styleClass="inventoryItemLabel">
+    <core:text>#{instanceOf(item, 'com.enactor.storeInventoryManagement.local.transferIn.ITransferInHeader') ? (length(locationsDynamicMap[item.sourceLocationKey.locationId].description) &gt; 20 ? concat(strings:substring(locationsDynamicMap[item.sourceLocationKey.locationId].description,0,20),'...') : locationsDynamicMap[item.sourceLocationKey.locationId].description) : (length(suppliersDynamicMap[item.supplierKey.supplierId].name) &gt; 20 ? concat(strings:substring(suppliersDynamicMap[item.supplierKey.supplierId].name,0,20),'...') : suppliersDynamicMap[item.supplierKey.supplierId].name)}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="Column5">
+                            <core:elements>
+<core:text lineHeight="0" messageBase="POSInventoryManagement/TransferIn/TransferInMessages" styleClass="inventoryItemLabel">
+    <core:text>#{dates:formatShortDate(locale, item.dateTimeCreated.localDateTime)}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="Column4">
+                            <core:elements>
+<core:text lineHeight="0" messageBase="POSInventoryManagement/TransferIn/TransferInMessages" styleClass="inventoryItemLabel">
+    <core:text>#{item.totalReceivedItems}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="Column3">
+                            <core:elements>
+<core:text lineHeight="0" messageBase="POSInventoryManagement/TransferIn/TransferInMessages" messageId="#{instanceOf(item, 'com.enactor.storeInventoryManagement.local.transferIn.ITransferInHeader')  ?'TRANSFER_DELIVERY_TYPE_LABEL' : 'SUPPLIER_DELIVERY_TYPE_LABEL' }" styleClass="inventoryItemLabel" visibility="#{!instanceOf(item, 'com.enactor.storeInventoryManagement.local.transferIn.ICustomerTransferInHeader')}" visible="true"/>
+<core:text lineHeight="0" messageBase="POSInventoryManagement/TransferIn/TransferInMessages" messageId="#{instanceOf(reason,'com.enactor.mfc.reason.IInterStoreTransferLimitedReason')  ? concat(reason.effectOnInventory,'_REQUEST_TYPE_LABEL') : 'TRANSFER_DELIVERY_TYPE_LABEL'}" styleClass="inventoryItemLabel" visibility="#{instanceOf(item, 'com.enactor.storeInventoryManagement.local.transferIn.ICustomerTransferInHeader')}" visible="true"/>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="Column2">
+                            <core:elements>
+<core:text lineHeight="0" messageBase="POSInventoryManagement/TransferIn/TransferInMessages" styleClass="inventoryItemLabel">
+    <core:text>#{instanceOf(item, 'com.enactor.storeInventoryManagement.local.transferIn.ITransferInHeader') ? item.distributionOrderId: item.purchaseOrderId}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine visibility="#{instanceOf(item, 'com.enactor.storeInventoryManagement.local.transferIn.ICustomerTransferInHeader')}">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="ColumnOrderRowLine">
+                            <core:elements>
+<core:text lineHeight="0" messageBase="POSInventoryManagement/TransferIn/TransferInMessages" messageId="ORDER_DETAILS" styleClass="inventoryItemLabel"/>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+            <core:row selectable="false" backgroundColour="LIGHT_GREY" enabled="false" style="SOLID_BACKGROUND">
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="TableSeparator">
+                            <core:elements>
+<core:imageElement originalFilename="Pos/seperator.png">
+    <core:flowConstraint height="2"/>
+</core:imageElement>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+        <core:entityReferences>
+            <core:entityReference name="reason" keyValue="#{empty(item.reasonKey) ? null : item.reasonKey}" entityName="reason" entityNamespace="http://www.enactor.com/retail"/>
+        </core:entityReferences>
+    </core:formatEntry>
+    <core:formatEntry id="TransferInHeader">
+        <core:elements>
+            <core:row backgroundColour="#e5e5e5" style="SOLID_BACKGROUND">
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" wrap="true" columnDefId="Column3">
+                            <core:elements>
+<core:text lineHeight="0" textTransform="UPPERCASE" messageBase="POSInventoryManagement/TransferIn/TransferInMessages" messageId="DELIVERY_TYPE_LABEL" styleClass="inventoryHeaderItemLabel" style="BOLD"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" wrap="true" columnDefId="Column1">
+                            <core:elements>
+<core:text lineHeight="0" textTransform="UPPERCASE" messageBase="POSInventoryManagement/TransferIn/TransferInMessages" messageId="DELIVERY_ID_LABEL" styleClass="inventoryHeaderItemLabel" style="BOLD"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" wrap="true" columnDefId="Column2">
+                            <core:elements>
+<core:text lineHeight="0" textTransform="UPPERCASE" messageBase="POSInventoryManagement/TransferIn/TransferInMessages" messageId="ORDER_ID_LABEL" styleClass="inventoryHeaderItemLabel" style="BOLD"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" wrap="true" columnDefId="Column4">
+                            <core:elements>
+<core:text lineHeight="0" textTransform="UPPERCASE" messageBase="POSInventoryManagement/TransferIn/TransferInMessages" messageId="NO_OF_ITEMS_HISTORY_LABEL" styleClass="inventoryHeaderItemLabel" style="BOLD"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" wrap="true" columnDefId="Column5">
+                            <core:elements>
+<core:text lineHeight="0" textTransform="UPPERCASE" messageBase="POSInventoryManagement/TransferIn/TransferInMessages" messageId="DATE_CREATED_LABEL" styleClass="inventoryHeaderItemLabel" style="BOLD"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" wrap="true" columnDefId="Column6">
+                            <core:elements>
+<core:text lineHeight="0" textTransform="UPPERCASE" messageBase="POSInventoryManagement/TransferIn/TransferInMessages" messageId="SOURCE_LABEL" styleClass="inventoryHeaderItemLabel" style="BOLD"/>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+</core:documentTemplate>

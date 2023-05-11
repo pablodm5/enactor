@@ -1,0 +1,2306 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<core:process xmlns:core="http://www.enactor.com/core" xmlns:retail="http://www.enactor.com/retail" xmlns:ns4="http://www.enactor.com/crm" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803" xmlns:ns6="http://www.apis-it.hr/fin/2012/types/f73" xmlns:ns7="http://www.w3.org/2000/09/xmldsig#" xmlns:ns8="http://www.enactor.com/retail/storedRetailTransaction/service" xmlns:ns9="http://www.fu.gov.si/" xmlns:ns10="http://www.enactor.com/addressLookup/service" xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:ns14="http://www.enactor.com/crm/customerLoyalty/service" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <core:processID>MFC/Loyalty/DoCalculateTransactionLoyaltyPoints</core:processID>
+    <core:version>1.0</core:version>
+    <core:name>Do Calculate Transaction Loyalty Points</core:name>
+    <core:defaultMessageBaseName></core:defaultMessageBaseName>
+    <core:firstStateID>Start</core:firstStateID>
+    <core:className></core:className>
+    <core:uiHints>
+        <entry>
+            <key>com.enactor.tools.editor.process.style</key>
+            <value>1023</value>
+        </entry>
+        <entry>
+            <key>com.enactor.tools.editor.process.xloc</key>
+            <value>8</value>
+        </entry>
+        <entry>
+            <key>com.enactor.tools.editor.process.yloc</key>
+            <value>8</value>
+        </entry>
+    </core:uiHints>
+    <core:metaData>
+        <core:inputs>
+            <core:input required="true" name="enactor.mfc.Transaction">
+                <core:interfaceName>com.enactor.core.transaction.ITransaction</core:interfaceName>
+            </core:input>
+            <core:input required="true" name="enactor.mfc.TransactionLocation">
+                <core:interfaceName>com.enactor.mfc.location.ILocation</core:interfaceName>
+            </core:input>
+            <core:input name="enactor.mfc.LoyaltySchemeKey">
+                <core:interfaceName>com.enactor.mfc.loyaltyScheme.ILoyaltySchemeKey</core:interfaceName>
+            </core:input>
+            <core:input name="enactor.mfc.LoyaltyTierCode">
+                <core:interfaceName>java.lang.String</core:interfaceName>
+            </core:input>
+            <core:input name="enactor.mfc.UpdateItems">
+                <core:interfaceName>java.lang.Boolean</core:interfaceName>
+            </core:input>
+            <core:input name="enactor.mfc.IncludeReturnItems">
+                <core:interfaceName>java.lang.Boolean</core:interfaceName>
+            </core:input>
+        </core:inputs>
+        <core:outputs>
+            <core:output required="true" name="enactor.pos.LoyaltyPoints">
+                <core:interfaceName>java.lang.Long</core:interfaceName>
+            </core:output>
+            <core:output required="true" name="enactor.pos.PromotionalLoyaltyPoints">
+                <core:interfaceName>java.lang.Long</core:interfaceName>
+            </core:output>
+            <core:output required="true" name="enactor.pos.PointsRate">
+                <core:interfaceName>java.lang.Integer</core:interfaceName>
+            </core:output>
+            <core:output required="false" name="enactor.mfc.BasketChanged">
+                <core:interfaceName>java.lang.Boolean</core:interfaceName>
+            </core:output>
+            <core:output required="false" name="enactor.pos.PointsMultiplier">
+                <core:interfaceName>java.lang.Integer</core:interfaceName>
+            </core:output>
+        </core:outputs>
+        <stateDataTypes>
+            <stateDataType required="true" name="enactor.mfc.ExchangeRate">
+                <core:interfaceName>com.enactor.mfc.exchangeRate.IExchangeRate</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.mfc.Basket">
+                <core:interfaceName>com.enactor.mfc.basket.IBasket</core:interfaceName>
+            </stateDataType>
+            <stateDataType name="enactor.mfc.UpdateItems">
+                <core:interfaceName>java.lang.Boolean</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.mfc.Transaction">
+                <core:interfaceName>com.enactor.core.transaction.ITransaction</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="false" name="enactor.mfc.BasketChanged">
+                <core:interfaceName>java.lang.Boolean</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.pos.LoyaltyPoints">
+                <core:interfaceName>java.lang.Long</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.mfc.CurrencyKey">
+                <core:interfaceName>com.enactor.mfc.currency.ICurrencyKey</core:interfaceName>
+            </stateDataType>
+            <stateDataType name="enactor.mfc.LoyaltySchemeKey">
+                <core:interfaceName>com.enactor.mfc.loyaltyScheme.ILoyaltySchemeKey</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.mfc.LoyaltyTier">
+                <core:interfaceName>com.enactor.mfc.loyaltyScheme.ILoyaltyTier</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.mfc.LoyaltyTierItem">
+                <core:interfaceName>com.enactor.mfc.loyaltyScheme.ILoyaltyTierItem</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.mfc.LoyaltyScheme">
+                <core:interfaceName>com.enactor.mfc.loyaltyScheme.ILoyaltyScheme</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.pos.PointsReward">
+                <core:interfaceName>java.lang.Integer</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.mfc.LoyaltyPointsAdjustment">
+                <core:interfaceName>java.lang.Long</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.mfc.TransactionLocation">
+                <core:interfaceName>com.enactor.mfc.location.ILocation</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.mfc.LoyaltyTierItemCurrencyKey">
+                <core:interfaceName>com.enactor.mfc.currency.ICurrencyKey</core:interfaceName>
+            </stateDataType>
+            <stateDataType name="enactor.mfc.LoyaltyTierCode">
+                <core:interfaceName>java.lang.String</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.pos.PromotionalLoyaltyPoints">
+                <core:interfaceName>java.lang.Long</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.pos.PointsRate">
+                <core:interfaceName>java.lang.Integer</core:interfaceName>
+            </stateDataType>
+            <stateDataType name="enactor.mfc.IncludeReturnItems">
+                <core:interfaceName>java.lang.Boolean</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="false" name="enactor.pos.PointsMultiplier">
+                <core:interfaceName>java.lang.Integer</core:interfaceName>
+            </stateDataType>
+        </stateDataTypes>
+    </core:metaData>
+    <core:endProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>EndProcessSuccess</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIEndProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2073</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>51</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData/>
+        <core:typeId>enactor.types.EndProcess</core:typeId>
+        <core:outcome>Success</core:outcome>
+        <core:defaultProcessId></core:defaultProcessId>
+    </core:endProcessAction>
+    <core:assignAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>AddPromotionPoints</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIAssignAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>959</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>3099</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>51</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.Basket">
+                    <core:interfaceName>com.enactor.mfc.basket.IBasket</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.pos.PromotionalLoyaltyPoints">
+                    <core:interfaceName>java.lang.Long</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.mfc.LoyaltyPointsAdjustment">
+                    <core:interfaceName>java.lang.Long</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.pos.LoyaltyPoints">
+                    <core:interfaceName>java.lang.Long</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="true" name="enactor.pos.PromotionalLoyaltyPoints">
+                    <core:interfaceName>java.lang.Long</core:interfaceName>
+                </core:output>
+                <core:output required="true" name="enactor.pos.LoyaltyPoints">
+                    <core:interfaceName>java.lang.Long</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.Assign</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>EndProcessSuccess</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:dataAssignment toExpression="promotionalLoyaltyPoints" fromExpression="promotionalLoyaltyPoints + ((enactor:empty(basket.promotionCalculation)) ? 0 : basket.promotionCalculation.totalPoints)"/>
+        <core:dataAssignment toExpression="loyaltyPoints" fromExpression="loyaltyPoints + (notEmpty(loyaltyPointsAdjustment) ? loyaltyPointsAdjustment : 0)"/>
+    </core:assignAction>
+    <core:assignAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>Initialise</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIAssignAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>959</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>705</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>443</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="0" name="enactor.mfc.ReceiptReturnPoints">
+            <core:interfaceName>java.lang.Long</core:interfaceName>
+        </core:param>
+        <core:param value="0" name="enactor.pos.PointsReward">
+            <core:interfaceName>java.lang.Integer</core:interfaceName>
+        </core:param>
+        <core:param value="false" name="enactor.mfc.BasketChanged">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:param>
+        <core:param value="0" name="enactor.mfc.PreviousLoyaltyPoints">
+            <core:interfaceName>java.lang.Long</core:interfaceName>
+        </core:param>
+        <core:param value="0" name="enactor.pos.LoyaltyPoints">
+            <core:interfaceName>java.lang.Long</core:interfaceName>
+        </core:param>
+        <core:param value="0" name="enactor.pos.PromotionalLoyaltyPoints">
+            <core:interfaceName>java.lang.Long</core:interfaceName>
+        </core:param>
+        <core:param value="0" name="enactor.mfc.CumulatedBaseValue">
+            <core:interfaceName>java.lang.Long</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.ReceiptReturnPoints">
+                    <core:interfaceName>java.lang.Long</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.pos.PointsReward">
+                    <core:interfaceName>java.lang.Integer</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.BasketChanged">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.PreviousLoyaltyPoints">
+                    <core:interfaceName>java.lang.Long</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.pos.LoyaltyPoints">
+                    <core:interfaceName>java.lang.Long</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.pos.PromotionalLoyaltyPoints">
+                    <core:interfaceName>java.lang.Long</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.CumulatedBaseValue">
+                    <core:interfaceName>java.lang.Long</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="true" name="enactor.mfc.ReceiptReturnPoints">
+                    <core:interfaceName>java.lang.Long</core:interfaceName>
+                </core:output>
+                <core:output required="true" name="enactor.pos.PointsReward">
+                    <core:interfaceName>java.lang.Integer</core:interfaceName>
+                </core:output>
+                <core:output required="true" name="enactor.mfc.BasketChanged">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:output>
+                <core:output required="true" name="enactor.mfc.PreviousLoyaltyPoints">
+                    <core:interfaceName>java.lang.Long</core:interfaceName>
+                </core:output>
+                <core:output required="true" name="enactor.pos.LoyaltyPoints">
+                    <core:interfaceName>java.lang.Long</core:interfaceName>
+                </core:output>
+                <core:output required="true" name="enactor.pos.PromotionalLoyaltyPoints">
+                    <core:interfaceName>java.lang.Long</core:interfaceName>
+                </core:output>
+                <core:output required="true" name="enactor.mfc.CumulatedBaseValue">
+                    <core:interfaceName>java.lang.Long</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.Assign</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>GetBasket</core:toActionID>
+            <core:condition>instanceOf(process.transaction,'com.enactor.mfc.retail.model.IRetailSaleData')</core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>EndProcessSuccess</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:assignAction>
+    <core:assignAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>GetBasket</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIAssignAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>959</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1011</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>443</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.pos.RetailSaleData">
+                    <core:interfaceName>com.enactor.mfc.retail.model.IRetailSaleData</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="true" name="enactor.mfc.Basket">
+                    <core:interfaceName>com.enactor.mfc.basket.IBasket</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.Assign</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>LoadLoyaltyScheme</core:toActionID>
+            <core:condition>notEmpty(process.loyaltySchemeKey) &amp;&amp; notEmpty(process.loyaltyTierCode)</core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>LoyaltyPointsAdjustment</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:dataAssignment toExpression="basket" fromExpression="retailSaleData.basket"/>
+    </core:assignAction>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>LoyaltyPointsAdjustment</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.mfc.basket.actions.GetLoyaltyPointsAdjustmentAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1023</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>3099</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>443</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.Basket">
+                    <core:interfaceName>com.enactor.mfc.basket.IBasket</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output name="enactor.mfc.LoyaltyPointsAdjustment">
+                    <core:interfaceName>java.lang.Long</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>AddPromotionPoints</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>LoadLoyaltyScheme</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.commonUI.entities.processes.LoadEntityLenientAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>959</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1047</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>846</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input name="enactor.coreUI.Key">
+                    <core:interfaceName>com.enactor.core.entities.IEntityKey</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output name="enactor.coreUI.Entity">
+                    <core:interfaceName>com.enactor.core.entities.IEntity</core:interfaceName>
+                </core:output>
+                <core:output name="enactor.coreUI.Key">
+                    <core:interfaceName>com.enactor.core.entities.IEntityKey</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+                <core:outcome name="InputEmpty"/>
+                <core:outcome name="NoSuchRecord"/>
+            </core:outcomes>
+            <core:sessionManagementType>MAKE_SESSION_IF_NO_CURRENT</core:sessionManagementType>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>3</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>CreateCurrencyKey</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>TestUpdateItemsBasket</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>InputEmpty</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>EndProcessFailLoadScheme</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>NoSuchRecord</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>4</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>SetIncludeReturnItems</core:toActionID>
+            <core:condition>process.loyaltyScheme.includeReturns</core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>GetTier</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.mfc.loyaltyScheme.actions.GetLoyaltyTierFromSchemeAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>959</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2073</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>846</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.LoyaltyScheme">
+                    <core:interfaceName>com.enactor.mfc.loyaltyScheme.ILoyaltyScheme</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.LoyaltyTierCode">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.mfc.CurrencyKey">
+                    <core:interfaceName>com.enactor.mfc.currency.ICurrencyKey</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output name="enactor.mfc.LoyaltyTier">
+                    <core:interfaceName>com.enactor.mfc.loyaltyScheme.ILoyaltyTier</core:interfaceName>
+                </core:output>
+                <core:output name="enactor.mfc.LoyaltyTierItem">
+                    <core:interfaceName>com.enactor.mfc.loyaltyScheme.ILoyaltyTierItem</core:interfaceName>
+                </core:output>
+                <core:output name="enactor.mfc.LoyaltyTierItemCurrencyKey">
+                    <core:interfaceName>com.enactor.mfc.currency.ICurrencyKey</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+                <core:outcome name="NotFound"/>
+                <core:outcome name="InputEmpty"/>
+            </core:outcomes>
+            <core:sessionManagementType>NONE</core:sessionManagementType>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>GetPointsRate</core:toActionID>
+            <core:condition>notEmpty(process.loyaltyTierItem)</core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>TestUpdateItemsBasket</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>InputEmpty</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>3</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>EndProcessFailGetTier</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>NotFound</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>4</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>TestUpdateItemsBasket</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>CreateCurrencyKey</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.CreateEntityKeyAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>27</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1389</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>846</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="http://www.enactor.com/retail" name="enactor.coreUI.EntityNamespace">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:param value="currency" name="enactor.coreUI.EntityName">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.coreUI.EntityName">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.coreUI.EntityNamespace">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output name="enactor.coreUI.Key">
+                    <core:interfaceName>com.enactor.core.entities.IEntityKey</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>SetCurrencyKeyProperties</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:assignAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>SetCurrencyKeyProperties</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIAssignAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>27</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1731</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>846</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.Basket">
+                    <core:interfaceName>com.enactor.mfc.basket.IBasket</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.CurrencyKey">
+                    <core:interfaceName>com.enactor.mfc.currency.ICurrencyKey</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="true" name="enactor.mfc.CurrencyKey">
+                    <core:interfaceName>com.enactor.mfc.currency.ICurrencyKey</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.Assign</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>GetTier</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:dataAssignment toExpression="currencyKey.currencyId" fromExpression="basket.currencyId"/>
+    </core:assignAction>
+    <core:endProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>EndProcessFailLoadScheme</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIEndProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2073</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>247</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData/>
+        <core:typeId>enactor.types.EndProcess</core:typeId>
+        <core:outcome>FailLoadScheme</core:outcome>
+        <core:defaultProcessId></core:defaultProcessId>
+    </core:endProcessAction>
+    <core:endProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>EndProcessFailGetTier</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIEndProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2073</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>443</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData/>
+        <core:typeId>enactor.types.EndProcess</core:typeId>
+        <core:outcome>FailGetTier</core:outcome>
+        <core:defaultProcessId></core:defaultProcessId>
+    </core:endProcessAction>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>LoadExchangeRate</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.mfc.exchangeRate.actions.LookupExchangeRateAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>27</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2415</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>1601</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.GroupKey">
+                    <core:interfaceName>com.enactor.core.group.IGroupKey</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.LocationKey">
+                    <core:interfaceName>com.enactor.mfc.location.ILocation</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.BaseCurrencyId">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input required="false" name="enactor.mfc.group.ExchangeRateGroup">
+                    <core:interfaceName>com.enactor.core.group.IGroupKey</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.ForeignCurrencyId">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output name="enactor.mfc.ExchangeRate">
+                    <core:interfaceName>com.enactor.mfc.exchangeRate.IExchangeRate</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+                <core:outcome name="NoSuchRecord"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>LogExchangeRateNotFound</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>NoSuchRecord</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>BasketItemLoopUpdateLoyalty</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>LogExchangeRateNotFound</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UILogMessageAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>11</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2073</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>1601</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="LOG_WARNING" name="enactor.coreUI.logging.LogLevel">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:param value="true" name="enactor.coreUI.logging.LogVariables">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:param>
+        <core:param value="Exchange Rate not found when calculating loyalty points" name="enactor.coreUI.LogMessage">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input name="enactor.coreUI.logging.LogLevel">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.logging.LogVariables">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.LogMessage">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.mfc.GroupKey">
+                    <core:interfaceName>com.enactor.core.group.IGroupKey</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.mfc.LocationKey">
+                    <core:interfaceName>com.enactor.mfc.location.ILocation</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.mfc.BaseCurrencyId">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.mfc.ForeignCurrencyId">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>TestUpdateItemsBasket</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>BasketItemLoopClearLoyalty</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.mfc.basket.actions.BasketItemLoopAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>959</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2757</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>846</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="com.enactor.mfc.basket.items.IItemLoyalty" name="enactor.mfc.BasketItemClassName">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:param value="true" name="enactor.mfc.IncludeVoidedItems">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input name="enactor.mfc.BasketItemClassName">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.BasketItemIterator">
+                    <core:interfaceName>java.util.Iterator</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.mfc.IncludeVoidedItems">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.mfc.IncludeReturnItems">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.RetailSaleTransaction">
+                    <core:interfaceName>com.enactor.mfc.retail.transaction.IRetailSaleTransaction</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output name="enactor.mfc.BasketItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.IBasketItem</core:interfaceName>
+                </core:output>
+                <core:output name="enactor.mfc.BasketItemIterator">
+                    <core:interfaceName>java.util.Iterator</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Completed"/>
+                <core:outcome name="Next"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>LoyaltyPointsAdjustment</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Completed</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>4</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>ClearPointsSalesNoLoyalty</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Next</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>BasketItemLoopUpdateLoyalty</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.mfc.basket.actions.BasketItemLoopAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>959</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2757</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>1601</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="true" name="enactor.mfc.IncludeVoidedItems">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:param>
+        <core:param value="com.enactor.mfc.basket.items.IItemLoyalty" name="enactor.mfc.BasketItemClassName">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.BasketItemIterator">
+                    <core:interfaceName>java.util.Iterator</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.mfc.IncludeVoidedItems">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.mfc.IncludeReturnItems">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.RetailSaleTransaction">
+                    <core:interfaceName>com.enactor.mfc.retail.transaction.IRetailSaleTransaction</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.mfc.BasketItemClassName">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output name="enactor.mfc.BasketItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.IBasketItem</core:interfaceName>
+                </core:output>
+                <core:output name="enactor.mfc.BasketItemIterator">
+                    <core:interfaceName>java.util.Iterator</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Completed"/>
+                <core:outcome name="Next"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>AddPointsReward</core:toActionID>
+            <core:condition>notEmpty(process.updateItems) &amp;&amp; process.updateItems</core:condition>
+            <core:outcome>Completed</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>4</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>LoyaltyValueSalesItem</core:toActionID>
+            <core:condition>instanceOf(state.itemLoyalty, 'com.enactor.mfc.basket.items.ISalesItem')</core:condition>
+            <core:outcome>Next</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>CalculateLoyaltyPointsBasket</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Completed</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>3</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>BasketItemLoopUpdateLoyalty</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Next</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>5</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>LoyaltyValueTenderItem</core:toActionID>
+            <core:condition>instanceOf(state.itemLoyalty, 'com.enactor.mfc.basket.items.ITenderItem')</core:condition>
+            <core:outcome>Next</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:assignAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>IsForeign</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIAssignAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>27</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2415</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>1210</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.LoyaltyScheme">
+                    <core:interfaceName>com.enactor.mfc.loyaltyScheme.ILoyaltyScheme</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.Basket">
+                    <core:interfaceName>com.enactor.mfc.basket.IBasket</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.LoyaltyTierItemCurrencyKey">
+                    <core:interfaceName>com.enactor.mfc.currency.ICurrencyKey</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="true" name="enactor.mfc.Foreign">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.Assign</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>BasketItemLoopUpdateLoyalty</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>LoadExchangeRate</core:toActionID>
+            <core:condition>state.foreign</core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:dataAssignment toExpression="foreign" fromExpression="loyaltyScheme.calculateInTierCurrency &amp;&amp; basket.currencyId != loyaltyTierItemCurrencyKey.currencyId"/>
+    </core:assignAction>
+    <core:assignAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>AddPointsReward</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIAssignAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>959</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>3441</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>846</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.pos.PointsReward">
+                    <core:interfaceName>java.lang.Integer</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.pos.LoyaltyPoints">
+                    <core:interfaceName>java.lang.Long</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.ReceiptReturnPoints">
+                    <core:interfaceName>java.lang.Long</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="true" name="enactor.pos.LoyaltyPoints">
+                    <core:interfaceName>java.lang.Long</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.Assign</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>LoyaltyPointsAdjustment</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:dataAssignment toExpression="loyaltyPoints" fromExpression="pointsReward + loyaltyPoints + receiptReturnPoints"/>
+    </core:assignAction>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>TestUpdateItemsBasket</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UINullAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2415</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>443</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.NullAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>BasketItemLoopClearLoyalty</core:toActionID>
+            <core:condition>notEmpty(process.updateItems) &amp;&amp; process.updateItems</core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>LoyaltyPointsAdjustment</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:assignAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>ClearPointsSalesNoLoyalty</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIAssignAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>959</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>3099</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>846</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="false" name="enactor.mfc.BasketChanged">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.ItemLoyalty">
+                    <core:interfaceName>com.enactor.mfc.basket.items.IItemLoyalty</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="false" name="enactor.mfc.BasketChanged">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:output>
+                <core:output required="true" name="enactor.mfc.ItemLoyalty">
+                    <core:interfaceName>com.enactor.mfc.basket.items.IItemLoyalty</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.Assign</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>BasketItemLoopClearLoyalty</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:dataAssignment toExpression="basketChanged" fromExpression="basketChanged || itemLoyalty.loyaltyPoints != 0"/>
+        <core:dataAssignment toExpression="itemLoyalty.loyaltyPoints" fromExpression="0"/>
+    </core:assignAction>
+    <core:executeProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>CalculateLoyaltyPointsBasket</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UICallProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>27</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>3441</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>1210</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.ExchangeRate">
+                    <core:interfaceName>com.enactor.mfc.exchangeRate.IExchangeRate</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.LoyaltyTierItemCurrencyKey">
+                    <core:interfaceName>com.enactor.mfc.currency.ICurrencyKey</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.Foreign">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.BaseCurrencyId">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.LoyaltyTierItem">
+                    <core:interfaceName>com.enactor.mfc.loyaltyScheme.ILoyaltyTierItem</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.CumulatedBaseValue">
+                    <core:interfaceName>java.lang.Long</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="false" name="enactor.pos.PointsReward">
+                    <core:interfaceName>java.lang.Integer</core:interfaceName>
+                </core:output>
+                <core:output required="true" name="enactor.pos.LoyaltyPoints">
+                    <core:interfaceName>java.lang.Long</core:interfaceName>
+                </core:output>
+                <core:output required="true" name="enactor.pos.PointsRate">
+                    <core:interfaceName>java.lang.Integer</core:interfaceName>
+                </core:output>
+                <core:output required="false" name="enactor.pos.PointsMultiplier">
+                    <core:interfaceName>java.lang.Integer</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.CallProcess</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>AddPointsReward</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:executeProcessId>MFC/Loyalty/CalculateLoyaltyPoints</core:executeProcessId>
+    </core:executeProcessAction>
+    <core:executeProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>LoyaltyValueTenderItem</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UICallProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>27</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>3441</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>2119</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.ExchangeRate">
+                    <core:interfaceName>com.enactor.mfc.exchangeRate.IExchangeRate</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.mfc.UpdateItems">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.LoyaltyTierItemCurrencyKey">
+                    <core:interfaceName>com.enactor.mfc.currency.ICurrencyKey</core:interfaceName>
+                </core:input>
+                <core:input required="false" name="enactor.mfc.BasketChanged">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.PreviousLoyaltyPoints">
+                    <core:interfaceName>java.lang.Long</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.Foreign">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.TenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.ITenderItem</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.BaseCurrencyId">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.LoyaltyTierItem">
+                    <core:interfaceName>com.enactor.mfc.loyaltyScheme.ILoyaltyTierItem</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.CumulatedBaseValue">
+                    <core:interfaceName>java.lang.Long</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="true" name="enactor.pos.PointsReward">
+                    <core:interfaceName>java.lang.Integer</core:interfaceName>
+                </core:output>
+                <core:output required="false" name="enactor.mfc.BasketChanged">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:output>
+                <core:output required="true" name="enactor.mfc.PreviousLoyaltyPoints">
+                    <core:interfaceName>java.lang.Long</core:interfaceName>
+                </core:output>
+                <core:output required="true" name="enactor.pos.LoyaltyPoints">
+                    <core:interfaceName>java.lang.Long</core:interfaceName>
+                </core:output>
+                <core:output required="true" name="enactor.mfc.TenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.ITenderItem</core:interfaceName>
+                </core:output>
+                <core:output required="true" name="enactor.mfc.CumulatedBaseValue">
+                    <core:interfaceName>java.lang.Long</core:interfaceName>
+                </core:output>
+                <core:output required="true" name="enactor.pos.PointsRate">
+                    <core:interfaceName>java.lang.Integer</core:interfaceName>
+                </core:output>
+                <core:output required="false" name="enactor.pos.PointsMultiplier">
+                    <core:interfaceName>java.lang.Integer</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.CallProcess</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>BasketItemLoopUpdateLoyalty</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:executeProcessId>MFC/Loyalty/LoyaltyTenderItem</core:executeProcessId>
+    </core:executeProcessAction>
+    <core:executeProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>LoyaltyValueSalesItem</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UICallProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>27</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>3441</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>1601</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.ExchangeRate">
+                    <core:interfaceName>com.enactor.mfc.exchangeRate.IExchangeRate</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.mfc.UpdateItems">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.ReceiptReturnPoints">
+                    <core:interfaceName>java.lang.Long</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.LoyaltyTierItemCurrencyKey">
+                    <core:interfaceName>com.enactor.mfc.currency.ICurrencyKey</core:interfaceName>
+                </core:input>
+                <core:input required="false" name="enactor.mfc.BasketChanged">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.PreviousLoyaltyPoints">
+                    <core:interfaceName>java.lang.Long</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.Foreign">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.SalesItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.ISalesItem</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.BaseCurrencyId">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.LoyaltyTierItem">
+                    <core:interfaceName>com.enactor.mfc.loyaltyScheme.ILoyaltyTierItem</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.CumulatedBaseValue">
+                    <core:interfaceName>java.lang.Long</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="true" name="enactor.mfc.ReceiptReturnPoints">
+                    <core:interfaceName>java.lang.Long</core:interfaceName>
+                </core:output>
+                <core:output required="true" name="enactor.pos.PointsReward">
+                    <core:interfaceName>java.lang.Integer</core:interfaceName>
+                </core:output>
+                <core:output required="false" name="enactor.mfc.BasketChanged">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:output>
+                <core:output required="true" name="enactor.mfc.PreviousLoyaltyPoints">
+                    <core:interfaceName>java.lang.Long</core:interfaceName>
+                </core:output>
+                <core:output required="true" name="enactor.mfc.SalesItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.ISalesItem</core:interfaceName>
+                </core:output>
+                <core:output required="true" name="enactor.pos.LoyaltyPoints">
+                    <core:interfaceName>java.lang.Long</core:interfaceName>
+                </core:output>
+                <core:output required="true" name="enactor.mfc.CumulatedBaseValue">
+                    <core:interfaceName>java.lang.Long</core:interfaceName>
+                </core:output>
+                <core:output required="true" name="enactor.pos.PointsRate">
+                    <core:interfaceName>java.lang.Integer</core:interfaceName>
+                </core:output>
+                <core:output required="false" name="enactor.pos.PointsMultiplier">
+                    <core:interfaceName>java.lang.Integer</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.CallProcess</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>4</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>BasketItemLoopUpdateLoyalty</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:executeProcessId>MFC/Loyalty/LoyaltySalesItem</core:executeProcessId>
+    </core:executeProcessAction>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>GetPointsRate</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.mfc.loyaltyScheme.actions.GetTierPointsRate</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>27</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2415</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>846</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input name="enactor.mfc.LoyaltyTierItem">
+                    <core:interfaceName>com.enactor.mfc.loyaltyScheme.ILoyaltyTierItem</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.mfc.Amount">
+                    <core:interfaceName>java.lang.Long</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output name="enactor.pos.PointsRate">
+                    <core:interfaceName>java.lang.Integer</core:interfaceName>
+                </core:output>
+                <core:output name="enactor.pos.PointsMultiplier">
+                    <core:interfaceName>java.lang.Integer</core:interfaceName>
+                </core:output>
+                <core:output name="enactor.pos.PointsReward">
+                    <core:interfaceName>java.lang.Integer</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>IsForeign</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:assignAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>SetIncludeReturnItems</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIAssignAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>27</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1389</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>1140</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="true" name="enactor.mfc.IncludeReturnItems">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="false" name="enactor.mfc.IncludeReturnItems">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="false" name="enactor.mfc.IncludeReturnItems">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.Assign</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>CreateCurrencyKey</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:assignAction>
+    <core:state>
+        <core:url></core:url>
+        <core:stateID>Start</core:stateID>
+        <core:name></core:name>
+        <core:className></core:className>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>37</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>363</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>846</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <handledEvents>
+                <handledEvent name="StateEntered"/>
+            </handledEvents>
+            <stateDataTypes>
+                <stateDataType required="true" name="enactor.mfc.BasketItemIterator">
+                    <core:interfaceName>java.util.Iterator</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="true" name="enactor.mfc.ReceiptReturnPoints">
+                    <core:interfaceName>java.lang.Long</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="true" name="enactor.mfc.ItemLoyalty">
+                    <core:interfaceName>com.enactor.mfc.basket.items.IItemLoyalty</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="true" name="enactor.mfc.Foreign">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="true" name="enactor.mfc.PreviousLoyaltyPoints">
+                    <core:interfaceName>java.lang.Long</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="true" name="enactor.mfc.LoyaltyItemValue">
+                    <core:interfaceName>java.lang.Long</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="true" name="enactor.mfc.CumulatedBaseValue">
+                    <core:interfaceName>java.lang.Long</core:interfaceName>
+                </stateDataType>
+            </stateDataTypes>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicState</core:typeId>
+        <core:singleInstance>false</core:singleInstance>
+        <core:respondToViewEvents>false</core:respondToViewEvents>
+        <core:actionInputMappings>
+            <core:actionMapping>
+                <core:actionID>Initialise</core:actionID>
+                <core:mappings>
+                    <core:processMappings/>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>GetBasket</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.Transaction">
+<core:interfaceName>com.enactor.core.transaction.ITransaction</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.pos.RetailSaleData">
+<core:interfaceName>com.enactor.mfc.retail.model.IRetailSaleData</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings/>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>LoadLoyaltyScheme</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType name="enactor.mfc.LoyaltySchemeKey">
+<core:interfaceName>com.enactor.mfc.loyaltyScheme.ILoyaltySchemeKey</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType name="enactor.coreUI.Key">
+<core:interfaceName>com.enactor.core.entities.IEntityKey</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings/>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>LoadExchangeRate</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.TransactionLocation">
+<core:interfaceName>com.enactor.mfc.location.ILocation</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.LocationKey">
+<core:interfaceName>com.enactor.mfc.location.ILocation</core:interfaceName>
+                            </core:targetDataType>
+                            <core:expression>transactionLocation.key</core:expression>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.LoyaltyTierItemCurrencyKey">
+<core:interfaceName>com.enactor.mfc.currency.ICurrencyKey</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.ForeignCurrencyId">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:targetDataType>
+                            <core:expression>loyaltyTierItemCurrencyKey.currencyId</core:expression>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.TransactionLocation">
+<core:interfaceName>com.enactor.mfc.location.ILocation</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.GroupKey">
+<core:interfaceName>com.enactor.core.group.IGroupKey</core:interfaceName>
+                            </core:targetDataType>
+                            <core:expression>transactionLocation.regionGroupKey</core:expression>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.Basket">
+<core:interfaceName>com.enactor.mfc.basket.IBasket</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.BaseCurrencyId">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:targetDataType>
+                            <core:expression>basket.currencyId</core:expression>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.TransactionLocation">
+<core:interfaceName>com.enactor.mfc.location.ILocation</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="false" name="enactor.mfc.group.ExchangeRateGroup">
+<core:interfaceName>com.enactor.core.group.IGroupKey</core:interfaceName>
+                            </core:targetDataType>
+                            <core:expression>transactionLocation.exchangeRateGroupKey</core:expression>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings/>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>LogExchangeRateNotFound</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.TransactionLocation">
+<core:interfaceName>com.enactor.mfc.location.ILocation</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType name="enactor.mfc.LocationKey">
+<core:interfaceName>com.enactor.mfc.location.ILocation</core:interfaceName>
+                            </core:targetDataType>
+                            <core:expression>transactionLocation.key</core:expression>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.TransactionLocation">
+<core:interfaceName>com.enactor.mfc.location.ILocation</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType name="enactor.mfc.GroupKey">
+<core:interfaceName>com.enactor.core.group.IGroupKey</core:interfaceName>
+                            </core:targetDataType>
+                            <core:expression>transactionLocation.regionGroupKey</core:expression>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.Basket">
+<core:interfaceName>com.enactor.mfc.basket.IBasket</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType name="enactor.mfc.BaseCurrencyId">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:targetDataType>
+                            <core:expression>basket.currencyId</core:expression>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.CurrencyKey">
+<core:interfaceName>com.enactor.mfc.currency.ICurrencyKey</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType name="enactor.mfc.ForeignCurrencyId">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:targetDataType>
+                            <core:expression>currencyKey.currencyId</core:expression>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings/>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>BasketItemLoopClearLoyalty</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.Transaction">
+<core:interfaceName>com.enactor.core.transaction.ITransaction</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.RetailSaleTransaction">
+<core:interfaceName>com.enactor.mfc.retail.transaction.IRetailSaleTransaction</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType name="enactor.mfc.IncludeReturnItems">
+<core:interfaceName>java.lang.Boolean</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType name="enactor.mfc.IncludeReturnItems">
+<core:interfaceName>java.lang.Boolean</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.BasketItemIterator">
+<core:interfaceName>java.util.Iterator</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.BasketItemIterator">
+<core:interfaceName>java.util.Iterator</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>BasketItemLoopUpdateLoyalty</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.Transaction">
+<core:interfaceName>com.enactor.core.transaction.ITransaction</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.RetailSaleTransaction">
+<core:interfaceName>com.enactor.mfc.retail.transaction.IRetailSaleTransaction</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType name="enactor.mfc.IncludeReturnItems">
+<core:interfaceName>java.lang.Boolean</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType name="enactor.mfc.IncludeReturnItems">
+<core:interfaceName>java.lang.Boolean</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.BasketItemIterator">
+<core:interfaceName>java.util.Iterator</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.BasketItemIterator">
+<core:interfaceName>java.util.Iterator</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>CalculateLoyaltyPointsBasket</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.ExchangeRate">
+<core:interfaceName>com.enactor.mfc.exchangeRate.IExchangeRate</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.ExchangeRate">
+<core:interfaceName>com.enactor.mfc.exchangeRate.IExchangeRate</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.LoyaltyTierItemCurrencyKey">
+<core:interfaceName>com.enactor.mfc.currency.ICurrencyKey</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.LoyaltyTierItemCurrencyKey">
+<core:interfaceName>com.enactor.mfc.currency.ICurrencyKey</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.LoyaltyTierItem">
+<core:interfaceName>com.enactor.mfc.loyaltyScheme.ILoyaltyTierItem</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.LoyaltyTierItem">
+<core:interfaceName>com.enactor.mfc.loyaltyScheme.ILoyaltyTierItem</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.Basket">
+<core:interfaceName>com.enactor.mfc.basket.IBasket</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.BaseCurrencyId">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:targetDataType>
+                            <core:expression>basket.currencyId</core:expression>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.Foreign">
+<core:interfaceName>java.lang.Boolean</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.Foreign">
+<core:interfaceName>java.lang.Boolean</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.CumulatedBaseValue">
+<core:interfaceName>java.lang.Long</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.CumulatedBaseValue">
+<core:interfaceName>java.lang.Long</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>LoyaltyValueTenderItem</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.Basket">
+<core:interfaceName>com.enactor.mfc.basket.IBasket</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.BaseCurrencyId">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:targetDataType>
+                            <core:expression>basket.currencyId</core:expression>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.LoyaltyTierItemCurrencyKey">
+<core:interfaceName>com.enactor.mfc.currency.ICurrencyKey</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.LoyaltyTierItemCurrencyKey">
+<core:interfaceName>com.enactor.mfc.currency.ICurrencyKey</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType name="enactor.mfc.UpdateItems">
+<core:interfaceName>java.lang.Boolean</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType name="enactor.mfc.UpdateItems">
+<core:interfaceName>java.lang.Boolean</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.ExchangeRate">
+<core:interfaceName>com.enactor.mfc.exchangeRate.IExchangeRate</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.ExchangeRate">
+<core:interfaceName>com.enactor.mfc.exchangeRate.IExchangeRate</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.LoyaltyTierItem">
+<core:interfaceName>com.enactor.mfc.loyaltyScheme.ILoyaltyTierItem</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.LoyaltyTierItem">
+<core:interfaceName>com.enactor.mfc.loyaltyScheme.ILoyaltyTierItem</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="false" name="enactor.mfc.BasketChanged">
+<core:interfaceName>java.lang.Boolean</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="false" name="enactor.mfc.BasketChanged">
+<core:interfaceName>java.lang.Boolean</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.ItemLoyalty">
+<core:interfaceName>com.enactor.mfc.basket.items.IItemLoyalty</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.TenderItem">
+<core:interfaceName>com.enactor.mfc.basket.items.ITenderItem</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.Foreign">
+<core:interfaceName>java.lang.Boolean</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.Foreign">
+<core:interfaceName>java.lang.Boolean</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.CumulatedBaseValue">
+<core:interfaceName>java.lang.Long</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.CumulatedBaseValue">
+<core:interfaceName>java.lang.Long</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.PreviousLoyaltyPoints">
+<core:interfaceName>java.lang.Long</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.PreviousLoyaltyPoints">
+<core:interfaceName>java.lang.Long</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>LoyaltyValueSalesItem</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.Basket">
+<core:interfaceName>com.enactor.mfc.basket.IBasket</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.BaseCurrencyId">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:targetDataType>
+                            <core:expression>basket.currencyId</core:expression>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.LoyaltyTierItemCurrencyKey">
+<core:interfaceName>com.enactor.mfc.currency.ICurrencyKey</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.LoyaltyTierItemCurrencyKey">
+<core:interfaceName>com.enactor.mfc.currency.ICurrencyKey</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType name="enactor.mfc.UpdateItems">
+<core:interfaceName>java.lang.Boolean</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType name="enactor.mfc.UpdateItems">
+<core:interfaceName>java.lang.Boolean</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.ExchangeRate">
+<core:interfaceName>com.enactor.mfc.exchangeRate.IExchangeRate</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.ExchangeRate">
+<core:interfaceName>com.enactor.mfc.exchangeRate.IExchangeRate</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.LoyaltyTierItem">
+<core:interfaceName>com.enactor.mfc.loyaltyScheme.ILoyaltyTierItem</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.LoyaltyTierItem">
+<core:interfaceName>com.enactor.mfc.loyaltyScheme.ILoyaltyTierItem</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="false" name="enactor.mfc.BasketChanged">
+<core:interfaceName>java.lang.Boolean</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="false" name="enactor.mfc.BasketChanged">
+<core:interfaceName>java.lang.Boolean</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.Foreign">
+<core:interfaceName>java.lang.Boolean</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.Foreign">
+<core:interfaceName>java.lang.Boolean</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.ItemLoyalty">
+<core:interfaceName>com.enactor.mfc.basket.items.IItemLoyalty</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.SalesItem">
+<core:interfaceName>com.enactor.mfc.basket.items.ISalesItem</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.CumulatedBaseValue">
+<core:interfaceName>java.lang.Long</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.CumulatedBaseValue">
+<core:interfaceName>java.lang.Long</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.ReceiptReturnPoints">
+<core:interfaceName>java.lang.Long</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.ReceiptReturnPoints">
+<core:interfaceName>java.lang.Long</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.PreviousLoyaltyPoints">
+<core:interfaceName>java.lang.Long</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.PreviousLoyaltyPoints">
+<core:interfaceName>java.lang.Long</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+        </core:actionInputMappings>
+        <core:actionOutputMappings>
+            <core:actionMapping>
+                <core:actionID>LoadLoyaltyScheme</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType name="enactor.coreUI.Entity">
+<core:interfaceName>com.enactor.core.entities.IEntity</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.LoyaltyScheme">
+<core:interfaceName>com.enactor.mfc.loyaltyScheme.ILoyaltyScheme</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType name="enactor.coreUI.Key">
+<core:interfaceName>com.enactor.core.entities.IEntityKey</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType name="enactor.mfc.LoyaltySchemeKey">
+<core:interfaceName>com.enactor.mfc.loyaltyScheme.ILoyaltySchemeKey</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:sourceDataType name="enactor.coreUI.Key">
+<core:interfaceName>com.enactor.core.entities.IEntityKey</core:interfaceName>
+                            </core:sourceDataType>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>CreateCurrencyKey</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType name="enactor.coreUI.Key">
+<core:interfaceName>com.enactor.core.entities.IEntityKey</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.CurrencyKey">
+<core:interfaceName>com.enactor.mfc.currency.ICurrencyKey</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings/>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>BasketItemLoopClearLoyalty</core:actionID>
+                <core:mappings>
+                    <core:processMappings/>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:sourceDataType name="enactor.mfc.BasketItem">
+<core:interfaceName>com.enactor.mfc.basket.items.IBasketItem</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.ItemLoyalty">
+<core:interfaceName>com.enactor.mfc.basket.items.IItemLoyalty</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType name="enactor.mfc.BasketItemIterator">
+<core:interfaceName>java.util.Iterator</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.BasketItemIterator">
+<core:interfaceName>java.util.Iterator</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>BasketItemLoopUpdateLoyalty</core:actionID>
+                <core:mappings>
+                    <core:processMappings/>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:sourceDataType name="enactor.mfc.BasketItemIterator">
+<core:interfaceName>java.util.Iterator</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.BasketItemIterator">
+<core:interfaceName>java.util.Iterator</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType name="enactor.mfc.BasketItem">
+<core:interfaceName>com.enactor.mfc.basket.items.IBasketItem</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.ItemLoyalty">
+<core:interfaceName>com.enactor.mfc.basket.items.IItemLoyalty</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>LoyaltyValueSalesItem</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.pos.LoyaltyPoints">
+<core:interfaceName>java.lang.Long</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.pos.LoyaltyPoints">
+<core:interfaceName>java.lang.Long</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.pos.PointsRate">
+<core:interfaceName>java.lang.Integer</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.pos.PointsRate">
+<core:interfaceName>java.lang.Integer</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.pos.PointsReward">
+<core:interfaceName>java.lang.Integer</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.pos.PointsReward">
+<core:interfaceName>java.lang.Integer</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="false" name="enactor.mfc.BasketChanged">
+<core:interfaceName>java.lang.Boolean</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="false" name="enactor.mfc.BasketChanged">
+<core:interfaceName>java.lang.Boolean</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="false" name="enactor.pos.PointsMultiplier">
+<core:interfaceName>java.lang.Integer</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="false" name="enactor.pos.PointsMultiplier">
+<core:interfaceName>java.lang.Integer</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.CumulatedBaseValue">
+<core:interfaceName>java.lang.Long</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.CumulatedBaseValue">
+<core:interfaceName>java.lang.Long</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.ReceiptReturnPoints">
+<core:interfaceName>java.lang.Long</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.ReceiptReturnPoints">
+<core:interfaceName>java.lang.Long</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.SalesItem">
+<core:interfaceName>com.enactor.mfc.basket.items.ISalesItem</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.ItemLoyalty">
+<core:interfaceName>com.enactor.mfc.basket.items.IItemLoyalty</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.PreviousLoyaltyPoints">
+<core:interfaceName>java.lang.Long</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.PreviousLoyaltyPoints">
+<core:interfaceName>java.lang.Long</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>LoyaltyValueTenderItem</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.pos.LoyaltyPoints">
+<core:interfaceName>java.lang.Long</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.pos.LoyaltyPoints">
+<core:interfaceName>java.lang.Long</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.pos.PointsRate">
+<core:interfaceName>java.lang.Integer</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.pos.PointsRate">
+<core:interfaceName>java.lang.Integer</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.pos.PointsReward">
+<core:interfaceName>java.lang.Integer</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.pos.PointsReward">
+<core:interfaceName>java.lang.Integer</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="false" name="enactor.mfc.BasketChanged">
+<core:interfaceName>java.lang.Boolean</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="false" name="enactor.mfc.BasketChanged">
+<core:interfaceName>java.lang.Boolean</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="false" name="enactor.pos.PointsMultiplier">
+<core:interfaceName>java.lang.Integer</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="false" name="enactor.pos.PointsMultiplier">
+<core:interfaceName>java.lang.Integer</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.CumulatedBaseValue">
+<core:interfaceName>java.lang.Long</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.CumulatedBaseValue">
+<core:interfaceName>java.lang.Long</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.TenderItem">
+<core:interfaceName>com.enactor.mfc.basket.items.ITenderItem</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.ItemLoyalty">
+<core:interfaceName>com.enactor.mfc.basket.items.IItemLoyalty</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.PreviousLoyaltyPoints">
+<core:interfaceName>java.lang.Long</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.PreviousLoyaltyPoints">
+<core:interfaceName>java.lang.Long</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+        </core:actionOutputMappings>
+        <core:eventLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>Initialise</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>StateEntered</core:event>
+        </core:eventLink>
+    </core:state>
+    <core:stateTransitions/>
+</core:process>

@@ -1,0 +1,1470 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<core:process xmlns:core="http://www.enactor.com/core" xmlns:retail="http://www.enactor.com/retail" xmlns:ns4="http://www.enactor.com/crm" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803" xmlns:ns6="http://www.apis-it.hr/fin/2012/types/f73" xmlns:ns7="http://www.w3.org/2000/09/xmldsig#" xmlns:ns8="http://www.enactor.com/retail/storedRetailTransaction/service" xmlns:ns9="http://www.fu.gov.si/" xmlns:ns10="http://www.enactor.com/addressLookup/service" xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:ns14="http://www.enactor.com/crm/customerLoyalty/service" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <core:processID>CustomerOrders/CheckReturnItemAuthorisation</core:processID>
+    <core:version>1.0</core:version>
+    <core:name></core:name>
+    <core:defaultMessageBaseName></core:defaultMessageBaseName>
+    <core:firstStateID>Start</core:firstStateID>
+    <core:className></core:className>
+    <core:uiHints>
+        <entry>
+            <key>com.enactor.tools.editor.process.style</key>
+            <value>2047</value>
+        </entry>
+        <entry>
+            <key>com.enactor.tools.editor.process.xloc</key>
+            <value>9</value>
+        </entry>
+        <entry>
+            <key>com.enactor.tools.editor.process.yloc</key>
+            <value>-38</value>
+        </entry>
+    </core:uiHints>
+    <core:metaData>
+        <core:inputs>
+            <core:input required="true" name="enactor.coreUI.User">
+                <core:interfaceName>com.enactor.core.signOn.ISignedOnUser</core:interfaceName>
+            </core:input>
+            <core:input required="true" name="enactor.customerOrders.retail.CustomerOrderHeader">
+                <core:interfaceName>com.enactor.customerOrders.retail.customerOrderHeader.ICustomerOrderHeader</core:interfaceName>
+            </core:input>
+            <core:input required="true" name="enactor.customerOrders.retail.CustomerOrderItems">
+                <core:interfaceName>java.util.List</core:interfaceName>
+            </core:input>
+            <core:input required="false" name="enactor.coreUI.AuthorisingUser">
+                <core:interfaceName>com.enactor.core.signOn.ISignedOnUser</core:interfaceName>
+            </core:input>
+            <core:input name="enactor.customerOrders.retail.CustomerOrderTypeId">
+                <core:interfaceName>java.lang.String</core:interfaceName>
+            </core:input>
+        </core:inputs>
+        <stateDataTypes>
+            <stateDataType required="true" name="enactor.customerOrders.retail.CustomerOrderHeader">
+                <core:interfaceName>com.enactor.customerOrders.retail.customerOrderHeader.ICustomerOrderHeader</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="false" name="enactor.coreUI.AuthorisingUser">
+                <core:interfaceName>com.enactor.core.signOn.ISignedOnUser</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="false" name="enactor.coreUI.IteratorItem">
+                <core:interfaceName>java.lang.Object</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.customerOrders.retail.CustomerOrderItem">
+                <core:interfaceName>com.enactor.customerOrders.retail.customerOrderItem.ICustomerOrderItem</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.coreUI.User">
+                <core:interfaceName>com.enactor.core.signOn.ISignedOnUser</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.customerOrders.retail.CustomerOrder">
+                <core:interfaceName>com.enactor.customerOrders.retail.customerOrder.ICustomerOrder</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.customerOrders.retail.CustomerOrderItems">
+                <core:interfaceName>java.util.List</core:interfaceName>
+            </stateDataType>
+            <stateDataType name="enactor.customerOrders.retail.CustomerOrderTypeId">
+                <core:interfaceName>java.lang.String</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.customerOrders.retail.CustomerOrderFulfilments">
+                <core:interfaceName>java.util.List</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.customerOrders.retail.CustomerOrderNotes">
+                <core:interfaceName>java.util.List</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.customerOrders.retail.CustomerOrderPayments">
+                <core:interfaceName>java.util.List</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="false" name="enactor.customerOrders.CheckPrivilegeResponse">
+                <core:interfaceName>java.lang.String</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="false" name="enactor.customerOrders.retail.RetailOrderPrivilegeManager">
+                <core:interfaceName>com.enactor.customerOrders.retail.privileges.IRetailOrderPrivilegeManager</core:interfaceName>
+            </stateDataType>
+        </stateDataTypes>
+    </core:metaData>
+    <core:notes>
+        <core:processNote>
+            <core:noteId>Note0</core:noteId>
+            <core:description>The Input CustomerOrderitems can be either a list of SimpleListElements or a list of CustomerOrderItems</core:description>
+            <core:constraint>
+                <core:x>270</core:x>
+                <core:y>10</core:y>
+                <core:height>84</core:height>
+                <core:width>310</core:width>
+            </core:constraint>
+        </core:processNote>
+        <core:processNote>
+            <core:noteId>Note1</core:noteId>
+            <core:description>Error is here as CustomerOrderRetails does not have a dependency on POS - POS. However, this is run by the POS, so it will work at runtime. ExtendedReturnItemDetails should be moved to somewhere common between POS and CustomerOrdersRetail.</core:description>
+            <core:constraint>
+                <core:x>1016</core:x>
+                <core:y>928</core:y>
+                <core:height>115</core:height>
+                <core:width>254</core:width>
+            </core:constraint>
+        </core:processNote>
+    </core:notes>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>IteratorOverItems</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.commonUI.iteration.actions.IterateAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>27</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1110</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>225</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.coreUI.Iterator">
+                    <core:interfaceName>java.util.Iterator</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output name="enactor.coreUI.IteratorItem">
+                    <core:interfaceName>java.lang.Object</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Completed"/>
+                <core:outcome name="Next"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>SetCustomerOrderItem</core:toActionID>
+            <core:condition>instanceOf(state.iteratorItem,&quot;com.enactor.customerOrders.retail.customerOrderItem.ICustomerOrderItem&quot;)</core:condition>
+            <core:outcome>Next</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>3</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>CastToCustomerOrderItem</core:toActionID>
+            <core:condition>instanceOf(state.iteratorItem,&quot;com.enactor.core.database.list.ISimpleListElement&quot;)</core:condition>
+            <core:outcome>Next</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>CheckPrivilegeResponse</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Completed</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>4</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>IteratorOverItems</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Next</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>5</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>CastToCustomerOrderItemFromExtendedReturnItemDetails</core:toActionID>
+            <core:condition>instanceOf(state.iteratorItem,&quot;com.enactor.pos.returns.IExtendedReturnItemDetails&quot;)</core:condition>
+            <core:outcome>Next</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>GetItemsIterator</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.commonUI.iteration.actions.GetIteratorAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>27</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>897</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>224</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.coreUI.Iterable">
+                    <core:interfaceName>java.lang.Object</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output name="enactor.coreUI.Iterator">
+                    <core:interfaceName>java.util.Iterator</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>IteratorOverItems</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:executeProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>CallCreateOrderPrivilegeManager</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UICallProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>27</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>683</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>223</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.customerOrders.retail.CustomerOrderHeader">
+                    <core:interfaceName>com.enactor.customerOrders.retail.customerOrderHeader.ICustomerOrderHeader</core:interfaceName>
+                </core:input>
+                <core:input required="false" name="enactor.customerOrders.retail.CustomerOrderTypeId">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="true" name="enactor.customerOrders.retail.CustomerOrderType">
+                    <core:interfaceName>com.enactor.customerOrders.retail.customerOrderType.ICustomerOrderType</core:interfaceName>
+                </core:output>
+                <core:output required="false" name="enactor.customerOrders.retail.RetailOrderPrivilegeManager">
+                    <core:interfaceName>com.enactor.customerOrders.retail.privileges.IRetailOrderPrivilegeManager</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+                <core:outcome name="FailedToLoadOrderType"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.CallProcess</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>GetItemsIterator</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID>FailedToCreateOrderPrivilegeManager</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>FailedToLoadOrderType</core:outcome>
+        </core:outcomeLink>
+        <core:executeProcessId>CustomerOrders/CreateRetailOrderPrivilegeManager</core:executeProcessId>
+    </core:executeProcessAction>
+    <core:endProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>EndProcessFail</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIEndProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2596</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>-22</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData/>
+        <core:typeId>enactor.types.EndProcess</core:typeId>
+        <core:outcome>Fail</core:outcome>
+        <core:defaultProcessId></core:defaultProcessId>
+    </core:endProcessAction>
+    <core:endProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>EndProcessSuccess</core:actionID>
+        <core:name>Success</core:name>
+        <core:className>com.enactor.coreUI.actions.UIEndProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2095</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>-14</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData/>
+        <core:typeId>enactor.types.EndProcess</core:typeId>
+        <core:outcome>Success</core:outcome>
+        <core:defaultProcessId></core:defaultProcessId>
+    </core:endProcessAction>
+    <core:assignAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>SetCustomerOrderItem</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIAssignAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>27</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1432</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>529</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="false" name="enactor.coreUI.IteratorItem">
+                    <core:interfaceName>java.lang.Object</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="true" name="enactor.customerOrders.retail.CustomerOrderItem">
+                    <core:interfaceName>com.enactor.customerOrders.retail.customerOrderItem.ICustomerOrderItem</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.Assign</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>TestRefundCompletedPrivilege</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:dataAssignment toExpression="customerOrderItem" fromExpression="iteratorItem"/>
+    </core:assignAction>
+    <core:assignAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>CastToCustomerOrderItem</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIAssignAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>27</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1431</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>730</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.customerOrders.SimpleListElement">
+                    <core:interfaceName>com.enactor.core.database.list.SimpleListElement</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.customerOrders.retail.CustomerOrderItem">
+                    <core:interfaceName>com.enactor.customerOrders.retail.customerOrderItem.ICustomerOrderItem</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="true" name="enactor.customerOrders.retail.CustomerOrderItem">
+                    <core:interfaceName>com.enactor.customerOrders.retail.customerOrderItem.ICustomerOrderItem</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.Assign</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>TestRefundCompletedPrivilege</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:dataAssignment toExpression="customerOrderItem" fromExpression="simpleListElement.key"/>
+    </core:assignAction>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>TestRefundCompletedPrivilege</core:actionID>
+        <core:name>TestOrderPrivilegeAction</core:name>
+        <core:className>com.enactor.customerOrders.retail.actions.TestOrderPrivilegeAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>27</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1656</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>529</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="enactor.customerOrders.RefundItem" name="enactor.mfc.PrivilegeId">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.customerOrders.retail.RetailOrderPrivilegeManager">
+                    <core:interfaceName>com.enactor.customerOrders.retail.privileges.IRetailOrderPrivilegeManager</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.customerOrders.retail.CustomerOrderPayment">
+                    <core:interfaceName>com.enactor.customerOrders.retail.customerOrderPayment.ICustomerOrderPayment</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.PrivilegeId">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.customerOrders.retail.CustomerOrderHeader">
+                    <core:interfaceName>com.enactor.customerOrders.retail.customerOrderHeader.ICustomerOrderHeader</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.customerOrders.retail.CustomerOrderItem">
+                    <core:interfaceName>com.enactor.customerOrders.retail.customerOrderItem.ICustomerOrderItem</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output name="enactor.customerOrders.CheckPrivilegeResponse">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="True"/>
+                <core:outcome name="False"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>IteratorOverItems</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>True</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>TestRefundNonCompletedItem</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>False</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>TestRefundNonCompletedItem</core:actionID>
+        <core:name>TestOrderPrivilegeAction</core:name>
+        <core:className>com.enactor.customerOrders.retail.actions.TestOrderPrivilegeAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>27</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1912</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>526</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="enactor.customerOrders.RefundNonCompletedItem" name="enactor.mfc.PrivilegeId">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.customerOrders.retail.RetailOrderPrivilegeManager">
+                    <core:interfaceName>com.enactor.customerOrders.retail.privileges.IRetailOrderPrivilegeManager</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.customerOrders.retail.CustomerOrderPayment">
+                    <core:interfaceName>com.enactor.customerOrders.retail.customerOrderPayment.ICustomerOrderPayment</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.PrivilegeId">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.customerOrders.retail.CustomerOrderHeader">
+                    <core:interfaceName>com.enactor.customerOrders.retail.customerOrderHeader.ICustomerOrderHeader</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.customerOrders.retail.CustomerOrderItem">
+                    <core:interfaceName>com.enactor.customerOrders.retail.customerOrderItem.ICustomerOrderItem</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output name="enactor.customerOrders.CheckPrivilegeResponse">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="True"/>
+                <core:outcome name="False"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>IteratorOverItems</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>True</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>3</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>Assign</core:toActionID>
+            <core:condition>strings:compareStrings(state.checkPrivilegeResponse, &quot;UNAUTHORISED&quot;)</core:condition>
+            <core:outcome>False</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>SwitchFailReturnMessage</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>False</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>CheckPrivilegeResponse</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UINullAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>3</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1224</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>65</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.NullAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>Null Action</core:toActionID>
+            <core:condition>strings:compareStrings(state.checkPrivilegeResponse, &quot;UNAUTHORISED&quot;)</core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>EndProcessSuccess</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:executeProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>Authorise</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.CallProcessWithPrivilegesAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>91</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1911</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>138</value>
+            </entry>
+        </core:uiHints>
+        <core:privileges>enactor.customerOrders.RefundNonCompletedItem</core:privileges>
+        <core:metaData>
+            <core:inputs>
+                <core:input name="enactor.coreUI.User">
+                    <core:interfaceName>com.enactor.core.signOn.ISignedOnUser</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="false" name="enactor.coreUI.AuthorisingUser">
+                    <core:interfaceName>com.enactor.core.signOn.ISignedOnUser</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+                <core:outcome name="Cancel"/>
+                <core:outcome name="Fail"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.CallProcess</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>SwitchFailReturnMessage</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Cancel</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>SwitchFailReturnMessage</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Fail</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>3</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>EndProcessSuccess</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:executeProcessId>Pos/SignOn/CheckAuthorisation</core:executeProcessId>
+    </core:executeProcessAction>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>SwitchFailReturnMessage</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UINullAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>3</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2167</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>143</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.NullAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID>ReturnMutlipleItemsFail</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition>size(process.customerOrderItems) &gt; 1</core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID>ReturnSingleItemFail</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:assignAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>Assign</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIAssignAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>27</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2140</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>525</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="false" name="enactor.customerOrders.CheckPrivilegeResponse">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="false" name="enactor.customerOrders.CheckPrivilegeResponse">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.Assign</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>IteratorOverItems</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:dataAssignment toExpression="checkPrivilegeResponse" fromExpression="(checkPrivilegeResponse==&quot;UNAUTHORISED&quot;) ? checkPrivilegeResponse : null"/>
+    </core:assignAction>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>Null Action</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UINullAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>3</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1429</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>175</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.NullAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID>ReturnMutlipleItemsAuthFail</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition>size(process.customerOrderItems) &gt; 1</core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID>ReturnSingleItemAuthFail</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:assignAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>CastToCustomerOrderItemFromExtendedReturnItemDetails</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIAssignAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.notes</key>
+                <value>Note1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>27</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1435</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>922</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.customerOrders.retail.CustomerOrderItem">
+                    <core:interfaceName>com.enactor.customerOrders.retail.customerOrderItem.ICustomerOrderItem</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.pos.ExtendedReturnItemDetails">
+                    <core:interfaceName>com.enactor.pos.returns.ExtendedReturnItemDetails</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="true" name="enactor.customerOrders.retail.CustomerOrderItem">
+                    <core:interfaceName>com.enactor.customerOrders.retail.customerOrderItem.ICustomerOrderItem</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.Assign</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>TestRefundCompletedPrivilege</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:dataAssignment toExpression="customerOrderItem" fromExpression="extendedReturnItemDetails.extensionReferenceData"/>
+    </core:assignAction>
+    <core:state>
+        <core:url></core:url>
+        <core:stateID>Start</core:stateID>
+        <core:name></core:name>
+        <core:className></core:className>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>37</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>259</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>213</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="POS" name="enactor.coreUI.ApplicationId">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <handledEvents>
+                <handledEvent name="StateEntered"/>
+            </handledEvents>
+            <stateDataTypes>
+                <stateDataType required="false" name="enactor.coreUI.AuthorisingUser">
+                    <core:interfaceName>com.enactor.core.signOn.ISignedOnUser</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="false" name="enactor.coreUI.IteratorItem">
+                    <core:interfaceName>java.lang.Object</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="true" name="enactor.customerOrders.retail.CustomerOrderItem">
+                    <core:interfaceName>com.enactor.customerOrders.retail.customerOrderItem.ICustomerOrderItem</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="true" name="enactor.customerOrders.retail.CustomerOrderType">
+                    <core:interfaceName>com.enactor.customerOrders.retail.customerOrderType.ICustomerOrderType</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="false" name="enactor.customerOrders.CheckPrivilegeResponse">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="false" name="enactor.coreUI.Iterator">
+                    <core:interfaceName>java.util.Iterator</core:interfaceName>
+                </stateDataType>
+            </stateDataTypes>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicState</core:typeId>
+        <core:singleInstance>false</core:singleInstance>
+        <core:respondToViewEvents>false</core:respondToViewEvents>
+        <core:actionInputMappings>
+            <core:actionMapping>
+                <core:actionID>GetItemsIterator</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.customerOrders.retail.CustomerOrderItems">
+<core:interfaceName>java.util.List</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.coreUI.Iterable">
+<core:interfaceName>java.lang.Object</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings/>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>CastToCustomerOrderItem</core:actionID>
+                <core:mappings>
+                    <core:processMappings/>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.customerOrders.retail.CustomerOrderItem">
+<core:interfaceName>com.enactor.customerOrders.retail.customerOrderItem.ICustomerOrderItem</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.customerOrders.retail.CustomerOrderItem">
+<core:interfaceName>com.enactor.customerOrders.retail.customerOrderItem.ICustomerOrderItem</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="false" name="enactor.coreUI.IteratorItem">
+<core:interfaceName>java.lang.Object</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.customerOrders.SimpleListElement">
+<core:interfaceName>com.enactor.core.database.list.SimpleListElement</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>CastToCustomerOrderItemFromExtendedReturnItemDetails</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="false" name="enactor.coreUI.IteratorItem">
+<core:interfaceName>java.lang.Object</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.pos.ExtendedReturnItemDetails">
+<core:interfaceName>com.enactor.pos.returns.ExtendedReturnItemDetails</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.customerOrders.retail.CustomerOrderItem">
+<core:interfaceName>com.enactor.customerOrders.retail.customerOrderItem.ICustomerOrderItem</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.customerOrders.retail.CustomerOrderItem">
+<core:interfaceName>com.enactor.customerOrders.retail.customerOrderItem.ICustomerOrderItem</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>CallLoadCustomerOrder</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.customerOrders.retail.CustomerOrderHeader">
+<core:interfaceName>com.enactor.customerOrders.retail.customerOrderHeader.ICustomerOrderHeader</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.customerOrders.retail.CustomerOrderHeaderKey">
+<core:interfaceName>com.enactor.customerOrders.retail.customerOrderHeader.ICustomerOrderHeaderKey</core:interfaceName>
+                            </core:targetDataType>
+                            <core:expression>customerOrderHeader.key</core:expression>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings/>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>PopulateCustomerOrder</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.customerOrders.retail.CustomerOrder">
+<core:interfaceName>com.enactor.customerOrders.retail.customerOrder.ICustomerOrder</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.customerOrders.retail.CustomerOrder">
+<core:interfaceName>com.enactor.customerOrders.retail.customerOrder.ICustomerOrder</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.customerOrders.retail.CustomerOrderFulfilments">
+<core:interfaceName>java.util.List</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.customerOrders.FulfilmentList">
+<core:interfaceName>java.util.List</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.customerOrders.retail.CustomerOrderHeader">
+<core:interfaceName>com.enactor.customerOrders.retail.customerOrderHeader.ICustomerOrderHeader</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.customerOrders.CustomerOrderHeader">
+<core:interfaceName>com.enactor.customerOrders.retail.customerOrderHeader.ICustomerOrderHeader</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.customerOrders.retail.CustomerOrderItems">
+<core:interfaceName>java.util.List</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="false" name="enactor.coreUI.ItemList">
+<core:interfaceName>java.util.List</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.customerOrders.retail.CustomerOrderNotes">
+<core:interfaceName>java.util.List</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.coreUI.NoteList">
+<core:interfaceName>java.util.List</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.customerOrders.retail.CustomerOrderPayments">
+<core:interfaceName>java.util.List</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.coreUI.PaymentList">
+<core:interfaceName>java.util.List</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings/>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>TestRefundCompletedPrivilege</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.customerOrders.retail.CustomerOrderHeader">
+<core:interfaceName>com.enactor.customerOrders.retail.customerOrderHeader.ICustomerOrderHeader</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType name="enactor.customerOrders.retail.CustomerOrderHeader">
+<core:interfaceName>com.enactor.customerOrders.retail.customerOrderHeader.ICustomerOrderHeader</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="false" name="enactor.customerOrders.retail.RetailOrderPrivilegeManager">
+<core:interfaceName>com.enactor.customerOrders.retail.privileges.IRetailOrderPrivilegeManager</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.customerOrders.retail.RetailOrderPrivilegeManager">
+<core:interfaceName>com.enactor.customerOrders.retail.privileges.IRetailOrderPrivilegeManager</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.customerOrders.retail.CustomerOrderItem">
+<core:interfaceName>com.enactor.customerOrders.retail.customerOrderItem.ICustomerOrderItem</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType name="enactor.customerOrders.retail.CustomerOrderItem">
+<core:interfaceName>com.enactor.customerOrders.retail.customerOrderItem.ICustomerOrderItem</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.customerOrders.retail.CustomerOrderPayment">
+<core:interfaceName>com.enactor.customerOrders.retail.customerOrderPayment.ICustomerOrderPayment</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>TestRefundNonCompletedItem</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.customerOrders.retail.CustomerOrderHeader">
+<core:interfaceName>com.enactor.customerOrders.retail.customerOrderHeader.ICustomerOrderHeader</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType name="enactor.customerOrders.retail.CustomerOrderHeader">
+<core:interfaceName>com.enactor.customerOrders.retail.customerOrderHeader.ICustomerOrderHeader</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="false" name="enactor.customerOrders.retail.RetailOrderPrivilegeManager">
+<core:interfaceName>com.enactor.customerOrders.retail.privileges.IRetailOrderPrivilegeManager</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.customerOrders.retail.RetailOrderPrivilegeManager">
+<core:interfaceName>com.enactor.customerOrders.retail.privileges.IRetailOrderPrivilegeManager</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.customerOrders.retail.CustomerOrderItem">
+<core:interfaceName>com.enactor.customerOrders.retail.customerOrderItem.ICustomerOrderItem</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType name="enactor.customerOrders.retail.CustomerOrderItem">
+<core:interfaceName>com.enactor.customerOrders.retail.customerOrderItem.ICustomerOrderItem</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.customerOrders.retail.CustomerOrderPayment">
+<core:interfaceName>com.enactor.customerOrders.retail.customerOrderPayment.ICustomerOrderPayment</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+        </core:actionInputMappings>
+        <core:actionOutputMappings>
+            <core:actionMapping>
+                <core:actionID>CallCreateOrderPrivilegeManager</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="false" name="enactor.customerOrders.retail.RetailOrderPrivilegeManager">
+<core:interfaceName>com.enactor.customerOrders.retail.privileges.IRetailOrderPrivilegeManager</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="false" name="enactor.customerOrders.retail.RetailOrderPrivilegeManager">
+<core:interfaceName>com.enactor.customerOrders.retail.privileges.IRetailOrderPrivilegeManager</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.customerOrders.retail.CustomerOrderType">
+<core:interfaceName>com.enactor.customerOrders.retail.customerOrderType.ICustomerOrderType</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.customerOrders.retail.CustomerOrderType">
+<core:interfaceName>com.enactor.customerOrders.retail.customerOrderType.ICustomerOrderType</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>CallLoadCustomerOrder</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.customerOrders.retail.CustomerOrderHeader">
+<core:interfaceName>com.enactor.customerOrders.retail.customerOrderHeader.ICustomerOrderHeader</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.customerOrders.retail.CustomerOrderHeader">
+<core:interfaceName>com.enactor.customerOrders.retail.customerOrderHeader.ICustomerOrderHeader</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.customerOrders.retail.CustomerOrderFulfilments">
+<core:interfaceName>java.util.List</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.customerOrders.retail.CustomerOrderFulfilments">
+<core:interfaceName>java.util.List</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.customerOrders.retail.CustomerOrderNotes">
+<core:interfaceName>java.util.List</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.customerOrders.retail.CustomerOrderNotes">
+<core:interfaceName>java.util.List</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.customerOrders.retail.CustomerOrderItems">
+<core:interfaceName>java.util.List</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.customerOrders.retail.CustomerOrderItems">
+<core:interfaceName>java.util.List</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.customerOrders.retail.CustomerOrderPayments">
+<core:interfaceName>java.util.List</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.customerOrders.retail.CustomerOrderPayments">
+<core:interfaceName>java.util.List</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.customerOrders.retail.CustomerOrder">
+<core:interfaceName>com.enactor.customerOrders.retail.customerOrder.ICustomerOrder</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.customerOrders.retail.CustomerOrder">
+<core:interfaceName>com.enactor.customerOrders.retail.customerOrder.ICustomerOrder</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings/>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>PopulateCustomerOrder</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.customerOrders.retail.CustomerOrder">
+<core:interfaceName>com.enactor.customerOrders.retail.customerOrder.ICustomerOrder</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.customerOrders.retail.CustomerOrder">
+<core:interfaceName>com.enactor.customerOrders.retail.customerOrder.ICustomerOrder</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings/>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>CreateCustomerOrder</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType name="enactor.coreUI.Entity">
+<core:interfaceName>com.enactor.core.entities.IEntity</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.customerOrders.retail.CustomerOrder">
+<core:interfaceName>com.enactor.customerOrders.retail.customerOrder.ICustomerOrder</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings/>
+                </core:mappings>
+            </core:actionMapping>
+        </core:actionOutputMappings>
+        <core:eventLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>CallCreateOrderPrivilegeManager</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>StateEntered</core:event>
+        </core:eventLink>
+    </core:state>
+    <core:messageState>
+        <core:url></core:url>
+        <core:stateID>ReturnSingleItemFail</core:stateID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.states.UIMessageState</core:className>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>5</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2409</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>143</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <handledEvents>
+                <handledEvent name="OKPressed"/>
+            </handledEvents>
+        </core:metaData>
+        <core:typeId>enactor.types.MessageState</core:typeId>
+        <core:singleInstance>false</core:singleInstance>
+        <core:respondToViewEvents>false</core:respondToViewEvents>
+        <core:actionInputMappings/>
+        <core:actionOutputMappings/>
+        <core:eventLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>EndProcessFail</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>OKPressed</core:event>
+        </core:eventLink>
+        <core:keepPromptOpen>false</core:keepPromptOpen>
+        <core:keepPreviousPromptOpen>false</core:keepPreviousPromptOpen>
+        <core:promptTimeout>0</core:promptTimeout>
+        <core:hideOpenPrompt>false</core:hideOpenPrompt>
+        <core:allowDatabasePromptLookup>false</core:allowDatabasePromptLookup>
+        <core:messageBase>Pos/Product/ReturnItemMessages</core:messageBase>
+        <core:messageId>RETURN_SINGLE_ITEM_FAIL</core:messageId>
+        <core:messageText></core:messageText>
+    </core:messageState>
+    <core:messageState>
+        <core:url></core:url>
+        <core:stateID>ReturnMutlipleItemsFail</core:stateID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.states.UIMessageState</core:className>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>5</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2411</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>267</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <handledEvents>
+                <handledEvent name="OKPressed"/>
+            </handledEvents>
+        </core:metaData>
+        <core:typeId>enactor.types.MessageState</core:typeId>
+        <core:singleInstance>false</core:singleInstance>
+        <core:respondToViewEvents>false</core:respondToViewEvents>
+        <core:actionInputMappings/>
+        <core:actionOutputMappings/>
+        <core:eventLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>EndProcessFail</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>OKPressed</core:event>
+        </core:eventLink>
+        <core:keepPromptOpen>false</core:keepPromptOpen>
+        <core:keepPreviousPromptOpen>false</core:keepPreviousPromptOpen>
+        <core:promptTimeout>0</core:promptTimeout>
+        <core:hideOpenPrompt>false</core:hideOpenPrompt>
+        <core:allowDatabasePromptLookup>false</core:allowDatabasePromptLookup>
+        <core:messageBase>Pos/Product/ReturnItemMessages</core:messageBase>
+        <core:messageId>RETURN_MULTIPLE_ITEM_FAIL</core:messageId>
+        <core:messageText></core:messageText>
+    </core:messageState>
+    <core:messageState>
+        <core:url></core:url>
+        <core:stateID>ReturnSingleItemAuthFail</core:stateID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.states.UIMessageState</core:className>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>5</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1644</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>139</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <handledEvents>
+                <handledEvent name="OKPressed"/>
+            </handledEvents>
+        </core:metaData>
+        <core:typeId>enactor.types.MessageState</core:typeId>
+        <core:singleInstance>false</core:singleInstance>
+        <core:respondToViewEvents>false</core:respondToViewEvents>
+        <core:actionInputMappings/>
+        <core:actionOutputMappings/>
+        <core:eventLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>Authorise</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>OKPressed</core:event>
+        </core:eventLink>
+        <core:keepPromptOpen>false</core:keepPromptOpen>
+        <core:keepPreviousPromptOpen>false</core:keepPreviousPromptOpen>
+        <core:promptTimeout>0</core:promptTimeout>
+        <core:hideOpenPrompt>false</core:hideOpenPrompt>
+        <core:allowDatabasePromptLookup>false</core:allowDatabasePromptLookup>
+        <core:messageBase>Pos/Product/ReturnItemMessages</core:messageBase>
+        <core:messageId>RETURN_SINGLE_ITEM_AUTHORISE_FAIL</core:messageId>
+        <core:messageText></core:messageText>
+    </core:messageState>
+    <core:messageState>
+        <core:url></core:url>
+        <core:stateID>ReturnMutlipleItemsAuthFail</core:stateID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.states.UIMessageState</core:className>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>5</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1644</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>268</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <handledEvents>
+                <handledEvent name="OKPressed"/>
+            </handledEvents>
+        </core:metaData>
+        <core:typeId>enactor.types.MessageState</core:typeId>
+        <core:singleInstance>false</core:singleInstance>
+        <core:respondToViewEvents>false</core:respondToViewEvents>
+        <core:actionInputMappings/>
+        <core:actionOutputMappings/>
+        <core:eventLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>Authorise</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>OKPressed</core:event>
+        </core:eventLink>
+        <core:keepPromptOpen>false</core:keepPromptOpen>
+        <core:keepPreviousPromptOpen>false</core:keepPreviousPromptOpen>
+        <core:promptTimeout>0</core:promptTimeout>
+        <core:hideOpenPrompt>false</core:hideOpenPrompt>
+        <core:allowDatabasePromptLookup>false</core:allowDatabasePromptLookup>
+        <core:messageBase>Pos/Product/ReturnItemMessages</core:messageBase>
+        <core:messageId>RETURN_MULTIPLE_ITEM_AUTHORISE_FAIL</core:messageId>
+        <core:messageText></core:messageText>
+    </core:messageState>
+    <core:messageState>
+        <core:url></core:url>
+        <core:stateID>FailedToCreateOrderPrivilegeManager</core:stateID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.states.UIMessageState</core:className>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>13</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>897</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>-5</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input name="enactor.customerOrders.retail.CustomerOrderHeader">
+                    <core:interfaceName>com.enactor.customerOrders.retail.customerOrderHeader.ICustomerOrderHeader</core:interfaceName>
+                </core:input>
+                <core:input required="false" name="enactor.customerOrders.retail.CustomerOrderTypeId">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <handledEvents>
+                <handledEvent name="OKPressed"/>
+            </handledEvents>
+            <stateDataTypes>
+                <stateDataType name="enactor.customerOrders.retail.CustomerOrderHeader">
+                    <core:interfaceName>com.enactor.customerOrders.retail.customerOrderHeader.ICustomerOrderHeader</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="false" name="enactor.customerOrders.CustomerOrderTypeId">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="false" name="enactor.customerOrders.retail.CustomerOrderTypeId">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </stateDataType>
+            </stateDataTypes>
+        </core:metaData>
+        <core:typeId>enactor.types.MessageState</core:typeId>
+        <core:singleInstance>false</core:singleInstance>
+        <core:respondToViewEvents>false</core:respondToViewEvents>
+        <core:actionInputMappings/>
+        <core:actionOutputMappings/>
+        <core:eventLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>EndProcessFail</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>OKPressed</core:event>
+        </core:eventLink>
+        <core:keepPromptOpen>false</core:keepPromptOpen>
+        <core:keepPreviousPromptOpen>false</core:keepPreviousPromptOpen>
+        <core:promptTimeout>0</core:promptTimeout>
+        <core:hideOpenPrompt>false</core:hideOpenPrompt>
+        <core:allowDatabasePromptLookup>false</core:allowDatabasePromptLookup>
+        <core:messageBase>Pos/Order/OrderMessages</core:messageBase>
+        <core:messageId>FAILED_TO_LOAD_CUSTOMER_ORDER_TYPE</core:messageId>
+        <core:messageText></core:messageText>
+    </core:messageState>
+    <core:stateTransitions/>
+</core:process>

@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<retail:posPromptPage xmlns:core="http://www.enactor.com/core" xmlns:retail="http://www.enactor.com/retail" xmlns:ns4="http://www.enactor.com/crm" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803" xmlns:ns6="http://www.apis-it.hr/fin/2012/types/f73" xmlns:ns7="http://www.w3.org/2000/09/xmldsig#" xmlns:ns8="http://www.enactor.com/retail/storedRetailTransaction/service" xmlns:ns9="http://www.fu.gov.si/" xmlns:ns10="http://www.enactor.com/addressLookup/service" xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:ns14="http://www.enactor.com/crm/customerLoyalty/service" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" allowResize="true" allowMove="true" allowClose="true" height="593" width="817" messageBase="Pos/CashManagement/CashManagementMessages" url="Pos/CashManagement/SelectTenderPrompt">
+    <core:elements>
+        <core:listBox lazyLoad="false" listSelectionMethod="DEFAULT" documentTemplateUrl="Pos/CashManagement/TenderListTemplate" styleClass="tenderSelectionList" enabled="true" id="SelectionList">
+            <core:elements/>
+            <core:listExpression>#{list}</core:listExpression>
+            <core:listingElementEvents>
+                <core:selectionEvent>page.SelectionList.changed</core:selectionEvent>
+            </core:listingElementEvents>
+            <core:selectableExpression>#{listItemVisibilityTest}</core:selectableExpression>
+        </core:listBox>
+        <core:text lineHeight="0" messageId="NO_APPLICABLE_TENDERS" id="Prompt">
+            <core:updateTriggers>
+                <core:element>SelectionList</core:element>
+            </core:updateTriggers>
+            <core:uiMessage messageId="EDIT_DENOMINATIONS" applicability="#{empty cashupTenders &amp;&amp; !viewingValues &amp;&amp; !empty selectedItem &amp;&amp; selectedItem.enterByDenomination}"/>
+            <core:uiMessage messageId="EDIT_TRACKED_ITEMS" applicability="#{empty cashupTenders &amp;&amp; !viewingValues &amp;&amp; !empty selectedItem &amp;&amp; selectedItem.isTrackedItem}"/>
+            <core:uiMessage messageId="EDIT_VALUE" applicability="#{empty cashupTenders &amp;&amp; !viewingValues &amp;&amp; !empty selectedItem}"/>
+            <core:uiMessage messageId="EDIT_CASHUP_DENOMINATIONS" applicability="#{cashupTenders &amp;&amp; !viewingValues &amp;&amp; !empty selectedItem &amp;&amp; selectedItem.enterByDenomination}"/>
+            <core:uiMessage messageId="EDIT_CASHUP_TRACKED_ITEMS" applicability="#{cashupTenders &amp;&amp; !viewingValues &amp;&amp; !empty selectedItem &amp;&amp; selectedItem.isTrackedItem}"/>
+            <core:uiMessage messageId="EDIT_CASHUP_VALUE" applicability="#{cashupTenders &amp;&amp; !viewingValues &amp;&amp; !empty selectedItem}"/>
+            <core:uiMessage messageId="VIEW_DENOMINATIONS" applicability="#{viewingValues &amp;&amp; !empty selectedItem &amp;&amp; selectedItem.enterByDenomination}"/>
+            <core:uiMessage messageId="VIEW_TRACKED_ITEMS" applicability="#{viewingValues &amp;&amp; !empty selectedItem &amp;&amp; selectedItem.isTrackedItem}"/>
+            <core:uiMessage messageId="VIEWING_SIMPLE" applicability="#{viewingValues &amp;&amp; !empty selectedItem}"/>
+            <core:uiMessage messageId="SELECT_TENDER" applicability="#{size(list) &gt; 0}"/>
+        </core:text>
+        <core:inputText lineHeight="0" type="textField" focusOrder="1" visibility="#{!viewingValues &amp;&amp; !empty selectedItem &amp;&amp; !selectedItem.enterByDenomination &amp;&amp; !selectedItem.isTrackedItem &amp;&amp; simpleTenderEntry}" id="InputBox">
+            <core:updateTriggers>
+                <core:element>SelectionList</core:element>
+            </core:updateTriggers>
+            <core:text>${enactor.pos.TenderAmountLong}</core:text>
+            <core:textElementEvents enterEvent="OKPressed"/>
+            <core:validationData>
+                <core:currencyFieldValidationData>
+                    <core:type>CurrencyAmount</core:type>
+                    <core:allowNulls>true</core:allowNulls>
+                    <core:inputMask></core:inputMask>
+                    <core:validationClassname></core:validationClassname>
+                    <core:currencyId>#{selectedItem.currencyKey.currencyId}</core:currencyId>
+                </core:currencyFieldValidationData>
+            </core:validationData>
+        </core:inputText>
+        <core:button lineHeight="0" messageBase="Pos/General/PosMessages" messageId="BUTTON_OK" visibility="#{size(list) &gt; 0}" id="Button1">
+            <core:text>OKPressed</core:text>
+        </core:button>
+        <core:button lineHeight="0" messageBase="Pos/General/PosMessages" messageId="BUTTON_UP" styleClass="navigation-up" visibility="#{page['SelectionList'].visible &amp;&amp; page['SelectionList'].moveUp}" id="Button2">
+            <core:updateTriggers>
+                <core:element>SelectionList</core:element>
+            </core:updateTriggers>
+            <core:text>page.SelectionList.up</core:text>
+        </core:button>
+        <core:button lineHeight="0" messageBase="Pos/General/PosMessages" messageId="BUTTON_DOWN" styleClass="navigation-down" visibility="#{page['SelectionList'].visible &amp;&amp; page['SelectionList'].moveDown}" id="Button3">
+            <core:updateTriggers>
+                <core:element>SelectionList</core:element>
+            </core:updateTriggers>
+            <core:text>page.SelectionList.down</core:text>
+        </core:button>
+        <core:button lineHeight="0" messageId="NOTES_BUTTON" visibility="#{!bagOptions}" id="Button4">
+            <core:text>NotesPressed</core:text>
+        </core:button>
+        <core:button lineHeight="0" visibility="#{(notEmpty(showAcceptRejectButtons) &amp;&amp; showAcceptRejectButtons)  ||  (!empty showPrintButton &amp;&amp; showPrintButton)   ||   !viewingValues &amp;&amp; ((!bagOptions || bagOptions &amp;&amp; newBagTenders) &amp;&amp; size(list) &gt; 0   ||   bagOptions &amp;&amp; !newBagTenders)}" id="Button6">
+            <core:uiMessage messageId="ACCEPT_BUTTON" applicability="#{notEmpty(showAcceptRejectButtons) &amp;&amp; showAcceptRejectButtons}"/>
+            <core:uiMessage messageId="BUTTON_PRINT" messageBase="Pos/General/PosMessages" applicability="#{!empty showPrintButton &amp;&amp; showPrintButton}"/>
+            <core:uiMessage messageId="COMPLETE_BUTTON" applicability="#{!bagOptions &amp;&amp; size(list) &gt; 0 &amp;&amp; (promptForNotes != true || notEmpty(cMTransaction.notes))}"/>
+            <core:uiMessage messageId="CONTINUE_BUTTON" applicability="#{!bagOptions &amp;&amp; size(list) &gt; 0 &amp;&amp; (promptForNotes == true &amp;&amp; isEmpty(cMTransaction.notes))}"/>
+            <core:uiMessage messageId="BAG_TENDERS_BUTTON" applicability="#{bagOptions &amp;&amp; newBagTenders &amp;&amp; size(list) &gt; 0}"/>
+            <core:uiMessage messageId="BUTTON_BACK" messageBase="Pos/General/PosMessages" applicability="#{bagOptions &amp;&amp; !newBagTenders}"/>
+            <core:text>#{notEmpty(showAcceptRejectButtons) &amp;&amp; showAcceptRejectButtons ? 'AcceptPressed' : viewingValues ? 'PrintPressed' : 'CompletePressed'}</core:text>
+        </core:button>
+        <core:button lineHeight="0" messageId="REJECT_BUTTON" visibility="#{notEmpty(showAcceptRejectButtons) &amp;&amp; showAcceptRejectButtons}" id="Button7">
+            <core:text>RejectPressed</core:text>
+        </core:button>
+        <core:button lineHeight="0" visibility="#{viewingValues || !bagOptions || newBagTenders}" id="Button8">
+            <core:uiMessage messageId="VOID_BUTTON" applicability="#{!viewingValues &amp;&amp; !bagOptions}"/>
+            <core:uiMessage messageId="BUTTON_CANCEL" messageBase="Pos/General/PosMessages" applicability="#{!viewingValues &amp;&amp; bagOptions &amp;&amp; newBagTenders}"/>
+            <core:uiMessage messageId="BUTTON_BACK" messageBase="Pos/General/PosMessages" applicability="#{viewingValues}"/>
+            <core:text>#{viewingValues ? 'BackPressed' : 'VoidPressed'}</core:text>
+        </core:button>
+        <core:hidden id="Receipt"/>
+        <core:hidden id="DialogPanel"/>
+        <core:button lineHeight="0" messageId="ATTACHMENTS_BUTTON" visibility="#{(notEmpty(showAttachmentsButton) &amp;&amp; showAttachmentsButton)}" id="Button5">
+            <core:text>AttachmentsPressed</core:text>
+        </core:button>
+        <core:hidden id="Button9"/>
+        <core:hidden id="Button10"/>
+        <core:hidden id="TotalLabel"/>
+    </core:elements>
+    <core:templateURL>Pos/StandardPosTemplate</core:templateURL>
+    <core:events>
+        <core:event destination="enactor.Prompt" event="key.EnterPressed">OKPressed</core:event>
+        <core:event destination="SelectionList" event="key.UpPressed">up</core:event>
+        <core:event destination="SelectionList" event="key.DownPressed">down</core:event>
+        <core:event destination="InputBox" event="page.SelectionList.changed">update</core:event>
+        <core:event destination="InputBox" event="page.SelectionList.changed">focus</core:event>
+    </core:events>
+    <core:validationEvents>
+        <core:event>OKPressed</core:event>
+        <core:event>InputBoxEnterPressed</core:event>
+    </core:validationEvents>
+    <core:variables>
+        <core:variable required="true" name="enactor.coreUI.List">
+            <core:interfaceName>java.util.List</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="page">
+            <core:interfaceName>java.util.Map</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="viewingValues">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:variable>
+        <core:variable required="false" name="cashupTenders">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.cashManagement.BagOptions">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.cashManagement.NewBagTenders">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.cashManagement.ShowAcceptRejectButtons">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.cashManagement.ShowPrintButton">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.cashManagement.ShowAttachmentsButton">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.coreUI.SelectedItem">
+            <core:interfaceName>com.enactor.cashManagement.listElements.ITenderListElement</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.cashManagement.SimpleTenderEntry">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.coreUI.SelectedIndex">
+            <core:interfaceName>java.lang.Integer</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.cashManagement.CMTransaction">
+            <core:interfaceName>com.enactor.cashManagement.entities.ICMTransaction</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.cashManagement.PromptForNotes">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:variable>
+    </core:variables>
+</retail:posPromptPage>

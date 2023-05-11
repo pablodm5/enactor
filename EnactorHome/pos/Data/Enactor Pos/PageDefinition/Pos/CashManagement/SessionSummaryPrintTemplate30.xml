@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<core:documentTemplate xmlns:core="http://www.enactor.com/core" xmlns:retail="http://www.enactor.com/retail" xmlns:ns4="http://www.enactor.com/crm" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803" xmlns:ns6="http://www.apis-it.hr/fin/2012/types/f73" xmlns:ns7="http://www.w3.org/2000/09/xmldsig#" xmlns:ns8="http://www.enactor.com/retail/storedRetailTransaction/service" xmlns:ns9="http://www.fu.gov.si/" xmlns:ns10="http://www.enactor.com/addressLookup/service" xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:ns14="http://www.enactor.com/crm/customerLoyalty/service" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" paginated="false" width="30" messageBase="Pos/CashManagement/CashManagementMessages" title="Session Summary" url="Pos/CashManagement/SessionSummaryPrintTemplate30">
+    <core:elements>
+        <core:formatElement formatId="sessionSummaryHeader"/>
+        <core:formatElement formatId="sessionSummaryBody"/>
+        <core:formatElement formatId="sessionSummaryFooter"/>
+    </core:elements>
+    <core:includedTemplateUrl>Pos/CashManagement/CashManagementCommonColumnDefs30</core:includedTemplateUrl>
+    <core:includedTemplateUrl>Pos/CashManagement/SessionSummaryPrintTemplate</core:includedTemplateUrl>
+    <core:formatEntry id="separator">
+        <core:elements>
+            <core:lineElement>
+                <core:text>------------------------------</core:text>
+            </core:lineElement>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="tenderItem">
+        <core:elements>
+            <core:row visibility="#{cMSessionSummary[item.tenderId].countedValue != 0 || cMSessionSummary[item.tenderId].expectedValue != 0 || cMSessionSummary[item.tenderId].countedQuantity != 0 || cMSessionSummary[item.tenderId].expectedQuantity != 0 || item.isTrackedItem &amp;&amp; size(cMSessionSummary[item.tenderId].mismatchedTrackedItems) &gt; 0}">
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="Description" id="1">
+                            <core:elements>
+<core:text>
+    <core:text>#{item.description}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="AmountSubLine" id="3">
+                            <core:elements>
+<core:text visibility="#{item.enterByQuantity}">
+    <core:text>#{cMSessionSummary[item.tenderId].countedQuantity}</core:text>
+</core:text>
+<core:text visibility="#{!item.enterByQuantity}">
+    <core:formatters>
+        <core:formatCurrencyAmount currencyId="#{cMSessionSummary[item.tenderId].currencyKey.currencyId}"/>
+    </core:formatters>
+    <core:text>#{cMSessionSummary[item.tenderId].countedValue}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="SubDescription" id="2">
+                            <core:elements>
+<core:text messageId="EXPECTED_VALUE"/>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="AmountSubLine" id="3">
+                            <core:elements>
+<core:text visibility="#{item.enterByQuantity}">
+    <core:text>#{cMSessionSummary[item.tenderId].expectedQuantity}</core:text>
+</core:text>
+<core:text visibility="#{!item.enterByQuantity}">
+    <core:formatters>
+        <core:formatCurrencyAmount currencyId="#{cMSessionSummary[item.tenderId].currencyKey.currencyId}"/>
+    </core:formatters>
+    <core:text>#{cMSessionSummary[item.tenderId].expectedValue}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="SubDescription" id="2">
+                            <core:elements>
+<core:text messageId="DISCREPANCY_VALUE"/>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="AmountSubLine" id="3">
+                            <core:elements>
+<core:text visibility="#{item.enterByQuantity}">
+    <core:text>#{cMSessionSummary[item.tenderId].discrepancyQuantity}</core:text>
+</core:text>
+<core:text visibility="#{!item.enterByQuantity}">
+    <core:formatters>
+        <core:formatCurrencyAmount currencyId="#{cMSessionSummary[item.tenderId].currencyKey.currencyId}"/>
+    </core:formatters>
+    <core:text>#{cMSessionSummary[item.tenderId].discrepancyValue}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+            <core:formatElement applicability="#{item.isTrackedItem &amp;&amp; size(cMSessionSummary[item.tenderId].mismatchedTrackedItems) &gt; 0}" formatId="trackedItemsList"/>
+            <core:row visibility="#{cMSessionSummary[item.tenderId].countedValue != 0 || cMSessionSummary[item.tenderId].expectedValue != 0 || cMSessionSummary[item.tenderId].countedQuantity != 0 || cMSessionSummary[item.tenderId].expectedQuantity != 0 || item.isTrackedItem &amp;&amp; size(cMSessionSummary[item.tenderId].mismatchedTrackedItems) &gt; 0}">
+                <core:rowLine>
+                    <core:elements/>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="tenderItemsTotal">
+        <core:elements>
+            <core:row>
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="Description">
+                            <core:elements>
+<core:text messageId="TOTAL" id="1"/>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="AmountSubLine">
+                            <core:elements>
+<core:text>
+    <core:formatters>
+        <core:formatCurrencyAmount currencyId="#{cMSessionSummaryItem.currencyKey.currencyId}"/>
+    </core:formatters>
+    <core:text>#{cMSessionSummaryItem.countedValue}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine>
+                    <core:elements>
+                        <core:lineElement/>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="SubDescription" id="2">
+                            <core:elements>
+<core:text messageId="EXPECTED_VALUE"/>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="AmountSubLine">
+                            <core:elements>
+<core:text>
+    <core:formatters>
+        <core:formatCurrencyAmount currencyId="#{cMSessionSummaryItem.currencyKey.currencyId}"/>
+    </core:formatters>
+    <core:text>#{cMSessionSummaryItem.expectedValue}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine>
+                    <core:elements>
+                        <core:lineElement/>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="SubDescription">
+                            <core:elements>
+<core:text messageId="DISCREPANCY_VALUE"/>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="AmountSubLine">
+                            <core:elements>
+<core:text>
+    <core:formatters>
+        <core:formatCurrencyAmount currencyId="#{cMSessionSummaryItem.currencyKey.currencyId}"/>
+    </core:formatters>
+    <core:text>#{cMSessionSummaryItem.countedValue - cMSessionSummaryItem.expectedValue}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine>
+                    <core:elements>
+                        <core:lineElement/>
+                        <core:formatElement formatId="summaryFooter"/>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="trackedItem">
+        <core:elements>
+            <core:row>
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="Reference">
+                            <core:elements>
+<core:text>
+    <core:text>#{trackedItem.reference}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="Status">
+                            <core:elements>
+<core:text messageId="TRACKED_ITEM_STATUS_EXPECTED" visibility="#{!trackedItem.newEntry}"/>
+<core:text messageId="TRACKED_ITEM_STATUS_COUNTED" visibility="#{trackedItem.newEntry}"/>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="SubAmountSubLine">
+                            <core:elements>
+<core:text>
+    <core:formatters>
+        <core:formatCurrencyAmount currencyId="#{cMSessionSummary[item.tenderId].currencyKey.currencyId}"/>
+    </core:formatters>
+    <core:text>#{trackedItem.value}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+</core:documentTemplate>

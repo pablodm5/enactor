@@ -1,0 +1,421 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<core:documentTemplate xmlns:core="http://www.enactor.com/core" xmlns:retail="http://www.enactor.com/retail" xmlns:ns4="http://www.enactor.com/crm" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803" xmlns:ns6="http://www.apis-it.hr/fin/2012/types/f73" xmlns:ns7="http://www.w3.org/2000/09/xmldsig#" xmlns:ns8="http://www.enactor.com/retail/storedRetailTransaction/service" xmlns:ns9="http://www.fu.gov.si/" xmlns:ns10="http://www.enactor.com/addressLookup/service" xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:ns14="http://www.enactor.com/crm/customerLoyalty/service" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" paginated="false" messageBase="Pos/CashManagement/CashManagementMessages" title="Session Summary" url="Pos/CashManagement/SessionSummaryPrintTemplate">
+    <core:elements/>
+    <core:variables>
+        <core:variable required="true" name="enactor.cashManagement.CMTransaction">
+            <core:interfaceName>com.enactor.cashManagement.entities.ICMTransaction</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.mfc.Location">
+            <core:interfaceName>com.enactor.mfc.location.IStore</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.mfc.PosTerminal">
+            <core:interfaceName>com.enactor.mfc.posTerminal.IPOSTerminal</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.cashManagement.CMSessionSummary">
+            <core:interfaceName>java.util.Map</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.cashManagement.CMSessionSummaryItem">
+            <core:interfaceName>com.enactor.cashManagement.listElements.ICMSessionSummaryListElement</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.cashManagement.TendersList">
+            <core:interfaceName>java.util.List</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="item">
+            <core:interfaceName>com.enactor.cashManagement.listElements.ITenderListElement</core:interfaceName>
+        </core:variable>
+    </core:variables>
+    <core:includedTemplateUrl>Pos/CashManagement/Catalog/CashManagementFormatEntryCatalog</core:includedTemplateUrl>
+    <core:formatEntry id="lineBreak">
+        <core:elements>
+            <core:lineElement id="LineBreakLine"/>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="pageBreak">
+        <core:elements>
+            <core:page number="0" id="PageBreakPage"/>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="tenderItemsList">
+        <core:elements>
+            <core:tableTemplate list="#{tendersList}" id="Items">
+                <core:formatElement formatId="tenderItem"/>
+            </core:tableTemplate>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="tenderItem">
+        <core:elements>
+            <core:row visibility="#{cMSessionSummary[item.tenderId].countedValue != 0 || cMSessionSummary[item.tenderId].expectedValue != 0 || cMSessionSummary[item.tenderId].countedQuantity != 0 || cMSessionSummary[item.tenderId].expectedQuantity != 0 || item.isTrackedItem &amp;&amp; size(cMSessionSummary[item.tenderId].mismatchedTrackedItems) &gt; 0}" id="TenderItemRow">
+                <core:rowLine id="TenderItemRowLine">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="Description" id="TenderItemDescriptionColumn">
+                            <core:elements>
+<core:text id="TenderItemDescription">
+    <core:text>#{item.description}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="Amount" id="TenderItemAmount">
+                            <core:elements>
+<core:text visibility="#{item.enterByQuantity}" id="TenderItemCountedQuantity">
+    <core:text>#{cMSessionSummary[item.tenderId].countedQuantity}</core:text>
+</core:text>
+<core:text visibility="#{!item.enterByQuantity}" id="TenderItemCurrencyId">
+    <core:formatters>
+        <core:formatCurrencyAmount currencyId="#{cMSessionSummary[item.tenderId].currencyKey.currencyId}"/>
+    </core:formatters>
+    <core:text>#{cMSessionSummary[item.tenderId].countedValue}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine id="TenderItemExpectedValueRowLine">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="SubDescription" id="TenderItemExpectedValueLabel">
+                            <core:elements>
+<core:text messageId="EXPECTED_VALUE" id="TenderItemExpectedValueLabelText"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="Amount" id="TenderItemExpectedQuantityColumn">
+                            <core:elements>
+<core:text visibility="#{item.enterByQuantity}" id="TenderItemExpectedQuantity">
+    <core:text>#{cMSessionSummary[item.tenderId].expectedQuantity}</core:text>
+</core:text>
+<core:text visibility="#{!item.enterByQuantity}" id="TenderItemExpectedValue">
+    <core:formatters>
+        <core:formatCurrencyAmount currencyId="#{cMSessionSummary[item.tenderId].currencyKey.currencyId}"/>
+    </core:formatters>
+    <core:text>#{cMSessionSummary[item.tenderId].expectedValue}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine id="TenderItemDiscrepancyValueRowLine">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="SubDescription" id="TenderItemDiscrepancyValueLabel">
+                            <core:elements>
+<core:text messageId="DISCREPANCY_VALUE" id="TenderItemDiscrepancyValueLabelText"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="Amount" id="TenderItemDiscrepancyQuantityColumn">
+                            <core:elements>
+<core:text visibility="#{item.enterByQuantity}" id="TenderItemDiscrepancyQuantity">
+    <core:text>#{cMSessionSummary[item.tenderId].discrepancyQuantity}</core:text>
+</core:text>
+<core:text visibility="#{!item.enterByQuantity}" id="TenderItemDiscrepancyValue">
+    <core:formatters>
+        <core:formatCurrencyAmount currencyId="#{cMSessionSummary[item.tenderId].currencyKey.currencyId}"/>
+    </core:formatters>
+    <core:text>#{cMSessionSummary[item.tenderId].discrepancyValue}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+            <core:formatElement applicability="#{item.isTrackedItem &amp;&amp; size(cMSessionSummary[item.tenderId].mismatchedTrackedItems) &gt; 0}" formatId="trackedItemsList"/>
+            <core:row visibility="#{cMSessionSummary[item.tenderId].countedValue != 0 || cMSessionSummary[item.tenderId].expectedValue != 0 || cMSessionSummary[item.tenderId].countedQuantity != 0 || cMSessionSummary[item.tenderId].expectedQuantity != 0 || item.isTrackedItem &amp;&amp; size(cMSessionSummary[item.tenderId].mismatchedTrackedItems) &gt; 0}" id="MismatchedTrackedItemsRow">
+                <core:rowLine id="MismatchedTrackedItemsRowLine">
+                    <core:elements/>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="trackedItemsList">
+        <core:elements>
+            <core:tableTemplate listVariableName="trackedItem" list="#{cMSessionSummary[item.tenderId].mismatchedTrackedItems}" id="TrackedItems">
+                <core:formatElement formatId="trackedItem"/>
+            </core:tableTemplate>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="trackedItem">
+        <core:elements>
+            <core:row id="TrackedItemRow">
+                <core:rowLine id="TrackedItemRowLine">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="Reference" id="TrackedItemReferenceColumn">
+                            <core:elements>
+<core:text id="TrackedItemReferenceText">
+    <core:text>#{trackedItem.reference}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="Status">
+                            <core:elements>
+<core:text messageId="TRACKED_ITEM_STATUS_EXPECTED" visibility="#{!trackedItem.newEntry}" id="TrackedItemStatusExpected"/>
+<core:text messageId="TRACKED_ITEM_STATUS_COUNTED" visibility="#{trackedItem.newEntry}" id="TrackedItemStatusCounted"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="SubAmount" id="TrackedItemValueColumn">
+                            <core:elements>
+<core:text id="TrackedItemValueText">
+    <core:formatters>
+        <core:formatCurrencyAmount currencyId="#{cMSessionSummary[item.tenderId].currencyKey.currencyId}"/>
+    </core:formatters>
+    <core:text>#{trackedItem.value}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="tenderItemsTotal">
+        <core:elements>
+            <core:line id="CountedTenderValueLine">
+                <core:elements>
+                    <core:column maxLines="0" columnDefId="Description" id="TenderItemsTotalLabel">
+                        <core:elements>
+                            <core:text messageId="TOTAL" id="TenderItemsTotalLabelText"/>
+                        </core:elements>
+                    </core:column>
+                    <core:column maxLines="0" columnDefId="Amount" id="TenderItemsCountedValueColumn">
+                        <core:elements>
+                            <core:text id="TenderItemsCountedValueText">
+<core:formatters>
+    <core:formatCurrencyAmount currencyId="#{cMSessionSummaryItem.currencyKey.currencyId}"/>
+</core:formatters>
+<core:text>#{cMSessionSummaryItem.countedValue}</core:text>
+                            </core:text>
+                        </core:elements>
+                    </core:column>
+                </core:elements>
+            </core:line>
+            <core:line id="ExpectedTenderValueLine">
+                <core:elements>
+                    <core:column maxLines="0" columnDefId="SubDescription" id="ExpectedTenderValueLabel">
+                        <core:elements>
+                            <core:text messageId="EXPECTED_VALUE" id="ExpectedTenderValueLabelText"/>
+                        </core:elements>
+                    </core:column>
+                    <core:column maxLines="0" columnDefId="Amount" id="ExpectedTenderValueColumn">
+                        <core:elements>
+                            <core:text id="ExpectedTenderValueText">
+<core:formatters>
+    <core:formatCurrencyAmount currencyId="#{cMSessionSummaryItem.currencyKey.currencyId}"/>
+</core:formatters>
+<core:text>#{cMSessionSummaryItem.expectedValue}</core:text>
+                            </core:text>
+                        </core:elements>
+                    </core:column>
+                </core:elements>
+            </core:line>
+            <core:line id="DiscrepancyTenderValueLine">
+                <core:elements>
+                    <core:column maxLines="0" columnDefId="SubDescription" id="DiscrepancyTenderValueLabel">
+                        <core:elements>
+                            <core:text messageId="DISCREPANCY_VALUE" id="DiscrepancyTenderValueLabelText"/>
+                        </core:elements>
+                    </core:column>
+                    <core:column maxLines="0" columnDefId="Amount" id="DiscrepancyTenderValueColumn">
+                        <core:elements>
+                            <core:text id="DiscrepancyTenderValue">
+<core:formatters>
+    <core:formatCurrencyAmount currencyId="#{cMSessionSummaryItem.currencyKey.currencyId}"/>
+</core:formatters>
+<core:text>#{cMSessionSummaryItem.countedValue - cMSessionSummaryItem.expectedValue}</core:text>
+                            </core:text>
+                        </core:elements>
+                    </core:column>
+                </core:elements>
+            </core:line>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="summaryHeader">
+        <core:elements>
+            <core:formatElement formatId="headerLogo" visible="false"/>
+            <core:formatElement applicability="#{cMTransaction.trainingMode}" formatId="cashManagementTrainingModeHeader"/>
+            <core:formatElement applicability="#{cMTransaction.isVoided}" formatId="cashManagementVoidedHeader"/>
+            <core:formatElement formatId="cashManagementTransactionHeader"/>
+            <core:formatElement formatId="cashManagementOwner"/>
+            <core:formatElement applicability="#{(instanceOf(cMTransaction, 'com.enactor.cashManagement.entities.ITerminalReasonTransaction') || instanceOf(cMTransaction, 'com.enactor.cashManagement.entities.ISafeReasonTransaction')) &amp;&amp; notEmpty(cMTransaction.reference)}" formatId="cashManagementReference"/>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="sessionSummaryHeader">
+        <core:elements>
+            <core:formatElement formatId="headerLogo" visible="false"/>
+            <core:formatElement applicability="#{cMTransaction.trainingMode}" formatId="cashManagementTrainingModeHeader"/>
+            <core:formatElement applicability="#{cMTransaction.isVoided}" formatId="cashManagementVoidedHeader"/>
+            <core:formatElement formatId="cashManagementTransactionHeader"/>
+            <core:formatElement formatId="cashManagementOwner"/>
+            <core:formatElement applicability="#{(instanceOf(cMTransaction, 'com.enactor.cashManagement.entities.ITerminalReasonTransaction') || instanceOf(cMTransaction, 'com.enactor.cashManagement.entities.ISafeReasonTransaction')) &amp;&amp; notEmpty(cMTransaction.reference)}" formatId="cashManagementReference"/>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="cashManagementTrainingModeHeader">
+        <core:elements>
+            <core:line id="CashManagementTrainingModeHeaderLine">
+                <core:elements>
+                    <core:column maxLines="0" columnDefId="FullCentre" id="TrainingModeHeaderLabel">
+                        <core:elements>
+                            <core:text messageId="TRAINING_MODE_HEADING" id="TrainingModeHeaderLabelText"/>
+                        </core:elements>
+                    </core:column>
+                </core:elements>
+            </core:line>
+            <core:formatElement formatId="separator"/>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="cashManagementVoidedHeader">
+        <core:elements>
+            <core:line id="CashManagementVoidedHeaderLine">
+                <core:elements>
+                    <core:column maxLines="0" columnDefId="FullCentre" id="VoidedHeaderLabel">
+                        <core:elements>
+                            <core:text messageId="VOIDED_HEADING" id="VoidedHeaderText"/>
+                        </core:elements>
+                    </core:column>
+                </core:elements>
+            </core:line>
+            <core:formatElement formatId="separator"/>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="cashManagementTransactionHeader">
+        <core:elements>
+            <core:line id="CashManagementTransactionHeaderLine">
+                <core:elements>
+                    <core:column maxLines="0" columnDefId="FullCentre" id="CashManagementTransactionHeadings">
+                        <core:elements>
+                            <core:text messageId="SAFE_CASHUP_HEADING" visibility="#{cMTransaction.transactionType == 'SafeCashup'}" id="SafeCashupHeadingText"/>
+                            <core:text messageId="SAFE_FINALISE_HEADING" visibility="#{cMTransaction.transactionType == 'SafeFinalise'}" id="SafeFinaliseHeadingText"/>
+                            <core:text messageId="SAFE_SPOT_CHECK_HEADING" visibility="#{cMTransaction.transactionType == 'SafeSpotCheck'}" id="SafeSpotCheckHeadingText"/>
+                            <core:text messageId="TERMINAL_CASHUP_AND_EMPTY_HEADING" visibility="#{cMTransaction.transactionType == 'TerminalCashupAndEmpty'}" id="TerminalCashupAndEmptyHeadingText"/>
+                            <core:text messageId="TERMINAL_CASHUP_AND_LEAVE_HEADING" visibility="#{cMTransaction.transactionType == 'TerminalCashupAndLeave'}" id="TerminalCashupAndLeaveHeadingText"/>
+                            <core:text messageId="TERMINAL_FINALISE_HEADING" visibility="#{cMTransaction.transactionType == 'TerminalFinalise'}" id="TerminalFinaliseHeadingText"/>
+                            <core:text messageId="TERMINAL_SPOT_CHECK_HEADING" visibility="#{cMTransaction.transactionType == 'TerminalSpotCheck'}" id="TerminalSpotCheckHeadingText"/>
+                        </core:elements>
+                    </core:column>
+                </core:elements>
+            </core:line>
+            <core:formatElement formatId="separator"/>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="cashManagementOwner">
+        <core:elements>
+            <core:line id="CashManagementOwnerLine">
+                <core:elements>
+                    <core:column maxLines="0" columnDefId="FullCentre" id="CashManagementOwnerColumn">
+                        <core:elements>
+                            <core:text messageId="#{cMTransaction.ownerKey.type == 2 ? 'CASHIER' : cMTransaction.ownerKey.type == 4 ? 'SAFE' : cMTransaction.ownerKey.type == 5 ? 'PAY_POINT' : 'TERMINAL'}" id="CashManagementOwnerType"/>
+                            <core:text id="CashManagementOwnerEmptySpaceText">
+<core:text> </core:text>
+                            </core:text>
+                            <core:text id="CashManagementOwnerId">
+<core:text>#{cMTransaction.ownerKey.ownerId}</core:text>
+                            </core:text>
+                        </core:elements>
+                    </core:column>
+                </core:elements>
+            </core:line>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="cashManagementReference">
+        <core:elements>
+            <core:line id="CashManagementReferenceLine">
+                <core:elements>
+                    <core:column maxLines="0" columnDefId="FullCentre" id="CashManagementReferenceColumn">
+                        <core:elements>
+                            <core:text messageId="PRINT_REFERENCE" id="CashManagementReferenceLabelText"/>
+                            <core:text id="CashManagementReferenceText">
+<core:text>#{cMTransaction.reference}</core:text>
+                            </core:text>
+                        </core:elements>
+                    </core:column>
+                </core:elements>
+            </core:line>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="sessionSummaryBody">
+        <core:elements>
+            <core:formatElement formatId="tenderItemsList"/>
+            <core:formatElement formatId="tenderItemsTotal"/>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="summaryFooter">
+        <core:elements>
+            <core:formatElement applicability="#{notEmpty(cMTransaction.notes)}" formatId="cashManagementNotes"/>
+            <core:formatElement formatId="separator"/>
+            <core:formatElement formatId="cashManagementTrailerLine"/>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="sessionSummaryFooter">
+        <core:elements>
+            <core:formatElement applicability="#{notEmpty(cMTransaction.notes)}" formatId="cashManagementNotes"/>
+            <core:formatElement formatId="separator"/>
+            <core:formatElement formatId="cashManagementTrailerLine"/>
+            <core:formatElement formatId="pageBreak"/>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="cashManagementNotes">
+        <core:elements>
+            <core:formatElement formatId="separator"/>
+            <core:line id="CashManagementNotesLine">
+                <core:elements>
+                    <core:column maxLines="0" wrap="true" align="LEFT" columnDefId="SubDescription" id="CashManagementNotesColumn">
+                        <core:elements>
+                            <core:text id="CashManagementNotesText">
+<core:text>#{cMTransaction.notes}</core:text>
+                            </core:text>
+                        </core:elements>
+                    </core:column>
+                </core:elements>
+            </core:line>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="cashManagementTrailerLine">
+        <core:elements>
+            <core:line id="CashManagementTrailerLine">
+                <core:elements>
+                    <core:column maxLines="0" columnDefId="FullLeft" id="CashManagementTrailerCreatedDateColumn">
+                        <core:elements>
+                            <core:text id="CashManagementTrailerCreatedDateText">
+<core:formatters>
+    <core:formatDate pattern="shortDateTime"/>
+</core:formatters>
+<core:text>#{cMTransaction.dateCreated}</core:text>
+                            </core:text>
+                        </core:elements>
+                    </core:column>
+                    <core:column maxLines="0" columnDefId="FullCentre" id="CashManagementTrailerAuthorisingUserKeyColumn">
+                        <core:elements>
+                            <core:text id="CashManagementTrailerAuthorisingUserKeyText">
+<core:text>#{(notEmpty(cMTransaction.authorisingUserKey)  &amp;&amp; notEmpty(cMTransaction.authorisingUserKey.userId)) ? cMTransaction.authorisingUserKey.userId : user.userId}</core:text>
+                            </core:text>
+                        </core:elements>
+                    </core:column>
+                    <core:column maxLines="0" columnDefId="FullRight" id="CashManagementTrailerDetailsColumns">
+                        <core:elements>
+                            <core:text id="CashManagementTrailerBranchNumberText">
+<core:text>#{location.branchNumber}</core:text>
+                            </core:text>
+                            <core:text id="CashManagementTrailerEmptySpace1">
+<core:text> </core:text>
+                            </core:text>
+                            <core:text id="CashManagementTrailerTerminalNumber">
+<core:text>#{posTerminal.terminalNumber}</core:text>
+                            </core:text>
+                            <core:text id="CashManagementTrailerEmptySpace2">
+<core:text> </core:text>
+                            </core:text>
+                            <core:text id="CashManagementTrailerTransactionNumber">
+<core:text>#{cMTransaction.transactionNumber}</core:text>
+                            </core:text>
+                        </core:elements>
+                    </core:column>
+                </core:elements>
+            </core:line>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="headerLogo">
+        <core:elements>
+            <core:column maxLines="0" columnDefId="FullCentre" id="HeaderLogo">
+                <core:elements>
+                    <core:imageElement visibility="#{location.receiptHeaderImageKey != null}" id="HeaderImage">
+                        <core:imageKey type="#{location.receiptHeaderImageKey.type}" category="#{location.receiptHeaderImageKey.category}">#{location.receiptHeaderImageKey.imageId}</core:imageKey>
+                    </core:imageElement>
+                </core:elements>
+            </core:column>
+        </core:elements>
+    </core:formatEntry>
+</core:documentTemplate>

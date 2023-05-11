@@ -1,0 +1,863 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<core:simpleActivityFlowBusinessProcess xmlns:core="http://www.enactor.com/core" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803" xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:ns10="tools" xmlns:ns4="http://maven.apache.org/POM/4.0.0" xmlns:retail="http://www.enactor.com/retail" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:tools="http://www.enactor.com/tools">
+    <core:processId>MessageSystem/MessageSystem</core:processId>
+    <core:name>Message System</core:name>
+    <core:description>Message System Business Process</core:description>
+    <core:businessProcessTypeId>MessageSystem/MessageSystemBusinessProcessType</core:businessProcessTypeId>
+    <core:startPrivilege>enactor.messageSystem.Run</core:startPrivilege>
+    <core:administerPrivilege>enactor.messageSystem.Admin</core:administerPrivilege>
+    <core:deprecated>false</core:deprecated>
+    <core:metaData>
+        <core:inputs>
+            <core:input required="true" name="enactor.messageSystem.MessageText">
+                <core:interfaceName>java.lang.String</core:interfaceName>
+            </core:input>
+            <core:input required="true" name="enactor.messageSystem.Sender">
+                <core:interfaceName>com.enactor.mfc.user.IUserKey</core:interfaceName>
+            </core:input>
+        </core:inputs>
+    </core:metaData>
+    <core:uiSettings xsi:type="tools:BusinessProcessSettings" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <core:constraint xsi:type="core:UIPositionConstraint">
+            <core:x>14</core:x>
+            <core:y>26</core:y>
+        </core:constraint>
+        <tools:swimLanes>
+            <tools:lane label="Create Message" height="278" id="Lane 1"/>
+            <tools:lane label="Message Distribution" height="243" id="Lane 2"/>
+            <tools:lane label="Read Messages" height="333" id="Lane 3"/>
+        </tools:swimLanes>
+        <tools:notes xsi:type="core:WrappedNull"/>
+        <tools:style>61</tools:style>
+    </core:uiSettings>
+    <core:activities xsi:type="core:WrappedList" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <core:listElement>
+            <core:value xsi:type="core:HTActivity">
+                <core:activityId>CreateMessage</core:activityId>
+                <core:name>Create message</core:name>
+                <core:description>Create message</core:description>
+                <core:activityTypeId>MessageSystem/CreateMessageActivityType</core:activityTypeId>
+                <core:activityOutcome name="OK">
+                    <core:toActivity>SelectRoles</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:activityOutcome name="Direct">
+                    <core:toActivity>SendToAllUsers</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:suspendActivityOutcome name="Suspend">
+                    <core:toActivity>CreateMessage</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:suspendActivityOutcome>
+                <core:activityOutcome name="Cancel">
+                    <core:toActivity>CancelAndDiscard</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:catchAllOutcome xsi:type="core:ActivityOutcome" name="Error">
+                    <core:toActivity>CreateMessageError</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:catchAllOutcome>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>216</core:x>
+                        <core:y>197</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 1</tools:swimLaneId>
+                </core:uiSettings>
+                <core:metaData>
+                    <core:inputs>
+                        <core:input required="true" name="enactor.messageSystem.MessageText">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.messageSystem.Urgent">
+                            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.messageSystem.RequestConfirmation">
+                            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.messageSystem.RequestReply">
+                            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.messageSystem.Deadline">
+                            <core:interfaceName>java.util.Date</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.messageSystem.Sender">
+                            <core:interfaceName>com.enactor.mfc.user.IUserKey</core:interfaceName>
+                        </core:input>
+                    </core:inputs>
+                    <core:outputs>
+                        <core:output required="true" name="enactor.messageSystem.MessageText">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:output>
+                        <core:output required="true" name="enactor.messageSystem.Urgent">
+                            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                        </core:output>
+                        <core:output required="true" name="enactor.messageSystem.RequestConfirmation">
+                            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                        </core:output>
+                        <core:output required="true" name="enactor.messageSystem.RequestReply">
+                            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                        </core:output>
+                        <core:output required="true" name="enactor.messageSystem.Deadline">
+                            <core:interfaceName>java.util.Date</core:interfaceName>
+                        </core:output>
+                        <core:output required="true" name="enactor.messageSystem.Sender">
+                            <core:interfaceName>com.enactor.mfc.user.IUserKey</core:interfaceName>
+                        </core:output>
+                    </core:outputs>
+                </core:metaData>
+                <core:timeoutDuration>P0Y0M3DT0H0M</core:timeoutDuration>
+                <core:jobType>Messaging</core:jobType>
+                <core:jobHeader>Create Message</core:jobHeader>
+                <core:jobDescription>Create Message</core:jobDescription>
+                <core:displayDescriptionMessageBase>MessageSystem/MessageSystemMessages</core:displayDescriptionMessageBase>
+                <core:displayDescriptionMessageId>CREATE_OR_EDIT_MESSAGE_TITLE</core:displayDescriptionMessageId>
+                <core:displayTitleMessageBase>MessageSystem/MessageSystemMessages</core:displayTitleMessageBase>
+                <core:displayTitleMessageId>CREATE_OR_EDIT_MESSAGE_TITLE</core:displayTitleMessageId>
+                <core:priority>5</core:priority>
+                <core:peopleGroupEvaluator>{http://www.enactor.com/task}SimpleUserEvaluator</core:peopleGroupEvaluator>
+            </core:value>
+            <core:index>0</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:EndProcessActivity">
+                <core:activityId>CancelAndDiscard</core:activityId>
+                <core:name>Cancel and Discard</core:name>
+                <core:description>Cancels and discards the process history</core:description>
+                <core:activityTypeId>Generic/EndProcessActivityType</core:activityTypeId>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>554</core:x>
+                        <core:y>27</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 1</tools:swimLaneId>
+                </core:uiSettings>
+                <core:discard>true</core:discard>
+            </core:value>
+            <core:index>1</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:HTActivity">
+                <core:activityId>SelectRoles</core:activityId>
+                <core:name>Select Roles</core:name>
+                <core:description>Select Roles</core:description>
+                <core:activityTypeId>Role/SelectRolesActivityType</core:activityTypeId>
+                <core:activityOutcome name="Cancel">
+                    <core:toActivity>CancelAndDiscard</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:activityOutcome name="OK">
+                    <core:toActivity>SelectLocations</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:activityOutcome name="Back">
+                    <core:toActivity>CreateMessage</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:suspendActivityOutcome name="Suspend">
+                    <core:toActivity>SelectRoles</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:suspendActivityOutcome>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>430</core:x>
+                        <core:y>195</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 1</tools:swimLaneId>
+                </core:uiSettings>
+                <core:metaData>
+                    <core:inputs>
+                        <core:input required="true" name="enactor.mfc.RoleKeys">
+                            <core:interfaceName>java.util.List</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.mfc.AllRoles">
+                            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                        </core:input>
+                    </core:inputs>
+                    <core:outputs>
+                        <core:output required="true" name="enactor.mfc.RoleKeys">
+                            <core:interfaceName>java.util.List</core:interfaceName>
+                        </core:output>
+                        <core:output required="true" name="enactor.mfc.AllRoles">
+                            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                        </core:output>
+                    </core:outputs>
+                </core:metaData>
+                <core:jobType>Messaging</core:jobType>
+                <core:jobHeader>Select Roles</core:jobHeader>
+                <core:jobDescription>Select Roles</core:jobDescription>
+                <core:priority>5</core:priority>
+                <core:peopleGroupEvaluator>{http://www.enactor.com/task}SimpleUserEvaluator</core:peopleGroupEvaluator>
+                <core:peopleGroupParameters>
+                    <core:parameter required="true" name="userId">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>#{sender.userId}</core:value>
+                    </core:parameter>
+                </core:peopleGroupParameters>
+            </core:value>
+            <core:index>2</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:HTActivity">
+                <core:activityId>SelectLocations</core:activityId>
+                <core:name>Select Locations</core:name>
+                <core:description>Select Locations</core:description>
+                <core:activityTypeId>Location/SelectLocationsActivityType</core:activityTypeId>
+                <core:activityOutcome name="OK">
+                    <core:toActivity>SendToAllUsers</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:activityOutcome name="Cancel">
+                    <core:toActivity>CancelAndDiscard</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:activityOutcome name="Back">
+                    <core:toActivity>SelectRoles</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:suspendActivityOutcome name="Suspend">
+                    <core:toActivity>SelectLocations</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:suspendActivityOutcome>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>637</core:x>
+                        <core:y>199</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 1</tools:swimLaneId>
+                </core:uiSettings>
+                <core:jobType>Messaging</core:jobType>
+                <core:jobHeader>Select Locations</core:jobHeader>
+                <core:jobDescription>Select Locations</core:jobDescription>
+                <core:priority>5</core:priority>
+                <core:peopleGroupEvaluator>{http://www.enactor.com/task}SimpleUserEvaluator</core:peopleGroupEvaluator>
+                <core:peopleGroupParameters>
+                    <core:parameter required="true" name="userId">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>#{sender.userId}</core:value>
+                    </core:parameter>
+                </core:peopleGroupParameters>
+            </core:value>
+            <core:index>3</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:HTActivity">
+                <core:activityId>SendToAllUsers</core:activityId>
+                <core:name>Send To All Users</core:name>
+                <core:description>Send To All Users</core:description>
+                <core:activityTypeId>Generic/YesNoTaskActivityType</core:activityTypeId>
+                <core:activityOutcome name="Yes">
+                    <core:toActivity>GenerateMessagesForAllUsers</core:toActivity>
+                    <core:proceedImmediately>false</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:activityOutcome name="No">
+                    <core:toActivity>GenerateMessages</core:toActivity>
+                    <core:proceedImmediately>false</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:suspendActivityOutcome name="Suspend">
+                    <core:toActivity>SendToAllUsers</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:suspendActivityOutcome>
+                <core:activityOutcome name="Cancel">
+                    <core:toActivity>CancelAndDiscard</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:parameters>
+                    <core:parameter required="true" name="enactor.task.maintenance.Message">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>Distribute the message to all matching users</core:value>
+                    </core:parameter>
+                    <core:parameter required="true" name="enactor.task.maintenance.MessageTitle">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>Distribution Strategy</core:value>
+                    </core:parameter>
+                </core:parameters>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>827</core:x>
+                        <core:y>201</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 1</tools:swimLaneId>
+                </core:uiSettings>
+                <core:jobType>Messaging</core:jobType>
+                <core:jobHeader>Send To All Users</core:jobHeader>
+                <core:jobDescription>Send To All Users</core:jobDescription>
+                <core:priority>5</core:priority>
+                <core:peopleGroupEvaluator>{http://www.enactor.com/task}SimpleUserEvaluator</core:peopleGroupEvaluator>
+                <core:peopleGroupParameters>
+                    <core:parameter required="true" name="userId">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>#{sender.userId}</core:value>
+                    </core:parameter>
+                </core:peopleGroupParameters>
+            </core:value>
+            <core:index>4</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:CallProcessActivity">
+                <core:activityId>GenerateMessages</core:activityId>
+                <core:name>Generate Message</core:name>
+                <core:activityTypeId>MessageSystem/GenerateMessagesActivityType</core:activityTypeId>
+                <core:activityOutcome name="Fail">
+                    <core:toActivity>NotifyFail</core:toActivity>
+                    <core:proceedImmediately>false</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:activityOutcome name="Success">
+                    <core:toActivity>NotifySuccess</core:toActivity>
+                    <core:proceedImmediately>false</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:activityOutcome name="GenerateMessage">
+                    <core:toActivity>NullActionEntryPoint</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>1049</core:x>
+                        <core:y>10</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 2</tools:swimLaneId>
+                </core:uiSettings>
+            </core:value>
+            <core:index>5</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:CallProcessActivity">
+                <core:activityId>GenerateMessagesForAllUsers</core:activityId>
+                <core:name>Generate Messages for all Users</core:name>
+                <core:activityTypeId>MessageSystem/GenerateMessagesForAllUsersActivityType</core:activityTypeId>
+                <core:activityOutcome name="Success">
+                    <core:toActivity>NotifySuccess</core:toActivity>
+                    <core:proceedImmediately>false</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:activityOutcome name="Fail">
+                    <core:toActivity>NotifyFail</core:toActivity>
+                    <core:proceedImmediately>false</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:activityOutcome name="GenerateMessage">
+                    <core:toActivity>NullActionEntryPoint</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>1269</core:x>
+                        <core:y>13</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 2</tools:swimLaneId>
+                </core:uiSettings>
+            </core:value>
+            <core:index>6</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:EndProcessActivity">
+                <core:activityId>MessageDistributionComplete</core:activityId>
+                <core:name>Message Distribution Complete</core:name>
+                <core:activityTypeId>Generic/EndProcessActivityType</core:activityTypeId>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>1425</core:x>
+                        <core:y>39</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 1</tools:swimLaneId>
+                </core:uiSettings>
+                <core:discard>false</core:discard>
+            </core:value>
+            <core:index>7</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:HTActivity">
+                <core:activityId>NotifySuccess</core:activityId>
+                <core:name>Notify Success</core:name>
+                <core:activityTypeId>Generic/ClickOnlyTaskActivityType</core:activityTypeId>
+                <core:activityOutcome name="OK">
+                    <core:toActivity>MessageDistributionComplete</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>1291</core:x>
+                        <core:y>208</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 1</tools:swimLaneId>
+                </core:uiSettings>
+                <core:jobType>Messaging</core:jobType>
+                <core:jobHeader>Distribution Completed</core:jobHeader>
+                <core:jobDescription>Message distribution completed successfully</core:jobDescription>
+                <core:priority>5</core:priority>
+                <core:peopleGroupEvaluator>{http://www.enactor.com/task}SimpleUserEvaluator</core:peopleGroupEvaluator>
+                <core:peopleGroupParameters>
+                    <core:parameter required="true" name="userId">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>#{sender.userId}</core:value>
+                    </core:parameter>
+                </core:peopleGroupParameters>
+            </core:value>
+            <core:index>8</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:HTActivity">
+                <core:activityId>NotifyFail</core:activityId>
+                <core:name>Notify Fail</core:name>
+                <core:activityTypeId>Generic/ClickOnlyTaskActivityType</core:activityTypeId>
+                <core:activityOutcome name="OK">
+                    <core:toActivity>MessageDistributionComplete</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>1532</core:x>
+                        <core:y>208</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 1</tools:swimLaneId>
+                </core:uiSettings>
+                <core:jobType>Messaging</core:jobType>
+                <core:jobHeader>Distribution Failed</core:jobHeader>
+                <core:jobDescription>Message distribution failed</core:jobDescription>
+                <core:priority>5</core:priority>
+                <core:peopleGroupEvaluator>{http://www.enactor.com/task}SimpleUserEvaluator</core:peopleGroupEvaluator>
+                <core:peopleGroupParameters>
+                    <core:parameter required="true" name="userId">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>#{sender.userId}</core:value>
+                    </core:parameter>
+                </core:peopleGroupParameters>
+            </core:value>
+            <core:index>9</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:HTActivity">
+                <core:activityId>ReadMessage</core:activityId>
+                <core:name>Read Message</core:name>
+                <core:activityTypeId>MessageSystem/ReadMessageActivityType</core:activityTypeId>
+                <core:activityOutcome name="Done">
+                    <core:toActivity>NeedConfirmation</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:activityOutcome name="Reply">
+                    <core:toActivity>ReplyMessage</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:suspendActivityOutcome name="Suspend">
+                    <core:toActivity>ReadMessage</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:suspendActivityOutcome>
+                <core:activityOutcome name="Timeout">
+                    <core:toActivity>NotifyTimeout</core:toActivity>
+                    <core:proceedImmediately>false</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>1495</core:x>
+                        <core:y>41</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 3</tools:swimLaneId>
+                </core:uiSettings>
+                <core:metaData>
+                    <core:inputs>
+                        <core:input required="true" name="enactor.messageSystem.MessageText">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.messageSystem.Sender">
+                            <core:interfaceName>com.enactor.mfc.user.IUserKey</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.messageSystem.RequestReply">
+                            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.messageSystem.RequestConfirmation">
+                            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                        </core:input>
+                    </core:inputs>
+                </core:metaData>
+                <core:jobType>Messaging</core:jobType>
+                <core:jobHeader>Read Message</core:jobHeader>
+                <core:jobDescription>Read Message</core:jobDescription>
+                <core:priority>5</core:priority>
+                <core:peopleGroupEvaluator>{http://www.enactor.com/messageSystem}MessageRecipientEvaluator</core:peopleGroupEvaluator>
+                <core:peopleGroupParameters>
+                    <core:parameter name="userId">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>#{recipient.userId}</core:value>
+                    </core:parameter>
+                </core:peopleGroupParameters>
+            </core:value>
+            <core:index>10</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:HTActivity">
+                <core:activityId>ReplyMessage</core:activityId>
+                <core:activityTypeId>MessageSystem/ReplyMessageActivityType</core:activityTypeId>
+                <core:activityOutcome name="Done">
+                    <core:toActivity>ReadReply</core:toActivity>
+                    <core:proceedImmediately>false</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:suspendActivityOutcome name="Suspend">
+                    <core:toActivity>ReplyMessage</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:suspendActivityOutcome>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>1853</core:x>
+                        <core:y>36</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 3</tools:swimLaneId>
+                </core:uiSettings>
+                <core:metaData>
+                    <core:inputs>
+                        <core:input required="true" name="enactor.messageSystem.MessageText">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.messageSystem.Sender">
+                            <core:interfaceName>com.enactor.mfc.user.IUserKey</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.messageSystem.Recipient">
+                            <core:interfaceName>com.enactor.mfc.user.IUserKey</core:interfaceName>
+                        </core:input>
+                    </core:inputs>
+                    <core:outputs>
+                        <core:output required="true" name="enactor.messageSystem.ReplyMessageText">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:output>
+                    </core:outputs>
+                </core:metaData>
+                <core:jobType>Messaging</core:jobType>
+                <core:jobHeader>Reply Message</core:jobHeader>
+                <core:jobDescription>Reply message</core:jobDescription>
+                <core:priority>5</core:priority>
+                <core:peopleGroupEvaluator>{http://www.enactor.com/task}SimpleUserEvaluator</core:peopleGroupEvaluator>
+                <core:peopleGroupParameters>
+                    <core:parameter required="true" name="userId">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>#{recipient.userId}</core:value>
+                    </core:parameter>
+                </core:peopleGroupParameters>
+            </core:value>
+            <core:index>11</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:HTActivity">
+                <core:activityId>NotifyTimeout</core:activityId>
+                <core:name>Timeout Notification</core:name>
+                <core:activityTypeId>MessageSystem/MessageTimeoutNotificationActivityType</core:activityTypeId>
+                <core:activityOutcome name="OK">
+                    <core:toActivity>EndAfterFeedback</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:suspendActivityOutcome name="Suspend">
+                    <core:toActivity>NotifyTimeout</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:suspendActivityOutcome>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>2273</core:x>
+                        <core:y>207</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 1</tools:swimLaneId>
+                </core:uiSettings>
+                <core:jobType>Messaging</core:jobType>
+                <core:jobHeader>Message Timeout</core:jobHeader>
+                <core:jobDescription>Message was not read on time</core:jobDescription>
+                <core:priority>5</core:priority>
+                <core:peopleGroupEvaluator>{http://www.enactor.com/task}SimpleUserEvaluator</core:peopleGroupEvaluator>
+                <core:peopleGroupParameters>
+                    <core:parameter required="true" name="userId">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>#{sender.userId}</core:value>
+                    </core:parameter>
+                </core:peopleGroupParameters>
+            </core:value>
+            <core:index>12</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:HTActivity">
+                <core:activityId>ReadReply</core:activityId>
+                <core:name>Read Reply</core:name>
+                <core:activityTypeId>MessageSystem/ReadReplyActivityType</core:activityTypeId>
+                <core:suspendActivityOutcome name="Suspend">
+                    <core:toActivity>ReadReply</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:suspendActivityOutcome>
+                <core:activityOutcome name="Done">
+                    <core:toActivity>EndAfterFeedback</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>2041</core:x>
+                        <core:y>204</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 1</tools:swimLaneId>
+                </core:uiSettings>
+                <core:metaData>
+                    <core:inputs>
+                        <core:input required="true" name="enactor.messageSystem.MessageText">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.messageSystem.Recipient">
+                            <core:interfaceName>com.enactor.mfc.user.IUserKey</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.messageSystem.ReplyMessageText">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                    </core:inputs>
+                </core:metaData>
+                <core:jobType>Messaging</core:jobType>
+                <core:jobHeader>Read Reply</core:jobHeader>
+                <core:jobDescription>Read reply to your message</core:jobDescription>
+                <core:priority>5</core:priority>
+                <core:peopleGroupEvaluator>{http://www.enactor.com/task}SimpleUserEvaluator</core:peopleGroupEvaluator>
+                <core:peopleGroupParameters>
+                    <core:parameter required="true" name="userId">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>#{sender.userId}</core:value>
+                    </core:parameter>
+                </core:peopleGroupParameters>
+            </core:value>
+            <core:index>13</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:IfActionActivity">
+                <core:activityId>NeedConfirmation</core:activityId>
+                <core:activityTypeId>Generic/IfActionActivityType</core:activityTypeId>
+                <core:activityOutcome name="Yes">
+                    <core:toActivity>NotifyDelivery</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:activityOutcome name="No">
+                    <core:toActivity>EndAfterRead</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>1858</core:x>
+                        <core:y>285</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 3</tools:swimLaneId>
+                </core:uiSettings>
+                <core:conditionalExpression>#{requestConfirmation}</core:conditionalExpression>
+            </core:value>
+            <core:index>14</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:HTActivity">
+                <core:activityId>NotifyDelivery</core:activityId>
+                <core:name>Delivery Notification</core:name>
+                <core:activityTypeId>MessageSystem/MessageDeliveryConfirmationActivityType</core:activityTypeId>
+                <core:activityOutcome name="OK">
+                    <core:toActivity>EndAfterFeedback</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:suspendActivityOutcome name="Suspend">
+                    <core:toActivity>NotifyDelivery</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:suspendActivityOutcome>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>2474</core:x>
+                        <core:y>208</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 1</tools:swimLaneId>
+                </core:uiSettings>
+                <core:metaData>
+                    <core:inputs>
+                        <core:input required="true" name="enactor.messageSystem.MessageText">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.messageSystem.Recipient">
+                            <core:interfaceName>com.enactor.mfc.user.IUserKey</core:interfaceName>
+                        </core:input>
+                    </core:inputs>
+                </core:metaData>
+                <core:jobType>Messaging</core:jobType>
+                <core:jobHeader>Message Delivered</core:jobHeader>
+                <core:jobDescription>Message was delivered to recipient on time</core:jobDescription>
+                <core:priority>5</core:priority>
+                <core:peopleGroupEvaluator>{http://www.enactor.com/task}SimpleUserEvaluator</core:peopleGroupEvaluator>
+                <core:peopleGroupParameters>
+                    <core:parameter required="true" name="userId">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>#{sender.userId}</core:value>
+                    </core:parameter>
+                </core:peopleGroupParameters>
+            </core:value>
+            <core:index>15</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:EndProcessActivity">
+                <core:activityId>EndAfterRead</core:activityId>
+                <core:name>End after read</core:name>
+                <core:activityTypeId>Generic/EndProcessActivityType</core:activityTypeId>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>2187</core:x>
+                        <core:y>210</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 3</tools:swimLaneId>
+                </core:uiSettings>
+                <core:discard>false</core:discard>
+            </core:value>
+            <core:index>16</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:EndProcessActivity">
+                <core:activityId>EndAfterFeedback</core:activityId>
+                <core:name>End after Feedback</core:name>
+                <core:activityTypeId>Generic/EndProcessActivityType</core:activityTypeId>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>2272</core:x>
+                        <core:y>58</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 1</tools:swimLaneId>
+                </core:uiSettings>
+                <core:discard>false</core:discard>
+            </core:value>
+            <core:index>17</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:ActionActivity">
+                <core:activityId>NullActionEntryPoint</core:activityId>
+                <core:name>Null Action Entry Point</core:name>
+                <core:description>Temporary Fix to get around the time out issue on non-default entry points.</core:description>
+                <core:activityTypeId>Generic/NullActionActivityType</core:activityTypeId>
+                <core:activityOutcome name="Success">
+                    <core:toActivity>ReadMessage</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>1285</core:x>
+                        <core:y>84</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 3</tools:swimLaneId>
+                    <tools:style>3</tools:style>
+                </core:uiSettings>
+            </core:value>
+            <core:index>18</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:HTActivity">
+                <core:activityId>DefaultCancel</core:activityId>
+                <core:name>Default Cancel</core:name>
+                <core:activityTypeId>Generic/ShowMessageActivityType</core:activityTypeId>
+                <core:activityOutcome name="OK">
+                    <core:toActivity>CancelAndDiscard</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:parameters>
+                    <core:parameter required="true" name="enactor.task.maintenance.Message">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>Example default outcome</core:value>
+                    </core:parameter>
+                    <core:parameter required="true" name="enactor.task.maintenance.MessageTitle">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>Example Default Outcome</core:value>
+                    </core:parameter>
+                </core:parameters>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>437</core:x>
+                        <core:y>-199</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 1</tools:swimLaneId>
+                </core:uiSettings>
+                <core:jobType>Messaging</core:jobType>
+                <core:jobHeader>Default Cancel</core:jobHeader>
+                <core:jobDescription>Message distribution completed successfully</core:jobDescription>
+                <core:priority>5</core:priority>
+                <core:peopleGroupEvaluator>{http://www.enactor.com/task}SimpleUserEvaluator</core:peopleGroupEvaluator>
+                <core:peopleGroupParameters>
+                    <core:parameter required="true" name="userId">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>#{sender.userId}</core:value>
+                    </core:parameter>
+                </core:peopleGroupParameters>
+            </core:value>
+            <core:index>19</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:HTActivity">
+                <core:activityId>CatchAllFail</core:activityId>
+                <core:name>Catch All Fail</core:name>
+                <core:activityTypeId>Generic/ShowMessageActivityType</core:activityTypeId>
+                <core:activityOutcome name="OK">
+                    <core:toActivity>CancelAndDiscard</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:parameters>
+                    <core:parameter name="enactor.task.maintenance.Message">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>#{concat(concat(concat(concat(concat('Unexpected outcome in BusinessProcess=',bpData.processId),';Activity='), bpData.lastActivityId), ';Outcome='), bpData.lastActivityOutcome)}</core:value>
+                    </core:parameter>
+                    <core:parameter name="enactor.task.maintenance.MessageTitle">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>Unexpected Outcome</core:value>
+                    </core:parameter>
+                </core:parameters>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>215</core:x>
+                        <core:y>-200</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 1</tools:swimLaneId>
+                </core:uiSettings>
+                <core:jobType>Messaging</core:jobType>
+                <core:jobHeader>Catch All Fail</core:jobHeader>
+                <core:jobDescription>Message distribution failed</core:jobDescription>
+                <core:priority>5</core:priority>
+                <core:peopleGroupEvaluator>{http://www.enactor.com/mfc}PrivilegeEvaluator</core:peopleGroupEvaluator>
+                <core:peopleGroupParameters>
+                    <core:parameter name="privilegeId">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>GLOBAL_BIZ_PROC_ADMIN</core:value>
+                    </core:parameter>
+                </core:peopleGroupParameters>
+            </core:value>
+            <core:index>20</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:HTActivity">
+                <core:activityId>CreateMessageError</core:activityId>
+                <core:name>Error Creating Message</core:name>
+                <core:activityTypeId>Generic/ShowMessageActivityType</core:activityTypeId>
+                <core:activityOutcome name="OK">
+                    <core:toActivity>CancelAndDiscard</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:parameters>
+                    <core:parameter name="enactor.task.maintenance.Message">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>#{concat(concat(concat('Unexpected outcome in Activity=', bpData.lastActivityId), ';Outcome='), bpData.lastActivityOutcome)}</core:value>
+                    </core:parameter>
+                    <core:parameter name="enactor.task.maintenance.MessageTitle">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>Unexpected Outcome</core:value>
+                    </core:parameter>
+                </core:parameters>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>425</core:x>
+                        <core:y>446</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 1</tools:swimLaneId>
+                </core:uiSettings>
+                <core:jobType>Messaging</core:jobType>
+                <core:jobHeader>Error Creating Message</core:jobHeader>
+                <core:jobDescription>Message distribution failed</core:jobDescription>
+                <core:priority>5</core:priority>
+                <core:peopleGroupEvaluator>{http://www.enactor.com/task}SimpleUserEvaluator</core:peopleGroupEvaluator>
+            </core:value>
+            <core:index>21</core:index>
+        </core:listElement>
+        <core:listImplClass>java.util.LinkedList</core:listImplClass>
+    </core:activities>
+    <core:defaultStartActivityId>CreateMessage</core:defaultStartActivityId>
+    <core:defaultOutcomes>
+        <core:activityOutcome name="Cancel">
+            <core:toActivity>DefaultCancel</core:toActivity>
+            <core:proceedImmediately>true</core:proceedImmediately>
+        </core:activityOutcome>
+    </core:defaultOutcomes>
+    <core:activityOutcome name="CatchAll">
+        <core:toActivity>CatchAllFail</core:toActivity>
+        <core:proceedImmediately>true</core:proceedImmediately>
+    </core:activityOutcome>
+</core:simpleActivityFlowBusinessProcess>

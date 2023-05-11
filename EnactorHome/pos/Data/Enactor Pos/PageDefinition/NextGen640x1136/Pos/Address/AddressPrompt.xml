@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<retail:posPromptPage xmlns:core="http://www.enactor.com/core" xmlns:retail="http://www.enactor.com/retail" xmlns:ns4="http://www.enactor.com/crm" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803" xmlns:ns6="http://www.apis-it.hr/fin/2012/types/f73" xmlns:ns7="http://www.w3.org/2000/09/xmldsig#" xmlns:ns8="http://www.enactor.com/retail/storedRetailTransaction/service" xmlns:ns9="http://www.fu.gov.si/" xmlns:ns10="http://www.enactor.com/addressLookup/service" xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:ns14="http://www.enactor.com/crm/customerLoyalty/service" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" allowResize="true" allowMove="true" allowClose="true" windowtype="view-panel" height="1136" width="640" updateMode="UPDATE_ELEMENTS" messageBase="Pos/Address/CaptureAddressMessages" url="NextGen640x1136/Pos/Address/AddressPrompt">
+    <core:elements>
+        <core:hidden id="ReceiptPanel"/>
+        <core:hidden id="NumericInputPanel"/>
+        <core:hidden id="SelectionList"/>
+        <core:button adjustImagesToSize="false" lineHeight="0" id="BackButton">
+            <core:text>CancelPressed</core:text>
+        </core:button>
+        <core:label lineHeight="0" messageId="RESOURCE_FRIENDLY_NAME" id="TitleLabel"/>
+        <core:panel styleClass="dialogPanel" id="DialogPanel">
+            <core:boundsConstraint height="896" width="640" y="120" x="0"/>
+            <core:templateConstraints allowChangeBounds="false"/>
+            <core:elements>
+                <core:inputText hintTextMessageId="ORGANISATION" lineHeight="0" type="textField" focusOrder="1" styleClass="inputText" id="OrganisationField">
+                    <core:boundsConstraint height="60" width="577" y="40" x="28"/>
+                    <core:text>#{address.organisation}</core:text>
+                </core:inputText>
+                <core:inputText hintTextMessageId="ADDRESS_LINE_1" lineHeight="0" type="textField" focusOrder="2" styleClass="inputText" id="AddressLine1Field">
+                    <core:boundsConstraint height="60" width="580" y="135" x="28"/>
+                    <core:text>#{address.street1}</core:text>
+                </core:inputText>
+                <core:inputText hintTextMessageId="ADDRESS_LINE_2" lineHeight="0" type="textField" focusOrder="3" styleClass="inputText" id="AddressLine2Field">
+                    <core:boundsConstraint height="60" width="580" y="235" x="31"/>
+                    <core:text>#{address.street2}</core:text>
+                </core:inputText>
+                <core:inputText hintTextMessageId="ADDRESS_LINE_3" lineHeight="0" type="textField" focusOrder="4" styleClass="inputText" id="AddressLine3Field">
+                    <core:boundsConstraint height="60" width="275" y="335" x="28"/>
+                    <core:text>#{address.street3}</core:text>
+                </core:inputText>
+                <core:inputText hintTextMessageId="TOWN" lineHeight="0" type="textField" focusOrder="5" styleClass="inputText" id="TownField">
+                    <core:boundsConstraint height="60" width="295" y="335" x="313"/>
+                    <core:text>#{address.town}</core:text>
+                </core:inputText>
+                <core:inputText hintTextMessageId="COUNTY" lineHeight="0" type="textField" focusOrder="6" styleClass="inputText" id="CountyField">
+                    <core:boundsConstraint height="60" width="275" y="435" x="28"/>
+                    <core:text>#{address.county}</core:text>
+                </core:inputText>
+                <core:comboBox manualDropDownDisabled="false" lazyLoad="false" freeEntry="true" hintTextMessageId="PROVINCE" editable="true" lineHeight="0" type="textField" focusOrder="7" styleClass="inputText" visibility="#{countryCode != null and countryCode.allowEntryOfProvince}" id="ProvinceField">
+                    <core:boundsConstraint height="60" width="295" y="435" x="313"/>
+                    <core:text>#{address.province}</core:text>
+                    <core:listExpression>#{provinceList}</core:listExpression>
+                    <core:listingElementEvents/>
+                </core:comboBox>
+                <core:comboBox manualDropDownDisabled="false" lazyLoad="false" hintTextMessageId="PROVINCE" editable="true" lineHeight="0" type="textField" focusOrder="8" styleClass="formCombo" transparentBackground="true" backgroundImageURL="NextGen480x1136/Pos/Dropdown-Arrow.png" visibility="#{!countryCode.allowEntryOfProvince &amp;&amp; !isEmpty(provinceList)}" visible="false" id="ProvinceField">
+                    <core:boundsConstraint height="50" width="207" y="520" x="315"/>
+                    <core:text>#{address.province}</core:text>
+                    <core:listExpression>#{provinceList}</core:listExpression>
+                    <core:listingElementEvents/>
+                </core:comboBox>
+                <core:comboBox manualDropDownDisabled="false" lazyLoad="false" allowBlank="true" hintTextMessageId="COUNTRY" lineHeight="0" type="textField" focusOrder="9" styleClass="inputText" transparentBackground="false" backgroundImageURL="NextGen480x800/Pos/Dropdown-Arrow.png" id="CountryField">
+                    <core:boundsConstraint height="60" width="275" y="535" x="28"/>
+                    <core:text>#{address.countryCode}</core:text>
+                    <core:listExpression>${countryList}</core:listExpression>
+                    <core:listingElementEvents>
+                        <core:selectionEvent>CountrySelected</core:selectionEvent>
+                    </core:listingElementEvents>
+                </core:comboBox>
+                <core:inputText hintTextMessageId="POST_CODE" validationData="#{addressBean:getPostcodeFieldValidator(4,10, countryCode)}" lineHeight="0" type="textField" focusOrder="10" styleClass="inputText" id="PostCodeField">
+                    <core:boundsConstraint height="60" width="275" y="648" x="27"/>
+                    <core:text>#{address.postCode}</core:text>
+                </core:inputText>
+                <core:button lineHeight="0" messageBase="#{captureAddressPromptMessageBase}" messageId="ADDRESS_BUTTON_ADDRESS_LOOKUP" styleClass="generalGreyButton" visibility="#{isEmpty(hidePostcodeSearch) || !hidePostcodeSearch}" id="AddressLookupButton">
+                    <core:boundsConstraint height="60" width="295" y="648" x="312"/>
+                    <core:text>AddressLookup</core:text>
+                </core:button>
+                <core:errorLabel errorFieldId="OrganisationField" allowWrap="true" lineHeight="0" styleClass="formErrorLabel" colour="RED" id="OrganisationError">
+                    <core:boundsConstraint height="30" width="580" y="99" x="28"/>
+                    <core:text>#{formErrors != null ? formErrors['OrganisationField'] : null}</core:text>
+                </core:errorLabel>
+                <core:errorLabel errorFieldId="AddressLine1Field" allowWrap="true" lineHeight="0" styleClass="formErrorLabel" colour="RED" id="AddressLine1Error">
+                    <core:boundsConstraint height="30" width="580" y="195" x="28"/>
+                    <core:text>#{formErrors != null ? formErrors['AddressLine1Field'] : null}</core:text>
+                </core:errorLabel>
+                <core:errorLabel errorFieldId="AddressLine2Field" allowWrap="true" lineHeight="0" styleClass="formErrorLabel" colour="RED" id="AddressLine2Error">
+                    <core:boundsConstraint height="30" width="580" y="295" x="31"/>
+                    <core:text>#{formErrors != null ? formErrors['AddressLine2Field'] : null}</core:text>
+                </core:errorLabel>
+                <core:errorLabel errorFieldId="AddressLine3Field" allowWrap="true" lineHeight="0" styleClass="formErrorLabel" colour="RED" id="AddressLine3Error">
+                    <core:boundsConstraint height="30" width="275" y="395" x="28"/>
+                    <core:text>#{formErrors != null ? formErrors['AddressLine3Field'] : null}</core:text>
+                </core:errorLabel>
+                <core:errorLabel errorFieldId="TownField" allowWrap="true" lineHeight="0" styleClass="formErrorLabel" colour="RED" id="TownError">
+                    <core:boundsConstraint height="30" width="295" y="395" x="313"/>
+                    <core:text>#{formErrors != null ? formErrors['TownField'] : null}</core:text>
+                </core:errorLabel>
+                <core:errorLabel errorFieldId="CountyField" allowWrap="true" lineHeight="0" styleClass="formErrorLabel" colour="RED" id="CountyError">
+                    <core:boundsConstraint height="30" width="275" y="495" x="28"/>
+                    <core:text>#{formErrors != null ? formErrors['CountyField'] : null}</core:text>
+                </core:errorLabel>
+                <core:errorLabel errorFieldId="ProvinceField" allowWrap="true" lineHeight="0" styleClass="formErrorLabel" visibility="#{(countryCode != null and countryCode.allowEntryOfProvince) || !isEmpty(provinceList)}" visible="false" colour="RED" id="ProvinceError">
+                    <core:boundsConstraint height="30" width="295" y="495" x="313"/>
+                    <core:text>#{formErrors != null ? formErrors['ProvinceField'] : null}</core:text>
+                </core:errorLabel>
+                <core:errorLabel errorFieldId="CountryField" allowWrap="true" lineHeight="0" styleClass="formErrorLabel" colour="RED" id="CountryError">
+                    <core:boundsConstraint height="30" width="428" y="595" x="28"/>
+                    <core:text>#{formErrors != null ? formErrors['CountryField'] : null}</core:text>
+                </core:errorLabel>
+                <core:errorLabel errorFieldId="PostCodeField" allowWrap="true" lineHeight="0" styleClass="formErrorLabel" colour="RED" id="PostCodeError">
+                    <core:boundsConstraint height="30" width="275" y="705" x="27"/>
+                    <core:text>#{formErrors != null ? formErrors['PostCodeField'] : null}</core:text>
+                </core:errorLabel>
+                <core:button lineHeight="0" messageBase="#{captureAddressPromptMessageBase}" messageId="ADDRESS_BUTTON_CLEAR_ADDRESS" styleClass="generalGreyButton" visibility="#{false &amp;&amp; (isEmpty(hidePostcodeSearch) || !hidePostcodeSearch)}" id="ClearAddressButton">
+                    <core:boundsConstraint height="60" width="295" y="813" x="312"/>
+                    <core:text>AddressLookup</core:text>
+                </core:button>
+            </core:elements>
+        </core:panel>
+        <core:panel namingContainer="false" styleClass="footerOverridePanel" id="FooterOverridePanel">
+            <core:boundsConstraint height="100" width="640" y="1015" x="0"/>
+            <core:elements>
+                <core:button lineHeight="0" messageBase="#{captureAddressPromptMessageBase}" messageId="ADDRESS_BUTTON_CANCEL" styleClass="footerOverrideButtonCancel" id="Button_1">
+                    <core:boundsConstraint height="86" width="142" y="14" x="12"/>
+                    <core:text>CancelPressed</core:text>
+                </core:button>
+                <core:button lineHeight="0" messageBase="#{captureAddressPromptMessageBase}" messageId="ADDRESS_BUTTON_SKIP" styleClass="footerOverrideButton" visibility="#{allowSkipCaptureAddress}" visible="true" id="Button_2">
+                    <core:boundsConstraint height="86" width="142" y="14" x="160"/>
+                    <core:text>Skip</core:text>
+                </core:button>
+                <core:button lineHeight="0" messageBase="#{captureAddressPromptMessageBase}" messageId="ADDRESS_BUTTON_OK" styleClass="footerOverrideButtonOk" id="Button_4">
+                    <core:boundsConstraint height="86" width="142" y="14" x="479"/>
+                    <core:text>OKPressed</core:text>
+                </core:button>
+            </core:elements>
+        </core:panel>
+        <core:hidden id="OverflowButton"/>
+        <core:hidden id="InputBoxBorderPanel"/>
+        <core:text lineHeight="0" messageBase="#{captureAddressPromptMessageBase}" messageId="ENTER_ADDRESS_PROMPT" styleClass="promptLabel" id="Prompt"/>
+    </core:elements>
+    <core:templateURL>NextGen640x1136/Pos/FullScreenTraditionalPosTemplate</core:templateURL>
+    <core:events>
+        <core:event destination="enactor.Page" event="key.EnterPressed">tabNext</core:event>
+    </core:events>
+    <core:validationEvents>
+        <core:event>OKPressed</core:event>
+        <core:event>InputBoxEnterPressed</core:event>
+    </core:validationEvents>
+    <core:variables>
+        <core:variable required="true" name="CaptureAddressPromptMessageBase">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.mfc.Address">
+            <core:interfaceName>com.enactor.mfc.address.IAddress</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.pos.CountryList">
+            <core:interfaceName>java.util.List</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.pos.HidePostcodeSearch">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="ShowBackButton">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.mfc.CountryCode">
+            <core:interfaceName>com.enactor.mfc.countryCode.ICountryCode</core:interfaceName>
+        </core:variable>
+        <core:variable name="provinceList">
+            <core:interfaceName>java.util.List</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.pos.AllowSkipCaptureAddress">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:variable>
+    </core:variables>
+    <core:functionLibraries>
+        <core:functionLibrary name="addressBean" path="com.enactor.pos.address.AddressBean">
+            <core:type>CLASS</core:type>
+        </core:functionLibrary>
+    </core:functionLibraries>
+</retail:posPromptPage>

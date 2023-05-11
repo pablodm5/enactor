@@ -1,0 +1,1 @@
+New prompts implemented for the customer and/or overridden components should be organised under this directory.

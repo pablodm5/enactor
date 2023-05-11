@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<retail:posPromptPage xmlns:core="http://www.enactor.com/core" xmlns:retail="http://www.enactor.com/retail" xmlns:ns4="http://www.enactor.com/crm" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803" xmlns:ns6="http://www.apis-it.hr/fin/2012/types/f73" xmlns:ns7="http://www.w3.org/2000/09/xmldsig#" xmlns:ns8="http://www.enactor.com/retail/storedRetailTransaction/service" xmlns:ns9="http://www.fu.gov.si/" xmlns:ns10="http://www.enactor.com/addressLookup/service" xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:ns14="http://www.enactor.com/crm/customerLoyalty/service" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" allowResize="true" allowMove="true" allowClose="true" updateMode="REDRAW_PAGE" messageBase="POSInventoryManagement/TransferOut/TransferOutMessages" url="Standard1280x800/POSInventoryManagement/TransferOut/TransferOutItems">
+    <core:elements>
+        <core:hidden id="Receipt"/>
+        <core:hidden id="SelectionList">
+            <core:boundsConstraint height="366" width="817" y="77" x="16"/>
+        </core:hidden>
+        <core:button messageBase="POSInventoryManagement/Common/GeneralMessages" messageId="ADD_ITEM_BUTTON_LABEL" visibility="#{notEmpty(reason) &amp;&amp; instanceOf(reason,'com.enactor.mfc.reason.IInterStoreTransferReason') &amp;&amp; reason.allowLooseItemsTransfer}" id="Button1">
+            <core:text>AddItemPressed</core:text>
+        </core:button>
+        <core:button messageBase="POSInventoryManagement/Common/GeneralMessages" messageId="UP_BUTTON_LABEL" visibility="#{notEmpty(transferOutItemsList) &amp;&amp; !(indexOf(transferOutItemsList, selectedRow)%pageSize==0)}" id="Button2">
+            <core:text>UpPressed</core:text>
+        </core:button>
+        <core:button messageBase="POSInventoryManagement/Common/GeneralMessages" messageId="DOWN_BUTTON_LABEL" visibility="#{!(indexOf(transferOutItemsList, selectedRow) %pageSize==pageSize-1 || size(transferOutItemsList) == (indexOf(transferOutItemsList, selectedRow) + 1))}" id="Button3">
+            <core:text>DownPressed</core:text>
+        </core:button>
+        <core:button messageBase="POSInventoryManagement/Common/GeneralMessages" messageId="EDIT_ITEM_BUTTON_LABEL" id="Button4">
+            <core:text>EditItemPressed</core:text>
+        </core:button>
+        <core:button messageBase="POSInventoryManagement/Common/GeneralMessages" messageId="CANCEL_BUTTON_LABEL" id="Button8">
+            <core:text>CancelPressed</core:text>
+        </core:button>
+        <core:button messageBase="POSInventoryManagement/Common/GeneralMessages" messageId="BACK_BUTTON_LABEL" id="Button7">
+            <core:text>BackPressed</core:text>
+        </core:button>
+        <core:text messageId="PLEASE_SCAN_PRODUCT_ID_TO_BE_SENT" visibility="#{notEmpty(reason) &amp;&amp; instanceOf(reason,'com.enactor.mfc.reason.IInterStoreTransferReason') &amp;&amp; reason.allowLooseItemsTransfer}" id="Prompt"/>
+        <core:button messageBase="POSInventoryManagement/Common/GeneralMessages" messageId="VOID_ITEM_BUTTON_LABEL" id="Button5">
+            <core:text>VoidPressed</core:text>
+        </core:button>
+        <core:inputText visibility="#{notEmpty(reason) &amp;&amp; instanceOf(reason,'com.enactor.mfc.reason.IInterStoreTransferReason') &amp;&amp; reason.allowLooseItemsTransfer}" id="InputBox">
+            <core:text>#{productId}</core:text>
+        </core:inputText>
+        <core:hidden id="BackgroundPanel"/>
+        <core:panel id="PagingSelectionListPanel">
+            <core:elements>
+                <core:panel id="PagingSelectionHeaderPanelMedium">
+                    <core:boundsConstraint height="60" width="1061" y="0" x="0"/>
+                    <core:elements>
+                        <core:label messageId="DISPATCH_ID_LABEL" styleClass="formFieldLabel" id="DISPATCH_ID_LABEL">
+                            <core:boundsConstraint height="20" width="175" y="14" x="24"/>
+                        </core:label>
+                        <core:inputText editable="false" borderStyle="Line" styleClass="formInputText" transparentBackground="true" enabled="true" id="DISPATCH_ID">
+                            <core:boundsConstraint height="28" width="175" y="10" x="170"/>
+                            <core:text>#{transferOutHeader.transferOutHeaderId}</core:text>
+                        </core:inputText>
+                        <core:label messageId="REQUEST_ID_LABEL" styleClass="formFieldLabel" id="REQUEST_ID_LABEL">
+                            <core:boundsConstraint height="20" width="175" y="14" x="376"/>
+                        </core:label>
+                        <core:inputText editable="false" borderStyle="Line" styleClass="formInputText" transparentBackground="true" enabled="true" id="REQUEST_ID">
+                            <core:boundsConstraint height="28" width="175" y="10" x="504"/>
+                            <core:text>#{transferOutHeader.distributionOrderId}</core:text>
+                        </core:inputText>
+                    </core:elements>
+                </core:panel>
+                <core:listBox lazyLoad="false" listSelectionMethod="DEFAULT" documentTemplateUrl="POSInventoryManagement/TransferOut/TransferOutItemListTemplate" selectedIndex="0" styleClass="dataListBox" id="PagingSelectionListBoxMedium">
+                    <core:boundsConstraint height="304" width="821" y="0" x="0"/>
+                    <core:elements/>
+                    <core:listExpression>#{transferOutItemsList}</core:listExpression>
+                    <core:dataExpression>item</core:dataExpression>
+                    <core:selectedIndices>
+                        <item>0</item>
+                    </core:selectedIndices>
+                </core:listBox>
+                <core:panel id="PagingSelectionPageControlsPanel">
+                    <core:boundsConstraint height="30" width="821" y="364" x="0"/>
+                    <core:elements>
+                        <core:panel hAlign="CENTRE" id="PagingSelectionPageControlsReferencePanel">
+                            <core:flowConstraint width="100%" height="100%"/>
+                            <core:elements>
+<core:pageElementRef pageDefinitionURL="POSInventoryManagement/Common/POSInventoryManagementPagedListPageControl" id="PAGE_CONTROLS">
+    <core:flowConstraint/>
+    <core:elements/>
+    <core:parameter value="#{transferOutItemsList}" name="enactor.coreUI.List">
+        <core:interfaceName>com.enactor.core.database.list.IPagedList</core:interfaceName>
+    </core:parameter>
+    <core:parameter value="#{pageSize}" name="enactor.coreUI.PageSize">
+        <core:interfaceName>java.lang.Integer</core:interfaceName>
+    </core:parameter>
+</core:pageElementRef>
+                            </core:elements>
+                        </core:panel>
+                    </core:elements>
+                </core:panel>
+            </core:elements>
+        </core:panel>
+    </core:elements>
+    <core:templateURL>Standard1280x800/Pos/FullScreenTraditionalPosTemplate</core:templateURL>
+    <core:events>
+        <core:event destination="Button1" event="key.EnterPressed">press</core:event>
+        <core:event destination="Button7" event="key.KeyCode27Pressed">press</core:event>
+        <core:event destination="Button2" event="key.UpPressed">press</core:event>
+        <core:event destination="Button3" event="key.DownPressed">press</core:event>
+    </core:events>
+    <core:preferredConstraintType>BOUNDS</core:preferredConstraintType>
+    <core:variables>
+        <core:variable name="enactor.inventoryManagement.local.TransferOutHeader">
+            <core:interfaceName>com.enactor.storeInventoryManagement.local.transferOut.ITransferOutHeader</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.mfc.Device">
+            <core:interfaceName>com.enactor.mfc.device.IDevice</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.inventoryManagement.local.TransferOutItemsList">
+            <core:interfaceName>java.util.List</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.coreUI.ListCriteria">
+            <core:interfaceName>com.enactor.core.servers.IListCriteria</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.mfc.ProductId">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.inventoryManagement.ColourMap">
+            <core:interfaceName>java.util.Map</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.inventoryManagement.SizeMap">
+            <core:interfaceName>java.util.Map</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.inventoryManagement.StyleMap">
+            <core:interfaceName>java.util.Map</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.mfc.ProductActualStockLevelsMap">
+            <core:interfaceName>java.util.Map</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.mfc.ProductQuantityMap">
+            <core:interfaceName>java.util.Map</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.coreUI.PageSize">
+            <core:interfaceName>java.lang.Integer</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.coreUI.SelectedRow">
+            <core:interfaceName>com.enactor.core.database.list.IKeyedListElement</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.mfc.Reason">
+            <core:interfaceName>com.enactor.mfc.reason.Reason</core:interfaceName>
+        </core:variable>
+    </core:variables>
+    <core:scannerEnabled>true</core:scannerEnabled>
+    <core:scannerDataName>#{scannerData}</core:scannerDataName>
+</retail:posPromptPage>

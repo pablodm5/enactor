@@ -1,0 +1,545 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns4:simpleActivityFlowBusinessProcess xmlns:ns2="http://www.enactor.com/retail" xmlns:ns3="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:ns4="http://www.enactor.com/core" xmlns:ns5="http://www.enactor.com/tools">
+    <ns4:processId>CRM/InviteCustomerBusinessProcess</ns4:processId>
+    <ns4:name>Invite Customer Process</ns4:name>
+    <ns4:description>Process to send a generic customer invitation</ns4:description>
+    <ns4:businessProcessTypeId>CRM/InviteCustomerBusinessProcessType</ns4:businessProcessTypeId>
+    <ns4:startPrivilege>enactor.crm.inviteCustomer.Run</ns4:startPrivilege>
+    <ns4:administerPrivilege>enactor.crm.inviteCustomer.Admin</ns4:administerPrivilege>
+    <ns4:deprecated>false</ns4:deprecated>
+    <ns4:metaData>
+        <ns4:inputs>
+            <ns4:input required="true" name="enactor.mfc.CustomerNumber">
+                <ns4:interfaceName>java.lang.String</ns4:interfaceName>
+            </ns4:input>
+            <ns4:input required="true" name="enactor.mfc.LoyaltyAccountId">
+                <ns4:interfaceName>java.lang.String</ns4:interfaceName>
+            </ns4:input>
+            <ns4:input required="true" name="enactor.mfc.CommunicationScriptId">
+                <ns4:interfaceName>java.lang.String</ns4:interfaceName>
+            </ns4:input>
+        </ns4:inputs>
+    </ns4:metaData>
+    <ns4:uiSettings xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="ns5:BusinessProcessSettings">
+        <ns4:constraint xsi:type="ns4:UIPositionConstraint">
+            <ns4:x>23</ns4:x>
+            <ns4:y>24</ns4:y>
+        </ns4:constraint>
+        <ns5:swimLanes>
+            <ns5:lane label="System" height="341" id="Lane 1"/>
+            <ns5:lane label="Customer" height="340" id="Lane 2"/>
+            <ns5:lane label="Salesperson" height="302" id="Lane 3"/>
+        </ns5:swimLanes>
+        <ns5:notes xsi:type="ns4:WrappedList">
+            <ns4:listElement>
+                <ns4:value xsi:type="ns5:BPNote">
+                    <ns5:noteId>Note0</ns5:noteId>
+                    <ns5:swimLaneId>Lane 1</ns5:swimLaneId>
+                    <ns5:description>Currently this is hardcoded to use a user account with ID 'CUST_SERVICE_TEST1' with a valid email address 'cust.service.test1@enactor.co.uk'
+
+Note : All of these are configured as parameters of this activity</ns5:description>
+                    <ns5:constraint>
+                        <ns4:x>919</ns4:x>
+                        <ns4:y>-160</ns4:y>
+                        <ns4:height>111</ns4:height>
+                        <ns4:width>272</ns4:width>
+                    </ns5:constraint>
+                </ns4:value>
+                <ns4:index>0</ns4:index>
+            </ns4:listElement>
+        </ns5:notes>
+    </ns4:uiSettings>
+    <ns4:activities xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="ns4:WrappedList">
+        <ns4:listElement>
+            <ns4:value xsi:type="ns4:CallProcessActivity">
+                <ns4:activityId>CreateInvitation</ns4:activityId>
+                <ns4:name>Create Invitation</ns4:name>
+                <ns4:activityTypeId>CRM/CreateCustomerInvitationActivityType</ns4:activityTypeId>
+                <ns4:activityOutcome name="Success">
+                    <ns4:toActivity>EmailInvitationToCustomer</ns4:toActivity>
+                    <ns4:proceedImmediately>true</ns4:proceedImmediately>
+                </ns4:activityOutcome>
+                <ns4:activityOutcome name="Fail">
+                    <ns4:toActivity>NotifyFailedToCreateInvitation</ns4:toActivity>
+                    <ns4:proceedImmediately>true</ns4:proceedImmediately>
+                </ns4:activityOutcome>
+                <ns4:catchAllOutcome xsi:type="ns4:ActivityOutcome" name="Error">
+                    <ns4:toActivity>NotifyFailedToCreateInvitation</ns4:toActivity>
+                    <ns4:proceedImmediately>true</ns4:proceedImmediately>
+                </ns4:catchAllOutcome>
+                <ns4:uiSettings xsi:type="ns5:ActivitySettings">
+                    <ns4:constraint xsi:type="ns4:UIPositionConstraint">
+                        <ns4:x>660</ns4:x>
+                        <ns4:y>9</ns4:y>
+                    </ns4:constraint>
+                    <ns5:swimLaneId>Lane 1</ns5:swimLaneId>
+                </ns4:uiSettings>
+                <ns4:metaData>
+                    <ns4:inputs>
+                        <ns4:input required="true" name="enactor.mfc.CustomerNumber">
+                            <ns4:interfaceName>java.lang.String</ns4:interfaceName>
+                        </ns4:input>
+                        <ns4:input required="true" name="enactor.mfc.LoyaltyAccountId">
+                            <ns4:interfaceName>java.lang.String</ns4:interfaceName>
+                        </ns4:input>
+                    </ns4:inputs>
+                    <ns4:outputs>
+                        <ns4:output required="true" name="enactor.core.NavigationLinkId">
+                            <ns4:interfaceName>java.lang.String</ns4:interfaceName>
+                        </ns4:output>
+                        <ns4:output required="true" name="enactor.core.NavigationLinkReference">
+                            <ns4:interfaceName>java.lang.String</ns4:interfaceName>
+                        </ns4:output>
+                    </ns4:outputs>
+                </ns4:metaData>
+            </ns4:value>
+            <ns4:index>0</ns4:index>
+        </ns4:listElement>
+        <ns4:listElement>
+            <ns4:value xsi:type="ns4:CallProcessActivity">
+                <ns4:activityId>EmailInvitationToCustomer</ns4:activityId>
+                <ns4:name>Email Invitation To Customer</ns4:name>
+                <ns4:description>Emails the link to the invitation to the customer</ns4:description>
+                <ns4:activityTypeId>CRM/SendCustomerInvitationActivityType</ns4:activityTypeId>
+                <ns4:activityOutcome name="Success">
+                    <ns4:toActivity>CustomerResponse</ns4:toActivity>
+                    <ns4:proceedImmediately>true</ns4:proceedImmediately>
+                </ns4:activityOutcome>
+                <ns4:activityOutcome name="Fail">
+                    <ns4:toActivity>NotifyFailedToEmail</ns4:toActivity>
+                    <ns4:proceedImmediately>true</ns4:proceedImmediately>
+                </ns4:activityOutcome>
+                <ns4:activityOutcome name="NoSuchCustomer">
+                    <ns4:toActivity>NotifyFailedToEmail</ns4:toActivity>
+                    <ns4:proceedImmediately>true</ns4:proceedImmediately>
+                </ns4:activityOutcome>
+                <ns4:activityOutcome name="NoSuchScript">
+                    <ns4:toActivity>NotifyFailedToEmail</ns4:toActivity>
+                    <ns4:proceedImmediately>true</ns4:proceedImmediately>
+                </ns4:activityOutcome>
+                <ns4:catchAllOutcome xsi:type="ns4:ActivityOutcome" name="Error">
+                    <ns4:toActivity>NotifyFailedToEmail</ns4:toActivity>
+                    <ns4:proceedImmediately>true</ns4:proceedImmediately>
+                </ns4:catchAllOutcome>
+                <ns4:parameters>
+                    <ns4:parameter required="true" name="enactor.core.email.MailBoxName">
+                        <ns4:interfaceName>java.lang.String</ns4:interfaceName>
+                        <ns4:value>CUST_SERVICE_TEST1</ns4:value>
+                    </ns4:parameter>
+                    <ns4:parameter required="true" name="enactor.crm.customer.registration.SenderAddress">
+                        <ns4:interfaceName>java.lang.String</ns4:interfaceName>
+                        <ns4:value>cust.service.test1@enactor.co.uk</ns4:value>
+                    </ns4:parameter>
+                </ns4:parameters>
+                <ns4:uiSettings xsi:type="ns5:ActivitySettings">
+                    <ns4:constraint xsi:type="ns4:UIPositionConstraint">
+                        <ns4:x>931</ns4:x>
+                        <ns4:y>9</ns4:y>
+                    </ns4:constraint>
+                    <ns5:swimLaneId>Lane 1</ns5:swimLaneId>
+                    <ns5:noteReference name="Note Link">
+                        <ns4:toActivity>Note0</ns4:toActivity>
+                        <ns4:proceedImmediately>true</ns4:proceedImmediately>
+                    </ns5:noteReference>
+                </ns4:uiSettings>
+                <ns4:metaData>
+                    <ns4:inputs>
+                        <ns4:input required="true" name="enactor.mfc.CustomerNumber">
+                            <ns4:interfaceName>java.lang.String</ns4:interfaceName>
+                        </ns4:input>
+                        <ns4:input required="true" name="enactor.core.NavigationLinkId">
+                            <ns4:interfaceName>java.lang.String</ns4:interfaceName>
+                        </ns4:input>
+                        <ns4:input required="true" name="enactor.core.NavigationLinkReference">
+                            <ns4:interfaceName>java.lang.String</ns4:interfaceName>
+                        </ns4:input>
+                        <ns4:input required="true" name="enactor.mfc.LoyaltyAccountId">
+                            <ns4:interfaceName>java.lang.String</ns4:interfaceName>
+                        </ns4:input>
+                        <ns4:input required="true" name="enactor.mfc.CommunicationScriptId">
+                            <ns4:interfaceName>java.lang.String</ns4:interfaceName>
+                        </ns4:input>
+                    </ns4:inputs>
+                    <ns4:outputs>
+                        <ns4:output required="true" name="enactor.core.mail.store.EmailMessageId">
+                            <ns4:interfaceName>java.lang.String</ns4:interfaceName>
+                        </ns4:output>
+                    </ns4:outputs>
+                </ns4:metaData>
+            </ns4:value>
+            <ns4:index>1</ns4:index>
+        </ns4:listElement>
+        <ns4:listElement>
+            <ns4:value xsi:type="ns4:EndProcessActivity">
+                <ns4:activityId>Completed</ns4:activityId>
+                <ns4:activityTypeId>Generic/EndProcessActivityType</ns4:activityTypeId>
+                <ns4:uiSettings xsi:type="ns5:ActivitySettings">
+                    <ns4:constraint xsi:type="ns4:UIPositionConstraint">
+                        <ns4:x>1580</ns4:x>
+                        <ns4:y>40</ns4:y>
+                    </ns4:constraint>
+                    <ns5:swimLaneId>Lane 2</ns5:swimLaneId>
+                    <ns5:style>1</ns5:style>
+                </ns4:uiSettings>
+                <ns4:discard>false</ns4:discard>
+            </ns4:value>
+            <ns4:index>2</ns4:index>
+        </ns4:listElement>
+        <ns4:listElement>
+            <ns4:value xsi:type="ns4:HTActivity">
+                <ns4:activityId>NotifyFailedToCreateInvitation</ns4:activityId>
+                <ns4:name>Notify failure to create invitation</ns4:name>
+                <ns4:activityTypeId>CRM/NotifyFailureActivityType</ns4:activityTypeId>
+                <ns4:activityOutcome name="Complete">
+                    <ns4:toActivity>Completed</ns4:toActivity>
+                    <ns4:proceedImmediately>true</ns4:proceedImmediately>
+                </ns4:activityOutcome>
+                <ns4:activityOutcome name="Retry">
+                    <ns4:toActivity>CreateInvitation</ns4:toActivity>
+                    <ns4:proceedImmediately>true</ns4:proceedImmediately>
+                </ns4:activityOutcome>
+                <ns4:suspendActivityOutcome name="Suspend">
+                    <ns4:toActivity>NotifyFailedToCreateInvitation</ns4:toActivity>
+                    <ns4:proceedImmediately>true</ns4:proceedImmediately>
+                </ns4:suspendActivityOutcome>
+                <ns4:uiSettings xsi:type="ns5:ActivitySettings">
+                    <ns4:constraint xsi:type="ns4:UIPositionConstraint">
+                        <ns4:x>682</ns4:x>
+                        <ns4:y>16</ns4:y>
+                    </ns4:constraint>
+                    <ns5:swimLaneId>Lane 3</ns5:swimLaneId>
+                    <ns5:style>3</ns5:style>
+                </ns4:uiSettings>
+                <ns4:jobType>Customer Invitation</ns4:jobType>
+                <ns4:jobHeader>Error Creating Invitation to #{customerName}</ns4:jobHeader>
+                <ns4:displayTitle>Error Creating Invitation</ns4:displayTitle>
+                <ns4:priority>5</ns4:priority>
+                <ns4:peopleGroupEvaluator>{http://www.enactor.com/crm}CustomerSalesPerson</ns4:peopleGroupEvaluator>
+                <ns4:peopleGroupParameters>
+                    <ns4:parameter required="true" name="customerId">
+                        <ns4:interfaceName>java.lang.String</ns4:interfaceName>
+                        <ns4:value>#{customerNumber}</ns4:value>
+                    </ns4:parameter>
+                </ns4:peopleGroupParameters>
+            </ns4:value>
+            <ns4:index>3</ns4:index>
+        </ns4:listElement>
+        <ns4:listElement>
+            <ns4:value xsi:type="ns4:HTActivity">
+                <ns4:activityId>InformAcceptance</ns4:activityId>
+                <ns4:activityTypeId>Generic/ShowMessageActivityType</ns4:activityTypeId>
+                <ns4:suspendActivityOutcome name="Suspend">
+                    <ns4:toActivity>InformAcceptance</ns4:toActivity>
+                    <ns4:proceedImmediately>true</ns4:proceedImmediately>
+                </ns4:suspendActivityOutcome>
+                <ns4:activityOutcome name="OK">
+                    <ns4:toActivity>Completed</ns4:toActivity>
+                    <ns4:proceedImmediately>true</ns4:proceedImmediately>
+                </ns4:activityOutcome>
+                <ns4:parameters>
+                    <ns4:parameter name="enactor.task.maintenance.Message">
+                        <ns4:interfaceName>java.lang.String</ns4:interfaceName>
+                        <ns4:value>#{concat(concat('Customer ',customerName),' has accepted the invitation.')}</ns4:value>
+                    </ns4:parameter>
+                    <ns4:parameter name="enactor.task.maintenance.MessageTitle">
+                        <ns4:interfaceName>java.lang.String</ns4:interfaceName>
+                        <ns4:value>Customer Invitation</ns4:value>
+                    </ns4:parameter>
+                </ns4:parameters>
+                <ns4:uiSettings xsi:type="ns5:ActivitySettings">
+                    <ns4:constraint xsi:type="ns4:UIPositionConstraint">
+                        <ns4:x>1254</ns4:x>
+                        <ns4:y>28</ns4:y>
+                    </ns4:constraint>
+                    <ns5:swimLaneId>Lane 3</ns5:swimLaneId>
+                    <ns5:style>3</ns5:style>
+                </ns4:uiSettings>
+                <ns4:jobType>Customer Invitation</ns4:jobType>
+                <ns4:jobHeader>Customer Invitation Accepted by #{customerName}</ns4:jobHeader>
+                <ns4:priority>5</ns4:priority>
+                <ns4:peopleGroupEvaluator>{http://www.enactor.com/crm}CustomerSalesPerson</ns4:peopleGroupEvaluator>
+                <ns4:peopleGroupParameters>
+                    <ns4:parameter required="true" name="customerId">
+                        <ns4:interfaceName>java.lang.String</ns4:interfaceName>
+                        <ns4:value>#{customerNumber}</ns4:value>
+                    </ns4:parameter>
+                </ns4:peopleGroupParameters>
+            </ns4:value>
+            <ns4:index>4</ns4:index>
+        </ns4:listElement>
+        <ns4:listElement>
+            <ns4:value xsi:type="ns4:HTActivity">
+                <ns4:activityId>CustomerResponse</ns4:activityId>
+                <ns4:activityTypeId>CRM/RespondToInvitationActivityType</ns4:activityTypeId>
+                <ns4:activityOutcome name="Accept">
+                    <ns4:toActivity>InformAcceptance</ns4:toActivity>
+                    <ns4:proceedImmediately>true</ns4:proceedImmediately>
+                </ns4:activityOutcome>
+                <ns4:activityOutcome name="Reject">
+                    <ns4:toActivity>InformRejection</ns4:toActivity>
+                    <ns4:proceedImmediately>true</ns4:proceedImmediately>
+                </ns4:activityOutcome>
+                <ns4:activityOutcome name="Timeout">
+                    <ns4:toActivity>InformTimeout</ns4:toActivity>
+                    <ns4:proceedImmediately>true</ns4:proceedImmediately>
+                </ns4:activityOutcome>
+                <ns4:suspendActivityOutcome name="Later">
+                    <ns4:toActivity>CustomerResponse</ns4:toActivity>
+                    <ns4:proceedImmediately>true</ns4:proceedImmediately>
+                </ns4:suspendActivityOutcome>
+                <ns4:uiSettings xsi:type="ns5:ActivitySettings">
+                    <ns4:constraint xsi:type="ns4:UIPositionConstraint">
+                        <ns4:x>1192</ns4:x>
+                        <ns4:y>6</ns4:y>
+                    </ns4:constraint>
+                    <ns5:swimLaneId>Lane 2</ns5:swimLaneId>
+                    <ns5:style>3</ns5:style>
+                </ns4:uiSettings>
+                <ns4:timeoutDuration>P0Y0M7DT0H0M</ns4:timeoutDuration>
+                <ns4:jobType>Customer Invitation</ns4:jobType>
+                <ns4:jobHeader>Respond to Invitation</ns4:jobHeader>
+                <ns4:priority>5</ns4:priority>
+                <ns4:peopleGroupEvaluator>{http://www.enactor.com/task}SimpleUserEvaluator</ns4:peopleGroupEvaluator>
+                <ns4:peopleGroupParameters>
+                    <ns4:parameter required="true" name="userId">
+                        <ns4:interfaceName>java.lang.String</ns4:interfaceName>
+                        <ns4:value>CUST_USER</ns4:value>
+                    </ns4:parameter>
+                </ns4:peopleGroupParameters>
+            </ns4:value>
+            <ns4:index>5</ns4:index>
+        </ns4:listElement>
+        <ns4:listElement>
+            <ns4:value xsi:type="ns4:HTActivity">
+                <ns4:activityId>InformRejection</ns4:activityId>
+                <ns4:activityTypeId>Generic/ShowMessageActivityType</ns4:activityTypeId>
+                <ns4:suspendActivityOutcome name="Suspend">
+                    <ns4:toActivity>InformRejection</ns4:toActivity>
+                    <ns4:proceedImmediately>true</ns4:proceedImmediately>
+                </ns4:suspendActivityOutcome>
+                <ns4:activityOutcome name="OK">
+                    <ns4:toActivity>Completed</ns4:toActivity>
+                    <ns4:proceedImmediately>true</ns4:proceedImmediately>
+                </ns4:activityOutcome>
+                <ns4:parameters>
+                    <ns4:parameter required="true" name="enactor.task.maintenance.Message">
+                        <ns4:interfaceName>java.lang.String</ns4:interfaceName>
+                        <ns4:value>#{concat(concat('Customer ',customerName),' has rejected the invitation to register.')}</ns4:value>
+                    </ns4:parameter>
+                    <ns4:parameter required="true" name="enactor.task.maintenance.MessageTitle">
+                        <ns4:interfaceName>java.lang.String</ns4:interfaceName>
+                        <ns4:value>Customer Registration</ns4:value>
+                    </ns4:parameter>
+                </ns4:parameters>
+                <ns4:uiSettings xsi:type="ns5:ActivitySettings">
+                    <ns4:constraint xsi:type="ns4:UIPositionConstraint">
+                        <ns4:x>1254</ns4:x>
+                        <ns4:y>175</ns4:y>
+                    </ns4:constraint>
+                    <ns5:swimLaneId>Lane 3</ns5:swimLaneId>
+                    <ns5:style>3</ns5:style>
+                </ns4:uiSettings>
+                <ns4:jobType>Customer Invitation</ns4:jobType>
+                <ns4:jobHeader>Customer Invitation Rejected by #{customerName}</ns4:jobHeader>
+                <ns4:priority>5</ns4:priority>
+                <ns4:peopleGroupEvaluator>{http://www.enactor.com/crm}CustomerSalesPerson</ns4:peopleGroupEvaluator>
+                <ns4:peopleGroupParameters>
+                    <ns4:parameter required="true" name="customerId">
+                        <ns4:interfaceName>java.lang.String</ns4:interfaceName>
+                        <ns4:value>#{customerNumber}</ns4:value>
+                    </ns4:parameter>
+                </ns4:peopleGroupParameters>
+            </ns4:value>
+            <ns4:index>6</ns4:index>
+        </ns4:listElement>
+        <ns4:listElement>
+            <ns4:value xsi:type="ns4:HTActivity">
+                <ns4:activityId>NotifyFailedToEmail</ns4:activityId>
+                <ns4:name>Notify failure to email</ns4:name>
+                <ns4:activityTypeId>CRM/NotifyFailureActivityType</ns4:activityTypeId>
+                <ns4:suspendActivityOutcome name="Suspend">
+                    <ns4:toActivity>NotifyFailedToEmail</ns4:toActivity>
+                    <ns4:proceedImmediately>true</ns4:proceedImmediately>
+                </ns4:suspendActivityOutcome>
+                <ns4:activityOutcome name="Retry">
+                    <ns4:toActivity>EmailInvitationToCustomer</ns4:toActivity>
+                    <ns4:proceedImmediately>true</ns4:proceedImmediately>
+                </ns4:activityOutcome>
+                <ns4:activityOutcome name="Complete">
+                    <ns4:toActivity>Completed</ns4:toActivity>
+                    <ns4:proceedImmediately>true</ns4:proceedImmediately>
+                </ns4:activityOutcome>
+                <ns4:uiSettings xsi:type="ns5:ActivitySettings">
+                    <ns4:constraint xsi:type="ns4:UIPositionConstraint">
+                        <ns4:x>940</ns4:x>
+                        <ns4:y>21</ns4:y>
+                    </ns4:constraint>
+                    <ns5:swimLaneId>Lane 3</ns5:swimLaneId>
+                    <ns5:style>3</ns5:style>
+                </ns4:uiSettings>
+                <ns4:jobType>Customer Invitation</ns4:jobType>
+                <ns4:jobHeader>Error Emailing Invitation to #{customerName}</ns4:jobHeader>
+                <ns4:jobDescription>Error emailing invitation</ns4:jobDescription>
+                <ns4:displayDescription>Error Emailing Invitation to Customer</ns4:displayDescription>
+                <ns4:displayTitle>Error Emailing Invitation to Customer</ns4:displayTitle>
+                <ns4:priority>5</ns4:priority>
+                <ns4:peopleGroupEvaluator>{http://www.enactor.com/crm}CustomerSalesPerson</ns4:peopleGroupEvaluator>
+                <ns4:peopleGroupParameters>
+                    <ns4:parameter required="true" name="customerId">
+                        <ns4:interfaceName>java.lang.String</ns4:interfaceName>
+                        <ns4:value>#{customerNumber}</ns4:value>
+                    </ns4:parameter>
+                </ns4:peopleGroupParameters>
+            </ns4:value>
+            <ns4:index>7</ns4:index>
+        </ns4:listElement>
+        <ns4:listElement>
+            <ns4:value xsi:type="ns4:HTActivity">
+                <ns4:activityId>InformTimeout</ns4:activityId>
+                <ns4:activityTypeId>Generic/ShowMessageActivityType</ns4:activityTypeId>
+                <ns4:suspendActivityOutcome name="Suspend">
+                    <ns4:toActivity>InformTimeout</ns4:toActivity>
+                    <ns4:proceedImmediately>true</ns4:proceedImmediately>
+                </ns4:suspendActivityOutcome>
+                <ns4:activityOutcome name="OK">
+                    <ns4:toActivity>InvitationExpired</ns4:toActivity>
+                    <ns4:proceedImmediately>true</ns4:proceedImmediately>
+                </ns4:activityOutcome>
+                <ns4:parameters>
+                    <ns4:parameter required="true" name="enactor.task.maintenance.Message">
+                        <ns4:interfaceName>java.lang.String</ns4:interfaceName>
+                        <ns4:value>#{concat(concat('Invitation to register sent to customer ',customerName),' has expired.')}</ns4:value>
+                    </ns4:parameter>
+                    <ns4:parameter required="true" name="enactor.task.maintenance.MessageTitle">
+                        <ns4:interfaceName>java.lang.String</ns4:interfaceName>
+                        <ns4:value>Customer Registration</ns4:value>
+                    </ns4:parameter>
+                </ns4:parameters>
+                <ns4:uiSettings xsi:type="ns5:ActivitySettings">
+                    <ns4:constraint xsi:type="ns4:UIPositionConstraint">
+                        <ns4:x>1254</ns4:x>
+                        <ns4:y>323</ns4:y>
+                    </ns4:constraint>
+                    <ns5:swimLaneId>Lane 3</ns5:swimLaneId>
+                    <ns5:style>3</ns5:style>
+                </ns4:uiSettings>
+                <ns4:jobType>Customer Invitation</ns4:jobType>
+                <ns4:jobHeader>Customer Invitation Timed out (#{customerName})</ns4:jobHeader>
+                <ns4:priority>3</ns4:priority>
+                <ns4:peopleGroupEvaluator>{http://www.enactor.com/crm}CustomerSalesPerson</ns4:peopleGroupEvaluator>
+                <ns4:peopleGroupParameters>
+                    <ns4:parameter required="true" name="customerId">
+                        <ns4:interfaceName>java.lang.String</ns4:interfaceName>
+                        <ns4:value>#{customerNumber}</ns4:value>
+                    </ns4:parameter>
+                </ns4:peopleGroupParameters>
+            </ns4:value>
+            <ns4:index>8</ns4:index>
+        </ns4:listElement>
+        <ns4:listElement>
+            <ns4:value xsi:type="ns4:EndProcessActivity">
+                <ns4:activityId>InvitationExpired</ns4:activityId>
+                <ns4:activityTypeId>Generic/EndProcessActivityType</ns4:activityTypeId>
+                <ns4:uiSettings xsi:type="ns5:ActivitySettings">
+                    <ns4:constraint xsi:type="ns4:UIPositionConstraint">
+                        <ns4:x>1572</ns4:x>
+                        <ns4:y>56</ns4:y>
+                    </ns4:constraint>
+                    <ns5:swimLaneId>Lane 3</ns5:swimLaneId>
+                    <ns5:style>1</ns5:style>
+                </ns4:uiSettings>
+                <ns4:discard>false</ns4:discard>
+            </ns4:value>
+            <ns4:index>9</ns4:index>
+        </ns4:listElement>
+        <ns4:listElement>
+            <ns4:value xsi:type="ns4:HTActivity">
+                <ns4:activityId>SetUpCustomerInvitation</ns4:activityId>
+                <ns4:name>Set up Customer Invitation</ns4:name>
+                <ns4:activityTypeId>CRM/SetUpCustomerInvitationActivityType</ns4:activityTypeId>
+                <ns4:suspendActivityOutcome name="Suspend">
+                    <ns4:toActivity>SetUpCustomerInvitation</ns4:toActivity>
+                    <ns4:proceedImmediately>true</ns4:proceedImmediately>
+                </ns4:suspendActivityOutcome>
+                <ns4:activityOutcome name="Cancel">
+                    <ns4:toActivity>Discard</ns4:toActivity>
+                    <ns4:proceedImmediately>true</ns4:proceedImmediately>
+                </ns4:activityOutcome>
+                <ns4:activityOutcome name="Success">
+                    <ns4:toActivity>CreateInvitation</ns4:toActivity>
+                    <ns4:proceedImmediately>true</ns4:proceedImmediately>
+                </ns4:activityOutcome>
+                <ns4:uiSettings xsi:type="ns5:ActivitySettings">
+                    <ns4:constraint xsi:type="ns4:UIPositionConstraint">
+                        <ns4:x>357</ns4:x>
+                        <ns4:y>53</ns4:y>
+                    </ns4:constraint>
+                    <ns5:swimLaneId>Lane 3</ns5:swimLaneId>
+                </ns4:uiSettings>
+                <ns4:metaData>
+                    <ns4:outputs>
+                        <ns4:output required="true" name="enactor.mfc.CustomerNumber">
+                            <ns4:interfaceName>java.lang.String</ns4:interfaceName>
+                        </ns4:output>
+                        <ns4:output required="true" name="enactor.mfc.LoyaltyAccountId">
+                            <ns4:interfaceName>java.lang.String</ns4:interfaceName>
+                        </ns4:output>
+                        <ns4:output required="true" name="enactor.mfc.CommunicationScriptId">
+                            <ns4:interfaceName>java.lang.String</ns4:interfaceName>
+                        </ns4:output>
+                        <ns4:output required="true" name="enactor.mfc.CustomerName">
+                            <ns4:interfaceName>java.lang.String</ns4:interfaceName>
+                        </ns4:output>
+                    </ns4:outputs>
+                </ns4:metaData>
+                <ns4:jobType>Customer Invitation</ns4:jobType>
+                <ns4:jobHeader>Set Up Customer Invitation</ns4:jobHeader>
+                <ns4:jobDescription>Set Up Customer Invitation</ns4:jobDescription>
+                <ns4:displayDescriptionMessageBase>CRM/CustomerRegistrationMessages</ns4:displayDescriptionMessageBase>
+                <ns4:displayDescriptionMessageId>SETUP_EVENT_INVITATION_SUBTITLE</ns4:displayDescriptionMessageId>
+                <ns4:displayTitleMessageBase>CRM/CustomerRegistrationMessages</ns4:displayTitleMessageBase>
+                <ns4:displayTitleMessageId>SETUP_EVENT_INVITATION_TITLE</ns4:displayTitleMessageId>
+                <ns4:priority>5</ns4:priority>
+                <ns4:peopleGroupEvaluator>{http://www.enactor.com/task}SimpleUserEvaluator</ns4:peopleGroupEvaluator>
+            </ns4:value>
+            <ns4:index>10</ns4:index>
+        </ns4:listElement>
+        <ns4:listElement>
+            <ns4:value xsi:type="ns4:StartActivity">
+                <ns4:activityId>StartCustomerInvitation</ns4:activityId>
+                <ns4:name>Start</ns4:name>
+                <ns4:activityTypeId>Generic/StartProcessActivityType</ns4:activityTypeId>
+                <ns4:activityOutcome name="Success">
+                    <ns4:toActivity>SetUpCustomerInvitation</ns4:toActivity>
+                    <ns4:proceedImmediately>true</ns4:proceedImmediately>
+                </ns4:activityOutcome>
+                <ns4:uiSettings xsi:type="ns5:ActivitySettings">
+                    <ns4:constraint xsi:type="ns4:UIPositionConstraint">
+                        <ns4:x>134</ns4:x>
+                        <ns4:y>64</ns4:y>
+                    </ns4:constraint>
+                    <ns5:swimLaneId>Lane 3</ns5:swimLaneId>
+                </ns4:uiSettings>
+            </ns4:value>
+            <ns4:index>11</ns4:index>
+        </ns4:listElement>
+        <ns4:listElement>
+            <ns4:value xsi:type="ns4:EndProcessActivity">
+                <ns4:activityId>Discard</ns4:activityId>
+                <ns4:activityTypeId>Generic/EndProcessActivityType</ns4:activityTypeId>
+                <ns4:uiSettings xsi:type="ns5:ActivitySettings">
+                    <ns4:constraint xsi:type="ns4:UIPositionConstraint">
+                        <ns4:x>368</ns4:x>
+                        <ns4:y>12</ns4:y>
+                    </ns4:constraint>
+                    <ns5:swimLaneId>Lane 1</ns5:swimLaneId>
+                </ns4:uiSettings>
+                <ns4:discard>true</ns4:discard>
+            </ns4:value>
+            <ns4:index>12</ns4:index>
+        </ns4:listElement>
+        <ns4:listImplClass>java.util.LinkedList</ns4:listImplClass>
+    </ns4:activities>
+    <ns4:defaultStartActivityId>CreateInvitation</ns4:defaultStartActivityId>
+    <ns4:defaultOutcomes/>
+</ns4:simpleActivityFlowBusinessProcess>

@@ -1,0 +1,2050 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<core:process xmlns:core="http://www.enactor.com/core" xmlns:retail="http://www.enactor.com/retail" xmlns:ns4="http://www.enactor.com/crm" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:ns6="http://www.apis-it.hr/fin/2012/types/f73" xmlns:ns7="http://www.w3.org/2000/09/xmldsig#" xmlns:ns8="http://www.fu.gov.si/" xmlns:ns9="http://www.enactor.com/addressLookup/service" xmlns:ns10="http://www.enactor.com/retail/storedRetailTransaction/service" xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:ns14="http://www.enactor.com/crm/customerLoyalty/service" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <core:processID>EstateDirector/Processing/CustomerOrders/ProcessOrderPayments</core:processID>
+    <core:version>1.0</core:version>
+    <core:name></core:name>
+    <core:defaultMessageBaseName></core:defaultMessageBaseName>
+    <core:firstStateID>Entry State</core:firstStateID>
+    <core:className></core:className>
+    <core:uiHints>
+        <entry>
+            <key>com.enactor.tools.editor.process.style</key>
+            <value>57</value>
+        </entry>
+        <entry>
+            <key>com.enactor.tools.editor.process.xloc</key>
+            <value>0</value>
+        </entry>
+        <entry>
+            <key>com.enactor.tools.editor.process.yloc</key>
+            <value>12</value>
+        </entry>
+    </core:uiHints>
+    <core:metaData>
+        <core:inputs>
+            <core:input required="true" name="enactor.customerOrders.CustomerOrderId">
+                <core:interfaceName>java.lang.String</core:interfaceName>
+            </core:input>
+            <core:input required="true" name="enactor.mfc.RetailSaleTransaction">
+                <core:interfaceName>com.enactor.mfc.retail.transaction.IRetailSaleTransaction</core:interfaceName>
+            </core:input>
+            <core:input required="true" name="enactor.customerOrders.MaximumPayment">
+                <core:interfaceName>java.lang.Long</core:interfaceName>
+            </core:input>
+            <core:input required="false" name="enactor.customerOrders.TotalUsedTenderValue">
+                <core:interfaceName>java.lang.Long</core:interfaceName>
+            </core:input>
+        </core:inputs>
+        <core:outputs>
+            <core:output required="true" name="enactor.customerOrders.PaymentList">
+                <core:interfaceName>java.util.List</core:interfaceName>
+            </core:output>
+            <core:output name="enactor.customerOrders.TotalUsedTenderValue">
+                <core:interfaceName>java.lang.Long</core:interfaceName>
+            </core:output>
+        </core:outputs>
+        <stateDataTypes>
+            <stateDataType required="true" name="enactor.mfc.ChequeTenderItem">
+                <core:interfaceName>com.enactor.mfc.basket.items.IChequeTenderItem</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.mfc.BasketItemIterator">
+                <core:interfaceName>java.util.Iterator</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.mfc.AccountTenderItem">
+                <core:interfaceName>com.enactor.mfc.basket.items.IAccountTenderItem</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.customerOrders.CustomerOrderId">
+                <core:interfaceName>java.lang.String</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.customerOrders.MaximumPayment">
+                <core:interfaceName>java.lang.Long</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.customerOrders.retail.CustomerOrderCreatePaymentMessage">
+                <core:interfaceName>com.enactor.customerOrders.retail.customerOrderPaymentMessage.ICustomerOrderCreatePaymentMessage</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.mfc.BasketItem">
+                <core:interfaceName>com.enactor.mfc.basket.items.ITenderItem</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.mfc.RetailSaleTransaction">
+                <core:interfaceName>com.enactor.mfc.retail.transaction.IRetailSaleTransaction</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.customerOrders.PaymentList">
+                <core:interfaceName>java.util.List</core:interfaceName>
+            </stateDataType>
+            <stateDataType name="enactor.customerOrders.TotalUsedTenderValue">
+                <core:interfaceName>java.lang.Long</core:interfaceName>
+            </stateDataType>
+        </stateDataTypes>
+    </core:metaData>
+    <core:notes>
+        <core:processNote>
+            <core:noteId>Note1</core:noteId>
+            <core:description>We negate the sign of the tender on the basket so that payments are positive in the order system</core:description>
+            <core:constraint>
+                <core:x>3699</core:x>
+                <core:y>1035</core:y>
+                <core:height>117</core:height>
+                <core:width>163</core:width>
+            </core:constraint>
+        </core:processNote>
+    </core:notes>
+    <core:assignAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>InitialiseChequePayment</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIAssignAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>27</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>3278</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>2307</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="customerOrderChequePayment" name="enactor.customerOrders.PaymentType">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.ChequeTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.IChequeTenderItem</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.customerOrders.retail.CustomerOrderCreatePaymentMessage">
+                    <core:interfaceName>com.enactor.customerOrders.retail.customerOrderPaymentMessage.ICustomerOrderCreateChequePaymentMessage</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.customerOrders.PaymentType">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.BasketItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.ITenderItem</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="true" name="enactor.customerOrders.retail.CustomerOrderCreatePaymentMessage">
+                    <core:interfaceName>com.enactor.customerOrders.retail.customerOrderPaymentMessage.ICustomerOrderCreateChequePaymentMessage</core:interfaceName>
+                </core:output>
+                <core:output required="true" name="enactor.mfc.ChequeTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.IChequeTenderItem</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.Assign</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>InitialisePaymentProperties</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:dataAssignment toExpression="chequeTenderItem" fromExpression="basketItem"/>
+        <core:dataAssignment toExpression="customerOrderCreatePaymentMessage.sortCode" fromExpression="chequeTenderItem.bankSortCode"/>
+        <core:dataAssignment toExpression="customerOrderCreatePaymentMessage.accountNumber" fromExpression="chequeTenderItem.chequeAccountNumber"/>
+        <core:dataAssignment toExpression="customerOrderCreatePaymentMessage.chequeNumber" fromExpression="chequeTenderItem.chequeNumber"/>
+        <core:dataAssignment toExpression="customerOrderCreatePaymentMessage.paymentType" fromExpression="paymentType"/>
+    </core:assignAction>
+    <core:assignAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>InitialiseAccountPayment</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIAssignAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>27</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>3278</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>1575</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="customerOrderAccountPayment" name="enactor.customerOrders.PaymentType">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.BasketItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.ITenderItem</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.customerOrders.PaymentType">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.customerOrders.retail.CustomerOrderCreatePaymentMessage">
+                    <core:interfaceName>com.enactor.customerOrders.retail.customerOrderPaymentMessage.ICustomerOrderCreateAccountPaymentMessage</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.AccountTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.IAccountTenderItem</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="true" name="enactor.customerOrders.retail.CustomerOrderCreatePaymentMessage">
+                    <core:interfaceName>com.enactor.customerOrders.retail.customerOrderPaymentMessage.ICustomerOrderCreateAccountPaymentMessage</core:interfaceName>
+                </core:output>
+                <core:output required="true" name="enactor.mfc.AccountTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.IAccountTenderItem</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.Assign</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>InitialisePaymentProperties</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:dataAssignment toExpression="accountTenderItem" fromExpression="basketItem"/>
+        <core:dataAssignment toExpression="customerOrderCreatePaymentMessage.accountId" fromExpression="accountTenderItem.accountId"/>
+        <core:dataAssignment toExpression="customerOrderCreatePaymentMessage.paymentType" fromExpression="paymentType"/>
+    </core:assignAction>
+    <core:assignAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>InitialiseCardPayment</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIAssignAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>27</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>3278</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>1941</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="customerOrderCardPayment" name="enactor.customerOrders.PaymentType">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.customerOrders.retail.CustomerOrderCreatePaymentMessage">
+                    <core:interfaceName>com.enactor.customerOrders.retail.customerOrderPaymentMessage.ICustomerOrderCreateCardPaymentMessage</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.CardPaymentTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.ICardPaymentTenderItem</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.BasketItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.ITenderItem</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.customerOrders.PaymentType">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="true" name="enactor.customerOrders.retail.CustomerOrderCreatePaymentMessage">
+                    <core:interfaceName>com.enactor.customerOrders.retail.customerOrderPaymentMessage.ICustomerOrderCreateCardPaymentMessage</core:interfaceName>
+                </core:output>
+                <core:output required="true" name="enactor.mfc.CardPaymentTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.ICardPaymentTenderItem</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.Assign</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>InitialisePaymentProperties</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>AssignPaymentServiceProvider</core:toActionID>
+            <core:condition>instanceOf(process.basketItem, 'com.enactor.mfc.basket.items.IPaymentServiceTenderItem')</core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:dataAssignment toExpression="cardPaymentTenderItem" fromExpression="basketItem"/>
+        <core:dataAssignment toExpression="customerOrderCreatePaymentMessage.cardDetails" fromExpression="cardPaymentTenderItem.cardDetails"/>
+        <core:dataAssignment toExpression="customerOrderCreatePaymentMessage.paymentType" fromExpression="paymentType"/>
+    </core:assignAction>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>CreateCashPayment</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.CreateEntityAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>27</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2911</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>1209</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="customerOrderCreateCashPaymentMessage" name="enactor.coreUI.EntityName">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:param value="http://www.enactor.com/retail" name="enactor.coreUI.EntityNamespace">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.coreUI.EntityName">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.coreUI.EntityNamespace">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output name="enactor.coreUI.Entity">
+                    <core:interfaceName>com.enactor.core.entities.IEntity</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>SetPaymentTypeForCash</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>CreateAccountPayment</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.CreateEntityAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>27</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2911</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>1575</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="customerOrderCreateAccountPaymentMessage" name="enactor.coreUI.EntityName">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:param value="http://www.enactor.com/retail" name="enactor.coreUI.EntityNamespace">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.coreUI.EntityName">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.coreUI.EntityNamespace">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output name="enactor.coreUI.Entity">
+                    <core:interfaceName>com.enactor.core.entities.IEntity</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>InitialiseAccountPayment</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>CreateChequePayment</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.CreateEntityAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>27</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2911</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>2307</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="customerOrderCreateChequePaymentMessage" name="enactor.coreUI.EntityName">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:param value="http://www.enactor.com/retail" name="enactor.coreUI.EntityNamespace">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.coreUI.EntityName">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.coreUI.EntityNamespace">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output name="enactor.coreUI.Entity">
+                    <core:interfaceName>com.enactor.core.entities.IEntity</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>InitialiseChequePayment</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>CreateCardPayment</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.CreateEntityAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>27</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2911</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>1941</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="customerOrderCreateCardPaymentMessage" name="enactor.coreUI.EntityName">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:param value="http://www.enactor.com/retail" name="enactor.coreUI.EntityNamespace">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.coreUI.EntityName">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.coreUI.EntityNamespace">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output name="enactor.coreUI.Entity">
+                    <core:interfaceName>com.enactor.core.entities.IEntity</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>SetPaymentTypeForCard</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:endProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>Success</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIEndProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2177</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>11</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData/>
+        <core:typeId>enactor.types.EndProcess</core:typeId>
+        <core:outcome>Success</core:outcome>
+        <core:defaultProcessId></core:defaultProcessId>
+    </core:endProcessAction>
+    <core:createObject>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>CreateOrderPaymentsList</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UICreateObjectAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1076</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>761</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:outputs>
+                <core:output name="enactor.coreUI.Object">
+                    <core:interfaceName>java.lang.Object</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.CreateObject</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>6</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>IterateTenderItemsForOrderPayment</core:toActionID>
+            <core:condition>process.maximumPayment != 0</core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>TestExchangePaymentRequired</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:objectClassname></core:objectClassname>
+        <core:objectXml>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;yes&quot;?&gt;
+&lt;core:wrappedList xmlns:core=&quot;http://www.enactor.com/core&quot; xmlns:hta=&quot;http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803&quot; xmlns:htd=&quot;http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803&quot; xmlns:htt=&quot;http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803&quot; xmlns:ns5=&quot;http://www.enactor.com/retail/storedRetailTransaction/service&quot; xmlns:retail=&quot;http://www.enactor.com/retail&quot; xmlns:sref=&quot;http://docs.oasis-open.org/wsbpel/2.0/serviceref&quot; xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;/&gt;</core:objectXml>
+    </core:createObject>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>CreateCustomerOrderPayment</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.CreateEntityAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>27</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2905</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>2912</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="customerOrderCreatePaymentMessage" name="enactor.coreUI.EntityName">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:param value="http://www.enactor.com/retail" name="enactor.coreUI.EntityNamespace">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.coreUI.EntityName">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.coreUI.EntityNamespace">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output name="enactor.coreUI.Entity">
+                    <core:interfaceName>com.enactor.core.entities.IEntity</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>SetPaymentType</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>AddOrderPaymentToList</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.AddToCollectionAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>27</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>4020</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>761</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input name="enactor.coreUI.Collection">
+                    <core:interfaceName>java.util.Collection</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.coreUI.Object">
+                    <core:interfaceName>java.lang.Object</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output name="enactor.coreUI.Collection">
+                    <core:interfaceName>java.util.Collection</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>UpdateValues</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:assignAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>InitialisePaymentProperties</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIAssignAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.notes</key>
+                <value>Note1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>27</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>3645</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>1209</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.BasketItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.ITenderItem</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.customerOrders.PaymentValue">
+                    <core:interfaceName>java.lang.Long</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.customerOrders.retail.CustomerOrderCreatePaymentMessage">
+                    <core:interfaceName>com.enactor.customerOrders.retail.customerOrderPaymentMessage.ICustomerOrderCreatePaymentMessage</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.customerOrders.CustomerOrderId">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.RetailSaleTransaction">
+                    <core:interfaceName>com.enactor.mfc.retail.transaction.IRetailSaleTransaction</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.customerOrders.IsRefund">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="true" name="enactor.customerOrders.retail.CustomerOrderCreatePaymentMessage">
+                    <core:interfaceName>com.enactor.customerOrders.retail.customerOrderPaymentMessage.ICustomerOrderCreatePaymentMessage</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.Assign</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>AddOrderPaymentToList</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:dataAssignment toExpression="customerOrderCreatePaymentMessage.transactionId" fromExpression="retailSaleTransaction.transactionId"/>
+        <core:dataAssignment toExpression="customerOrderCreatePaymentMessage.isRefund" fromExpression="isRefund"/>
+        <core:dataAssignment toExpression="customerOrderCreatePaymentMessage.customerOrderId" fromExpression="customerOrderId"/>
+        <core:dataAssignment toExpression="customerOrderCreatePaymentMessage.amount" fromExpression="paymentValue"/>
+        <core:dataAssignment toExpression="customerOrderCreatePaymentMessage.currencyKey.currencyId" fromExpression="basketItem.currencyId"/>
+        <core:dataAssignment toExpression="customerOrderCreatePaymentMessage.exchangeRate" fromExpression="basketItem.exchangeRate"/>
+        <core:dataAssignment toExpression="customerOrderCreatePaymentMessage.foreignValue" fromExpression="basketItem.foreignAmount"/>
+        <core:dataAssignment toExpression="customerOrderCreatePaymentMessage.tenderKey" fromExpression="basketItem.tenderKey"/>
+        <core:dataAssignment toExpression="customerOrderCreatePaymentMessage.createdByUserKey" fromExpression="retailSaleTransaction.completedBy.userKey"/>
+        <core:dataAssignment toExpression="customerOrderCreatePaymentMessage.transactionLineNumber" fromExpression="basketItem.lineNumber"/>
+    </core:assignAction>
+    <core:assignAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>InitialiseCashPayment</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIAssignAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>27</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>3278</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>1209</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="customerOrderCashPayment" name="enactor.customerOrders.PaymentType">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.customerOrders.retail.CustomerOrderCreatePaymentMessage">
+                    <core:interfaceName>com.enactor.customerOrders.retail.customerOrderPaymentMessage.ICustomerOrderCreateCashPaymentMessage</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.customerOrders.PaymentType">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="true" name="enactor.customerOrders.retail.CustomerOrderCreatePaymentMessage">
+                    <core:interfaceName>com.enactor.customerOrders.retail.customerOrderPaymentMessage.ICustomerOrderCreateCashPaymentMessage</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.Assign</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>InitialisePaymentProperties</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:dataAssignment toExpression="customerOrderCreatePaymentMessage.paymentType" fromExpression="paymentType"/>
+    </core:assignAction>
+    <core:assignAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>InitialisePayment</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIAssignAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>27</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>3281</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>2923</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="customerOrderPayment" name="enactor.customerOrders.PaymentType">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.customerOrders.retail.CustomerOrderCreatePaymentMessage">
+                    <core:interfaceName>com.enactor.customerOrders.retail.customerOrderPaymentMessage.ICustomerOrderCreateAccountPaymentMessage</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.customerOrders.PaymentType">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="true" name="enactor.customerOrders.retail.CustomerOrderCreatePaymentMessage">
+                    <core:interfaceName>com.enactor.customerOrders.retail.customerOrderPaymentMessage.ICustomerOrderCreateAccountPaymentMessage</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.Assign</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>InitialisePaymentProperties</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:dataAssignment toExpression="customerOrderCreatePaymentMessage.paymentType" fromExpression="paymentType"/>
+    </core:assignAction>
+    <core:assignAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>Initialise</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIAssignAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>27</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>709</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>761</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="false" name="enactor.customerOrders.TotalUsedTenderValue">
+                    <core:interfaceName>java.lang.Long</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.customerOrders.MaximumPayment">
+                    <core:interfaceName>java.lang.Long</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="false" name="enactor.customerOrders.TotalUsedTenderValue">
+                    <core:interfaceName>java.lang.Long</core:interfaceName>
+                </core:output>
+                <core:output required="true" name="enactor.customerOrders.RemainingTenderValue">
+                    <core:interfaceName>java.lang.Long</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.Assign</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>CreateOrderPaymentsList</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:dataAssignment toExpression="totalUsedTenderValue" fromExpression="notEmpty(totalUsedTenderValue) ? totalUsedTenderValue : 0"/>
+        <core:dataAssignment toExpression="remainingTenderValue" fromExpression="maximumPayment"/>
+    </core:assignAction>
+    <core:assignAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>UpdateValues</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIAssignAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>27</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2177</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>761</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.customerOrders.retail.CustomerOrderCreatePaymentMessage">
+                    <core:interfaceName>com.enactor.customerOrders.retail.customerOrderPaymentMessage.ICustomerOrderCreatePaymentMessage</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.customerOrders.TotalUsedTenderValue">
+                    <core:interfaceName>java.lang.Long</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.customerOrders.RemainingTenderValue">
+                    <core:interfaceName>java.lang.Long</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.customerOrders.IsRefund">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="true" name="enactor.customerOrders.TotalUsedTenderValue">
+                    <core:interfaceName>java.lang.Long</core:interfaceName>
+                </core:output>
+                <core:output required="true" name="enactor.customerOrders.MaximumPayment">
+                    <core:interfaceName>java.lang.Long</core:interfaceName>
+                </core:output>
+                <core:output required="true" name="enactor.customerOrders.RemainingTenderValue">
+                    <core:interfaceName>java.lang.Long</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.Assign</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>TestExchangePaymentRequired</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>IterateTenderItemsForOrderPayment</core:toActionID>
+            <core:condition>state.remainingTenderValue != 0</core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:dataAssignment toExpression="totalUsedTenderValue" fromExpression="totalUsedTenderValue + (isRefund ? -customerOrderCreatePaymentMessage.amount : customerOrderCreatePaymentMessage.amount)"/>
+        <core:dataAssignment toExpression="remainingTenderValue" fromExpression="remainingTenderValue -  (isRefund ? -customerOrderCreatePaymentMessage.amount : customerOrderCreatePaymentMessage.amount)"/>
+    </core:assignAction>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>IterateTenderItemsForOrderPayment</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.customerOrders.retail.processing.IterateItemsForOrderPayment</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>27</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1443</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>761</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="false" name="enactor.mfc.BasketItemIterator">
+                    <core:interfaceName>java.util.Iterator</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.RetailSaleTransaction">
+                    <core:interfaceName>com.enactor.mfc.retail.transaction.IRetailSaleTransaction</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="false" name="enactor.mfc.BasketItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.IBasketItem</core:interfaceName>
+                </core:output>
+                <core:output required="false" name="enactor.mfc.BasketItemIterator">
+                    <core:interfaceName>java.util.Iterator</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Completed"/>
+                <core:outcome name="Next"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>TestExchangePaymentRequired</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Completed</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>7</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>TestRefund</core:toActionID>
+            <core:condition>!process.basketItem.isChange &amp;&amp; (process.maximumPayment &lt; 0 ? process.basketItem.effectiveNetValue &gt; 0 : process.basketItem.effectiveNetValue &lt; 0)</core:condition>
+            <core:outcome>Next</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>IterateTenderItemsForOrderPayment</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Next</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>CreateExchangePayment</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.CreateEntityAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>27</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2177</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>355</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="customerOrderCreateExchangePaymentMessage" name="enactor.coreUI.EntityName">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:param value="http://www.enactor.com/retail" name="enactor.coreUI.EntityNamespace">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.coreUI.EntityName">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.coreUI.EntityNamespace">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output name="enactor.coreUI.Entity">
+                    <core:interfaceName>com.enactor.core.entities.IEntity</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>InitialiseExchangePaymentProperties</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:assignAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>InitialiseExchangePaymentProperties</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIAssignAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>27</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2544</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>355</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="customerOrderExchangePayment" name="enactor.customerOrders.PaymentType">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.customerOrders.RemainingTenderValue">
+                    <core:interfaceName>java.lang.Long</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.customerOrders.PaymentType">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.customerOrders.CustomerOrderId">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.customerOrders.retail.CustomerOrderCreatePaymentMessage">
+                    <core:interfaceName>com.enactor.customerOrders.retail.customerOrderPaymentMessage.ICustomerOrderCreatePaymentMessage</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.RetailSaleTransaction">
+                    <core:interfaceName>com.enactor.mfc.retail.transaction.IRetailSaleTransaction</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="true" name="enactor.customerOrders.retail.CustomerOrderCreatePaymentMessage">
+                    <core:interfaceName>com.enactor.customerOrders.retail.customerOrderPaymentMessage.ICustomerOrderCreatePaymentMessage</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.Assign</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>AddExchangePaymentToList</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:dataAssignment toExpression="customerOrderCreatePaymentMessage.transactionId" fromExpression="retailSaleTransaction.transactionId"/>
+        <core:dataAssignment toExpression="customerOrderCreatePaymentMessage.customerOrderId" fromExpression="customerOrderId"/>
+        <core:dataAssignment toExpression="customerOrderCreatePaymentMessage.amount" fromExpression="remainingTenderValue"/>
+        <core:dataAssignment toExpression="customerOrderCreatePaymentMessage.currencyKey.currencyId" fromExpression="retailSaleTransaction.basket.currencyId"/>
+        <core:dataAssignment toExpression="customerOrderCreatePaymentMessage.paymentType" fromExpression="paymentType"/>
+    </core:assignAction>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>AddExchangePaymentToList</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.AddToCollectionAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>27</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2911</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>355</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input name="enactor.coreUI.Collection">
+                    <core:interfaceName>java.util.Collection</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.coreUI.Object">
+                    <core:interfaceName>java.lang.Object</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output name="enactor.coreUI.Collection">
+                    <core:interfaceName>java.util.Collection</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>Success</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>TestTenderType</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UINullAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>3</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2544</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>1575</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.NullAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>CreateCashPayment</core:toActionID>
+            <core:condition>instanceOf(process.basketItem, 'com.enactor.mfc.basket.items.ICashTenderItem')</core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>CreateAccountPayment</core:toActionID>
+            <core:condition>instanceOf(process.basketItem, 'com.enactor.mfc.basket.items.ICustomerAccountTenderItem')</core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>3</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>CreateCardPayment</core:toActionID>
+            <core:condition>instanceOf(process.basketItem, 'com.enactor.mfc.basket.items.ICardPaymentTenderItem')</core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>4</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>CreateChequePayment</core:toActionID>
+            <core:condition>instanceOf(process.basketItem, 'com.enactor.mfc.basket.items.IChequeTenderItem')</core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>5</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>CreateCustomerOrderPayment</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>6</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>CreateGiftCardPayment</core:toActionID>
+            <core:condition>instanceOf(process.basketItem, 'com.enactor.mfc.basket.items.GiftCardTenderItem')</core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>TestExchangePaymentRequired</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UINullAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1443</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>355</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.NullAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>CreateExchangePayment</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>Success</core:toActionID>
+            <core:condition>state.remainingTenderValue == 0</core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>TestRefund</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UINullAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1810</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>1209</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.NullAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>CalculateRefundPaymentValue</core:toActionID>
+            <core:condition>process.maximumPayment &lt; 0</core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>CalculateSalePaymentValue</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:assignAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>CalculateSalePaymentValue</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIAssignAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>27</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2177</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>1209</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.customerOrders.RemainingTenderValue">
+                    <core:interfaceName>java.lang.Long</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.BasketItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.ITenderItem</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="true" name="enactor.customerOrders.PaymentValue">
+                    <core:interfaceName>java.lang.Long</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.Assign</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>TestTenderType</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:dataAssignment toExpression="paymentValue" fromExpression="(remainingTenderValue &gt; -basketItem.effectiveNetValue) ? -basketItem.effectiveNetValue : remainingTenderValue"/>
+    </core:assignAction>
+    <core:assignAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>CalculateRefundPaymentValue</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIAssignAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>27</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2177</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>1575</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.customerOrders.RemainingTenderValue">
+                    <core:interfaceName>java.lang.Long</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.BasketItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.ITenderItem</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="true" name="enactor.customerOrders.PaymentValue">
+                    <core:interfaceName>java.lang.Long</core:interfaceName>
+                </core:output>
+                <core:output required="true" name="enactor.customerOrders.IsRefund">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.Assign</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>TestTenderType</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:dataAssignment toExpression="paymentValue" fromExpression="(remainingTenderValue &gt; -basketItem.effectiveNetValue) ? remainingTenderValue : basketItem.effectiveNetValue"/>
+        <core:dataAssignment toExpression="isRefund" fromExpression="true"/>
+    </core:assignAction>
+    <core:assignAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>AssignPaymentServiceProvider</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIAssignAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>959</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>3513</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>1920</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.mfc.BasketItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.IPaymentServiceTenderItem</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.customerOrders.retail.CustomerOrderCreatePaymentMessage">
+                    <core:interfaceName>com.enactor.customerOrders.retail.customerOrderPaymentMessage.ICustomerOrderCreatePaymentMessage</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="true" name="enactor.customerOrders.retail.CustomerOrderCreatePaymentMessage">
+                    <core:interfaceName>com.enactor.customerOrders.retail.customerOrderPaymentMessage.ICustomerOrderCreatePaymentMessage</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.Assign</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>InitialisePaymentProperties</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:dataAssignment toExpression="customerOrderCreatePaymentMessage.paymentServiceProvider" fromExpression="basketItem.paymentServiceType"/>
+    </core:assignAction>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>CreateGiftCardPayment</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.CreateEntityAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>27</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2904</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>2596</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="customerOrderCreateGiftCardPaymentMessage" name="enactor.coreUI.EntityName">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:param value="http://www.enactor.com/retail" name="enactor.coreUI.EntityNamespace">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.coreUI.EntityName">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.coreUI.EntityNamespace">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output name="enactor.coreUI.Entity">
+                    <core:interfaceName>com.enactor.core.entities.IEntity</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>SetPaymentTypeForGiftCard</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:assignAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>InitialiseGiftCardPayment</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIAssignAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>27</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>3280</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>2598</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.customerOrders.PaymentType">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.customerOrders.retail.CustomerOrderCreatePaymentMessage">
+                    <core:interfaceName>com.enactor.customerOrders.retail.customerOrderPaymentMessage.ICustomerOrderCreateGiftCardPaymentMessage</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.GiftCardTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.IGiftCardTenderItem</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="true" name="enactor.customerOrders.retail.CustomerOrderCreatePaymentMessage">
+                    <core:interfaceName>com.enactor.customerOrders.retail.customerOrderPaymentMessage.ICustomerOrderCreateGiftCardPaymentMessage</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.Assign</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>InitialisePaymentProperties</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:dataAssignment toExpression="customerOrderCreatePaymentMessage.paymentType" fromExpression="paymentType"/>
+        <core:dataAssignment toExpression="customerOrderCreatePaymentMessage.giftCardDetails" fromExpression="giftCardTenderItem.giftCardDetails"/>
+    </core:assignAction>
+    <core:assignAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>SetPaymentTypeForCash</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIAssignAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>3277</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>1117</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.customerOrders.IsRefund">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="true" name="enactor.customerOrders.PaymentType">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.Assign</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>InitialiseCashPayment</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:dataAssignment toExpression="paymentType" fromExpression="isRefund ? 'customerOrderCashRefund' : 'customerOrderCashPayment'"/>
+    </core:assignAction>
+    <core:assignAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>SetPaymentTypeForCard</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIAssignAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>3279</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>1871</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.customerOrders.IsRefund">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="true" name="enactor.customerOrders.PaymentType">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.Assign</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>InitialiseCardPayment</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:dataAssignment toExpression="paymentType" fromExpression="isRefund ? 'customerOrderCardRefund' : 'customerOrderCardPayment'"/>
+    </core:assignAction>
+    <core:assignAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>SetPaymentTypeForGiftCard</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIAssignAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>3281</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>2843</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.customerOrders.IsRefund">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="true" name="enactor.customerOrders.PaymentType">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.Assign</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>InitialiseGiftCardPayment</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:dataAssignment toExpression="paymentType" fromExpression="isRefund ? 'customerOrderGiftCardRefund' : 'customerOrderGiftCardPayment'"/>
+    </core:assignAction>
+    <core:assignAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>SetPaymentType</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIAssignAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>3281</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>3139</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.customerOrders.IsRefund">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="true" name="enactor.customerOrders.PaymentType">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.Assign</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>InitialisePayment</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:dataAssignment toExpression="paymentType" fromExpression="isRefund ? 'customerOrderRefund' : 'customerOrderPayment'"/>
+    </core:assignAction>
+    <core:state>
+        <core:url></core:url>
+        <core:stateID>Entry State</core:stateID>
+        <core:name></core:name>
+        <core:className></core:className>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>37</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>342</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>761</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <handledEvents>
+                <handledEvent name="StateEntered"/>
+            </handledEvents>
+            <stateDataTypes>
+                <stateDataType required="true" name="enactor.customerOrders.RemainingTenderValue">
+                    <core:interfaceName>java.lang.Long</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="true" name="enactor.mfc.CardTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.ICardTenderItem</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="true" name="enactor.customerOrders.PaymentValue">
+                    <core:interfaceName>java.lang.Long</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="true" name="enactor.mfc.CardPaymentTenderItem">
+                    <core:interfaceName>com.enactor.mfc.basket.items.ICardPaymentTenderItem</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="true" name="enactor.customerOrders.IsRefund">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="true" name="enactor.customerOrders.PaymentType">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </stateDataType>
+            </stateDataTypes>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicState</core:typeId>
+        <core:singleInstance>false</core:singleInstance>
+        <core:respondToViewEvents>false</core:respondToViewEvents>
+        <core:actionInputMappings>
+            <core:actionMapping>
+                <core:actionID>AddOrderPaymentToList</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.customerOrders.retail.CustomerOrderCreatePaymentMessage">
+<core:interfaceName>com.enactor.customerOrders.retail.customerOrderPaymentMessage.ICustomerOrderCreatePaymentMessage</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.coreUI.Object">
+<core:interfaceName>java.lang.Object</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.customerOrders.PaymentList">
+<core:interfaceName>java.util.List</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType name="enactor.coreUI.Collection">
+<core:interfaceName>java.util.Collection</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings/>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>AddExchangePaymentToList</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.customerOrders.PaymentList">
+<core:interfaceName>java.util.List</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType name="enactor.coreUI.Collection">
+<core:interfaceName>java.util.Collection</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.customerOrders.retail.CustomerOrderCreatePaymentMessage">
+<core:interfaceName>com.enactor.customerOrders.retail.customerOrderPaymentMessage.ICustomerOrderCreatePaymentMessage</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.coreUI.Object">
+<core:interfaceName>java.lang.Object</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings/>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>InitialiseGiftCardPayment</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.customerOrders.retail.CustomerOrderCreatePaymentMessage">
+<core:interfaceName>com.enactor.customerOrders.retail.customerOrderPaymentMessage.ICustomerOrderCreatePaymentMessage</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.customerOrders.retail.CustomerOrderCreatePaymentMessage">
+<core:interfaceName>com.enactor.customerOrders.retail.customerOrderPaymentMessage.ICustomerOrderCreateGiftCardPaymentMessage</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.BasketItem">
+<core:interfaceName>com.enactor.mfc.basket.items.ITenderItem</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.GiftCardTenderItem">
+<core:interfaceName>com.enactor.mfc.basket.items.IGiftCardTenderItem</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.customerOrders.PaymentType">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.customerOrders.PaymentType">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+        </core:actionInputMappings>
+        <core:actionOutputMappings>
+            <core:actionMapping>
+                <core:actionID>CreateCashPayment</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType name="enactor.coreUI.Entity">
+<core:interfaceName>com.enactor.core.entities.IEntity</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.customerOrders.retail.CustomerOrderCreatePaymentMessage">
+<core:interfaceName>com.enactor.customerOrders.retail.customerOrderPaymentMessage.ICustomerOrderCreatePaymentMessage</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings/>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>CreateAccountPayment</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType name="enactor.coreUI.Entity">
+<core:interfaceName>com.enactor.core.entities.IEntity</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.customerOrders.retail.CustomerOrderCreatePaymentMessage">
+<core:interfaceName>com.enactor.customerOrders.retail.customerOrderPaymentMessage.ICustomerOrderCreatePaymentMessage</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings/>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>CreateCardPayment</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType name="enactor.coreUI.Entity">
+<core:interfaceName>com.enactor.core.entities.IEntity</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.customerOrders.retail.CustomerOrderCreatePaymentMessage">
+<core:interfaceName>com.enactor.customerOrders.retail.customerOrderPaymentMessage.ICustomerOrderCreatePaymentMessage</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings/>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>CreateChequePayment</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType name="enactor.coreUI.Entity">
+<core:interfaceName>com.enactor.core.entities.IEntity</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.customerOrders.retail.CustomerOrderCreatePaymentMessage">
+<core:interfaceName>com.enactor.customerOrders.retail.customerOrderPaymentMessage.ICustomerOrderCreatePaymentMessage</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings/>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>CreateOrderPaymentsList</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType name="enactor.coreUI.Object">
+<core:interfaceName>java.lang.Object</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.customerOrders.PaymentList">
+<core:interfaceName>java.util.List</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings/>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>CreateCustomerOrderPayment</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType name="enactor.coreUI.Entity">
+<core:interfaceName>com.enactor.core.entities.IEntity</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.customerOrders.retail.CustomerOrderCreatePaymentMessage">
+<core:interfaceName>com.enactor.customerOrders.retail.customerOrderPaymentMessage.ICustomerOrderCreatePaymentMessage</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings/>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>AddOrderPaymentToList</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType name="enactor.coreUI.Collection">
+<core:interfaceName>java.util.Collection</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.customerOrders.PaymentList">
+<core:interfaceName>java.util.List</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings/>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>CreateExchangePayment</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType name="enactor.coreUI.Entity">
+<core:interfaceName>com.enactor.core.entities.IEntity</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.customerOrders.retail.CustomerOrderCreatePaymentMessage">
+<core:interfaceName>com.enactor.customerOrders.retail.customerOrderPaymentMessage.ICustomerOrderCreatePaymentMessage</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings/>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>AddExchangePaymentToList</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType name="enactor.coreUI.Collection">
+<core:interfaceName>java.util.Collection</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.customerOrders.PaymentList">
+<core:interfaceName>java.util.List</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings/>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>CreateGiftCardPayment</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType name="enactor.coreUI.Entity">
+<core:interfaceName>com.enactor.core.entities.IEntity</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.customerOrders.retail.CustomerOrderCreatePaymentMessage">
+<core:interfaceName>com.enactor.customerOrders.retail.customerOrderPaymentMessage.ICustomerOrderCreatePaymentMessage</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings/>
+                </core:mappings>
+            </core:actionMapping>
+        </core:actionOutputMappings>
+        <core:eventLink>
+            <core:linkID>5</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>Initialise</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>StateEntered</core:event>
+        </core:eventLink>
+    </core:state>
+    <core:stateTransitions/>
+</core:process>

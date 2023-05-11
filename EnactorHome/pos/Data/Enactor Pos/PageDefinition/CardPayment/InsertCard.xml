@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<retail:posPromptPage xmlns:core="http://www.enactor.com/core" xmlns:retail="http://www.enactor.com/retail" xmlns:ns4="http://www.enactor.com/crm" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803" xmlns:ns6="http://www.apis-it.hr/fin/2012/types/f73" xmlns:ns7="http://www.w3.org/2000/09/xmldsig#" xmlns:ns8="http://www.enactor.com/retail/storedRetailTransaction/service" xmlns:ns9="http://www.fu.gov.si/" xmlns:ns10="http://www.enactor.com/addressLookup/service" xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:ns14="http://www.enactor.com/crm/customerLoyalty/service" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" allowResize="true" allowMove="true" allowClose="true" height="593" width="801" messageBase="Pos/Tender/TenderMessages" titleId="INSERT_CARD_TITLE" url="CardPayment/InsertCard">
+    <core:elements>
+        <core:text id="Prompt">
+            <core:uiMessage messageId="INSERT_CARD_SEE_PHONE" applicability="#{contactlessEnabled &amp;&amp; notEmpty(iCCReaderStatus) &amp;&amp; enumEquals(iCCReaderStatus.status, 'SEE_PHONE')}"/>
+            <core:uiMessage messageId="INSERT_CARD_CTLS_COLLISION" applicability="#{contactlessEnabled &amp;&amp; notEmpty(iCCReaderStatus) &amp;&amp; enumEquals(iCCReaderStatus.status, 'CTLS_COLLISION')}"/>
+            <core:uiMessage messageId="INSERT_CARD_CTLS_UNSUPPORTED" applicability="#{contactlessEnabled &amp;&amp; notEmpty(iCCReaderStatus) &amp;&amp; enumEquals(iCCReaderStatus.status, 'CTLS_UNSUPPORTED')}"/>
+            <core:uiMessage messageId="INSERT_CARD_CTLS_READ_ERROR" applicability="#{contactlessEnabled &amp;&amp; notEmpty(iCCReaderStatus) &amp;&amp; enumEquals(iCCReaderStatus.status, 'CTLS_READ_ERROR')}"/>
+            <core:uiMessage messageId="ICC_PIN_ENTRY_IN_PROGRESS" applicability="#{notEmpty(iCCReaderStatus) &amp;&amp; enumEquals(iCCReaderStatus.status, 'PIN_ENTRY')}"/>
+            <core:uiMessage messageId="ICC_PIN_ENTRY_RETRY_IN_PROGRESS" applicability="#{notEmpty(iCCReaderStatus) &amp;&amp; enumEquals(iCCReaderStatus.status, 'PIN_ENTRY_RETRY')}"/>
+            <core:uiMessage messageId="ICC_PIN_ENTRY_LAST_TRY_IN_PROGRESS" applicability="#{notEmpty(iCCReaderStatus) &amp;&amp; enumEquals(iCCReaderStatus.status, 'PIN_ENTRY_LAST_TRY')}"/>
+            <core:uiMessage messageId="CTLS_FF_HOST_FORCED_INSERT_CARD" applicability="#{notEmpty(contactOnly) &amp;&amp; contactOnly &amp;&amp; fallForwardSCA}"/>
+            <core:uiMessage messageId="INSERT_CARD_FALL_FORWARD_CONTACT_ONLY" applicability="#{notEmpty(contactOnly) &amp;&amp; contactOnly &amp;&amp; fallForward}"/>
+            <core:uiMessage messageId="INSERT_CARD_CONTACT_ONLY" applicability="#{notEmpty(contactOnly) &amp;&amp; contactOnly}"/>
+            <core:uiMessage messageId="INSERT_CARD_CONTACT_OR_MSR_ONLY" applicability="#{!contactlessEnabled &amp;&amp; iCCReaderConfiguration.enableContactless}"/>
+            <core:uiMessage messageId="CTLS_HOST_FORCED_RETAP" applicability="#{contactlessEnabled &amp;&amp; contactlessRetap}"/>
+            <core:uiMessage messageId="INSERT_CARD_WITH_CONTACTLESS" applicability="#{contactlessEnabled}"/>
+            <core:uiMessage messageId="INSERT_CARD_RETRY" applicability="#{!empty(iCCRetryCount) &amp;&amp; iCCRetryCount &gt; 0}"/>
+            <core:uiMessage messageId="INSERT_CARD_REGISTRATION" applicability="#{registration}"/>
+            <core:uiMessage messageId="INSERT_CARD"/>
+        </core:text>
+        <core:inputText type="textField" focusOrder="1" styleClass="card-input" visibility="#{!(notEmpty(manualInput) || (notEmpty(iCCReaderConfiguration) &amp;&amp; (iCCReaderConfiguration.enableP2PE == iCCReaderConfiguration.enableKeyedCardInput)))}" enable="#{!(notEmpty(manualInput) || (notEmpty(iCCReaderConfiguration) &amp;&amp; (!iCCReaderConfiguration.enableP2PE &amp;&amp; !iCCReaderConfiguration.enableKeyedCardInput)))}" id="InputBox">
+            <core:text>${enactor.pos.CardNumberKeyed}</core:text>
+            <core:textElementEvents enterEvent="OKPressed"/>
+        </core:inputText>
+        <core:button messageId="BUTTON_OK" id="Button1">
+            <core:text>OKPressed</core:text>
+        </core:button>
+        <core:button messageId="BUTTON_CONTACTLESS" visibility="#{(notEmpty(iCCReaderConfiguration) &amp;&amp; iCCReaderConfiguration.enableContactless) &amp;&amp; !contactlessEnabled &amp;&amp; !contactOnly &amp;&amp; !fallForward &amp;&amp; (iCCReaderConfiguration.contactlessTransactionLimit == 0 || tenderAmount &lt;= iCCReaderConfiguration.contactlessTransactionLimit)}" id="Button2">
+            <core:text>EnableContactless</core:text>
+        </core:button>
+        <core:button messageId="BUTTON_KEY_CARD" visibility="#{notEmpty(manualInput) || (notEmpty(iCCReaderConfiguration) &amp;&amp; (iCCReaderConfiguration.enableP2PE == iCCReaderConfiguration.enableKeyedCardInput) &amp;&amp; (isEmpty(contactlessEnabled) || !contactlessEnabled) &amp;&amp; !contactOnly)}" id="Button3">
+            <core:text>KeyCardPressed</core:text>
+        </core:button>
+        <core:button messageId="BUTTON_CANCEL_CONTACTLESS" visibility="#{notEmpty(contactlessEnabled) &amp;&amp; contactlessEnabled}" id="Button7">
+            <core:text>CancelContactless</core:text>
+        </core:button>
+        <core:button messageId="BUTTON_CANCEL" id="Button8">
+            <core:text>CancelPressed</core:text>
+        </core:button>
+    </core:elements>
+    <core:templateURL>/Pos/StandardPosTemplate</core:templateURL>
+    <core:variables>
+        <core:variable name="ManualInput">
+            <core:interfaceName>com.enactor.coreUI.peripherals.msr.IManualInput</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.mfc.ICCReaderConfiguration">
+            <core:interfaceName>com.enactor.coreUI.peripherals.icc.IICCReaderConfiguration</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.pos.ContactlessEnabled">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.pos.ContactOnly">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.pos.FallForward">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.pos.FallForwardSCA">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.pos.ContactlessRetap">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.pos.TenderAmount">
+            <core:interfaceName>java.lang.Long</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.pos.Registration">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:variable>
+    </core:variables>
+    <core:scannerEnabled>false</core:scannerEnabled>
+    <core:scannerDataName></core:scannerDataName>
+    <core:mSREnabled>true</core:mSREnabled>
+    <core:mSRDataName>enactor.pos.CardTrack2</core:mSRDataName>
+</retail:posPromptPage>

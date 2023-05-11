@@ -1,0 +1,2184 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<core:process xmlns:core="http://www.enactor.com/core" xmlns:retail="http://www.enactor.com/retail" xmlns:ns4="http://www.enactor.com/crm" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803" xmlns:ns6="http://www.apis-it.hr/fin/2012/types/f73" xmlns:ns7="http://www.w3.org/2000/09/xmldsig#" xmlns:ns8="http://www.enactor.com/retail/storedRetailTransaction/service" xmlns:ns9="http://www.fu.gov.si/" xmlns:ns10="http://www.enactor.com/addressLookup/service" xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:ns14="http://www.enactor.com/crm/customerLoyalty/service" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <core:processID>ReProcess/ResubmitFailedDocuments</core:processID>
+    <core:version>1.0</core:version>
+    <core:name></core:name>
+    <core:defaultMessageBaseName></core:defaultMessageBaseName>
+    <core:firstStateID>State</core:firstStateID>
+    <core:className></core:className>
+    <core:uiHints>
+        <entry>
+            <key>com.enactor.tools.editor.process.style</key>
+            <value>2047</value>
+        </entry>
+        <entry>
+            <key>com.enactor.tools.editor.process.xloc</key>
+            <value>8</value>
+        </entry>
+        <entry>
+            <key>com.enactor.tools.editor.process.yloc</key>
+            <value>8</value>
+        </entry>
+    </core:uiHints>
+    <core:metaData>
+        <core:inputs>
+            <core:input required="true" name="enactor.coreUI.PageSize">
+                <core:interfaceName>java.lang.Integer</core:interfaceName>
+            </core:input>
+        </core:inputs>
+        <stateDataTypes>
+            <stateDataType required="true" name="enactor.coreUI.ListCriteria">
+                <core:interfaceName>com.enactor.core.servers.IListCriteria</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.coreUI.PageSize">
+                <core:interfaceName>java.lang.Integer</core:interfaceName>
+            </stateDataType>
+        </stateDataTypes>
+    </core:metaData>
+    <core:comment>List all failed documents and resubmit them in batches of 100</core:comment>
+    <core:endProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>Success</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIEndProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2012</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>98</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData/>
+        <core:typeId>enactor.types.EndProcess</core:typeId>
+        <core:outcome>Success</core:outcome>
+        <core:defaultProcessId></core:defaultProcessId>
+    </core:endProcessAction>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>AddDocumentStatusFilter</core:actionID>
+        <core:name>AddListFilterAction</core:name>
+        <core:className>com.enactor.commonUI.list.processes.AddListFilterAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>959</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>452</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>235</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="Status" name="enactor.coreUI.FilterId">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:param value="IntegerValueFilter" name="enactor.coreUI.FilterType">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:param value="#{convert:toInt('3')}" name="enactor.coreUI.DefaultValue">
+            <core:interfaceName>java.lang.Object</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.coreUI.FilterId">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.FilterType">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.FilterClassname">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.ListFilters">
+                    <core:interfaceName>java.util.List</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.CompoundListFilters">
+                    <core:interfaceName>java.util.List</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.ListFiltersMap">
+                    <core:interfaceName>java.util.Map</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.ListCriteria">
+                    <core:interfaceName>com.enactor.core.servers.IListCriteria</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.CaseInsensitive">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.ComparisonOperator">
+                    <core:interfaceName>com.enactor.core.listFilters.ComparisonOperators</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.DefaultToFirstValue">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.DefaultValue">
+                    <core:interfaceName>java.lang.Object</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.EntityName">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.EntityNamespace">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.FilterVariableNames">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.ListFilterWidth">
+                    <core:interfaceName>java.lang.Integer</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.ListFilterHidden">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.ListName">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.MessageId">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.MessageBasename">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.ListOrProperties">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.UseValueForAllProperties">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.ValueArray">
+                    <core:interfaceName>java.lang.Object</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.FuzzyLevel">
+                    <core:interfaceName>java.lang.Integer</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.commonUI.ReplaceExistingFilter">
+                    <core:interfaceName>java.lang.Integer</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.commonUI.ForceApplicable">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.commonUI.OrNull">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.ListAllowBlank">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.BlankValue">
+                    <core:interfaceName>java.lang.Object</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.UseKeyForValue">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.FilterKeyProperty">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.commonUI.PersistenceGroupId">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.commonUI.IgnorePersistenceGroupValues">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output name="enactor.coreUI.ListCriteria">
+                    <core:interfaceName>com.enactor.core.servers.IListCriteria</core:interfaceName>
+                </core:output>
+                <core:output name="enactor.coreUI.ListFilters">
+                    <core:interfaceName>java.util.List</core:interfaceName>
+                </core:output>
+                <core:output name="enactor.coreUI.ListFiltersMap">
+                    <core:interfaceName>java.util.Map</core:interfaceName>
+                </core:output>
+                <core:output name="enactor.coreUI.ListFilter">
+                    <core:interfaceName>com.enactor.core.listFilters.IListFilter</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>AddLatestDateFilter</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:assignAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>SetBeginningOfDay</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIAssignAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>959</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>230</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>436</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input name="enactor.coreProcessing.EarliestDate">
+                    <core:interfaceName>java.util.Date</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output name="enactor.coreProcessing.EarliestDate">
+                    <core:interfaceName>java.util.Date</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.Assign</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>AddDocumentStatusFilter</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:dataAssignment toExpression="earliestDate" fromExpression="dates:getDayStart(dates:getNow())"/>
+    </core:assignAction>
+    <core:assignAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>SetEarliestDate</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIAssignAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>959</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1562</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>235</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.coreProcessing.EarliestDate">
+                    <core:interfaceName>java.util.Date</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.coreUI.ListFilter">
+                    <core:interfaceName>com.enactor.core.listFilters.IListFilter</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="true" name="enactor.coreUI.ListFilter">
+                    <core:interfaceName>com.enactor.core.listFilters.IListFilter</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.Assign</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>LoadPagedListAction</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:dataAssignment toExpression="listFilter.value" fromExpression="earliestDate"/>
+    </core:assignAction>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>AddEarliestDateFilter</core:actionID>
+        <core:name>AddListFilterAction</core:name>
+        <core:className>com.enactor.commonUI.list.processes.AddListFilterAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>959</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>896</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>235</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="StartDate" name="enactor.coreUI.FilterId">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:param value="StartDateValueFilter" name="enactor.coreUI.FilterType">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.coreUI.FilterId">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.FilterType">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.FilterClassname">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.ListFilters">
+                    <core:interfaceName>java.util.List</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.CompoundListFilters">
+                    <core:interfaceName>java.util.List</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.ListFiltersMap">
+                    <core:interfaceName>java.util.Map</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.ListCriteria">
+                    <core:interfaceName>com.enactor.core.servers.IListCriteria</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.CaseInsensitive">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.ComparisonOperator">
+                    <core:interfaceName>com.enactor.core.listFilters.ComparisonOperators</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.DefaultToFirstValue">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.DefaultValue">
+                    <core:interfaceName>java.lang.Object</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.EntityName">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.EntityNamespace">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.FilterVariableNames">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.ListFilterWidth">
+                    <core:interfaceName>java.lang.Integer</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.ListFilterHidden">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.ListName">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.MessageId">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.MessageBasename">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.ListOrProperties">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.UseValueForAllProperties">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.ValueArray">
+                    <core:interfaceName>java.lang.Object</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.FuzzyLevel">
+                    <core:interfaceName>java.lang.Integer</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.commonUI.ReplaceExistingFilter">
+                    <core:interfaceName>java.lang.Integer</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.commonUI.ForceApplicable">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.commonUI.OrNull">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.ListAllowBlank">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.BlankValue">
+                    <core:interfaceName>java.lang.Object</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.UseKeyForValue">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.FilterKeyProperty">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.commonUI.PersistenceGroupId">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.commonUI.IgnorePersistenceGroupValues">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output name="enactor.coreUI.ListCriteria">
+                    <core:interfaceName>com.enactor.core.servers.IListCriteria</core:interfaceName>
+                </core:output>
+                <core:output name="enactor.coreUI.ListFilters">
+                    <core:interfaceName>java.util.List</core:interfaceName>
+                </core:output>
+                <core:output name="enactor.coreUI.ListFiltersMap">
+                    <core:interfaceName>java.util.Map</core:interfaceName>
+                </core:output>
+                <core:output name="enactor.coreUI.ListFilter">
+                    <core:interfaceName>com.enactor.core.listFilters.IListFilter</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>AddPageInfoAction</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>ResubmitFailedDocumentsAction</core:actionID>
+        <core:name>ResubmitFailedDocumentsAction</core:name>
+        <core:className>com.enactor.coreProcessing.document.actions.ResubmitFailedDocumentsAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>959</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2012</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>470</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="${Service.DeviceID}" name="enactor.coreUI.ConnectedProcessClientId">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.coreUI.ConnectedProcessClientId">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.Key">
+                    <core:interfaceName>com.enactor.core.entities.IEntityKey</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.List">
+                    <core:interfaceName>java.util.List</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+            <core:sessionManagementType>MAKE_SESSION_IF_NO_CURRENT</core:sessionManagementType>
+        </core:metaData>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>CloseSessionAction</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>AddPageInfoAction</core:actionID>
+        <core:name>AddPageInfoAction</core:name>
+        <core:className>com.enactor.commonUI.list.processes.AddPageInfoAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>959</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1118</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>235</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input name="enactor.coreUI.ListCriteria">
+                    <core:interfaceName>com.enactor.core.servers.IListCriteria</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.PageSize">
+                    <core:interfaceName>java.lang.Integer</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.RowOffset">
+                    <core:interfaceName>java.lang.Integer</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output name="enactor.coreUI.ListCriteria">
+                    <core:interfaceName>com.enactor.core.servers.IListCriteria</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>AddOrderByPropertyAction</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>AddOrderByPropertyAction</core:actionID>
+        <core:name>AddOrderByPropertyAction</core:name>
+        <core:className>com.enactor.commonUI.list.processes.AddOrderByPropertyAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>959</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1118</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>470</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="dateReceived" name="enactor.coreUI.ListOrderByColumnName">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.coreUI.ListOrderByColumnName">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.ListOrderBySortDirection">
+                    <core:interfaceName>com.enactor.core.servers.SortDirection</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.ListCriteria">
+                    <core:interfaceName>com.enactor.core.servers.IListCriteria</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output name="enactor.coreUI.ListCriteria">
+                    <core:interfaceName>com.enactor.core.servers.IListCriteria</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID>Looping State</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>GetLastReceived</core:actionID>
+        <core:name>LoadEntityAction</core:name>
+        <core:className>com.enactor.commonUI.entities.processes.LoadEntityAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>27</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2012</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>235</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.coreUI.Key">
+                    <core:interfaceName>com.enactor.core.entities.IEntityKey</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output name="enactor.coreUI.Key">
+                    <core:interfaceName>com.enactor.core.entities.IEntityKey</core:interfaceName>
+                </core:output>
+                <core:output name="enactor.coreUI.Entity">
+                    <core:interfaceName>com.enactor.core.entities.IEntity</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+            <core:sessionManagementType>MAKE_SESSION_IF_NO_CURRENT</core:sessionManagementType>
+        </core:metaData>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>ResubmitFailedDocumentsAction</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:assignAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>UpdateEarliestDate</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIAssignAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>959</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1340</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>697</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.coreProcessing.LastReceived">
+                    <core:interfaceName>java.util.Date</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.coreProcessing.EarliestDate">
+                    <core:interfaceName>java.util.Date</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="true" name="enactor.coreProcessing.EarliestDate">
+                    <core:interfaceName>java.util.Date</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.Assign</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID>Looping State</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:dataAssignment toExpression="earliestDate" fromExpression="lastReceived == null ? earliestDate : lastReceived"/>
+    </core:assignAction>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>CloseSessionAction</core:actionID>
+        <core:name>CloseSessionAction</core:name>
+        <core:className>com.enactor.commonUI.dataAccess.processes.CloseSessionAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>3</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1784</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>576</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>ConstructMessage</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>WriteApplicationProcessLogAction</core:actionID>
+        <core:name>WriteApplicationProcessLogAction</core:name>
+        <core:className>com.enactor.commonUI.logging.actions.WriteApplicationProcessLogAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>959</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1562</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>697</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="2" name="enactor.commonUI.logging.LogEntryType">
+            <core:interfaceName>java.lang.Integer</core:interfaceName>
+        </core:param>
+        <core:param value="${Service.DeviceID}" name="enactor.coreUI.DeviceId">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:param value="reprocessDocument" name="enactor.commonUI.logging.EntryType">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input name="Exception">
+                    <core:interfaceName>java.lang.Throwable</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.MessageBasename">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.Message">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.MessageId">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.LoggingLocale">
+                    <core:interfaceName>java.util.Locale</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.ProcessId">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.ReferenceId">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.UserId">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.DeviceId">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.commonUI.logging.EntryType">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.commonUI.logging.LogEntryType">
+                    <core:interfaceName>java.lang.Integer</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output name="enactor.commonUI.logging.ApplicationProcessLogEntry">
+                    <core:interfaceName>com.enactor.commonUI.logging.IApplicationProcessLogEntry</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>UpdateEarliestDate</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>AddLatestDateFilter</core:actionID>
+        <core:name>AddListFilterAction</core:name>
+        <core:className>com.enactor.commonUI.list.processes.AddListFilterAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>959</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>674</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>235</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="EndDate" name="enactor.coreUI.FilterId">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:param value="EndDateValueFilter" name="enactor.coreUI.FilterType">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.coreUI.FilterId">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.FilterType">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.FilterClassname">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.ListFilters">
+                    <core:interfaceName>java.util.List</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.CompoundListFilters">
+                    <core:interfaceName>java.util.List</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.ListFiltersMap">
+                    <core:interfaceName>java.util.Map</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.ListCriteria">
+                    <core:interfaceName>com.enactor.core.servers.IListCriteria</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.CaseInsensitive">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.ComparisonOperator">
+                    <core:interfaceName>com.enactor.core.listFilters.ComparisonOperators</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.DefaultToFirstValue">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.DefaultValue">
+                    <core:interfaceName>java.lang.Object</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.EntityName">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.EntityNamespace">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.FilterVariableNames">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.ListFilterWidth">
+                    <core:interfaceName>java.lang.Integer</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.ListFilterHidden">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.ListName">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.MessageId">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.MessageBasename">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.ListOrProperties">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.UseValueForAllProperties">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.ValueArray">
+                    <core:interfaceName>java.lang.Object</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.FuzzyLevel">
+                    <core:interfaceName>java.lang.Integer</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.commonUI.ReplaceExistingFilter">
+                    <core:interfaceName>java.lang.Integer</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.commonUI.ForceApplicable">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.commonUI.OrNull">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.ListAllowBlank">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.BlankValue">
+                    <core:interfaceName>java.lang.Object</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.UseKeyForValue">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.FilterKeyProperty">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.commonUI.PersistenceGroupId">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.commonUI.IgnorePersistenceGroupValues">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output name="enactor.coreUI.ListCriteria">
+                    <core:interfaceName>com.enactor.core.servers.IListCriteria</core:interfaceName>
+                </core:output>
+                <core:output name="enactor.coreUI.ListFilters">
+                    <core:interfaceName>java.util.List</core:interfaceName>
+                </core:output>
+                <core:output name="enactor.coreUI.ListFiltersMap">
+                    <core:interfaceName>java.util.Map</core:interfaceName>
+                </core:output>
+                <core:output name="enactor.coreUI.ListFilter">
+                    <core:interfaceName>com.enactor.core.listFilters.IListFilter</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>AddEarliestDateFilter</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:assignAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>ConstructMessage</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIAssignAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>959</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1784</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>697</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.coreProcessing.ReprocessedCount">
+                    <core:interfaceName>java.lang.Integer</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.coreUI.Message">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.coreUI.List">
+                    <core:interfaceName>java.util.List</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="true" name="enactor.coreProcessing.ReprocessedCount">
+                    <core:interfaceName>java.lang.Integer</core:interfaceName>
+                </core:output>
+                <core:output required="true" name="enactor.coreUI.Message">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.Assign</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>WriteApplicationProcessLogAction</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:dataAssignment toExpression="reprocessedCount" fromExpression="reprocessedCount + size(list)"/>
+        <core:dataAssignment toExpression="message" fromExpression="concatenate('Resubmitted: ', valueOf(reprocessedCount), ' failed documents')"/>
+    </core:assignAction>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>LoadPagedListAction</core:actionID>
+        <core:name>LoadPagedListAction</core:name>
+        <core:className>com.enactor.commonUI.list.processes.LoadPagedListAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>959</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1784</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>235</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input name="enactor.coreUI.EndpointReference">
+                    <core:interfaceName>com.enactor.core.processConnections.IEndpointReference</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.coreUI.EntityName">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.coreUI.EntityNamespace">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.ListName">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.ListCriteria">
+                    <core:interfaceName>com.enactor.core.servers.IListCriteria</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.PageSize">
+                    <core:interfaceName>java.lang.Integer</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.RowOffset">
+                    <core:interfaceName>java.lang.Integer</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.EntityServerName">
+                    <core:interfaceName>javax.xml.namespace.QName</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output name="enactor.coreUI.List">
+                    <core:interfaceName>java.util.List</core:interfaceName>
+                </core:output>
+                <core:output name="enactor.coreUI.ListCriteria">
+                    <core:interfaceName>com.enactor.core.servers.IListCriteria</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+            <core:sessionManagementType>MAKE_NEW_SESSION</core:sessionManagementType>
+        </core:metaData>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>GetLastReceived</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>Success</core:toActionID>
+            <core:condition>size(state.list) == 0</core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>LogException</core:actionID>
+        <core:name>WriteApplicationProcessLogAction</core:name>
+        <core:className>com.enactor.commonUI.logging.actions.WriteApplicationProcessLogAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>452</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>98</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="2" name="enactor.commonUI.logging.LogEntryType">
+            <core:interfaceName>java.lang.Integer</core:interfaceName>
+        </core:param>
+        <core:param value="${Service.DeviceID}" name="enactor.coreUI.DeviceId">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:param value="reprocessDocument" name="enactor.commonUI.logging.EntryType">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input name="Exception">
+                    <core:interfaceName>java.lang.Throwable</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.MessageBasename">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.Message">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.MessageId">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.LoggingLocale">
+                    <core:interfaceName>java.util.Locale</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.ProcessId">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.ReferenceId">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.UserId">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.DeviceId">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.commonUI.logging.EntryType">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.commonUI.logging.LogEntryType">
+                    <core:interfaceName>java.lang.Integer</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output name="enactor.commonUI.logging.ApplicationProcessLogEntry">
+                    <core:interfaceName>com.enactor.commonUI.logging.IApplicationProcessLogEntry</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>Exception:CloseSession</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>Exception:CloseSession</core:actionID>
+        <core:name>CloseSessionAction</core:name>
+        <core:className>com.enactor.commonUI.dataAccess.processes.CloseSessionAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>674</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>98</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>Fail</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:endProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>Fail</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIEndProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>896</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>98</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData/>
+        <core:typeId>enactor.types.EndProcess</core:typeId>
+        <core:outcome>Fail</core:outcome>
+        <core:defaultProcessId></core:defaultProcessId>
+    </core:endProcessAction>
+    <core:eventLink>
+        <core:linkID>1</core:linkID>
+        <core:toStateID></core:toStateID>
+        <core:toActionID>LogException</core:toActionID>
+        <core:condition></core:condition>
+        <core:event>Exception</core:event>
+    </core:eventLink>
+    <core:state>
+        <core:url></core:url>
+        <core:stateID>State</core:stateID>
+        <core:name></core:name>
+        <core:className></core:className>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>57</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>230</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>98</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="document" name="enactor.coreUI.EntityName">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:param value="http://www.enactor.com/core" name="enactor.coreUI.EntityNamespace">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.coreUI.EntityName">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.coreUI.EntityNamespace">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="true" name="enactor.coreProcessing.EarliestDate">
+                    <core:interfaceName>java.util.Date</core:interfaceName>
+                </core:output>
+                <core:output required="true" name="enactor.coreUI.ListFilter">
+                    <core:interfaceName>com.enactor.core.listFilters.IListFilter</core:interfaceName>
+                </core:output>
+                <core:output required="true" name="enactor.coreUI.EntityName">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:output>
+                <core:output required="true" name="enactor.coreUI.EntityNamespace">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <handledEvents>
+                <handledEvent name="StateEntered"/>
+            </handledEvents>
+            <stateDataTypes>
+                <stateDataType required="true" name="enactor.coreProcessing.EarliestDate">
+                    <core:interfaceName>java.util.Date</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="true" name="enactor.coreUI.ListFilter">
+                    <core:interfaceName>com.enactor.core.listFilters.IListFilter</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="true" name="enactor.coreUI.EntityName">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="true" name="enactor.coreUI.EntityNamespace">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </stateDataType>
+            </stateDataTypes>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicState</core:typeId>
+        <core:singleInstance>false</core:singleInstance>
+        <core:respondToViewEvents>false</core:respondToViewEvents>
+        <core:actionInputMappings>
+            <core:actionMapping>
+                <core:actionID>AddDocumentStatusFilter</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.coreUI.ListCriteria">
+<core:interfaceName>com.enactor.core.servers.IListCriteria</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType name="enactor.coreUI.ListCriteria">
+<core:interfaceName>com.enactor.core.servers.IListCriteria</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.coreUI.UseKeyForValue">
+<core:interfaceName>java.lang.Boolean</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.coreUI.CaseInsensitive">
+<core:interfaceName>java.lang.Boolean</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.coreUI.MessageId">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.coreUI.MessageBasename">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.coreUI.FilterClassname">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.coreUI.ListOrProperties">
+<core:interfaceName>java.lang.Boolean</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.coreUI.BlankValue">
+<core:interfaceName>java.lang.Object</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.commonUI.OrNull">
+<core:interfaceName>java.lang.Boolean</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.coreUI.ListFilterHidden">
+<core:interfaceName>java.lang.Boolean</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.coreUI.ListFilters">
+<core:interfaceName>java.util.List</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.coreUI.FuzzyLevel">
+<core:interfaceName>java.lang.Integer</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.coreUI.FilterKeyProperty">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.commonUI.PersistenceGroupId">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.coreUI.ListFiltersMap">
+<core:interfaceName>java.util.Map</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.coreUI.UseValueForAllProperties">
+<core:interfaceName>java.lang.Boolean</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.coreUI.ListName">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.coreUI.DefaultToFirstValue">
+<core:interfaceName>java.lang.Boolean</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.commonUI.IgnorePersistenceGroupValues">
+<core:interfaceName>java.lang.Boolean</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.coreUI.ListFilterWidth">
+<core:interfaceName>java.lang.Integer</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.coreUI.ComparisonOperator">
+<core:interfaceName>com.enactor.core.listFilters.ComparisonOperators</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.coreUI.CompoundListFilters">
+<core:interfaceName>java.util.List</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.commonUI.ForceApplicable">
+<core:interfaceName>java.lang.Boolean</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.coreUI.ValueArray">
+<core:interfaceName>java.lang.Object</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.coreUI.ListAllowBlank">
+<core:interfaceName>java.lang.Boolean</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.coreUI.FilterVariableNames">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.commonUI.ReplaceExistingFilter">
+<core:interfaceName>java.lang.Integer</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.coreUI.EntityName">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType name="enactor.coreUI.EntityName">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.coreUI.EntityNamespace">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType name="enactor.coreUI.EntityNamespace">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>AddEarliestDateFilter</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.coreUI.ListCriteria">
+<core:interfaceName>com.enactor.core.servers.IListCriteria</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType name="enactor.coreUI.ListCriteria">
+<core:interfaceName>com.enactor.core.servers.IListCriteria</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.coreUI.UseKeyForValue">
+<core:interfaceName>java.lang.Boolean</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.coreUI.CaseInsensitive">
+<core:interfaceName>java.lang.Boolean</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.coreUI.MessageId">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.coreUI.MessageBasename">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.coreUI.FilterClassname">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.coreUI.DefaultValue">
+<core:interfaceName>java.lang.Object</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.coreUI.ListOrProperties">
+<core:interfaceName>java.lang.Boolean</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.coreUI.BlankValue">
+<core:interfaceName>java.lang.Object</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.commonUI.OrNull">
+<core:interfaceName>java.lang.Boolean</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.coreUI.ListFilterHidden">
+<core:interfaceName>java.lang.Boolean</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.coreUI.ListFilters">
+<core:interfaceName>java.util.List</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.coreUI.FuzzyLevel">
+<core:interfaceName>java.lang.Integer</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.coreUI.FilterKeyProperty">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.commonUI.PersistenceGroupId">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.coreUI.ListFiltersMap">
+<core:interfaceName>java.util.Map</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.coreUI.UseValueForAllProperties">
+<core:interfaceName>java.lang.Boolean</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.coreUI.ListName">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.coreUI.DefaultToFirstValue">
+<core:interfaceName>java.lang.Boolean</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.commonUI.IgnorePersistenceGroupValues">
+<core:interfaceName>java.lang.Boolean</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.coreUI.ListFilterWidth">
+<core:interfaceName>java.lang.Integer</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.coreUI.ComparisonOperator">
+<core:interfaceName>com.enactor.core.listFilters.ComparisonOperators</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.coreUI.CompoundListFilters">
+<core:interfaceName>java.util.List</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.commonUI.ForceApplicable">
+<core:interfaceName>java.lang.Boolean</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.coreUI.ValueArray">
+<core:interfaceName>java.lang.Object</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.coreUI.ListAllowBlank">
+<core:interfaceName>java.lang.Boolean</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.coreUI.FilterVariableNames">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.commonUI.ReplaceExistingFilter">
+<core:interfaceName>java.lang.Integer</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.coreUI.EntityName">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType name="enactor.coreUI.EntityName">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.coreUI.EntityNamespace">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType name="enactor.coreUI.EntityNamespace">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>AddLatestDateFilter</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.coreUI.ListCriteria">
+<core:interfaceName>com.enactor.core.servers.IListCriteria</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType name="enactor.coreUI.ListCriteria">
+<core:interfaceName>com.enactor.core.servers.IListCriteria</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.coreUI.EntityName">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType name="enactor.coreUI.EntityName">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.coreUI.EntityNamespace">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType name="enactor.coreUI.EntityNamespace">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.coreUI.ValueArray">
+<core:interfaceName>java.lang.Object</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.coreUI.UseValueForAllProperties">
+<core:interfaceName>java.lang.Boolean</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.coreUI.UseKeyForValue">
+<core:interfaceName>java.lang.Boolean</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.commonUI.ReplaceExistingFilter">
+<core:interfaceName>java.lang.Integer</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.commonUI.PersistenceGroupId">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.commonUI.OrNull">
+<core:interfaceName>java.lang.Boolean</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.coreUI.MessageBasename">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.coreUI.MessageId">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.coreUI.ListOrProperties">
+<core:interfaceName>java.lang.Boolean</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.coreUI.ListName">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.coreUI.ListFiltersMap">
+<core:interfaceName>java.util.Map</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.coreUI.ListFilters">
+<core:interfaceName>java.util.List</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.coreUI.ListFilterWidth">
+<core:interfaceName>java.lang.Integer</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.coreUI.ListFilterHidden">
+<core:interfaceName>java.lang.Boolean</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.coreUI.ListAllowBlank">
+<core:interfaceName>java.lang.Boolean</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.commonUI.IgnorePersistenceGroupValues">
+<core:interfaceName>java.lang.Boolean</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.coreUI.FuzzyLevel">
+<core:interfaceName>java.lang.Integer</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.commonUI.ForceApplicable">
+<core:interfaceName>java.lang.Boolean</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.coreUI.FilterVariableNames">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.coreUI.FilterKeyProperty">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.coreUI.FilterClassname">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.coreUI.DefaultToFirstValue">
+<core:interfaceName>java.lang.Boolean</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.coreUI.CompoundListFilters">
+<core:interfaceName>java.util.List</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.coreUI.ComparisonOperator">
+<core:interfaceName>com.enactor.core.listFilters.ComparisonOperators</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.coreUI.CaseInsensitive">
+<core:interfaceName>java.lang.Boolean</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.coreUI.BlankValue">
+<core:interfaceName>java.lang.Object</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.coreProcessing.EarliestDate">
+<core:interfaceName>java.util.Date</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType name="enactor.coreUI.DefaultValue">
+<core:interfaceName>java.lang.Object</core:interfaceName>
+                            </core:targetDataType>
+                            <core:expression>dates:getDayEnd(earliestDate)</core:expression>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+        </core:actionInputMappings>
+        <core:actionOutputMappings>
+            <core:actionMapping>
+                <core:actionID>AddDocumentStatusFilter</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType name="enactor.coreUI.ListCriteria">
+<core:interfaceName>com.enactor.core.servers.IListCriteria</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.coreUI.ListCriteria">
+<core:interfaceName>com.enactor.core.servers.IListCriteria</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:sourceDataType name="enactor.coreUI.ListFilter">
+<core:interfaceName>com.enactor.core.listFilters.IListFilter</core:interfaceName>
+                            </core:sourceDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType name="enactor.coreUI.ListFilters">
+<core:interfaceName>java.util.List</core:interfaceName>
+                            </core:sourceDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType name="enactor.coreUI.ListFiltersMap">
+<core:interfaceName>java.util.Map</core:interfaceName>
+                            </core:sourceDataType>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>AddEarliestDateFilter</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType name="enactor.coreUI.ListCriteria">
+<core:interfaceName>com.enactor.core.servers.IListCriteria</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.coreUI.ListCriteria">
+<core:interfaceName>com.enactor.core.servers.IListCriteria</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:sourceDataType name="enactor.coreUI.ListFilter">
+<core:interfaceName>com.enactor.core.listFilters.IListFilter</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.coreUI.ListFilter">
+<core:interfaceName>com.enactor.core.listFilters.IListFilter</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType name="enactor.coreUI.ListFilters">
+<core:interfaceName>java.util.List</core:interfaceName>
+                            </core:sourceDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType name="enactor.coreUI.ListFiltersMap">
+<core:interfaceName>java.util.Map</core:interfaceName>
+                            </core:sourceDataType>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>AddLatestDateFilter</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType name="enactor.coreUI.ListCriteria">
+<core:interfaceName>com.enactor.core.servers.IListCriteria</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.coreUI.ListCriteria">
+<core:interfaceName>com.enactor.core.servers.IListCriteria</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:sourceDataType name="enactor.coreUI.ListFilters">
+<core:interfaceName>java.util.List</core:interfaceName>
+                            </core:sourceDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType name="enactor.coreUI.ListFiltersMap">
+<core:interfaceName>java.util.Map</core:interfaceName>
+                            </core:sourceDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType name="enactor.coreUI.ListFilter">
+<core:interfaceName>com.enactor.core.listFilters.IListFilter</core:interfaceName>
+                            </core:sourceDataType>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+        </core:actionOutputMappings>
+        <core:eventLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>SetBeginningOfDay</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>StateEntered</core:event>
+        </core:eventLink>
+    </core:state>
+    <core:state>
+        <core:url></core:url>
+        <core:stateID>Looping State</core:stateID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.states.UILoopingState</core:className>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>2047</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1340</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>235</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="-1" required="false" name="enactor.coreUI.LoopCount">
+            <core:interfaceName>java.lang.Integer</core:interfaceName>
+        </core:param>
+        <core:param value="0" name="enactor.coreProcessing.ReprocessedCount">
+            <core:interfaceName>java.lang.Integer</core:interfaceName>
+        </core:param>
+        <core:param value="true" required="false" name="enactor.coreUI.LoopControl">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.coreProcessing.ReprocessedCount">
+                    <core:interfaceName>java.lang.Integer</core:interfaceName>
+                </core:input>
+                <core:input required="false" name="enactor.coreUI.LoopControl">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.coreUI.EntityName">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.coreUI.EntityNamespace">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.coreUI.ListFilter">
+                    <core:interfaceName>com.enactor.core.listFilters.IListFilter</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.coreProcessing.EarliestDate">
+                    <core:interfaceName>java.util.Date</core:interfaceName>
+                </core:input>
+                <core:input required="false" name="enactor.coreUI.LoopCount">
+                    <core:interfaceName>java.lang.Integer</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <handledEvents>
+                <handledEvent name="Completed"/>
+                <handledEvent name="Execute"/>
+            </handledEvents>
+            <stateDataTypes>
+                <stateDataType required="true" name="enactor.coreUI.EntityName">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="true" name="enactor.coreUI.EntityNamespace">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="false" name="enactor.coreUI.LoopControl">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="true" name="enactor.coreUI.ListFilter">
+                    <core:interfaceName>com.enactor.core.listFilters.IListFilter</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="true" name="enactor.coreProcessing.EarliestDate">
+                    <core:interfaceName>java.util.Date</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="false" name="enactor.coreUI.LoopCount">
+                    <core:interfaceName>java.lang.Integer</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="true" name="enactor.coreProcessing.LastReceived">
+                    <core:interfaceName>java.util.Date</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="true" name="enactor.coreUI.Message">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="true" name="enactor.coreProcessing.ReprocessedCount">
+                    <core:interfaceName>java.lang.Integer</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="true" name="enactor.coreUI.List">
+                    <core:interfaceName>java.util.List</core:interfaceName>
+                </stateDataType>
+            </stateDataTypes>
+        </core:metaData>
+        <core:typeId>enactor.types.LoopingState</core:typeId>
+        <core:singleInstance>false</core:singleInstance>
+        <core:respondToViewEvents>false</core:respondToViewEvents>
+        <core:actionInputMappings>
+            <core:actionMapping>
+                <core:actionID>GetLastReceived</core:actionID>
+                <core:mappings>
+                    <core:processMappings/>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.coreUI.List">
+<core:interfaceName>java.util.List</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.coreUI.Key">
+<core:interfaceName>com.enactor.core.entities.IEntityKey</core:interfaceName>
+                            </core:targetDataType>
+                            <core:expression>list[size(list)-1].key</core:expression>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>WriteApplicationProcessLogAction</core:actionID>
+                <core:mappings>
+                    <core:processMappings/>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.coreUI.Message">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType name="enactor.coreUI.Message">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.coreUI.UserId">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.coreUI.ReferenceId">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.coreUI.ProcessId">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.coreUI.MessageId">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.coreUI.MessageBasename">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.coreUI.LoggingLocale">
+<core:interfaceName>java.util.Locale</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>LoadPagedListAction</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.coreUI.ListCriteria">
+<core:interfaceName>com.enactor.core.servers.IListCriteria</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType name="enactor.coreUI.ListCriteria">
+<core:interfaceName>com.enactor.core.servers.IListCriteria</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.coreUI.EntityName">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.coreUI.EntityName">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.coreUI.EntityNamespace">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.coreUI.EntityNamespace">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.coreUI.RowOffset">
+<core:interfaceName>java.lang.Integer</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.coreUI.ListName">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.coreUI.PageSize">
+<core:interfaceName>java.lang.Integer</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.coreUI.EntityServerName">
+<core:interfaceName>javax.xml.namespace.QName</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.coreUI.EndpointReference">
+<core:interfaceName>com.enactor.core.processConnections.IEndpointReference</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+        </core:actionInputMappings>
+        <core:actionOutputMappings>
+            <core:actionMapping>
+                <core:actionID>GetLastReceived</core:actionID>
+                <core:mappings>
+                    <core:processMappings/>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:sourceDataType name="enactor.coreUI.Entity">
+<core:interfaceName>com.enactor.core.entities.IEntity</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.coreProcessing.LastReceived">
+<core:interfaceName>java.util.Date</core:interfaceName>
+                            </core:targetDataType>
+                            <core:expression>entity.dateReceived</core:expression>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType name="enactor.coreUI.Key">
+<core:interfaceName>com.enactor.core.entities.IEntityKey</core:interfaceName>
+                            </core:sourceDataType>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>WriteApplicationProcessLogAction</core:actionID>
+                <core:mappings>
+                    <core:processMappings/>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:sourceDataType name="enactor.commonUI.logging.ApplicationProcessLogEntry">
+<core:interfaceName>com.enactor.commonUI.logging.IApplicationProcessLogEntry</core:interfaceName>
+                            </core:sourceDataType>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+        </core:actionOutputMappings>
+        <core:eventLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>SetEarliestDate</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>Execute</core:event>
+        </core:eventLink>
+        <core:eventLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>Success</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>Completed</core:event>
+        </core:eventLink>
+    </core:state>
+    <core:stateTransitions/>
+</core:process>

@@ -1,0 +1,295 @@
+#!groovy
+
+//**************************************************************************************************
+// CUSTOMER RELEASE BUILD
+// Groovy Jenkins pipeline script for Customer Release builds
+//**************************************************************************************************
+
+svnRoot = "https://dev.enactor.co.uk/svn/dev/CustomerProducts";
+svnCredentialsId = env.SVN_CREDENTIAL;
+jenkinsCredentialsId = svnCredentialsId;
+svnServerId = "dev.enactor.co.uk";
+mvnVersion = "Apache Maven 3.6.0";
+
+// Arguments for a one-stage build, when no installers are required
+mvnGlobalArgs = "-Penv-create-deployment-archives,env-encrypt-artifacts,copy-release-artifacts ";
+
+// Arguments for a three-stage build, when installers are required and therefore require Windows nodes
+mvnGlobalArgsStage1 = "-Penv-code,env-create-deployment-archives,env-encrypt-artifacts ";
+mvnGlobalArgsAll = mvnGlobalArgs;
+mvnGlobalArgsParentVersions = mvnGlobalArgs;
+mvnForceProfiles = ""
+svnGlobalArgs = "";
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+// Input Parameter Setup
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+componentName = env.COMPONENT_NAME;
+
+releaseVersion = env.RELEASE_VERSION;
+
+authCode = env.AUTH_CODE;
+
+issueId = env.ISSUE_ID;
+
+if (!releaseVersion) {
+  releaseVersion = env.RELEASE_VERSION_PREFIX + env.BUILD_NUMBER;
+}
+echo "Building release ${releaseVersion}"
+
+replaceExistingTag = extractBooleanParameter(env.REPLACE_EXISTING_TAG, false)
+
+echo "Using SVN credentials ${svnCredentialsId}"
+
+platformVersion = env.PLATFORM_VERSION;
+if (platformVersion) {
+  echo "Using platform version ${platformVersion}"
+} else {
+  echo "No platform version defined (platform.version will not be modified in pom files)"
+}
+
+platformDevVersion = env.PLATFORM_DEVELOPMENT_VERSION
+if (platformDevVersion) {
+  echo "Using platform development version ${platformDevVersion}"
+} else {
+  echo "No platform development version defined"
+}
+
+identityVersion = env.IDENTITY_VERSION;
+if (identityVersion) {
+  echo "Using identity version ${identityVersion}"
+} else {
+  echo "No identity version defined (identity.version will not be modified in pom files)"
+}
+
+identityDevVersion = env.IDENTITY_DEVELOPMENT_VERSION;
+if (identityDevVersion) {
+  echo "Using identity development version ${identityDevVersion}"
+} else {
+  echo "No identity development version defined"
+}
+
+previousVersion = env.PREVIOUS_VERSION;
+if (previousVersion) {
+  echo "Using previous version ${previousVersion}"
+} else {
+  echo "No previous version defined"
+}
+
+customerVersion = releaseVersion;
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+// Common Functions
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+def extractBooleanParameter(parameter, defaultValue) {
+  if (parameter == null) {
+      return defaultValue;
+  } else {
+      return parameter.toBoolean();
+  }
+}
+
+def execSVN(svnCommandLine) {
+    withCredentials([usernamePassword(credentialsId: svnCredentialsId,
+        passwordVariable: 'SVN_PASSWORD', usernameVariable: 'SVN_USERNAME')]) {
+
+        def svnArgs="--username ${SVN_USERNAME} --password ${SVN_PASSWORD} --no-auth-cache"
+        def result = "";
+
+        if (isUnix()) {
+            result = sh returnStatus:true, script:"svn ${svnGlobalArgs} ${svnArgs} ${svnCommandLine}";
+        } else {
+            result = bat returnStatus:true, script:"svn ${svnGlobalArgs} ${svnArgs} ${svnCommandLine}";
+        }
+
+        return result;
+    }
+}
+
+def getReleaseDir() {
+
+	return "/mnt/Releases"
+}
+
+
+def execMaven(mvnCommandLine, mvnGlobalArgs) {
+    withMaven(
+        maven: mvnVersion,
+        mavenOpts: '',
+        mavenSettingsConfig: 'a223a531-c26f-4f17-8b78-2ba05f93f21c',
+        mavenSettingsFilePath: '') {
+
+		if (isUnix()) {
+			mvnGlobalArgs = mvnGlobalArgs +
+		    	"-DENACTOR_HOME=/var/jenkins_home " +
+		    	"-DLD_LIBRARY_PATH=/var/jenkins_home ";
+
+			sh "export PATH=\"$MVN_CMD_DIR:$PATH\" && mvn ${mvnGlobalArgs} ${mvnCommandLine}";
+		} else {
+			mvnGlobalArgs = mvnGlobalArgs +
+    			"-DENACTOR_HOME=c:/jenkins/enactor " +
+    			"-DLD_LIBRARY_PATH=c:/jenkins/enactor ";
+			bat "\"$MVN_CMD_DIR\\mvn\" ${mvnGlobalArgs} ${mvnCommandLine}";
+		}
+
+	}
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+// Main Pipeline
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+timestamps {
+
+	node {
+
+		if (replaceExistingTag) {
+			stage("Remove Existing Tag") {
+				echo "Deleting existing tag ${releaseVersion}"
+				def svnArgs="-m \"${issueId} - [release] deleting existing tag ${releaseVersion}. ${authCode}\""
+				execSVN("${svnArgs} rm ${svnRoot}/${componentName}/tags/${TAG_FOLDER}/${releaseVersion}");
+			}
+		} else {
+			stage("Check no Existing Tag") {
+				def result = execSVN("ls --depth empty ${svnRoot}/${componentName}/tags/${TAG_FOLDER}/${releaseVersion}");
+				if ("${result}" != "1") {
+				  error "Tag already appears to exist (${svnRoot}/${componentName}/tags/${TAG_FOLDER}/${releaseVersion}";
+				}
+			}
+		}
+
+	    stage("Checkout ${BRANCH_VERSION} Branch") {
+
+	        //deleteDir()
+			echo "Checking out branch ${svnRoot}/${componentName}/${BRANCH_VERSION}"
+	        checkout([$class: 'SubversionSCM', additionalCredentials: [], excludedCommitMessages: '', excludedRegions: '', excludedRevprop: '', excludedUsers: '', filterChangelog: false, ignoreDirPropChanges: false, includedRegions: '',
+	            locations: [[credentialsId: svnCredentialsId, depthOption: 'infinity', ignoreExternalsOption: false,
+	                local: "${componentName}",
+	                remote: "${svnRoot}/${componentName}/${BRANCH_VERSION}"]],
+	            workspaceUpdater: [$class: 'CheckoutUpdater']])
+			
+			def rootPomPath = "${componentName}\\pom.xml"
+			echo "Loading root POM file '${rootPomPath}'"
+			def rootPomFileText = readFile(rootPomPath)
+			
+			if (rootPomFileText) {
+				def rootPomFileTextString = rootPomFileText.toString()
+				echo "File Text: '${rootPomFileTextString}'"
+				
+				if (!rootPomFileTextString.contains("${componentName}/${BRANCH_VERSION}</connection>")
+					|| !rootPomFileTextString.contains("${componentName}/${BRANCH_VERSION}</developerConnection>")
+					|| !rootPomFileTextString.contains("${componentName}/${BRANCH_VERSION}</url>")) {
+					error "One or more SCM URLs in the root Maven POM do not appear to end with '${componentName}/${BRANCH_VERSION}' as expected";
+				} else {
+					echo "SCM details seem right"
+				}
+			} else {
+				echo "Root POM file ${rootPomPath} does not exist or is blank"
+			}
+	    }
+
+    	// In a three-stage release we just want to create the tag to start with, and then
+    	// subsequent stages will use that tag
+    	dir(componentName) {
+	    	stage("Create Tag") {
+	    		// Create a tag
+				echo "Creating release tag ${svnRoot}/${componentName}/tags/${TAG_FOLDER}/${releaseVersion}"
+				mvnCommandLine = "scm:tag -Dtag=${TAG_FOLDER}/${releaseVersion} -DtagBase=${svnRoot}/${componentName}/tags/ -Dmessage='${issueId} - Create ${releaseVersion} tag. ${authCode}'";
+				execMaven(mvnCommandLine, mvnGlobalArgsAll);
+	    	}
+    	}
+	}
+
+	node{
+		stage("Checkout Tag (Code)") {
+
+			// Check out the configured tag we created
+	        echo "Stage 1 - Checking out tag ${svnRoot}/${componentName}/tags/${TAG_FOLDER}/${releaseVersion}"
+	        checkout([$class: 'SubversionSCM', additionalCredentials: [], excludedCommitMessages: '', excludedRegions: '', excludedRevprop: '', excludedUsers: '', filterChangelog: false, ignoreDirPropChanges: false, includedRegions: '',
+	            locations: [[credentialsId: svnCredentialsId, depthOption: 'infinity', ignoreExternalsOption: false,
+	                local: "${componentName}",
+	                remote: "${svnRoot}/${componentName}/tags/${TAG_FOLDER}/${releaseVersion}@HEAD"]],
+	            workspaceUpdater: [$class: 'CheckoutUpdater']])
+	    }
+
+	    stage("Configure Tag") {
+
+	    	dir(componentName) {
+		    	// Update the parent of the children to the release version (leave it locally modified)
+				echo "Stage 1 - Updating parent versions of children to release version ${releaseVersion}"
+				mvnCommandLine="${mvnForceProfiles} versions:update-parent -DparentVersion=[${releaseVersion}] -DallowSnapshots=false -DgenerateBackupPoms=false";
+				execMaven(mvnCommandLine, mvnGlobalArgsParentVersions);
+
+				// Update the parent of the customer parent to the platform version (leave it locally modified)
+				echo "Stage 1 - Updating parent version of customer parent to release version ${platformVersion}"
+				mvnCommandLine="${mvnForceProfiles} versions:update-parent -DparentVersion=[${platformVersion}] -DallowSnapshots=false -DgenerateBackupPoms=false -f .";
+				execMaven(mvnCommandLine, mvnGlobalArgsParentVersions);
+
+				if (platformVersion) {
+					// Update the platform.version property to the platform version (leave it locally modified)
+					echo "Stage 1 - Updating platform.version property to ${platformVersion}"
+					mvnCommandLine="${mvnForceProfiles} enactor:setProperty -DpropertyName=platform.version -DpropertyValue=${platformVersion}";
+					execMaven(mvnCommandLine, mvnGlobalArgsAll);
+				} else {
+					echo "Stage 1 - Not updating platform version";
+				}
+
+				if (identityVersion) {
+					// Update the identity.version property to the identity version (leave it locally modified)
+					echo "Stage 1 - Updating identity.version property to ${identityVersion}"
+					mvnCommandLine="${mvnForceProfiles} enactor:setProperty -DpropertyName=identity.version -DpropertyValue=${identityVersion}";
+					execMaven(mvnCommandLine, mvnGlobalArgsAll);
+				} else {
+					echo "Stage 1 - Not updating identity version";
+				}
+
+				if (previousVersion) {
+					// Update various properties to the previous version (leave it locally modified)
+					// - required.version - Used by installers
+					echo "Stage 1 - Updating required.version property to ${previousVersion}"
+					mvnCommandLine="${mvnForceProfiles} enactor:setProperty -DpropertyName=required.version -DpropertyValue=${previousVersion}";
+					execMaven(mvnCommandLine, mvnGlobalArgsAll);
+				} else {
+					echo "Stage 1 - Not setting previous version";
+				}
+
+				// Change version to the release version prior to the build
+				echo "Stage 1 - Updating version to ${releaseVersion} prior to build and deploy"
+				mvnCommandLine = "${mvnForceProfiles} enactor:setVersion -DnewVersion=${releaseVersion} " +
+					"-DexcludeList=com.enactor:parent-pom," +
+					"com.enactor.installer:installer-parent," +
+					"com.enactor.installer:pdp-client-installer-parent," +
+					"com.enactor.installer:pdp-client-installer-32-parent," +
+					"com.enactor.installer:pdp-server-installer-parent," +
+					"com.enactor.installer:pos-installer-parent," +
+					"com.enactor.installer:pos-installer-32-parent," +
+					"com.enactor.installer:jmx-installer-parent," +
+					"com.enactor.installer:store-server-installer-parent";
+				execMaven(mvnCommandLine, mvnGlobalArgsAll);
+
+				// Check in any changes prior to the release preparation
+				echo "Stage 1 - Checking in property and version changes"
+				mvnCommandLine="enactor:commit -DcommitMessage=\"${issueId} - [release] checking in updated property and version changes for ${releaseVersion}. ${authCode}\" -DsvnServerId=" + svnServerId;
+				execMaven(mvnCommandLine, mvnGlobalArgsAll);
+			}
+		}
+
+		stage("Release (Code)") {
+
+			dir(componentName) {
+				// Perform the Stage 1 release without using the release plugin
+				echo "Stage 1 - Building and deploying release"
+				mvnCommandLine="clean install -U " +
+					"-Darguments=\"-Dreleases.home=" + getReleaseDir() + " -Drelease.dir=" + getReleaseDir() + " -T1.5C\"";
+				execMaven(mvnCommandLine, mvnGlobalArgs);
+				
+				// Archive generated artifacts
+				archiveArtifacts artifacts: '**/*.war,**/*.zip,**/*.msi,**/*.aar', onlyIfSuccessful: true
+			}
+		}
+	}
+}

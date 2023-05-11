@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<core:documentTemplate xmlns:core="http://www.enactor.com/core" xmlns:retail="http://www.enactor.com/retail" xmlns:ns4="http://www.enactor.com/crm" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803" xmlns:ns6="http://www.apis-it.hr/fin/2012/types/f73" xmlns:ns7="http://www.w3.org/2000/09/xmldsig#" xmlns:ns8="http://www.enactor.com/retail/storedRetailTransaction/service" xmlns:ns9="http://www.fu.gov.si/" xmlns:ns10="http://www.enactor.com/addressLookup/service" xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:ns14="http://www.enactor.com/crm/customerLoyalty/service" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" paginated="false" messageBase="Pos/CashManagement/OutlayMessages" title="Runtime Transaction List Template" url="Pos/CashManagement/Outlay/TransactionListTemplate">
+    <core:elements>
+        <core:tableTemplate id="RuntimeTransactionList">
+            <core:formatElement applicableClassName="com.enactor.cashManagement.entities.OutlayReturnTransactionElement" formatId="transactionListItem"/>
+            <core:formatElement applicableEntityName="listHeader" formatId="listHeader"/>
+            <core:formatElement applicableEntityName="listFooter" formatId="listFooter"/>
+        </core:tableTemplate>
+    </core:elements>
+    <core:columnDefs>
+        <core:columnDef id="RowType" start="2" end="22"/>
+        <core:columnDef id="Reason" start="22" end="47"/>
+        <core:columnDef id="Value" start="47" end="67" align="RIGHT"/>
+        <core:columnDef id="ReceiptImage" start="67" end="95"/>
+    </core:columnDefs>
+    <core:formatEntry id="transactionListItem">
+        <core:elements>
+            <core:row styleClass="transactionListItem">
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0">
+                            <core:elements>
+<core:imageElement>
+    <core:flowConstraint height="8"/>
+</core:imageElement>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="RowType" id="RowType">
+                            <core:elements>
+<core:text>
+    <core:text>#{resolveMessage('Pos/CashManagement/OutlayMessages', concat('OUTLAY_RETURN.', item.type))}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="Reason" id="Reason">
+                            <core:elements>
+<core:text>
+    <core:text>#{instanceOf(item.transaction, 'com.enactor.cashManagement.entities.ITerminalReasonTransaction') ? reasonNamesMap[item.transaction.reasonKey] : (instanceOf(item.transaction, 'com.enactor.cashManagement.entities.ISafeReasonTransaction') ? reasonNamesMap[item.transaction.reasonKey] : '-' )}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="Value" id="Value">
+                            <core:elements>
+<core:text>
+    <core:text>#{format:formatCurrencyCurrency(((item.type == 'OUTLAY_RETURN') ? item.transaction.baseCountedValueTotal : -item.transaction.baseCountedValueTotal), item.transaction.baseCurrencyKey.currencyId)}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="listHeader">
+        <core:elements>
+            <core:row styleClass="listHeader" style="BOLD">
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0">
+                            <core:elements>
+<core:imageElement>
+    <core:flowConstraint height="8"/>
+</core:imageElement>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="RowType" id="RowType">
+                            <core:elements>
+<core:text messageId="OUTLAY_RETURN_REASON"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="Reason" id="Reason">
+                            <core:elements>
+<core:text messageId="OUTLAY_RETURN_REASON"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="Value" id="Value">
+                            <core:elements>
+<core:text messageId="OUTLAY_RETURN_VALUE"/>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="listFooter">
+        <core:elements>
+            <core:row styleClass="listFooter">
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0">
+                            <core:elements>
+<core:imageElement>
+    <core:flowConstraint height="8"/>
+</core:imageElement>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="RowType" id="RowType">
+                            <core:elements>
+<core:text messageId="OUTLAY_RETURN.BALANCE"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="Value" id="Value">
+                            <core:elements>
+<core:text>
+    <core:text>#{format:formatCurrencyCurrency(-balance, balanceCurrencyId)}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+</core:documentTemplate>

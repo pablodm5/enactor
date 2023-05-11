@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:mjstring="com.enactor.tools.core.util.JavaCodeGenUtils"
+	xmlns:plnk="http://schemas.xmlsoap.org/ws/2003/05/partner-link/" xmlns:format="http://schemas.xmlsoap.org/wsdl/formatbinding/"
+	xmlns:java="http://schemas.xmlsoap.org/wsdl/java/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	name="CustomerTransactionLookupService" targetNamespace="http://www.enactor.com/retail/customerTransaction/service"
+	xmlns:service="http://www.enactor.com/retail/customerTransaction/service" xmlns:core="http://www.enactor.com/core">
+	<wsdl:types>
+		<xsd:schema>
+			<xsd:import namespace="http://www.enactor.com/retail/customerTransaction/service" schemaLocation="retail/CustomerTransactionLookupService/CustomerTransactionLookupService.xsd" />
+		</xsd:schema>
+		<xsd:schema>
+			<xsd:import namespace="http://www.enactor.com/core" schemaLocation="Core.xsd" />
+		</xsd:schema>
+	</wsdl:types>
+	<wsdl:message name="customerTransactionSearchRequestMessage">
+		<wsdl:part name="parameters" element="service:customerTransactionSearch" />
+	</wsdl:message>
+	<wsdl:message name="customerTransactionSearchResponseMessage">
+		<wsdl:part name="parameters" element="service:customerTransactionSearchResponse" />
+	</wsdl:message>
+	<wsdl:message name="customerTransactionEnquiryRequestMessage">
+		<wsdl:part name="parameters" element="service:customerTransactionEnquiry" />
+	</wsdl:message>
+	<wsdl:message name="customerTransactionEnquiryResponseMessage">
+		<wsdl:part name="parameters" element="service:customerTransactionEnquiryResponse" />
+	</wsdl:message>
+	<wsdl:message name="customerTransactionClaimRequestMessage">
+		<wsdl:part name="parameters" element="service:customerTransactionClaim" />
+	</wsdl:message>
+	<wsdl:message name="customerTransactionClaimResponseMessage">
+		<wsdl:part name="parameters" element="service:customerTransactionClaimResponse" />
+	</wsdl:message>
+	<wsdl:message name="databaseException">
+		<wsdl:part name="databaseException" element="core:databaseException" />
+	</wsdl:message>
+	<wsdl:message name="noSuchRecordException">
+		<wsdl:part name="noSuchRecordException" element="core:noSuchRecordException" />
+	</wsdl:message>
+	<wsdl:message name="customerTransactionSearchFault">
+		<wsdl:part name="customerTransactionSearchFault" element="service:customerTransactionSearchFault" />
+	</wsdl:message>
+	<wsdl:message name="customerTransactionEnquiryFault">
+		<wsdl:part name="customerTransactionEnquiryFault" element="service:customerTransactionEnquiryFault" />
+	</wsdl:message>
+	<wsdl:message name="customerTransactionClaimFault">
+		<wsdl:part name="customerTransactionClaimFault" element="service:customerTransactionClaimFault" />
+	</wsdl:message>
+	<wsdl:portType name="CustomerTransactionLookupServicePT">
+		<wsdl:documentation>This service is used to retrieve details about transactions a customer has performed
+		</wsdl:documentation>
+		<wsdl:operation name="customerTransactionSearch">
+			<wsdl:documentation>This operation is used to retrieve the transaction details of a particular customer.
+
+				The customer number denotes which customer to return data for, which may be limited by the from and to date parameters.
+
+				FromDate and ToDate are used to optionally restrict the returned contact history records.
+
+				The user id is the id of the user performing the search. It may be used to restrict the view of available data if
+				required.
+
+				MaxHits indicates the maximum number of records that should be returned. If more records are returned, in general this will
+				not cause an error, however the extra data will most
+				likely be ignored. If this value is less than 1, a reasonable limit should be
+				assumed.
+
+				OrderBy is used to indicate how the results should be ordered. It will contain the name of one of the
+				elements in the response, optionally followed by 'DESC' if the results should
+				be ordered in descending order
+				(ascending should be the default). For example, if the OrderBy property contained the
+				value 'transactionDate DESC'
+				then the results should be
+				order by their transaction date in descending order</wsdl:documentation>
+			<wsdl:input message="service:customerTransactionSearchRequestMessage" name="customerTransactionSearchRequestMessage" />
+			<wsdl:output message="service:customerTransactionSearchResponseMessage" name="customerTransactionSearchResponseMessage" />
+			<wsdl:fault name="databaseException" message="service:databaseException"></wsdl:fault>
+			<wsdl:fault name="customerTransactionSearchFault" message="service:customerTransactionSearchFault"></wsdl:fault>
+		</wsdl:operation>
+		<wsdl:operation name="customerTransactionEnquiry">
+			<wsdl:documentation>This operation is used to retrieve the details of a single customer transaction.
+
+				The transaction	reference is one supplied in a previous call to the customerTransactionSearch service.
+
+				The user id may optionally be
+				used to restrict the returned transaction line item records if necessary.
+
+				The response will include three prices for
+				each line.:
+				1. The unitPrice is the price for a single item of the product referenced by the line.
+				2. The netValue is the un-promoted value for the line.
+				3. The effectiveNetValue is the value for the line including the effect of any
+				promotions.
+
+				In most cases the netValue is the one displayed in any UIs
+
+			</wsdl:documentation>
+			<wsdl:input message="service:customerTransactionEnquiryRequestMessage" name="customerTransactionEnquiryRequestMessage" />
+			<wsdl:output message="service:customerTransactionEnquiryResponseMessage" name="customerTransactionEnquiryResponseMessage" />
+			<wsdl:fault name="databaseException" message="service:databaseException"></wsdl:fault>
+			<wsdl:fault name="noSuchRecordException" message="service:noSuchRecordException"></wsdl:fault>
+			<wsdl:fault name="customerTransactionEnquiryFault" message="service:customerTransactionEnquiryFault"></wsdl:fault>
+		</wsdl:operation>
+		<wsdl:operation name="customerTransactionClaim">
+			<wsdl:documentation>This operation is used to claim a transaction for a customer.
+
+				The customer number denotes which customer claim the transaction.
+				The transaction	is the transaction to claim.
+
+			</wsdl:documentation>
+			<wsdl:input message="service:customerTransactionClaimRequestMessage" name="customerTransactionClaimRequestMessage" />
+			<wsdl:output message="service:customerTransactionClaimResponseMessage" name="customerTransactionClaimResponseMessage" />
+			<wsdl:fault name="databaseException" message="service:databaseException"></wsdl:fault>
+			<wsdl:fault name="noSuchRecordException" message="service:noSuchRecordException"></wsdl:fault>
+			<wsdl:fault name="customerTransactionClaimFault" message="service:customerTransactionClaimFault"></wsdl:fault>
+		</wsdl:operation>
+	</wsdl:portType>
+	<wsdl:binding name="SOAPBinding" type="service:CustomerTransactionLookupServicePT">
+		<soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document" />
+		<wsdl:operation name="customerTransactionSearch">
+			<soap:operation
+				soapAction="http://www.enactor.com/retail/customerTransaction/service/CustomerTransactionLookupService/customerTransactionSearch" />
+			<wsdl:input name="customerTransactionSearchRequestMessage">
+				<soap:body parts="parameters" use="literal" />
+			</wsdl:input>
+			<wsdl:output name="customerTransactionSearchResponseMessage">
+				<soap:body parts="parameters" use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="customerTransactionEnquiry">
+			<soap:operation
+				soapAction="http://www.enactor.com/retail/customerTransaction/service/CustomerTransactionLookupService/customerTransactionEnquiry" />
+			<wsdl:input name="customerTransactionEnquiryRequestMessage">
+				<soap:body parts="parameters" use="literal" />
+			</wsdl:input>
+			<wsdl:output name="customerTransactionEnquiryResponseMessage">
+				<soap:body parts="parameters" use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="customerTransactionClaim">
+			<soap:operation
+				soapAction="http://www.enactor.com/retail/customerTransaction/service/CustomerTransactionLookupService/customerTransactionClaim" />
+			<wsdl:input name="customerTransactionClaimRequestMessage">
+				<soap:body parts="parameters" use="literal" />
+			</wsdl:input>
+			<wsdl:output name="customerTransactionClaimResponseMessage">
+				<soap:body parts="parameters" use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+	</wsdl:binding>
+	<wsdl:service name="CustomerTransactionLookupService">
+		<wsdl:port name="SOAPPort" binding="service:SOAPBinding">
+			<soap:address location="http://{SERVICE_URL}" />
+		</wsdl:port>
+	</wsdl:service>
+</wsdl:definitions>

@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<core:documentTemplate xmlns:core="http://www.enactor.com/core" xmlns:retail="http://www.enactor.com/retail" xmlns:ns4="http://www.enactor.com/crm" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803" xmlns:ns6="http://www.apis-it.hr/fin/2012/types/f73" xmlns:ns7="http://www.w3.org/2000/09/xmldsig#" xmlns:ns8="http://www.enactor.com/retail/storedRetailTransaction/service" xmlns:ns9="http://www.fu.gov.si/" xmlns:ns10="http://www.enactor.com/addressLookup/service" xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:ns14="http://www.enactor.com/crm/customerLoyalty/service" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" paginated="false" width="48" messageBase="Pos/Print/ReceiptMessages" title="Audit Print" url="Pos/Print/AuditPrintTemplate48">
+    <core:elements>
+        <core:tableTemplate listHeaderId="initialise" id="AuditBasketItems">
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.ISalesItem" applicability="#{isDispatch &amp;&amp; item.dispatchable &amp;&amp; mfcBasket:itemHasModifier(item, 'com.enactor.mfc.basket.items.IDispatchModifier')}"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.ISalesItem" applicability="#{isOrder &amp;&amp; item.orderable &amp;&amp; mfcBasket:itemHasModifier(item, 'com.enactor.mfc.basket.items.IOrderModifier')}"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IAlterationServiceDetailItem" applicability="#{isDispatch &amp;&amp; mfcBasket:itemHasModifier(item, 'com.enactor.mfc.basket.items.IDispatchModifier')}"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IAlterationServiceDetailItem" applicability="#{isOrder &amp;&amp; mfcBasket:itemHasModifier(item, 'com.enactor.mfc.basket.items.IOrderModifier')}"/>
+            <core:formatElement applicability="#{mfcBasket:itemHasModifier(item, 'com.enactor.mfc.basket.items.ICollectModifier')}"/>
+            <core:formatElement matchMultiple="true" applicableClassName="com.enactor.mfc.basket.items.ISalesItem" applicability="#{!item.voided &amp;&amp; !((isDispatch &amp;&amp; instanceOf(item, 'com.enactor.mfc.basket.items.ISalesItem') &amp;&amp; item.dispatchable &amp;&amp; mfcBasket:itemHasModifier(item, 'com.enactor.mfc.basket.items.IDispatchModifier')) || (isOrder &amp;&amp; instanceOf(item, 'com.enactor.mfc.basket.items.ISalesItem') &amp;&amp; item.orderable &amp;&amp; mfcBasket:itemHasModifier(item, 'com.enactor.mfc.basket.items.IOrderModifier')))}" formatId="allSalesItems"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IMerchandiseItem" applicability="#{abs(item.quantity) == 1 &amp;&amp; (item.unitType == null || enumEquals(item.unitType, 'UNIT')) &amp;&amp; !item.voided}" formatId="merchandiseItem"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IMerchandiseItem" applicability="#{!item.voided}" formatId="merchandiseItemMultiple"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IRecordRepairItem" applicability="#{!item.voided}" formatId="recordRepairItem"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IRecallRepairItem" applicability="#{!item.voided}" formatId="recallRepairItem"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IFeeItem" formatId="feeItem"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IGiftCardItem" formatId="nonMerchandiseItem"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IAlterationServiceItem"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.INonMerchandiseItem" applicability="#{abs(item.quantity) &lt;= 1 &amp;&amp; !item.voided}" formatId="nonMerchandiseItem"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.INonMerchandiseItem" applicability="#{abs(item.quantity) &gt; 1 &amp;&amp; !item.voided}" formatId="nonMerchandiseItemMultiple"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.ITransactionVoidItem" formatId="transactionVoidItem"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.INoSaleItem" formatId="noSaleItem"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IDiscountItem" applicability="#{!item.voided}" formatId="discountItem"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.ITransactionDiscountItem" applicability="#{!item.voided &amp;&amp; !instanceOf(item, 'com.enactor.mfc.basket.items.IEmployeeSaleTransactionDiscountItem')}" formatId="transactionDiscountItem"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IVoidItem" applicability="#{instanceOf(item.voidedItem, 'com.enactor.mfc.basket.items.IAlterationServiceDetailItem')}"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IAlterationServiceDetailItem" applicability="#{!(mfcBasket:itemHasModifier(item, 'com.enactor.mfc.basket.items.IDispatchModifier') || mfcBasket:itemHasModifier(item, 'com.enactor.mfc.basket.items.IOrderModifier'))}" formatId="alterationServiceDetailItem"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IPriceOverrideItem" applicability="#{!item.voided}" formatId="priceOverrideItem"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IIssueLoyaltyCardItem" applicability="#{!item.voided}" formatId="issueLoyaltyCardItem"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IHonourPromotionItem" applicability="#{!item.voided}" formatId="honourPromotionItem"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IRecordRepairItem" applicability="#{item.voided}" formatId="recordRepairItemVoided"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.ILoyaltyPointsAdjustmentItem" applicability="#{!item.voided}" formatId="loyaltyPointsAdjustmentItem"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.ILoyaltyPointsAdjustmentItem" applicability="#{item.voided}"/>
+            <core:formatElement applicableClassName="com.enactor.customerOrders.retail.basket.items.ICustomerOrderCollectionBasketItem" applicability="#{!item.voided}" formatId="customerOrderCollectionBasketItem"/>
+            <core:formatElement applicableClassName="com.enactor.customerOrders.retail.basket.items.ICustomerOrderCollectionHeaderBasketItem" applicability="#{!item.voided}" formatId="customerOrderCollectionHeaderBasketItem"/>
+            <core:formatElement applicableClassName="com.enactor.customerOrders.retail.basket.items.ICustomerOrderCollectionHeaderBasketItem" applicability="#{item.voided}"/>
+            <core:formatElement applicableClassName="com.enactor.customerOrders.retail.basket.items.ICustomerOrderPaymentBasketItem" applicability="#{!item.voided &amp;&amp; item.forCollection}" formatId="customerOrderPaymentForCollection"/>
+            <core:formatElement applicableClassName="com.enactor.customerOrders.retail.basket.items.ICustomerOrderPaymentBasketItem" applicability="#{!item.voided &amp;&amp; !item.forCollection}" formatId="customerOrderPaymentBasketItem"/>
+            <core:formatElement applicableClassName="com.enactor.customerOrders.retail.basket.items.ICustomerOrderCancellationBasketItem" applicability="#{!item.voided}" formatId="customerOrderCancellationBasketItem"/>
+            <core:formatElement applicableClassName="com.enactor.customerOrders.retail.basket.items.ICustomerOrderCancellationBasketItem" applicability="#{item.voided}"/>
+            <core:formatElement applicableClassName="com.enactor.customerOrders.retail.basket.items.ICustomerOrderCancellationHeaderBasketItem" applicability="#{!item.voided}" formatId="customerOrderCancellationHeaderBasketItem"/>
+            <core:formatElement applicableClassName="com.enactor.customerOrders.retail.basket.items.ICustomerOrderCancellationHeaderBasketItem" applicability="#{item.voided}"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IVoidableItem" applicability="#{item.voided}" formatId="basketItemVoided"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IProductPreparationOptionItem"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IVoucherRedemptionItem" formatId="voucherRedemptionItem"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IVoidItem" formatId="voidItem"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IStorageItem" formatId="storageItem"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IRecallItem" formatId="recallItem"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IAccountBalanceUpdateItem" formatId="accountBalanceUpdateItem"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IDiscountItem"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.ITransactionDiscountItem"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IIssueLoyaltyCardItem" applicability="#{item.voided}"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.ILoyaltyOfferDeclinedItem" formatId="loyaltyOfferDeclinedItem"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.ICollectDetailsItem" formatId="collectDetailsItem"/>
+            <core:formatElement applicableEntityName="quantityModifierItem"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IDispatchDetailsItem" formatId="dispatchDetailsItem"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IOrderDetailsItem" formatId="orderDetailsItem"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IDeliveryChargeItem" formatId="deliveryChargeItem"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IAdminChargeItem" formatId="adminChargeItem"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.ISurchargeItem" formatId="surchargeItem"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IDeliveryPackageItem" formatId="deliveryPackageItem"/>
+            <core:formatElement applicableEntityName="dummyItem"/>
+            <core:formatElement applicableEntityName="alterationServiceDetailItem"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IPostVoidItem" formatId="postVoidItem"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IPromotionControlItem" formatId="promotionControlItem"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IFlightDetailsItem" formatId="flightDetailsItem"/>
+            <core:formatElement applicableClassName="com.enactor.customerOrders.retail.basket.items.ICustomerOrderDepositBasketItem" formatId="auditCustomerOrderDepositBasketItem"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IOrderDetailsItem" formatId="auditOrderDetailsItem"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IVoidableItem" applicability="#{!item.voided}" formatId="basketItem"/>
+            <core:formatElement matchMultiple="true" applicableClassName="com.enactor.mfc.basket.items.ISalesItem" applicability="#{!item.voided &amp;&amp; !((isDispatch &amp;&amp; instanceOf(item, 'com.enactor.mfc.basket.items.ISalesItem') &amp;&amp; item.dispatchable &amp;&amp; mfcBasket:itemHasModifier(item, 'com.enactor.mfc.basket.items.IDispatchModifier')) || (isOrder &amp;&amp; instanceOf(item, 'com.enactor.mfc.basket.items.ISalesItem') &amp;&amp; item.orderable &amp;&amp; mfcBasket:itemHasModifier(item, 'com.enactor.mfc.basket.items.IOrderModifier')))}" formatId="afterSalesItems"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.ITaxSchemeOverrideItem" applicability="#{!item.voided}" formatId="taxSchemeOverrideItem"/>
+            <core:formatElement/>
+            <core:formatElement matchMultiple="true" applicableClassName="com.enactor.mfc.basket.items.ITenderItem" applicability="#{!item.voided}" formatId="saveTenderAuthUserId"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.ICashTenderItem" applicability="#{item.issuedAsCashback &amp;&amp; !item.voided}" formatId="cashbackTenderItem"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.ITenderItem" applicability="#{item.isChange &amp;&amp; !item.voided &amp;&amp; !item.isRefund}" formatId="changeTenderItem"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.ITenderItem" applicability="#{item.isChange &amp;&amp; !item.voided &amp;&amp; item.isRefund}" formatId="customerToPayTenderItem"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.ITenderItem" applicability="#{!item.isChange}" formatId="tenderItem"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IBasketItem" formatId="basketItem"/>
+            <core:entityReferences>
+                <core:entityReference name="department" entityName="group" entityNamespace="http://www.enactor.com/core">
+                    <core:keyProperty name="groupTypeId" value="#{'mmGroup'}"/>
+                    <core:keyProperty name="groupId" value="#{item.MMGroupId}"/>
+                    <core:keyProperty name="groupHierarchyId" value="#{item.MMGroupHierarchyId}"/>
+                    <core:keyProperty name="variantGroupTypeId" value="#{'region'}"/>
+                    <core:keyProperty name="variantGroupId" value="#{transaction.originatedBy.regionKey.groupId}"/>
+                    <core:keyProperty name="variantGroupHierarchyId" value="#{transaction.originatedBy.regionKey.groupHierarchyId}"/>
+                </core:entityReference>
+            </core:entityReferences>
+        </core:tableTemplate>
+        <core:tableTemplate id="AuditSystemEvents">
+            <core:formatElement applicability="#{item.eventTypeKey.eventTypeId == 'SignOn'}" formatId="eventSignOn"/>
+            <core:formatElement applicability="#{item.eventTypeKey.eventTypeId == 'RepeatedSignOnFail'}" formatId="eventRepeatedSignOnFail"/>
+            <core:formatElement applicability="#{item.eventTypeKey.eventTypeId == 'IncorrectSignOn'}" formatId="eventIncorrectSignOn"/>
+            <core:formatElement applicability="#{item.eventTypeKey.eventTypeId == 'SignOff'}" formatId="eventSignOff"/>
+            <core:formatElement applicability="#{item.eventTypeKey.eventTypeId == 'AuthorisationFailure'}" formatId="eventAuthorisationFailure"/>
+            <core:formatElement applicability="#{item.eventTypeKey.eventTypeId == 'PosStoreTransaction'}"/>
+            <core:formatElement applicability="#{item.eventTypeKey.eventTypeId == 'PosRecallTransaction'}"/>
+            <core:formatElement applicability="#{item.eventTypeKey.eventTypeId == 'Test'}" formatId="eventTest"/>
+            <core:formatElement applicability="#{item.eventTypeKey.eventTypeId == 'PublicKeyExpired'}" formatId="eventPublicKeyExpired"/>
+            <core:formatElement applicability="#{item.eventTypeKey.eventTypeId == 'NoPublicKeys'}" formatId="eventNoPublicKeys"/>
+            <core:formatElement applicability="#{item.eventTypeKey.eventTypeId == 'TrainingModeOn'}" formatId="eventTrainingModeOn"/>
+            <core:formatElement applicability="#{item.eventTypeKey.eventTypeId == 'TrainingModeOff'}" formatId="eventTrainingModeOff"/>
+            <core:formatElement formatId="eventUnsupported"/>
+        </core:tableTemplate>
+        <core:tableTemplate id="AuditEvents">
+            <core:formatElement applicability="#{item.eventName == 'enactor.pos.AuthUserSignedOn'}" formatId="authUserSignedOn"/>
+            <core:formatElement applicability="#{item.eventName == 'enactor.pos.AuthUserSignedOff'}" formatId="authUserSignedOff"/>
+            <core:formatElement applicability="#{item.eventName == 'enactor.pos.TotalPressed'}" formatId="totalPressedEvent"/>
+            <core:formatElement applicability="#{item.eventName == 'enactor.pos.TransactionStarted'}" formatId="transactionStarted"/>
+            <core:formatElement applicability="#{item.eventName == 'enactor.pos.TransactionEnding'}" formatId="transactionEnding"/>
+            <core:formatElement applicability="#{item.eventName == 'enactor.pos.TransactionComplete'}" formatId="transactionComplete"/>
+            <core:formatElement applicability="#{item.eventName == 'CashdrawerStatus'}" formatId="cashdrawerStatus"/>
+            <core:formatElement applicability="#{item.eventName == 'enactor.pos.SystemStartUp'}" formatId="systemStartUp"/>
+            <core:formatElement applicability="#{item.eventName == 'enactor.pos.SystemShutDown'}" formatId="systemShutDown"/>
+            <core:formatElement applicability="#{item.eventName == 'enactor.pos.LoyaltyCaptured'}" formatId="loyaltyCaptured"/>
+            <core:formatElement applicability="#{item.eventName == 'enactor.pos.DispatchDetailsChanged'}" formatId="dispatchDetailsChanged"/>
+            <core:formatElement applicability="#{item.eventName == 'enactor.pos.OrderDetailsChanged'}" formatId="orderDetailsChanged"/>
+            <core:formatElement applicability="#{item.eventName == 'enactor.pos.LockLocalDevice'}" formatId="eventLockLocalDevice"/>
+            <core:formatElement applicability="#{item.eventName == 'enactor.pos.UnlockLocalDevice'}" formatId="eventUnlockLocalDevice"/>
+            <core:formatElement applicability="#{item.eventName == 'enactor.pos.UnlockRemoteDevices'}" formatId="eventUnlockRemoteDevices"/>
+            <core:formatElement formatId="unsupportedEvent"/>
+        </core:tableTemplate>
+    </core:elements>
+    <core:includedTemplateUrl>Pos/Print/AuditPrintCommonFormatEntries</core:includedTemplateUrl>
+    <core:includedTemplateUrl>Pos/Print/ReceiptCommonColumnDefs48</core:includedTemplateUrl>
+    <core:includedTemplateUrl>Pos/Print/ReceiptGeneralFormatEntries48</core:includedTemplateUrl>
+</core:documentTemplate>

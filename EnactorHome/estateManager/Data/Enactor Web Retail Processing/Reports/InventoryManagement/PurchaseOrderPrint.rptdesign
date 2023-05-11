@@ -1,0 +1,2727 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.21" id="1">
+    <property name="author">David Bull</property>
+    <property name="comments">Copyright (c) 2010 Enactor Ltd.</property>
+    <property name="createdBy">Eclipse BIRT Designer Version 2.5.2.v20100208 Build &lt;2.5.2.v20100210-0630></property>
+    <text-property name="title">Purchase Order Print</text-property>
+    <html-property name="description">Purchase Order Print report</html-property>
+    <simple-property-list name="includeResource">
+        <value>Messages/InventoryManagement/PurchaseOrderPrintMessages</value>
+    </simple-property-list>
+    <property name="units">in</property>
+    <method name="initialize"><![CDATA[globalDataFormatter = Packages.com.enactor.coreUI.factories.DataFormatterFactory.getInstance().getFormatter(reportContext.getLocale());
+baseCurrencyId = globalDataFormatter.getBaseCurrencyId();
+
+if(params["purchaseOrderId"].value == null){
+	params["purchaseOrderId"].value = "";
+}
+]]></method>
+    <property name="theme">ReportLibrary.EnactorReportTheme</property>
+    <text-property name="displayName">Purchase Order Print</text-property>
+    <property name="layoutPreference">auto layout</property>
+    <property name="imageDPI">96</property>
+    <list-property name="libraries">
+        <structure>
+            <property name="fileName">InventoryManagementReportLibrary.rptlibrary</property>
+            <property name="namespace">ReportLibrary</property>
+        </structure>
+    </list-property>
+    <parameters>
+        <scalar-parameter name="odaJndiName" id="367">
+            <text-property name="promptText">ODA JNDI Name</text-property>
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant"></value>
+            </simple-property-list>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="purchaseOrderId" id="551">
+            <text-property name="promptText">Purchase Order Id</text-property>
+            <property name="valueType">static</property>
+            <property name="isRequired">true</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant">107000052</value>
+            </simple-property-list>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="companyId" id="2011">
+            <property name="valueType">static</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant">1</value>
+            </simple-property-list>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="cancelled" id="1923">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant">false</value>
+            </simple-property-list>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+    </parameters>
+    <data-sources>
+        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="Data Source" id="374"
+ extends="ReportLibrary.Data Source">
+            <list-property name="privateDriverProperties">
+                <ex-property>
+                    <name>contentBidiFormatStr</name>
+                    <value>ILYNN</value>
+                </ex-property>
+                <ex-property>
+                    <name>metadataBidiFormatStr</name>
+                    <value>ILYNN</value>
+                </ex-property>
+            </list-property>
+            <property name="odaDriverClass">com.mysql.jdbc.Driver</property>
+            <property name="odaURL">jdbc:mysql://localhost/enactor_trunk</property>
+            <property name="odaUser">enactor</property>
+            <encrypted-property name="odaPassword" encryptionID="base64">ZW5hY3Rvcg==</encrypted-property>
+        </oda-data-source>
+    </data-sources>
+    <data-sets>
+        <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="LocationDescription" id="999"
+ extends="ReportLibrary.LocationDescription"/>
+        <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="UserDescription" id="1005"
+ extends="ReportLibrary.UserDescription"/>
+        <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="ReasonDescription" id="1445"
+ extends="ReportLibrary.ReasonDescription"/>
+        <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="ItemQuery" id="1446">
+            <list-property name="computedColumns">
+                <structure>
+                    <property name="name">FORMATTED_UNIT_COST</property>
+                    <expression name="expression">longVal = row["UNIT_COST"] != null ? row["UNIT_COST"]  : 0;&#13;
+globalDataFormatter.formatCurrencyAmount(longVal, baseCurrencyId);</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">FORMATTED_LINE_TOTAL</property>
+                    <expression name="expression">longVal = row["LINE_TOTAL"] != null ? row["LINE_TOTAL"]  : 0;&#13;
+globalDataFormatter.formatCurrencyAmount(longVal, baseCurrencyId);</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">SUB_TOTAL_EX_VAT</property>
+                    <property name="dataType">float</property>
+                    <property name="aggregateFunction">SUM</property>
+                    <list-property name="arguments">
+                        <structure>
+                            <property name="name">Expression</property>
+                            <expression name="value">row["LINE_TOTAL"]</expression>
+                        </structure>
+                    </list-property>
+                </structure>
+                <structure>
+                    <property name="name">FORMATTED_SUB_TOTAL_EX_VAT</property>
+                    <expression name="expression">longVal = row["SUB_TOTAL_EX_VAT"] != null ? row["SUB_TOTAL_EX_VAT"]  : 0;&#13;
+globalDataFormatter.formatCurrencyAmount(longVal, baseCurrencyId);</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">TOTAL</property>
+                    <property name="dataType">float</property>
+                    <property name="aggregateFunction">SUM</property>
+                    <list-property name="arguments">
+                        <structure>
+                            <property name="name">Expression</property>
+                            <expression name="value">row["LINE_TOTAL"]</expression>
+                        </structure>
+                    </list-property>
+                </structure>
+                <structure>
+                    <property name="name">FORMATTED_TOTAL</property>
+                    <expression name="expression">longVal = row["TOTAL"] != null ? row["TOTAL"]  : 0;&#13;
+globalDataFormatter.formatCurrencyAmount(longVal, baseCurrencyId);</expression>
+                    <property name="dataType">string</property>
+                </structure>
+            </list-property>
+            <list-property name="columnHints">
+                <structure>
+                    <property name="columnName">Product_Id</property>
+                    <property name="alias">PRODUCT_ID</property>
+                </structure>
+                <structure>
+                    <property name="columnName">Supplier_Product_Id</property>
+                    <property name="alias">SUPPLIER_PRODUCT_ID</property>
+                </structure>
+                <structure>
+                    <property name="columnName">Description</property>
+                    <property name="alias">SUPPLIER_PRODUCT_DESCRIPTION</property>
+                </structure>
+                <structure>
+                    <property name="columnName">Style_Id</property>
+                    <property name="alias">STYLE</property>
+                </structure>
+                <structure>
+                    <property name="columnName">Unit_Qty</property>
+                    <property name="alias">QUANTITY</property>
+                </structure>
+                <structure>
+                    <property name="columnName">Multiple_To_Base</property>
+                    <property name="alias">MULTIPLE_TO_BASE</property>
+                </structure>
+                <structure>
+                    <property name="columnName">Cost</property>
+                    <property name="alias">UNIT_COST</property>
+                </structure>
+                <structure>
+                    <property name="columnName">LINE_TOTAL</property>
+                    <property name="alias">LINE_TOTAL</property>
+                </structure>
+                <structure>
+                    <property name="columnName">FORMATTED_UNIT_COST</property>
+                    <property name="alias">FORMATTED_UNIT_COST</property>
+                </structure>
+                <structure>
+                    <property name="columnName">FORMATTED_LINE_TOTAL</property>
+                    <property name="alias">FORMATTED_LINE_TOTAL</property>
+                </structure>
+                <structure>
+                    <property name="columnName">SUB_TOTAL_EX_VAT</property>
+                    <property name="alias">SUB_TOTAL_EX_VAT</property>
+                </structure>
+                <structure>
+                    <property name="columnName">FORMATTED_SUB_TOTAL_EX_VAT</property>
+                    <property name="alias">FORMATTED_SUB_TOTAL_EX_VAT</property>
+                </structure>
+                <structure>
+                    <property name="columnName">TOTAL</property>
+                    <property name="alias">TOTAL</property>
+                </structure>
+                <structure>
+                    <property name="columnName">FORMATTED_TOTAL</property>
+                    <property name="alias">FORMATTED_TOTAL</property>
+                </structure>
+                <structure>
+                    <property name="columnName">Description_6</property>
+                    <property name="alias">SIZE_DESCRIPTION</property>
+                </structure>
+                <structure>
+                    <property name="columnName">Description_4</property>
+                    <property name="alias">PRODUCT_DESCRIPTION</property>
+                </structure>
+                <structure>
+                    <property name="columnName">Description_7</property>
+                    <property name="alias">COLOUR_DESCRIPTION</property>
+                </structure>
+            </list-property>
+            <list-property name="parameters">
+                <structure>
+                    <property name="name">purchaseOrderId</property>
+                    <property name="paramName">purchaseOrderId</property>
+                    <property name="dataType">string</property>
+                    <property name="position">1</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+            </list-property>
+            <structure name="cachedMetaData">
+                <list-property name="resultSet">
+                    <structure>
+                        <property name="position">1</property>
+                        <property name="name">PRODUCT_ID</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">2</property>
+                        <property name="name">SUPPLIER_PRODUCT_ID</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">3</property>
+                        <property name="name">SUPPLIER_PRODUCT_DESCRIPTION</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">4</property>
+                        <property name="name">PRODUCT_DESCRIPTION</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">5</property>
+                        <property name="name">STYLE</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">6</property>
+                        <property name="name">SIZE_DESCRIPTION</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">7</property>
+                        <property name="name">COLOUR_DESCRIPTION</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">8</property>
+                        <property name="name">QUANTITY</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                    <structure>
+                        <property name="position">9</property>
+                        <property name="name">MULTIPLE_TO_BASE</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                    <structure>
+                        <property name="position">10</property>
+                        <property name="name">UNIT_COST</property>
+                        <property name="dataType">float</property>
+                    </structure>
+                    <structure>
+                        <property name="position">11</property>
+                        <property name="name">LINE_TOTAL</property>
+                        <property name="dataType">float</property>
+                    </structure>
+                    <structure>
+                        <property name="position">12</property>
+                        <property name="name">FORMATTED_UNIT_COST</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">13</property>
+                        <property name="name">FORMATTED_LINE_TOTAL</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">14</property>
+                        <property name="name">SUB_TOTAL_EX_VAT</property>
+                        <property name="dataType">float</property>
+                    </structure>
+                    <structure>
+                        <property name="position">15</property>
+                        <property name="name">FORMATTED_SUB_TOTAL_EX_VAT</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">16</property>
+                        <property name="name">TOTAL</property>
+                        <property name="dataType">float</property>
+                    </structure>
+                    <structure>
+                        <property name="position">17</property>
+                        <property name="name">FORMATTED_TOTAL</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                </list-property>
+            </structure>
+            <property name="dataSource">Data Source</property>
+            <list-property name="resultSet">
+                <structure>
+                    <property name="position">1</property>
+                    <property name="name">Product_Id</property>
+                    <property name="nativeName">Product_Id</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">2</property>
+                    <property name="name">Supplier_Product_Id</property>
+                    <property name="nativeName">Supplier_Product_Id</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">3</property>
+                    <property name="name">Description</property>
+                    <property name="nativeName">Description</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">4</property>
+                    <property name="name">Description_4</property>
+                    <property name="nativeName">Description</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">5</property>
+                    <property name="name">Style_Id</property>
+                    <property name="nativeName">Style_Id</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">6</property>
+                    <property name="name">Description_6</property>
+                    <property name="nativeName">Description</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">7</property>
+                    <property name="name">Description_7</property>
+                    <property name="nativeName">Description</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">8</property>
+                    <property name="name">Unit_Qty</property>
+                    <property name="nativeName">Unit_Qty</property>
+                    <property name="dataType">integer</property>
+                </structure>
+                <structure>
+                    <property name="position">9</property>
+                    <property name="name">Multiple_To_Base</property>
+                    <property name="nativeName">Multiple_To_Base</property>
+                    <property name="dataType">integer</property>
+                </structure>
+                <structure>
+                    <property name="position">10</property>
+                    <property name="name">Cost</property>
+                    <property name="nativeName">Cost</property>
+                    <property name="dataType">float</property>
+                </structure>
+                <structure>
+                    <property name="position">11</property>
+                    <property name="name">LINE_TOTAL</property>
+                    <property name="nativeName">LINE_TOTAL</property>
+                    <property name="dataType">float</property>
+                </structure>
+            </list-property>
+            <xml-property name="queryText"><![CDATA[   SELECT poi.Product_Id AS PRODUCT_ID,
+         sp.Supplier_Product_Id AS SUPPLIER_PRODUCT_ID,
+         sp.Description AS SUPPLIER_PRODUCT_DESCRIPTION,
+         p.Description AS DESCRIPTION,
+		 skup.Style_Id AS STYLE,
+	     s.Description AS SIZE_DESCRIPTION,
+         c.Description AS COLOUR_DESCRIPTION,
+		 poi.Unit_Qty AS QUANTITY,
+ 		 poi.Multiple_To_Base AS MULTIPLE_TO_BASE,
+		 spc.Cost AS UNIT_COST,
+		 poi.Unit_Qty * spc.Cost AS LINE_TOTAL
+  FROM PurchaseOrderItems poi
+  LEFT OUTER JOIN PurchaseOrderHeaders poh ON poi.Purchase_Order_Id = poh.Purchase_Order_Id
+  LEFT OUTER JOIN SKUProducts skup ON skup.Product_Id = poi.Product_Id
+  LEFT OUTER JOIN Products p ON p.Product_Id = poi.Product_Id
+  LEFT OUTER JOIN SupplierProducts sp ON sp.Supplier_Id = poh.Supplier_Id AND sp.Product_Id = poi.Product_Id AND sp.Supplier_Product_Id = poi.Supplier_Product_Id
+  LEFT OUTER JOIN (SELECT t1.Supplier_Id, t1.Supplier_Product_Id, t1.Cost
+                   FROM SupplierProductCosts t1 
+                   LEFT OUTER JOIN SupplierProductCosts t2 
+                   ON t2.Supplier_Id = t1.Supplier_Id 
+                   AND t2.Supplier_Product_Id = t1.Supplier_Product_Id 
+                   AND t2.Start_Date > t1.Start_Date
+                   WHERE t2.Supplier_Id IS NULL) spc
+  ON sp.Supplier_Product_Id = spc.Supplier_Product_Id AND sp.Supplier_Id = spc.Supplier_Id
+  LEFT OUTER JOIN Sizes s ON s.Size_Id = skup.Size_Id AND s.Size_Range_Id = skup.Size_Range_Id
+  LEFT OUTER JOIN Colours c ON c.Colour_Id = skup.Colour_Id AND c.Colour_Range_Id = skup.Colour_Range_Id
+  WHERE	 poi.Purchase_Order_Id = ?
+  AND	 (poi.Voided IS NULL OR poi.Voided = 0)
+  ORDER BY sp.Description, sp.Supplier_Product_Id]]></xml-property>
+        </oda-data-set>
+        <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="HeaderQuery" id="1529">
+            <list-property name="computedColumns">
+                <structure>
+                    <property name="name">APPROVED_BY</property>
+                    <expression name="expression">forename = row["AUTH_USER_FORENAME"] != null &amp;&amp; row["AUTH_USER_FORENAME"] != '-' ? row["AUTH_USER_FORENAME"] : '';&#13;
+surname = row["AUTH_USER_SURNAME"] != null ? row["AUTH_USER_SURNAME"] : '';&#13;
+forename + ' ' + surname;</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">FORMATTED_CREATED_DATE</property>
+                    <expression name="expression">var date = row["CREATED_DATE"];&#13;
+Packages.com.enactor.core.utilities.DateUtils.formatMediumDate(reportContext.getLocale(), date) ;</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">SET_BASE_CURRENCY_ID</property>
+                    <expression name="expression">baseCurrencyId = row["CURRENCY_ID"];&#13;
+'';</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">USER_NAME</property>
+                    <expression name="expression">forename = row["Forename_6"] != null &amp;&amp; row["AUTH_USER_FORENAME"] != '-' ? row["Forename_6"] : '';&#13;
+surname = row["Surname_7"] != null ? row["Surname_7"] : '';&#13;
+forename + ' ' + surname;</expression>
+                    <property name="dataType">string</property>
+                </structure>
+            </list-property>
+            <list-property name="columnHints">
+                <structure>
+                    <property name="columnName">Purchase_Order_Id</property>
+                    <property name="alias">PURCHASE_ORDER_ID</property>
+                </structure>
+                <structure>
+                    <property name="columnName">Currency_Id</property>
+                    <property name="alias">CURRENCY_ID</property>
+                </structure>
+                <structure>
+                    <property name="columnName">Name</property>
+                    <property name="alias">SUPPLIER_NAME</property>
+                </structure>
+                <structure>
+                    <property name="columnName">Forename</property>
+                    <property name="alias">AUTH_USER_FORENAME</property>
+                </structure>
+                <structure>
+                    <property name="columnName">Surname</property>
+                    <property name="alias">AUTH_USER_SURNAME</property>
+                </structure>
+                <structure>
+                    <property name="columnName">Created_Date</property>
+                    <property name="alias">CREATED_DATE</property>
+                </structure>
+                <structure>
+                    <property name="columnName">Destination_Location_Id</property>
+                    <property name="alias">DESTINATION_LOCATION_ID</property>
+                </structure>
+                <structure>
+                    <property name="columnName">Notes</property>
+                    <property name="alias">NOTES</property>
+                </structure>
+                <structure>
+                    <property name="columnName">Street1</property>
+                    <property name="alias">SUP_STREET1</property>
+                </structure>
+                <structure>
+                    <property name="columnName">Street2</property>
+                    <property name="alias">SUP_STREET2</property>
+                </structure>
+                <structure>
+                    <property name="columnName">Street3</property>
+                    <property name="alias">SUP_STREET3</property>
+                </structure>
+                <structure>
+                    <property name="columnName">Town</property>
+                    <property name="alias">SUP_TOWN</property>
+                </structure>
+                <structure>
+                    <property name="columnName">County</property>
+                    <property name="alias">SUP_COUNTY</property>
+                </structure>
+                <structure>
+                    <property name="columnName">Country</property>
+                    <property name="alias">SUP_COUNTRY</property>
+                </structure>
+                <structure>
+                    <property name="columnName">Post_Code</property>
+                    <property name="alias">SUP_POST_CODE</property>
+                </structure>
+                <structure>
+                    <property name="columnName">Description</property>
+                    <property name="alias">LOC_DESCRIPTION</property>
+                </structure>
+                <structure>
+                    <property name="columnName">APPROVED_BY</property>
+                    <property name="alias">APPROVED_BY</property>
+                </structure>
+                <structure>
+                    <property name="columnName">FORMATTED_CREATED_DATE</property>
+                    <property name="alias">FORMATTED_CREATED_DATE</property>
+                </structure>
+                <structure>
+                    <property name="columnName">SET_BASE_CURRENCY_ID</property>
+                    <property name="alias">SET_BASE_CURRENCY_ID</property>
+                </structure>
+                <structure>
+                    <property name="columnName">USER_NAME</property>
+                    <property name="alias">USER_NAME</property>
+                </structure>
+                <structure>
+                    <property name="columnName">Street1_19</property>
+                    <property name="alias">LOC_STREET1</property>
+                </structure>
+                <structure>
+                    <property name="columnName">Street2_20</property>
+                    <property name="alias">LOC_STREET2</property>
+                </structure>
+                <structure>
+                    <property name="columnName">Street3_21</property>
+                    <property name="alias">LOC_STREET3</property>
+                </structure>
+                <structure>
+                    <property name="columnName">Town_22</property>
+                    <property name="alias">LOC_TOWN</property>
+                </structure>
+                <structure>
+                    <property name="columnName">County_23</property>
+                    <property name="alias">LOC_COUNTY</property>
+                </structure>
+                <structure>
+                    <property name="columnName">Country_24</property>
+                    <property name="alias">LOC_COUNTRY</property>
+                </structure>
+                <structure>
+                    <property name="columnName">Post_Code_25</property>
+                    <property name="alias">LOC_POST_CODE</property>
+                </structure>
+            </list-property>
+            <list-property name="parameters">
+                <structure>
+                    <property name="name">purchaseOrderId</property>
+                    <property name="paramName">purchaseOrderId</property>
+                    <property name="dataType">string</property>
+                    <property name="position">1</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+            </list-property>
+            <structure name="cachedMetaData">
+                <list-property name="resultSet">
+                    <structure>
+                        <property name="position">1</property>
+                        <property name="name">PURCHASE_ORDER_ID</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">2</property>
+                        <property name="name">CURRENCY_ID</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">3</property>
+                        <property name="name">SUPPLIER_NAME</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">4</property>
+                        <property name="name">AUTH_USER_FORENAME</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">5</property>
+                        <property name="name">AUTH_USER_SURNAME</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">6</property>
+                        <property name="name">Forename_6</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">7</property>
+                        <property name="name">Surname_7</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">8</property>
+                        <property name="name">CREATED_DATE</property>
+                        <property name="dataType">date-time</property>
+                    </structure>
+                    <structure>
+                        <property name="position">9</property>
+                        <property name="name">DESTINATION_LOCATION_ID</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">10</property>
+                        <property name="name">NOTES</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">11</property>
+                        <property name="name">SUP_STREET1</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">12</property>
+                        <property name="name">SUP_STREET2</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">13</property>
+                        <property name="name">SUP_STREET3</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">14</property>
+                        <property name="name">SUP_TOWN</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">15</property>
+                        <property name="name">SUP_COUNTY</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">16</property>
+                        <property name="name">SUP_COUNTRY</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">17</property>
+                        <property name="name">SUP_POST_CODE</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">18</property>
+                        <property name="name">LOC_DESCRIPTION</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">19</property>
+                        <property name="name">LOC_STREET1</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">20</property>
+                        <property name="name">LOC_STREET2</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">21</property>
+                        <property name="name">LOC_STREET3</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">22</property>
+                        <property name="name">LOC_TOWN</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">23</property>
+                        <property name="name">LOC_COUNTY</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">24</property>
+                        <property name="name">LOC_COUNTRY</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">25</property>
+                        <property name="name">LOC_POST_CODE</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">26</property>
+                        <property name="name">APPROVED_BY</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">27</property>
+                        <property name="name">FORMATTED_CREATED_DATE</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">28</property>
+                        <property name="name">SET_BASE_CURRENCY_ID</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">29</property>
+                        <property name="name">USER_NAME</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                </list-property>
+            </structure>
+            <property name="dataSource">Data Source</property>
+            <list-property name="resultSet">
+                <structure>
+                    <property name="position">1</property>
+                    <property name="name">Purchase_Order_Id</property>
+                    <property name="nativeName">Purchase_Order_Id</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">2</property>
+                    <property name="name">Currency_Id</property>
+                    <property name="nativeName">Currency_Id</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">3</property>
+                    <property name="name">Name</property>
+                    <property name="nativeName">Name</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">4</property>
+                    <property name="name">Forename</property>
+                    <property name="nativeName">Forename</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">5</property>
+                    <property name="name">Surname</property>
+                    <property name="nativeName">Surname</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">6</property>
+                    <property name="name">Forename_6</property>
+                    <property name="nativeName">Forename</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">7</property>
+                    <property name="name">Surname_7</property>
+                    <property name="nativeName">Surname</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">8</property>
+                    <property name="name">Created_Date</property>
+                    <property name="nativeName">Created_Date</property>
+                    <property name="dataType">date-time</property>
+                </structure>
+                <structure>
+                    <property name="position">9</property>
+                    <property name="name">Destination_Location_Id</property>
+                    <property name="nativeName">Destination_Location_Id</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">10</property>
+                    <property name="name">Notes</property>
+                    <property name="nativeName">Notes</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">11</property>
+                    <property name="name">Street1</property>
+                    <property name="nativeName">Street1</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">12</property>
+                    <property name="name">Street2</property>
+                    <property name="nativeName">Street2</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">13</property>
+                    <property name="name">Street3</property>
+                    <property name="nativeName">Street3</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">14</property>
+                    <property name="name">Town</property>
+                    <property name="nativeName">Town</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">15</property>
+                    <property name="name">County</property>
+                    <property name="nativeName">County</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">16</property>
+                    <property name="name">Country</property>
+                    <property name="nativeName">Country</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">17</property>
+                    <property name="name">Post_Code</property>
+                    <property name="nativeName">Post_Code</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">18</property>
+                    <property name="name">Description</property>
+                    <property name="nativeName">Description</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">19</property>
+                    <property name="name">Street1_19</property>
+                    <property name="nativeName">Street1</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">20</property>
+                    <property name="name">Street2_20</property>
+                    <property name="nativeName">Street2</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">21</property>
+                    <property name="name">Street3_21</property>
+                    <property name="nativeName">Street3</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">22</property>
+                    <property name="name">Town_22</property>
+                    <property name="nativeName">Town</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">23</property>
+                    <property name="name">County_23</property>
+                    <property name="nativeName">County</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">24</property>
+                    <property name="name">Country_24</property>
+                    <property name="nativeName">Country</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">25</property>
+                    <property name="name">Post_Code_25</property>
+                    <property name="nativeName">Post_Code</property>
+                    <property name="dataType">string</property>
+                </structure>
+            </list-property>
+            <xml-property name="queryText"><![CDATA[select poh.PURCHASE_ORDER_ID, 
+	poh.Currency_Id as CURRENCY_ID,
+	s.Name as SUPPLIER_NAME, 
+	u.Forename as USER_FORENAME, 
+	u.Surname as USER_SURNAME, 
+	u2.Forename as AUTH_USER_FORENAME, 
+	u2.Surname as AUTH_USER_SURNAME, 
+	poh.Created_Date as CREATED_DATE, 
+	poh.Destination_Location_Id as DESTINATION_LOCATION_ID, 
+	poh.Notes as NOTES,
+	sa.Street1 AS SUP_STREET1,
+	sa.Street2 AS SUP_STREET2,
+	sa.Street3 AS SUP_STREET3,
+	sa.Town as SUP_TOWN,
+	sa.County as SUP_COUNTY,
+	sa.Country as SUP_COUNTRY,
+	sa.Post_Code as SUP_POST_CODE,
+	l.Description as LOC_DESCRIPTION,
+	l.Street1 as LOC_STREET1,
+	l.Street2 as LOC_STREET2,
+	l.Street3 as LOC_STREET3,
+	l.Town as LOC_TOWN,
+	l.County as LOC_COUNTY,
+	l.Country AS LOC_COUNTRY,
+	l.Post_Code as LOC_POST_CODE
+FROM PurchaseOrderHeaders poh
+left outer join Suppliers s on poh.Supplier_Id = s.Supplier_Id
+left outer join Users u on poh.Created_By_User_Id = u.User_Id
+left outer join	Users u2 on poh.Authorised_By_User_Id = u2.User_Id
+left outer join SupplierAddresses sa 
+	on sa.Supplier_Id = s.Supplier_Id
+	and sa.Address_Id = s.Purchase_Order_Contact_Id
+left outer join Locations l on poh.Destination_Location_Id = l.Location_Id
+where poh.Purchase_Order_Id = ? ]]></xml-property>
+        </oda-data-set>
+        <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="CompanyQuery" id="1984">
+            <list-property name="computedColumns">
+                <structure>
+                    <property name="name">BLANK_ORGANISATION</property>
+                    <expression name="expression">row["Address_Organisation"] != '-' ? row["Address_Organisation"] : ''</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">BLANK_STREET1</property>
+                    <expression name="expression">row["Address_Street1"] != '-' ? row["Address_Street1"] : ''</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">BLANK_STREET2</property>
+                    <expression name="expression">row["Address_Street2"] != '-' ? row["Address_Street2"] : ''</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">BLANK_STREET3</property>
+                    <expression name="expression">row["Address_Street3"] != '-' ? row["Address_Street3"] : ''</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">BLANK_TOWN</property>
+                    <expression name="expression">row["Address_Town"] != '-' ? row["Address_Town"] : ''</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">BLANK_COUNTY</property>
+                    <expression name="expression">row["Address_County"] != '-' ? row["Address_County"] : ''</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">BLANK_COUNTRY</property>
+                    <expression name="expression">row["Address_Country"] != '-' ? row["Address_Country"] : ''</expression>
+                    <property name="dataType">string</property>
+                </structure>
+            </list-property>
+            <list-property name="columnHints">
+                <structure>
+                    <property name="columnName">ID</property>
+                    <text-property name="displayName">ID</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">Timestamp</property>
+                    <text-property name="displayName">Timestamp</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">Entity_Name</property>
+                    <text-property name="displayName">Entity_Name</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">Last_Updated</property>
+                    <text-property name="displayName">Last_Updated</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">Name</property>
+                    <text-property name="displayName">Name</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">Currency_Id</property>
+                    <text-property name="displayName">Currency_Id</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">Company_Id</property>
+                    <text-property name="displayName">Company_Id</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">XML</property>
+                    <text-property name="displayName">XML</text-property>
+                </structure>
+            </list-property>
+            <list-property name="filter">
+                <structure>
+                    <property name="operator">eq</property>
+                    <expression name="expr" type="javascript">row["Company_Id"]</expression>
+                    <simple-property-list name="value1">
+                        <value>params["companyId"].value</value>
+                    </simple-property-list>
+                </structure>
+            </list-property>
+            <structure name="cachedMetaData">
+                <list-property name="resultSet">
+                    <structure>
+                        <property name="position">1</property>
+                        <property name="name">ID</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">2</property>
+                        <property name="name">Timestamp</property>
+                        <property name="dataType">decimal</property>
+                    </structure>
+                    <structure>
+                        <property name="position">3</property>
+                        <property name="name">Entity_Name</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">4</property>
+                        <property name="name">Last_Updated</property>
+                        <property name="dataType">date-time</property>
+                    </structure>
+                    <structure>
+                        <property name="position">5</property>
+                        <property name="name">Name</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">6</property>
+                        <property name="name">Currency_Id</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">7</property>
+                        <property name="name">Company_Id</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">8</property>
+                        <property name="name">Email_Address</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">9</property>
+                        <property name="name">Registration_Info</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">10</property>
+                        <property name="name">Website_URL</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">11</property>
+                        <property name="name">Phone_Number</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">12</property>
+                        <property name="name">Address_Organisation</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">13</property>
+                        <property name="name">Address_Street1</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">14</property>
+                        <property name="name">Address_Street2</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">15</property>
+                        <property name="name">Address_Street3</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">16</property>
+                        <property name="name">Address_Town</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">17</property>
+                        <property name="name">Address_County</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">18</property>
+                        <property name="name">Address_Country</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">19</property>
+                        <property name="name">Address_Postcode</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">20</property>
+                        <property name="name">Logo_Type</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">21</property>
+                        <property name="name">Logo_Id</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">22</property>
+                        <property name="name">Logo_Category</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">23</property>
+                        <property name="name">XML</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">24</property>
+                        <property name="name">BLANK_ORGANISATION</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">25</property>
+                        <property name="name">BLANK_STREET1</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">26</property>
+                        <property name="name">BLANK_STREET2</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">27</property>
+                        <property name="name">BLANK_STREET3</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">28</property>
+                        <property name="name">BLANK_TOWN</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">29</property>
+                        <property name="name">BLANK_COUNTY</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">30</property>
+                        <property name="name">BLANK_COUNTRY</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                </list-property>
+            </structure>
+            <property name="dataSource">Data Source</property>
+            <list-property name="resultSet">
+                <structure>
+                    <property name="position">1</property>
+                    <property name="name">ID</property>
+                    <property name="nativeName">ID</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">2</property>
+                    <property name="name">Timestamp</property>
+                    <property name="nativeName">Timestamp</property>
+                    <property name="dataType">decimal</property>
+                </structure>
+                <structure>
+                    <property name="position">3</property>
+                    <property name="name">Entity_Name</property>
+                    <property name="nativeName">Entity_Name</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">4</property>
+                    <property name="name">Last_Updated</property>
+                    <property name="nativeName">Last_Updated</property>
+                    <property name="dataType">date-time</property>
+                </structure>
+                <structure>
+                    <property name="position">5</property>
+                    <property name="name">Name</property>
+                    <property name="nativeName">Name</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">6</property>
+                    <property name="name">Currency_Id</property>
+                    <property name="nativeName">Currency_Id</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">7</property>
+                    <property name="name">Company_Id</property>
+                    <property name="nativeName">Company_Id</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">8</property>
+                    <property name="name">Email_Address</property>
+                    <property name="nativeName">Email_Address</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">9</property>
+                    <property name="name">Registration_Info</property>
+                    <property name="nativeName">Registration_Info</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">10</property>
+                    <property name="name">Website_URL</property>
+                    <property name="nativeName">Website_URL</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">11</property>
+                    <property name="name">Phone_Number</property>
+                    <property name="nativeName">Phone_Number</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">12</property>
+                    <property name="name">Address_Organisation</property>
+                    <property name="nativeName">Address_Organisation</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">13</property>
+                    <property name="name">Address_Street1</property>
+                    <property name="nativeName">Address_Street1</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">14</property>
+                    <property name="name">Address_Street2</property>
+                    <property name="nativeName">Address_Street2</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">15</property>
+                    <property name="name">Address_Street3</property>
+                    <property name="nativeName">Address_Street3</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">16</property>
+                    <property name="name">Address_Town</property>
+                    <property name="nativeName">Address_Town</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">17</property>
+                    <property name="name">Address_County</property>
+                    <property name="nativeName">Address_County</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">18</property>
+                    <property name="name">Address_Country</property>
+                    <property name="nativeName">Address_Country</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">19</property>
+                    <property name="name">Address_Postcode</property>
+                    <property name="nativeName">Address_Postcode</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">20</property>
+                    <property name="name">Logo_Type</property>
+                    <property name="nativeName">Logo_Type</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">21</property>
+                    <property name="name">Logo_Id</property>
+                    <property name="nativeName">Logo_Id</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">22</property>
+                    <property name="name">Logo_Category</property>
+                    <property name="nativeName">Logo_Category</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">23</property>
+                    <property name="name">XML</property>
+                    <property name="nativeName">XML</property>
+                    <property name="dataType">string</property>
+                </structure>
+            </list-property>
+            <xml-property name="queryText"><![CDATA[select *
+from companies]]></xml-property>
+            <xml-property name="designerValues"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<model:DesignValues xmlns:design="http://www.eclipse.org/datatools/connectivity/oda/design" xmlns:model="http://www.eclipse.org/birt/report/model/adapter/odaModel">
+  <Version>1.0</Version>
+  <design:ResultSets derivedMetaData="true">
+    <design:resultSetDefinitions>
+      <design:resultSetColumns>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:name>ID</design:name>
+            <design:position>1</design:position>
+            <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+            <design:precision>44</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>NotNullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>ID</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>ID</design:label>
+            <design:formattingHints>
+              <design:displaySize>44</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:name>Timestamp</design:name>
+            <design:position>2</design:position>
+            <design:nativeDataTypeCode>-5</design:nativeDataTypeCode>
+            <design:precision>20</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>NotNullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>Timestamp</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>Timestamp</design:label>
+            <design:formattingHints>
+              <design:displaySize>20</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:name>Entity_Name</design:name>
+            <design:position>3</design:position>
+            <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+            <design:precision>255</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>NotNullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>Entity_Name</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>Entity_Name</design:label>
+            <design:formattingHints>
+              <design:displaySize>255</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:name>Last_Updated</design:name>
+            <design:position>4</design:position>
+            <design:nativeDataTypeCode>93</design:nativeDataTypeCode>
+            <design:precision>19</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>Last_Updated</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>Last_Updated</design:label>
+            <design:formattingHints>
+              <design:displaySize>19</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:name>Name</design:name>
+            <design:position>5</design:position>
+            <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+            <design:precision>40</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>NotNullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>Name</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>Name</design:label>
+            <design:formattingHints>
+              <design:displaySize>40</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:name>Currency_Id</design:name>
+            <design:position>6</design:position>
+            <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+            <design:precision>20</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>NotNullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>Currency_Id</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>Currency_Id</design:label>
+            <design:formattingHints>
+              <design:displaySize>20</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:name>Company_Id</design:name>
+            <design:position>7</design:position>
+            <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+            <design:precision>20</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>Company_Id</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>Company_Id</design:label>
+            <design:formattingHints>
+              <design:displaySize>20</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:name>XML</design:name>
+            <design:position>8</design:position>
+            <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+            <design:precision>2147483647</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>NotNullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>XML</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>XML</design:label>
+            <design:formattingHints>
+              <design:displaySize>2147483647</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+      </design:resultSetColumns>
+      <design:criteria/>
+    </design:resultSetDefinitions>
+  </design:ResultSets>
+</model:DesignValues>]]></xml-property>
+        </oda-data-set>
+        <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="ImageQuery" id="2010">
+            <list-property name="parameters">
+                <structure>
+                    <property name="name">companyId</property>
+                    <property name="paramName">companyId</property>
+                    <property name="nativeName"></property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                    <property name="position">1</property>
+                    <property name="isOptional">true</property>
+                    <property name="allowNull">true</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+            </list-property>
+            <structure name="cachedMetaData">
+                <list-property name="resultSet">
+                    <structure>
+                        <property name="position">1</property>
+                        <property name="name">Company_Id</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">2</property>
+                        <property name="name">Data</property>
+                        <property name="dataType">blob</property>
+                    </structure>
+                </list-property>
+            </structure>
+            <property name="dataSource">Data Source</property>
+            <list-property name="resultSet">
+                <structure>
+                    <property name="position">1</property>
+                    <property name="name">Company_Id</property>
+                    <property name="nativeName">COMPANY_ID</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">2</property>
+                    <property name="name">Data</property>
+                    <property name="nativeName">DATA</property>
+                    <property name="dataType">blob</property>
+                    <property name="nativeDataType">2004</property>
+                </structure>
+            </list-property>
+            <xml-property name="queryText"><![CDATA[select c.Company_Id, i.Data
+from images i
+inner join companies c
+	on i.Type = c.Logo_Type
+	and i.Image_Id = c.Logo_Id
+	and i.Category = c.Logo_Category
+where c.Company_Id = ?]]></xml-property>
+            <xml-property name="designerValues"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<model:DesignValues xmlns:design="http://www.eclipse.org/datatools/connectivity/oda/design" xmlns:model="http://www.eclipse.org/birt/report/model/adapter/odaModel">
+  <Version>1.0</Version>
+  <design:DataSetParameters>
+    <design:parameterDefinitions>
+      <design:inOutMode>In</design:inOutMode>
+      <design:attributes>
+        <design:name></design:name>
+        <design:position>1</design:position>
+        <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+        <design:precision>20</design:precision>
+        <design:scale>0</design:scale>
+        <design:nullability>Nullable</design:nullability>
+      </design:attributes>
+      <design:inputAttributes>
+        <design:elementAttributes>
+          <design:optional>true</design:optional>
+        </design:elementAttributes>
+      </design:inputAttributes>
+    </design:parameterDefinitions>
+  </design:DataSetParameters>
+  <design:ResultSets derivedMetaData="true">
+    <design:resultSetDefinitions>
+      <design:resultSetColumns>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:name>Data</design:name>
+            <design:position>1</design:position>
+            <design:nativeDataTypeCode>-4</design:nativeDataTypeCode>
+            <design:precision>16777215</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>data</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>data</design:label>
+            <design:formattingHints>
+              <design:displaySize>16777215</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+      </design:resultSetColumns>
+      <design:criteria/>
+    </design:resultSetDefinitions>
+  </design:ResultSets>
+</model:DesignValues>]]></xml-property>
+        </oda-data-set>
+    </data-sets>
+    <page-setup>
+        <simple-master-page name="Simple MasterPage" id="2">
+            <property name="type">a4</property>
+            <property name="orientation">portrait</property>
+            <property name="topMargin">0.75in</property>
+            <property name="leftMargin">0.75in</property>
+            <property name="bottomMargin">0.75in</property>
+            <property name="rightMargin">0.75in</property>
+            <property name="borderBottomStyle">solid</property>
+            <property name="borderBottomWidth">thin</property>
+            <property name="borderLeftStyle">solid</property>
+            <property name="borderLeftWidth">thin</property>
+            <property name="borderRightStyle">solid</property>
+            <property name="borderRightWidth">thin</property>
+            <property name="borderTopStyle">solid</property>
+            <property name="borderTopWidth">thin</property>
+            <property name="marginLeft">0pt</property>
+            <property name="headerHeight">0in</property>
+            <page-footer>
+                <grid id="522">
+                    <property name="width">100%</property>
+                    <column id="523">
+                        <property name="width">45%</property>
+                    </column>
+                    <column id="524">
+                        <property name="width">4.3020833333in</property>
+                        <property name="textAlign">center</property>
+                    </column>
+                    <column id="525">
+                        <property name="width">5%</property>
+                    </column>
+                    <row id="1989">
+                        <cell id="1990">
+                            <property name="colSpan">3</property>
+                            <property name="rowSpan">1</property>
+                            <data id="1997">
+                                <property name="style">reportFooterWebsite</property>
+                                <property name="dataSet">CompanyQuery</property>
+                                <list-property name="boundDataColumns">
+                                    <structure>
+                                        <property name="name">Website_URL</property>
+                                        <text-property name="displayName">Website_URL</text-property>
+                                        <expression name="expression" type="javascript">dataSetRow["Website_URL"]</expression>
+                                        <property name="dataType">string</property>
+                                    </structure>
+                                </list-property>
+                                <property name="resultSetColumn">Website_URL</property>
+                            </data>
+                        </cell>
+                    </row>
+                    <row id="1993">
+                        <cell id="1994">
+                            <property name="colSpan">3</property>
+                            <property name="rowSpan">1</property>
+                            <property name="textAlign">center</property>
+                            <label id="1998">
+                                <property name="style">reportFooterCentre</property>
+                                <property name="borderBottomColor">black</property>
+                                <property name="marginRight">0.5mm</property>
+                                <property name="display">inline</property>
+                                <text-property name="text" key="REGISTERED_OFFICE">REGISTERED_OFFICE</text-property>
+                            </label>
+                            <data id="2012">
+                                <property name="style">reportFooterCentre</property>
+                                <property name="marginRight">0.5mm</property>
+                                <property name="display">inline</property>
+                                <property name="canShrink">false</property>
+                                <property name="dataSet">CompanyQuery</property>
+                                <list-property name="visibility">
+                                    <structure>
+                                        <property name="format">all</property>
+                                        <expression name="valueExpr" type="javascript">row["BLANK_ORGANISATION"] == ''</expression>
+                                    </structure>
+                                </list-property>
+                                <list-property name="boundDataColumns">
+                                    <structure>
+                                        <property name="name">BLANK_ORGANISATION</property>
+                                        <text-property name="displayName">BLANK_ORGANISATION</text-property>
+                                        <expression name="expression" type="javascript">dataSetRow["BLANK_ORGANISATION"]</expression>
+                                        <property name="dataType">string</property>
+                                    </structure>
+                                </list-property>
+                                <property name="resultSetColumn">BLANK_ORGANISATION</property>
+                            </data>
+                            <data id="2013">
+                                <property name="style">reportFooterCentre</property>
+                                <property name="marginRight">0.5mm</property>
+                                <property name="display">inline</property>
+                                <property name="canShrink">false</property>
+                                <property name="dataSet">CompanyQuery</property>
+                                <list-property name="visibility">
+                                    <structure>
+                                        <property name="format">all</property>
+                                        <expression name="valueExpr" type="javascript">row["BLANK_STREET1"] == ''</expression>
+                                    </structure>
+                                </list-property>
+                                <list-property name="boundDataColumns">
+                                    <structure>
+                                        <property name="name">BLANK_STREET1</property>
+                                        <text-property name="displayName">BLANK_STREET1</text-property>
+                                        <expression name="expression" type="javascript">dataSetRow["BLANK_STREET1"]</expression>
+                                        <property name="dataType">string</property>
+                                    </structure>
+                                </list-property>
+                                <property name="resultSetColumn">BLANK_STREET1</property>
+                            </data>
+                            <data id="2014">
+                                <property name="style">reportFooterCentre</property>
+                                <property name="marginRight">0.5mm</property>
+                                <property name="display">inline</property>
+                                <property name="canShrink">false</property>
+                                <property name="dataSet">CompanyQuery</property>
+                                <list-property name="visibility">
+                                    <structure>
+                                        <property name="format">all</property>
+                                        <expression name="valueExpr" type="javascript">row["BLANK_STREET2"] == ''</expression>
+                                    </structure>
+                                </list-property>
+                                <list-property name="boundDataColumns">
+                                    <structure>
+                                        <property name="name">BLANK_STREET2</property>
+                                        <text-property name="displayName">BLANK_STREET2</text-property>
+                                        <expression name="expression" type="javascript">dataSetRow["BLANK_STREET2"]</expression>
+                                        <property name="dataType">string</property>
+                                    </structure>
+                                </list-property>
+                                <property name="resultSetColumn">BLANK_STREET2</property>
+                            </data>
+                            <data id="2015">
+                                <property name="style">reportFooterCentre</property>
+                                <property name="marginRight">0.5mm</property>
+                                <property name="display">inline</property>
+                                <property name="canShrink">false</property>
+                                <property name="dataSet">CompanyQuery</property>
+                                <list-property name="visibility">
+                                    <structure>
+                                        <property name="format">all</property>
+                                        <expression name="valueExpr" type="javascript">row["BLANK_STREET3"] == ''</expression>
+                                    </structure>
+                                </list-property>
+                                <list-property name="boundDataColumns">
+                                    <structure>
+                                        <property name="name">BLANK_STREET3</property>
+                                        <text-property name="displayName">BLANK_STREET3</text-property>
+                                        <expression name="expression" type="javascript">dataSetRow["BLANK_STREET3"]</expression>
+                                        <property name="dataType">string</property>
+                                    </structure>
+                                </list-property>
+                                <property name="resultSetColumn">BLANK_STREET3</property>
+                            </data>
+                            <data id="2016">
+                                <property name="style">reportFooterCentre</property>
+                                <property name="marginRight">0.5mm</property>
+                                <property name="display">inline</property>
+                                <property name="canShrink">false</property>
+                                <property name="dataSet">CompanyQuery</property>
+                                <list-property name="visibility">
+                                    <structure>
+                                        <property name="format">all</property>
+                                        <expression name="valueExpr" type="javascript">row["BLANK_TOWN"] == ''</expression>
+                                    </structure>
+                                </list-property>
+                                <list-property name="boundDataColumns">
+                                    <structure>
+                                        <property name="name">BLANK_TOWN</property>
+                                        <text-property name="displayName">BLANK_TOWN</text-property>
+                                        <expression name="expression" type="javascript">dataSetRow["BLANK_TOWN"]</expression>
+                                        <property name="dataType">string</property>
+                                    </structure>
+                                </list-property>
+                                <property name="resultSetColumn">BLANK_TOWN</property>
+                            </data>
+                            <data id="2017">
+                                <property name="style">reportFooterCentre</property>
+                                <property name="marginRight">0.5mm</property>
+                                <property name="display">inline</property>
+                                <property name="canShrink">false</property>
+                                <property name="dataSet">CompanyQuery</property>
+                                <list-property name="visibility">
+                                    <structure>
+                                        <property name="format">all</property>
+                                        <expression name="valueExpr" type="javascript">row["BLANK_COUNTY"] == ''</expression>
+                                    </structure>
+                                </list-property>
+                                <list-property name="boundDataColumns">
+                                    <structure>
+                                        <property name="name">BLANK_COUNTY</property>
+                                        <text-property name="displayName">BLANK_COUNTY</text-property>
+                                        <expression name="expression" type="javascript">dataSetRow["BLANK_COUNTY"]</expression>
+                                        <property name="dataType">string</property>
+                                    </structure>
+                                </list-property>
+                                <property name="resultSetColumn">BLANK_COUNTY</property>
+                            </data>
+                            <data id="2018">
+                                <property name="style">reportFooterCentre</property>
+                                <property name="marginRight">0.5mm</property>
+                                <property name="display">inline</property>
+                                <property name="canShrink">false</property>
+                                <property name="dataSet">CompanyQuery</property>
+                                <list-property name="visibility">
+                                    <structure>
+                                        <property name="format">all</property>
+                                        <expression name="valueExpr" type="javascript">row["BLANK_COUNTRY"] == ''</expression>
+                                    </structure>
+                                </list-property>
+                                <list-property name="boundDataColumns">
+                                    <structure>
+                                        <property name="name">BLANK_COUNTRY</property>
+                                        <text-property name="displayName">BLANK_COUNTRY</text-property>
+                                        <expression name="expression" type="javascript">dataSetRow["BLANK_COUNTRY"]</expression>
+                                        <property name="dataType">string</property>
+                                    </structure>
+                                </list-property>
+                                <property name="resultSetColumn">BLANK_COUNTRY</property>
+                            </data>
+                            <data id="2019">
+                                <property name="style">reportFooterCentre</property>
+                                <property name="display">inline</property>
+                                <property name="canShrink">false</property>
+                                <property name="dataSet">CompanyQuery</property>
+                                <list-property name="boundDataColumns">
+                                    <structure>
+                                        <property name="name">Address_Postcode</property>
+                                        <text-property name="displayName">Address_Postcode</text-property>
+                                        <expression name="expression" type="javascript">dataSetRow["Address_Postcode"]</expression>
+                                        <property name="dataType">string</property>
+                                    </structure>
+                                </list-property>
+                                <property name="resultSetColumn">Address_Postcode</property>
+                            </data>
+                        </cell>
+                    </row>
+                    <row id="1985">
+                        <cell id="1986">
+                            <property name="colSpan">3</property>
+                            <property name="rowSpan">1</property>
+                            <property name="textAlign">center</property>
+                            <data id="2007">
+                                <property name="style">reportFooterCentre</property>
+                                <property name="marginRight">1mm</property>
+                                <property name="display">inline</property>
+                                <property name="dataSet">CompanyQuery</property>
+                                <list-property name="boundDataColumns">
+                                    <structure>
+                                        <property name="name">Registration_Info</property>
+                                        <text-property name="displayName">Registration_Info</text-property>
+                                        <expression name="expression" type="javascript">dataSetRow["Registration_Info"]</expression>
+                                        <property name="dataType">string</property>
+                                    </structure>
+                                </list-property>
+                                <property name="resultSetColumn">Registration_Info</property>
+                            </data>
+                            <label id="2008">
+                                <property name="style">reportFooterCentre</property>
+                                <property name="marginRight">0.5mm</property>
+                                <property name="display">inline</property>
+                                <text-property name="text" key="EMAIL">EMAIL</text-property>
+                            </label>
+                            <data id="2009">
+                                <property name="style">reportFooterCentre</property>
+                                <property name="display">inline</property>
+                                <property name="dataSet">CompanyQuery</property>
+                                <list-property name="boundDataColumns">
+                                    <structure>
+                                        <property name="name">Email_Address</property>
+                                        <text-property name="displayName">Email_Address</text-property>
+                                        <expression name="expression" type="javascript">dataSetRow["Email_Address"]</expression>
+                                        <property name="dataType">string</property>
+                                    </structure>
+                                </list-property>
+                                <property name="resultSetColumn">Email_Address</property>
+                            </data>
+                        </cell>
+                    </row>
+                    <row id="526">
+                        <cell id="527">
+                            <text name="GeneratedOnText" id="531">
+                                <property name="style">reportFooterLeft</property>
+                                <property name="marginTop">0pt</property>
+                                <property name="paddingTop">1pt</property>
+                                <property name="textAlign">left</property>
+                                <property name="contentType">html</property>
+                                <text-property name="content"><![CDATA[
+<value-of>l10nParams = new Array(1); l10nParams[0] = Packages.com.enactor.core.utilities.DateUtils.formatShortDateMediumTime(reportContext.getLocale(), new Date) ; reportContext.getMessage("GENERATED_ON", reportContext.getLocale(), l10nParams);</value-of>
+]]></text-property>
+                            </text>
+                        </cell>
+                        <cell id="528"/>
+                        <cell id="529">
+                            <grid id="532">
+                                <property name="width">100%</property>
+                                <column id="533"/>
+                                <column id="534"/>
+                                <column id="535"/>
+                                <row id="536">
+                                    <cell id="537">
+                                        <auto-text id="538">
+                                            <property name="style">reportFooterRight</property>
+                                            <property name="type">page-number</property>
+                                        </auto-text>
+                                    </cell>
+                                    <cell id="539">
+                                        <text id="540">
+                                            <property name="style">reportFooterCentre</property>
+                                            <property name="contentType">plain</property>
+                                            <text-property name="content"><![CDATA[/]]></text-property>
+                                        </text>
+                                    </cell>
+                                    <cell id="541">
+                                        <auto-text id="542">
+                                            <property name="style">reportFooterRight</property>
+                                            <property name="type">total-page</property>
+                                        </auto-text>
+                                    </cell>
+                                </row>
+                            </grid>
+                        </cell>
+                    </row>
+                </grid>
+            </page-footer>
+        </simple-master-page>
+    </page-setup>
+    <body>
+        <grid name="ReportTitleGrid1" id="1929">
+            <property name="height">0.2916666666666667in</property>
+            <property name="width">6.552083333333333in</property>
+            <column id="1930">
+                <property name="width">6.552083333333333in</property>
+            </column>
+            <row id="1931">
+                <cell id="1932">
+                    <property name="paddingTop">1pt</property>
+                    <grid id="1823">
+                        <column id="1824">
+                            <property name="width">25%</property>
+                        </column>
+                        <column id="1825"/>
+                        <column id="1840">
+                            <property name="width">15%</property>
+                        </column>
+                        <row id="2048">
+                            <cell id="2049">
+                                <property name="colSpan">3</property>
+                                <property name="rowSpan">1</property>
+                                <property name="textAlign">center</property>
+                                <property name="verticalAlign">middle</property>
+                                <label id="2052">
+                                    <property name="style">reportErrorSubtitle</property>
+                                    <list-property name="visibility">
+                                        <structure>
+                                            <property name="format">all</property>
+                                            <expression name="valueExpr" type="javascript">params["cancelled"].value != "true"</expression>
+                                        </structure>
+                                    </list-property>
+                                    <text-property name="text" key="CANCELLED">CANCELLED</text-property>
+                                </label>
+                            </cell>
+                        </row>
+                        <row id="1826">
+                            <cell id="2053">
+                                <property name="colSpan">1</property>
+                                <property name="rowSpan">3</property>
+                                <property name="textAlign">center</property>
+                                <property name="verticalAlign">middle</property>
+                                <image id="1933">
+                                    <property name="height">85px</property>
+                                    <property name="width">113px</property>
+                                    <property name="dataSet">ImageQuery</property>
+                                    <list-property name="boundDataColumns">
+                                        <structure>
+                                            <property name="name">Company_Id</property>
+                                            <expression name="expression" type="javascript">dataSetRow["Company_Id"]</expression>
+                                            <property name="dataType">string</property>
+                                        </structure>
+                                        <structure>
+                                            <property name="name">Data</property>
+                                            <expression name="expression" type="javascript">dataSetRow["Data"]</expression>
+                                            <property name="dataType">blob</property>
+                                        </structure>
+                                    </list-property>
+                                    <property name="source">expr</property>
+                                    <expression name="valueExpr">row["Data"]</expression>
+                                </image>
+                            </cell>
+                            <cell id="1828">
+                                <property name="colSpan">2</property>
+                                <property name="rowSpan">1</property>
+                                <text id="1934">
+                                    <property name="style">reportTitle</property>
+                                    <property name="contentType">auto</property>
+                                    <text-property name="content" key="TITLE"><![CDATA[]]></text-property>
+                                </text>
+                            </cell>
+                        </row>
+                        <row id="1834">
+                            <cell id="1836">
+                                <label id="1935">
+                                    <property name="style">criteriaLabelRight</property>
+                                    <text-property name="text" key="DATE_CREATED">DATE_CREATED</text-property>
+                                </label>
+                            </cell>
+                            <cell id="1838">
+                                <data id="1936">
+                                    <property name="style">reportCriteria</property>
+                                    <property name="dataSet">HeaderQuery</property>
+                                    <list-property name="boundDataColumns">
+                                        <structure>
+                                            <property name="name">FORMATTED_CREATED_DATE</property>
+                                            <text-property name="displayName">FORMATTED_CREATED_DATE</text-property>
+                                            <expression name="expression" type="javascript">dataSetRow["FORMATTED_CREATED_DATE"]</expression>
+                                            <property name="dataType">string</property>
+                                        </structure>
+                                    </list-property>
+                                    <property name="resultSetColumn">FORMATTED_CREATED_DATE</property>
+                                </data>
+                            </cell>
+                        </row>
+                        <row id="1831">
+                            <cell id="1833">
+                                <label id="1822">
+                                    <property name="style">criteriaLabelRight</property>
+                                    <text-property name="text" key="PURCHASE_ORDER_NO">PO_NUMBER</text-property>
+                                </label>
+                            </cell>
+                            <cell id="1839">
+                                <data id="2020">
+                                    <property name="style">reportCriteria</property>
+                                    <list-property name="boundDataColumns">
+                                        <structure>
+                                            <property name="name">purchaseOrderId</property>
+                                            <expression name="expression" type="javascript">params["purchaseOrderId"]</expression>
+                                            <property name="dataType">string</property>
+                                        </structure>
+                                    </list-property>
+                                    <property name="resultSetColumn">purchaseOrderId</property>
+                                </data>
+                            </cell>
+                        </row>
+                    </grid>
+                </cell>
+            </row>
+        </grid>
+        <grid name="ResultsGrid" id="384">
+            <property name="height">4in</property>
+            <property name="width">8.96875in</property>
+            <column id="385"/>
+            <row id="386">
+                <cell id="387">
+                    <table id="1530">
+                        <property name="height">1.75in</property>
+                        <property name="width">6.5in</property>
+                        <property name="dataSet">HeaderQuery</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">PURCHASE_ORDER_ID</property>
+                                <expression name="expression" type="javascript">dataSetRow["PURCHASE_ORDER_ID"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">CURRENCY_ID</property>
+                                <expression name="expression" type="javascript">dataSetRow["CURRENCY_ID"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">SUPPLIER_NAME</property>
+                                <expression name="expression" type="javascript">dataSetRow["SUPPLIER_NAME"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">AUTH_USER_FORENAME</property>
+                                <expression name="expression" type="javascript">dataSetRow["AUTH_USER_FORENAME"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">AUTH_USER_SURNAME</property>
+                                <expression name="expression" type="javascript">dataSetRow["AUTH_USER_SURNAME"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">Forename_6</property>
+                                <expression name="expression" type="javascript">dataSetRow["Forename_6"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">Surname_7</property>
+                                <expression name="expression" type="javascript">dataSetRow["Surname_7"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">CREATED_DATE</property>
+                                <expression name="expression" type="javascript">dataSetRow["CREATED_DATE"]</expression>
+                                <property name="dataType">date-time</property>
+                            </structure>
+                            <structure>
+                                <property name="name">DESTINATION_LOCATION_ID</property>
+                                <expression name="expression" type="javascript">dataSetRow["DESTINATION_LOCATION_ID"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">NOTES</property>
+                                <expression name="expression" type="javascript">dataSetRow["NOTES"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">SUP_STREET1</property>
+                                <expression name="expression" type="javascript">dataSetRow["SUP_STREET1"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">SUP_STREET2</property>
+                                <expression name="expression" type="javascript">dataSetRow["SUP_STREET2"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">SUP_STREET3</property>
+                                <expression name="expression" type="javascript">dataSetRow["SUP_STREET3"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">SUP_TOWN</property>
+                                <expression name="expression" type="javascript">dataSetRow["SUP_TOWN"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">SUP_COUNTY</property>
+                                <expression name="expression" type="javascript">dataSetRow["SUP_COUNTY"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">SUP_COUNTRY</property>
+                                <expression name="expression" type="javascript">dataSetRow["SUP_COUNTRY"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">SUP_POST_CODE</property>
+                                <expression name="expression" type="javascript">dataSetRow["SUP_POST_CODE"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">LOC_DESCRIPTION</property>
+                                <expression name="expression" type="javascript">dataSetRow["LOC_DESCRIPTION"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">LOC_STREET1</property>
+                                <expression name="expression" type="javascript">dataSetRow["LOC_STREET1"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">LOC_STREET2</property>
+                                <expression name="expression" type="javascript">dataSetRow["LOC_STREET2"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">LOC_STREET3</property>
+                                <expression name="expression" type="javascript">dataSetRow["LOC_STREET3"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">LOC_TOWN</property>
+                                <expression name="expression" type="javascript">dataSetRow["LOC_TOWN"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">LOC_COUNTY</property>
+                                <expression name="expression" type="javascript">dataSetRow["LOC_COUNTY"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">LOC_COUNTRY</property>
+                                <expression name="expression" type="javascript">dataSetRow["LOC_COUNTRY"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">LOC_POST_CODE</property>
+                                <expression name="expression" type="javascript">dataSetRow["LOC_POST_CODE"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">APPROVED_BY</property>
+                                <expression name="expression" type="javascript">dataSetRow["APPROVED_BY"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">FORMATTED_CREATED_DATE</property>
+                                <expression name="expression" type="javascript">dataSetRow["FORMATTED_CREATED_DATE"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">SET_BASE_CURRENCY_ID</property>
+                                <expression name="expression" type="javascript">dataSetRow["SET_BASE_CURRENCY_ID"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">USER_NAME</property>
+                                <expression name="expression" type="javascript">dataSetRow["USER_NAME"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                        </list-property>
+                        <column id="1604">
+                            <property name="width">20%</property>
+                        </column>
+                        <column id="1605">
+                            <property name="width">28%</property>
+                        </column>
+                        <column id="1606">
+                            <property name="width">4%</property>
+                        </column>
+                        <column id="1607">
+                            <property name="width">20%</property>
+                        </column>
+                        <column id="1608">
+                            <property name="width">28%</property>
+                        </column>
+                        <header>
+                            <row id="1531">
+                                <cell id="1532"/>
+                                <cell id="1534"/>
+                                <cell id="1536"/>
+                                <cell id="1538"/>
+                                <cell id="1540"/>
+                            </row>
+                        </header>
+                        <detail>
+                            <row id="1618">
+                                <cell id="1619">
+                                    <label id="1533">
+                                        <property name="style">criteriaLabel</property>
+                                        <text-property name="text" key="SUPPLIER_NAME">PURCHASE_ORDER_ID</text-property>
+                                    </label>
+                                </cell>
+                                <cell id="1620">
+                                    <data id="2022">
+                                        <property name="resultSetColumn">SUPPLIER_NAME</property>
+                                    </data>
+                                </cell>
+                                <cell id="1621"/>
+                                <cell id="1622">
+                                    <label id="1541">
+                                        <property name="style">criteriaLabel</property>
+                                        <text-property name="text" key="DELIVER_TO">CREATED_DATE</text-property>
+                                    </label>
+                                </cell>
+                                <cell id="1623">
+                                    <data id="2032">
+                                        <property name="resultSetColumn">LOC_DESCRIPTION</property>
+                                    </data>
+                                </cell>
+                            </row>
+                            <row id="1633">
+                                <cell id="1634"/>
+                                <cell id="1635">
+                                    <data id="2034">
+                                        <list-property name="visibility">
+                                            <structure>
+                                                <property name="format">all</property>
+                                                <expression name="valueExpr" type="javascript">row["SUP_STREET1"] == '-' || row["SUP_STREET1"] == null</expression>
+                                            </structure>
+                                        </list-property>
+                                        <property name="resultSetColumn">SUP_STREET1</property>
+                                    </data>
+                                    <data id="2035">
+                                        <list-property name="visibility">
+                                            <structure>
+                                                <property name="format">all</property>
+                                                <expression name="valueExpr" type="javascript">row["SUP_STREET2"] == '-' || row["SUP_STREET2"] == null</expression>
+                                            </structure>
+                                        </list-property>
+                                        <property name="resultSetColumn">SUP_STREET2</property>
+                                    </data>
+                                    <data id="2036">
+                                        <list-property name="visibility">
+                                            <structure>
+                                                <property name="format">all</property>
+                                                <expression name="valueExpr" type="javascript">row["SUP_STREET3"] == '-' || row["SUP_STREET3"] == null</expression>
+                                            </structure>
+                                        </list-property>
+                                        <property name="resultSetColumn">SUP_STREET3</property>
+                                    </data>
+                                    <data id="2037">
+                                        <list-property name="visibility">
+                                            <structure>
+                                                <property name="format">all</property>
+                                                <expression name="valueExpr" type="javascript">row["SUP_TOWN"] == '-' || row["SUP_TOWN"] == null</expression>
+                                            </structure>
+                                        </list-property>
+                                        <property name="resultSetColumn">SUP_TOWN</property>
+                                    </data>
+                                    <data id="2038">
+                                        <list-property name="visibility">
+                                            <structure>
+                                                <property name="format">all</property>
+                                                <expression name="valueExpr" type="javascript">row["SUP_COUNTY"] == '-' || row["SUP_COUNTY"] == null</expression>
+                                            </structure>
+                                        </list-property>
+                                        <property name="resultSetColumn">SUP_COUNTY</property>
+                                    </data>
+                                    <data id="2039">
+                                        <list-property name="visibility">
+                                            <structure>
+                                                <property name="format">all</property>
+                                                <expression name="valueExpr" type="javascript">row["SUP_COUNTRY"] == '-' || row["SUP_COUNTRY"] == null</expression>
+                                            </structure>
+                                        </list-property>
+                                        <property name="resultSetColumn">SUP_COUNTRY</property>
+                                    </data>
+                                    <data id="2046">
+                                        <list-property name="visibility">
+                                            <structure>
+                                                <property name="format">all</property>
+                                                <expression name="valueExpr" type="javascript">row["SUP_POST_CODE"] == '-' || row["SUP_POST_CODE"] == null</expression>
+                                            </structure>
+                                        </list-property>
+                                        <property name="resultSetColumn">SUP_POST_CODE</property>
+                                    </data>
+                                </cell>
+                                <cell id="1636"/>
+                                <cell id="1637"/>
+                                <cell id="1638">
+                                    <data id="2040">
+                                        <list-property name="visibility">
+                                            <structure>
+                                                <property name="format">all</property>
+                                                <expression name="valueExpr" type="javascript">row["LOC_STREET1"] == '-' || row["LOC_STREET1"] == null</expression>
+                                            </structure>
+                                        </list-property>
+                                        <property name="resultSetColumn">LOC_STREET1</property>
+                                    </data>
+                                    <data id="2041">
+                                        <list-property name="visibility">
+                                            <structure>
+                                                <property name="format">all</property>
+                                                <expression name="valueExpr" type="javascript">row["LOC_STREET2"] == '-' || row["LOC_STREET2"] == null</expression>
+                                            </structure>
+                                        </list-property>
+                                        <property name="resultSetColumn">LOC_STREET2</property>
+                                    </data>
+                                    <data id="2042">
+                                        <list-property name="visibility">
+                                            <structure>
+                                                <property name="format">all</property>
+                                                <expression name="valueExpr" type="javascript">row["LOC_STREET3"] == '-' || row["LOC_STREET3"] == null</expression>
+                                            </structure>
+                                        </list-property>
+                                        <property name="resultSetColumn">LOC_STREET3</property>
+                                    </data>
+                                    <data id="2043">
+                                        <list-property name="visibility">
+                                            <structure>
+                                                <property name="format">all</property>
+                                                <expression name="valueExpr" type="javascript">row["LOC_TOWN"] == '-' || row["LOC_TOWN"] == null</expression>
+                                            </structure>
+                                        </list-property>
+                                        <property name="resultSetColumn">LOC_TOWN</property>
+                                    </data>
+                                    <data id="2044">
+                                        <list-property name="visibility">
+                                            <structure>
+                                                <property name="format">all</property>
+                                                <expression name="valueExpr" type="javascript">row["LOC_COUNTY"] == '-' || row["LOC_COUNTY"] == null</expression>
+                                            </structure>
+                                        </list-property>
+                                        <property name="resultSetColumn">LOC_COUNTY</property>
+                                    </data>
+                                    <data id="2045">
+                                        <list-property name="visibility">
+                                            <structure>
+                                                <property name="format">all</property>
+                                                <expression name="valueExpr" type="javascript">row["LOC_COUNTRY"] == '-' || row["LOC_COUNTRY"] == null</expression>
+                                            </structure>
+                                        </list-property>
+                                        <property name="resultSetColumn">LOC_COUNTRY</property>
+                                    </data>
+                                    <data id="2047">
+                                        <list-property name="visibility">
+                                            <structure>
+                                                <property name="format">all</property>
+                                                <expression name="valueExpr" type="javascript">row["LOC_POST_CODE"] == '-' || row["LOC_POST_CODE"] == null</expression>
+                                            </structure>
+                                        </list-property>
+                                        <property name="resultSetColumn">LOC_POST_CODE</property>
+                                    </data>
+                                </cell>
+                            </row>
+                            <row id="1648">
+                                <cell id="1649">
+                                    <label id="1557">
+                                        <property name="style">criteriaLabel</property>
+                                        <text-property name="text" key="CRITERIA_9">USER_FORENAME</text-property>
+                                    </label>
+                                </cell>
+                                <cell id="1650">
+                                    <data id="2024">
+                                        <property name="resultSetColumn">USER_NAME</property>
+                                    </data>
+                                </cell>
+                                <cell id="1651"/>
+                                <cell id="1652">
+                                    <label id="1545">
+                                        <property name="style">criteriaLabel</property>
+                                        <text-property name="text" key="CRITERIA_7">COMMENTS</text-property>
+                                    </label>
+                                </cell>
+                                <cell id="1653">
+                                    <data id="2030">
+                                        <property name="resultSetColumn">NOTES</property>
+                                    </data>
+                                </cell>
+                            </row>
+                            <row id="1663">
+                                <cell id="1664">
+                                    <label id="1746">
+                                        <property name="style">criteriaLabel</property>
+                                        <text-property name="text" key="AUTH_USER_NAME">AUTH_USER_FORENAME</text-property>
+                                    </label>
+                                </cell>
+                                <cell id="1665">
+                                    <data id="2026">
+                                        <property name="resultSetColumn">APPROVED_BY</property>
+                                    </data>
+                                </cell>
+                                <cell id="1666"/>
+                                <cell id="1667"/>
+                                <cell id="1668"/>
+                            </row>
+                        </detail>
+                        <footer>
+                            <row id="1589">
+                                <cell id="1590"/>
+                                <cell id="1591"/>
+                                <cell id="1592"/>
+                                <cell id="1593"/>
+                                <cell id="1594">
+                                    <data id="1743">
+                                        <property name="fontStyle">italic</property>
+                                        <property name="resultSetColumn">SET_BASE_CURRENCY_ID</property>
+                                    </data>
+                                </cell>
+                            </row>
+                        </footer>
+                    </table>
+                </cell>
+            </row>
+            <row id="1693">
+                <cell id="1694"/>
+            </row>
+            <row id="425">
+                <cell id="426">
+                    <table id="1447">
+                        <property name="width">6.5in</property>
+                        <property name="dataSet">ItemQuery</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">PRODUCT_ID</property>
+                                <text-property name="displayName">PRODUCT_ID</text-property>
+                                <expression name="expression">dataSetRow["PRODUCT_ID"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">STYLE</property>
+                                <text-property name="displayName">STYLE</text-property>
+                                <expression name="expression">dataSetRow["STYLE"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">MULTIPLE_TO_BASE</property>
+                                <text-property name="displayName">MULTIPLE_TO_BASE</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["MULTIPLE_TO_BASE"]</expression>
+                                <property name="dataType">integer</property>
+                            </structure>
+                            <structure>
+                                <property name="name">QUANTITY</property>
+                                <text-property name="displayName">QUANTITY</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["QUANTITY"]</expression>
+                                <property name="dataType">integer</property>
+                            </structure>
+                            <structure>
+                                <property name="name">UNIT_COST</property>
+                                <text-property name="displayName">UNIT_COST</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["UNIT_COST"]</expression>
+                                <property name="dataType">float</property>
+                            </structure>
+                            <structure>
+                                <property name="name">SUPPLIER_PRODUCT_ID</property>
+                                <text-property name="displayName">SUPPLIER_PRODUCT_ID</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["SUPPLIER_PRODUCT_ID"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">FORMATTED_LINE_TOTAL</property>
+                                <text-property name="displayName">FORMATTED_LINE_TOTAL</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["FORMATTED_LINE_TOTAL"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">FORMATTED_UNIT_COST</property>
+                                <text-property name="displayName">FORMATTED_UNIT_COST</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["FORMATTED_UNIT_COST"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">SUB_TOTAL_EX_VAT</property>
+                                <text-property name="displayName">SUB_TOTAL_EX_VAT</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["SUB_TOTAL_EX_VAT"]</expression>
+                                <property name="dataType">float</property>
+                            </structure>
+                            <structure>
+                                <property name="name">FORMATTED_SUB_TOTAL_EX_VAT</property>
+                                <text-property name="displayName">FORMATTED_SUB_TOTAL_EX_VAT</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["FORMATTED_SUB_TOTAL_EX_VAT"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">FORMATTED_TOTAL</property>
+                                <text-property name="displayName">FORMATTED_TOTAL</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["FORMATTED_TOTAL"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">LINE_TOTAL</property>
+                                <expression name="expression" type="javascript">dataSetRow["LINE_TOTAL"]</expression>
+                                <property name="dataType">float</property>
+                            </structure>
+                            <structure>
+                                <property name="name">TOTAL</property>
+                                <expression name="expression" type="javascript">dataSetRow["TOTAL"]</expression>
+                                <property name="dataType">float</property>
+                            </structure>
+                            <structure>
+                                <property name="name">SUPPLIER_PRODUCT_DESCRIPTION</property>
+                                <text-property name="displayName">SUPPLIER_PRODUCT_DESCRIPTION</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["SUPPLIER_PRODUCT_DESCRIPTION"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">PRODUCT_DESCRIPTION</property>
+                                <expression name="expression" type="javascript">dataSetRow["PRODUCT_DESCRIPTION"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">SIZE_DESCRIPTION</property>
+                                <expression name="expression" type="javascript">dataSetRow["SIZE_DESCRIPTION"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">COLOUR_DESCRIPTION</property>
+                                <expression name="expression" type="javascript">dataSetRow["COLOUR_DESCRIPTION"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                        </list-property>
+                        <column id="1506">
+                            <property name="width">12%</property>
+                        </column>
+                        <column id="1507">
+                            <property name="width">14%</property>
+                        </column>
+                        <column id="2058">
+                            <property name="width">14%</property>
+                        </column>
+                        <column id="1508">
+                            <property name="width">8%</property>
+                        </column>
+                        <column id="1509">
+                            <property name="width">8%</property>
+                        </column>
+                        <column id="1510">
+                            <property name="width">8%</property>
+                        </column>
+                        <column id="1511">
+                            <property name="width">8%</property>
+                        </column>
+                        <column id="1512">
+                            <property name="width">8%</property>
+                        </column>
+                        <column id="1513">
+                            <property name="width">8%</property>
+                            <property name="fontSize">medium</property>
+                        </column>
+                        <column id="1762">
+                            <property name="width">12%</property>
+                        </column>
+                        <header>
+                            <row id="1448">
+                                <property name="borderTopColor">#000000</property>
+                                <property name="borderTopStyle">solid</property>
+                                <property name="borderTopWidth">thin</property>
+                                <cell id="1449">
+                                    <label id="1450">
+                                        <property name="style">columnHeader</property>
+                                        <text-property name="text" key="PRODUCT_ID">PRODUCT_ID</text-property>
+                                    </label>
+                                </cell>
+                                <cell id="1451">
+                                    <label id="1452">
+                                        <property name="style">columnHeader</property>
+                                        <text-property name="text" key="DESCRIPTION">DESCRIPTION</text-property>
+                                    </label>
+                                </cell>
+                                <cell id="2054">
+                                    <label id="2059">
+                                        <property name="style">columnHeader</property>
+                                        <text-property name="text" key="SUPPLIER_PRODUCT_DESCRIPTION">SUPPLIER_PRODUCT_DESCRIPTION</text-property>
+                                    </label>
+                                </cell>
+                                <cell id="1453">
+                                    <label id="1454">
+                                        <property name="style">columnHeader</property>
+                                        <text-property name="text" key="STYLE">STYLE</text-property>
+                                    </label>
+                                </cell>
+                                <cell id="1455">
+                                    <label id="1456">
+                                        <property name="style">columnHeader</property>
+                                        <text-property name="text" key="COLOUR">COLOUR</text-property>
+                                    </label>
+                                </cell>
+                                <cell id="1457">
+                                    <label id="1458">
+                                        <property name="style">columnHeader</property>
+                                        <text-property name="text" key="SIZE">SIZE</text-property>
+                                    </label>
+                                </cell>
+                                <cell id="1459">
+                                    <label id="1460">
+                                        <property name="style">columnHeaderRight</property>
+                                        <text-property name="text" key="PACK_SIZE">PACK_SIZE</text-property>
+                                    </label>
+                                </cell>
+                                <cell id="1461">
+                                    <label id="1462">
+                                        <property name="style">columnHeaderRight</property>
+                                        <text-property name="text" key="ORDER_QTY">QUANTITY</text-property>
+                                    </label>
+                                </cell>
+                                <cell id="1463">
+                                    <label id="1464">
+                                        <property name="style">columnHeaderRight</property>
+                                        <text-property name="text" key="UNIT_COST">UNIT_COST</text-property>
+                                    </label>
+                                </cell>
+                                <cell id="1759">
+                                    <label id="1763">
+                                        <property name="style">columnHeaderRight</property>
+                                        <text-property name="text" key="LINE_TOTAL">LINE_TOTAL</text-property>
+                                    </label>
+                                </cell>
+                            </row>
+                        </header>
+                        <detail>
+                            <row id="1471">
+                                <cell id="1472">
+                                    <data id="1473">
+                                        <property name="style">reportColumn</property>
+                                        <property name="resultSetColumn">PRODUCT_ID</property>
+                                    </data>
+                                </cell>
+                                <cell id="1474">
+                                    <data id="2063">
+                                        <property name="style">reportColumn</property>
+                                        <property name="resultSetColumn">PRODUCT_DESCRIPTION</property>
+                                    </data>
+                                </cell>
+                                <cell id="2055">
+                                    <data id="2060">
+                                        <property name="style">reportColumn</property>
+                                        <property name="resultSetColumn">SUPPLIER_PRODUCT_DESCRIPTION</property>
+                                    </data>
+                                </cell>
+                                <cell id="1476">
+                                    <data id="1477">
+                                        <property name="style">reportColumn</property>
+                                        <property name="resultSetColumn">STYLE</property>
+                                    </data>
+                                </cell>
+                                <cell id="1478">
+                                    <data id="2061">
+                                        <property name="style">reportColumn</property>
+                                        <property name="resultSetColumn">COLOUR_DESCRIPTION</property>
+                                    </data>
+                                </cell>
+                                <cell id="1480">
+                                    <data id="2062">
+                                        <property name="style">reportColumn</property>
+                                        <property name="resultSetColumn">SIZE_DESCRIPTION</property>
+                                    </data>
+                                </cell>
+                                <cell id="1482">
+                                    <data id="1764">
+                                        <property name="style">reportColumnCentre</property>
+                                        <property name="fontSize">small</property>
+                                        <property name="resultSetColumn">MULTIPLE_TO_BASE</property>
+                                    </data>
+                                </cell>
+                                <cell id="1484">
+                                    <data id="1765">
+                                        <property name="style">reportColumnCentre</property>
+                                        <property name="resultSetColumn">QUANTITY</property>
+                                    </data>
+                                </cell>
+                                <cell id="1486">
+                                    <data id="1772">
+                                        <property name="style">reportColumnRight</property>
+                                        <property name="resultSetColumn">FORMATTED_UNIT_COST</property>
+                                    </data>
+                                </cell>
+                                <cell id="1760">
+                                    <data id="1771">
+                                        <property name="style">reportColumnRight</property>
+                                        <property name="resultSetColumn">FORMATTED_LINE_TOTAL</property>
+                                    </data>
+                                </cell>
+                            </row>
+                        </detail>
+                        <footer>
+                            <row id="1494">
+                                <cell id="1495"/>
+                                <cell id="1496"/>
+                                <cell id="2056"/>
+                                <cell id="1497"/>
+                                <cell id="1498"/>
+                                <cell id="1499"/>
+                                <cell id="1500">
+                                    <property name="colSpan">3</property>
+                                    <property name="rowSpan">1</property>
+                                    <label id="1786">
+                                        <property name="style">reportColumnTotal</property>
+                                        <text-property name="text" key="SUB_TOTAL_EX_VAT"></text-property>
+                                    </label>
+                                </cell>
+                                <cell id="1761">
+                                    <data id="1785">
+                                        <property name="style">reportColumnTotal</property>
+                                        <property name="resultSetColumn">FORMATTED_SUB_TOTAL_EX_VAT</property>
+                                    </data>
+                                </cell>
+                            </row>
+                            <row id="1773">
+                                <cell id="1775"/>
+                                <cell id="1776"/>
+                                <cell id="2057"/>
+                                <cell id="1777"/>
+                                <cell id="1778"/>
+                                <cell id="1779"/>
+                                <cell id="1780">
+                                    <property name="colSpan">3</property>
+                                    <property name="rowSpan">1</property>
+                                    <label id="1787">
+                                        <property name="style">reportColumnTotal</property>
+                                        <text-property name="text" key="TOTAL"></text-property>
+                                    </label>
+                                </cell>
+                                <cell id="1783">
+                                    <data id="1788">
+                                        <property name="style">reportColumnTotal</property>
+                                        <property name="resultSetColumn">FORMATTED_TOTAL</property>
+                                    </data>
+                                </cell>
+                            </row>
+                        </footer>
+                    </table>
+                </cell>
+            </row>
+        </grid>
+    </body>
+</report>

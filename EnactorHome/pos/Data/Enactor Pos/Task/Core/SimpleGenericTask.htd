@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<htd:humanInteractions targetNamespace="http://www.enactor.com/core" xmlns:b4p="http://docs.oasis-open.org/ns/bpel4people/bpel4people/200803" xmlns:bpel11="http://schemas.xmlsoap.org/ws/2003/03/business-process/"
+	xmlns:bpel20="http://docs.oasis-open.org/wsbpel/2.0/process/executable" xmlns:core="http://www.enactor.com/core" xmlns:coreui="http://www.enactor.com/coreui" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803"
+	xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:ns10="tools"
+	xmlns:ns12="http://www.enactor.com/bpel/1_1/activity" xmlns:ns15="http://maven.apache.org/POM/4.0.0" xmlns:ns16="http://www.enactor.com/tools/bpel/wb/" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref"
+	xmlns:task="http://www.enactor.com/task" xmlns:tools="http://www.enactor.com/tools">
+	<htd:tasks>
+		<htd:task name="SimpleGenericTask">
+			<task:activationTime>
+				<task:until>string(htd:getInput()/core:taskData/core:activationTime)</task:until>
+			</task:activationTime>
+			<task:activationTime>
+				<task:for>string(htd:getInput()/core:taskData/core:activationDelay)</task:for>
+			</task:activationTime>
+			<htd:priority>number(htd:getInput()/core:taskData/core:priority)</htd:priority>
+			<htd:peopleAssignments>
+				<htd:potentialOwners>
+					<htd:from logicalPeopleGroup="task:GenericEvaluator">
+						<htd:argument name="evaluatorName">string(htd:getInput()/core:taskData/core:peopleGroupEvaluator)</htd:argument>
+						<htd:argument name="evaluatorConfig">htd:getInput()/core:taskData/core:peopleGroupConfig</htd:argument>
+					</htd:from>
+				</htd:potentialOwners>
+				<htd:businessAdministrators>
+					<htd:from logicalPeopleGroup="task:GenericEvaluator">
+						<htd:argument name="evaluatorName">string(htd:getInput()/core:taskData/core:businessAdminEvaluator)</htd:argument>
+						<htd:argument name="evaluatorConfig">htd:getInput()/core:taskData/core:businessAdminConfig</htd:argument>
+					</htd:from>
+				</htd:businessAdministrators>
+			</htd:peopleAssignments>
+			<htd:presentationElements>
+				<task:presentationData>
+					<task:applicationWorkflowId>${applicationWorkflowId}</task:applicationWorkflowId>
+				</task:presentationData>
+				<htd:name xml:lang="*">{$jobType}</htd:name>
+				<htd:presentationParameters>
+					<htd:presentationParameter type="xsd:string" name="jobHeader" xmlns:xsd="http://www.w3.org/2001/XMLSchema">string(htd:getInput()/core:taskData/core:jobHeader)</htd:presentationParameter>
+					<htd:presentationParameter type="xsd:string" name="jobType" xmlns:xsd="http://www.w3.org/2001/XMLSchema">string(htd:getInput()/core:taskData/core:jobType)</htd:presentationParameter>
+					<htd:presentationParameter type="xsd:string" name="jobDescription" xmlns:xsd="http://www.w3.org/2001/XMLSchema">string(htd:getInput()/core:taskData/core:jobDescription)</htd:presentationParameter>
+					<htd:presentationParameter type="xsd:string" name="applicationWorkflowId" xmlns:xsd="http://www.w3.org/2001/XMLSchema">string(htd:getInput()/core:taskData/core:applicationProcessId)
+					</htd:presentationParameter>
+				</htd:presentationParameters>
+				<htd:subject xml:lang="*">{$jobHeader}</htd:subject>
+				<htd:description xml:lang="*">{$jobDescription}</htd:description>
+			</htd:presentationElements>
+			<htd:deadlines>
+				<htd:completionDeadline task:name="Duration Timeout">
+					<htd:documentation xml:lang="en-GB">If not completed before the given duration expires, do a custom business process escalation
+					</htd:documentation>
+					<htd:for>string(htd:getInput()/core:taskData/core:timeoutDuration)</htd:for>
+					<htd:escalation name="CallTimeOutProcess">
+						<task:taskEscalationHandler finalState="OBSOLETE" businessProcessId="string(htd:getInput()/core:processId)" />
+					</htd:escalation>
+				</htd:completionDeadline>
+				<htd:completionDeadline task:name="Deadline Timeout">
+					<htd:documentation xml:lang="en-GB">If not completed by the given deadline, do a custom business process escalation
+					</htd:documentation>
+					<htd:until>string(htd:getInput()/core:taskData/core:timeoutDeadline)</htd:until>
+					<htd:escalation name="CallTimeOutProcess">
+						<task:taskEscalationHandler finalState="OBSOLETE" businessProcessId="string(htd:getInput()/core:processId)" />
+					</htd:escalation>
+				</htd:completionDeadline>
+			</htd:deadlines>
+		</htd:task>
+	</htd:tasks>
+</htd:humanInteractions>

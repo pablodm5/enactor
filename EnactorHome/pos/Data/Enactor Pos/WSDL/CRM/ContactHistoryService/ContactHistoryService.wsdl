@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:mjstring="com.enactor.tools.core.util.JavaCodeGenUtils"
+	xmlns:plnk="http://schemas.xmlsoap.org/ws/2003/05/partner-link/" xmlns:format="http://schemas.xmlsoap.org/wsdl/formatbinding/"
+	xmlns:java="http://schemas.xmlsoap.org/wsdl/java/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:core="http://www.enactor.com/core" name="ContactHistoryService" targetNamespace="http://www.enactor.com/crm/contactHistory/service"
+	xmlns:service="http://www.enactor.com/crm/contactHistory/service">
+	<wsdl:documentation>This service provides a mechanism for performing lookups of customer history records
+	</wsdl:documentation>
+	<wsdl:types>
+		<xsd:schema>
+			<xsd:import namespace="http://www.enactor.com/crm/contactHistory/service" schemaLocation="CRM/ContactHistoryService/ContactHistoryService.xsd" />
+		</xsd:schema>
+		<xsd:schema>
+			<xsd:import namespace="http://www.enactor.com/core" schemaLocation="Core/Core.xsd" />
+		</xsd:schema>
+
+	</wsdl:types>
+	<wsdl:message name="contactHistorySearchRequestMessage">
+		<wsdl:part name="parameters" element="service:contactHistorySearch" />
+	</wsdl:message>
+	<wsdl:message name="contactHistorySearchResponseMessage">
+		<wsdl:part name="parameters" element="service:contactHistorySearchResponse" />
+	</wsdl:message>
+	<wsdl:message name="contactHistoryDetailRequestMessage">
+		<wsdl:part name="parameters" element="service:contactHistoryDetail" />
+	</wsdl:message>
+	<wsdl:message name="contactHistoryDetailResponseMessage">
+		<wsdl:part name="parameters" element="service:contactHistoryDetailResponse" />
+	</wsdl:message>
+	<wsdl:message name="databaseException">
+		<wsdl:part name="databaseException" element="core:databaseException" />
+	</wsdl:message>
+	<wsdl:message name="noSuchRecordException">
+		<wsdl:part name="noSuchRecordException" element="core:noSuchRecordException" />
+	</wsdl:message>
+	<wsdl:message name="contactHistorySearchFault">
+		<wsdl:part name="contactHistorySearchFault" element="service:contactHistorySearchFault" />
+	</wsdl:message>
+	<wsdl:message name="contactHistoryDetailFault">
+		<wsdl:part name="contactHistoryDetailFault" element="service:contactHistoryDetailFault" />
+	</wsdl:message>
+	<wsdl:portType name="ContactHistoryServicePT">
+		<wsdl:operation name="contactHistorySearch">
+			<wsdl:documentation>This operation is used to retrieve the list of contact history records for the supplied customer number. 
+
+This user id is the id of the user performing the search and may be used to restrict the view of available records if required.
+
+FromDate and ToDate are used to optionally restrict the returned contact history records.
+
+MaxHits indicates that only this number of records should be returned -- if more than this are returned this will in general not cause an error, however the extra data will 
+probably be ignored. If this value is less than 1, a reasonable limit should be assumed.
+
+OrderBy is used to indicate the ordering of the returned records. The value will be one of the element names in the response, and may optionally be followed by DESC if
+the records should be ordered in descending order (ascending should be the default). For example, if this property has the value 'contactDate DESC' then the returned 
+contact history records should be ordered by their contact date in descending order. 
+
+In the results, the contact reference will be used to get the full details of the contact history record. The description field should be truncated to a length suitable for display
+in a table of results.</wsdl:documentation>
+			<wsdl:input message="service:contactHistorySearchRequestMessage" name="contactHistorySearchRequestMessage" />
+			<wsdl:output message="service:contactHistorySearchResponseMessage" name="contactHistorySearchResponseMessage" />
+			<wsdl:fault name="databaseException" message="service:databaseException"></wsdl:fault>
+			<wsdl:fault name="contactHistorySearchFault" message="service:contactHistorySearchFault"></wsdl:fault>
+		</wsdl:operation>
+		<wsdl:operation name="contactHistoryDetail">
+			<wsdl:documentation>This operation is used to get the full detail of a single contact history record.
+
+				The contact reference will be one of those supplied in a previous request to the contactHistorySearch service.
+
+				The result should be the full data for the single contact history record; the description field should not be truncated
+				event where it is very long./</wsdl:documentation>
+			<wsdl:input message="service:contactHistoryDetailRequestMessage" name="contactHistoryDetailRequestMessage" />
+			<wsdl:output message="service:contactHistoryDetailResponseMessage" name="contactHistoryDetailResponseMessage" />
+			<wsdl:fault name="databaseException" message="service:databaseException"></wsdl:fault>
+			<wsdl:fault name="noSuchRecordException" message="service:noSuchRecordException"></wsdl:fault>
+			<wsdl:fault name="contactHistoryDetailFault" message="service:contactHistoryDetailFault"></wsdl:fault>
+		</wsdl:operation>
+	</wsdl:portType>
+	<wsdl:binding name="SOAPBinding" type="service:ContactHistoryServicePT">
+		<soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document" />
+		<wsdl:operation name="contactHistorySearch">
+			<soap:operation soapAction="http://www.enactor.com/crm/contactHistory/service/contactHistorySearch" />
+			<wsdl:input name="contactHistorySearchRequestMessage">
+				<soap:body parts="parameters" use="literal" />
+			</wsdl:input>
+			<wsdl:output name="contactHistorySearchResponseMessage">
+				<soap:body parts="parameters" use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="contactHistoryDetail">
+			<soap:operation soapAction="http://www.enactor.com/crm/contactHistory/service/contactHistoryDetail" />
+			<wsdl:input name="contactHistoryDetailRequestMessage">
+				<soap:body parts="parameters" use="literal" />
+			</wsdl:input>
+			<wsdl:output name="contactHistoryDetailResponseMessage">
+				<soap:body parts="parameters" use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+	</wsdl:binding>
+	<wsdl:service name="ContactHistoryService">
+		<wsdl:port name="SOAPPort" binding="service:SOAPBinding">
+			<soap:address location="http://{SERVICE_URL}" />
+		</wsdl:port>
+	</wsdl:service>
+</wsdl:definitions>

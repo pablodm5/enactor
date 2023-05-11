@@ -1,0 +1,2744 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<core:process xmlns:core="http://www.enactor.com/core" xmlns:retail="http://www.enactor.com/retail" xmlns:ns4="http://www.enactor.com/crm" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803" xmlns:ns6="http://www.apis-it.hr/fin/2012/types/f73" xmlns:ns7="http://www.w3.org/2000/09/xmldsig#" xmlns:ns8="http://www.enactor.com/retail/storedRetailTransaction/service" xmlns:ns9="http://www.fu.gov.si/" xmlns:ns10="http://www.enactor.com/addressLookup/service" xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:ns14="http://www.enactor.com/crm/customerLoyalty/service" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <core:processID>EstateDirector/Imports/EstateManager/EstateManagerCreditNoteDocumentExtractor</core:processID>
+    <core:version>1.0</core:version>
+    <core:name>Estate Manager Document Extractor</core:name>
+    <core:defaultMessageBaseName></core:defaultMessageBaseName>
+    <core:firstStateID>Start</core:firstStateID>
+    <core:className></core:className>
+    <core:uiHints>
+        <entry>
+            <key>com.enactor.tools.editor.process.style</key>
+            <value>41</value>
+        </entry>
+        <entry>
+            <key>com.enactor.tools.editor.process.xloc</key>
+            <value>8</value>
+        </entry>
+        <entry>
+            <key>com.enactor.tools.editor.process.yloc</key>
+            <value>8</value>
+        </entry>
+    </core:uiHints>
+    <core:metaData>
+        <core:inputs>
+            <core:input required="false" name="enactor.coreUI.ControlService">
+                <core:interfaceName>com.enactor.core.services.IControlService</core:interfaceName>
+            </core:input>
+            <core:input name="enactor.coreProcessing.ExtractionStartDate">
+                <core:interfaceName>java.util.Date</core:interfaceName>
+            </core:input>
+            <core:input name="enactor.coreProcessing.ExtractionEndDate">
+                <core:interfaceName>java.util.Date</core:interfaceName>
+            </core:input>
+            <core:input name="enactor.coreUI.LoggingLocale">
+                <core:interfaceName>java.util.Locale</core:interfaceName>
+            </core:input>
+            <core:input required="false" name="enactor.mfc.Device">
+                <core:interfaceName>com.enactor.mfc.device.IDevice</core:interfaceName>
+            </core:input>
+            <core:input required="true" name="enactor.mfc.Location">
+                <core:interfaceName>com.enactor.mfc.location.ILocation</core:interfaceName>
+            </core:input>
+            <core:input required="false" name="enactor.coreUI.User">
+                <core:interfaceName>com.enactor.core.signOn.ISignedOnUser</core:interfaceName>
+            </core:input>
+        </core:inputs>
+        <stateDataTypes>
+            <stateDataType required="false" name="enactor.coreProcessing.LastExtractedDate">
+                <core:interfaceName>java.util.Date</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="false" name="enactor.coreUI.Iterator">
+                <core:interfaceName>java.util.Iterator</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="false" name="enactor.coreProcessing.RecentlyProcessedDocuments">
+                <core:interfaceName>java.util.List</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.coreUI.LoggingLocale">
+                <core:interfaceName>java.util.Locale</core:interfaceName>
+            </stateDataType>
+            <stateDataType name="enactor.coreProcessing.ExtractionEndDate">
+                <core:interfaceName>java.util.Date</core:interfaceName>
+            </stateDataType>
+            <stateDataType name="enactor.coreProcessing.ExtractionStartDate">
+                <core:interfaceName>java.util.Date</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="false" name="enactor.coreUI.ControlService">
+                <core:interfaceName>com.enactor.core.services.IControlService</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="false" name="enactor.mfc.Device">
+                <core:interfaceName>com.enactor.mfc.device.IDevice</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.mfc.Location">
+                <core:interfaceName>com.enactor.mfc.location.ILocation</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="false" name="enactor.coreUI.User">
+                <core:interfaceName>com.enactor.core.signOn.ISignedOnUser</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.coreProcessing.DeepCopyOfRecentlyProcessedDocuments">
+                <core:interfaceName>java.util.List</core:interfaceName>
+            </stateDataType>
+        </stateDataTypes>
+    </core:metaData>
+    <core:typeId>enactor.types.SelectionState</core:typeId>
+    <core:notes>
+        <core:processNote>
+            <core:noteId>Note0</core:noteId>
+            <core:description>The ReadFromDocumentsIn action modified the RecentlyProcessedDocuments list that it is provided with.  This is useful in EstateManagerDocumentExtractor but not what we want in this process.  We want to manage the contents of the RecentlyProcessedDocuments list and for it to contain just the last processed document, and for it not to be ever cleared out by this action, and so we pass in a temporary Deep Copy of the list which we don’t use again.</core:description>
+            <core:constraint>
+                <core:x>1959</core:x>
+                <core:y>18</core:y>
+                <core:height>126</core:height>
+                <core:width>387</core:width>
+            </core:constraint>
+        </core:processNote>
+    </core:notes>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>Wait</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIWaitAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>63</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>886</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>8</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="1000" required="false" name="enactor.coreUI.WaitTimeMs">
+            <core:interfaceName>java.lang.Integer</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="false" name="enactor.coreUI.WaitTimeMs">
+                    <core:interfaceName>java.lang.Integer</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>WaitAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>WriteIdleActivity</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:endProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>EndProcess</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIEndProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>886</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>804</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData/>
+        <core:typeId>enactor.types.EndProcess</core:typeId>
+        <core:outcome></core:outcome>
+        <core:defaultProcessId></core:defaultProcessId>
+    </core:endProcessAction>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>SetServiceAsRunning</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.SetControlServiceAsRunningAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>47</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>664</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>584</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.coreUI.ControlService">
+                    <core:interfaceName>com.enactor.core.services.IControlService</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID>Loop</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>SetServiceAsStopped</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.SetControlServiceAsStoppedAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>47</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>886</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>585</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.coreUI.ControlService">
+                    <core:interfaceName>com.enactor.core.services.IControlService</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>EndProcess</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>EndProcess</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Exception</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>SetServiceAsPaused</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.SetControlServiceAsPausedAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>47</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1171</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>585</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.coreUI.ControlService">
+                    <core:interfaceName>com.enactor.core.services.IControlService</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>Wait</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>CheckServiceStatus</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.CheckControlServiceStatusAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>47</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>886</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>205</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.coreUI.ControlService">
+                    <core:interfaceName>com.enactor.core.services.IControlService</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outcomes>
+                <core:outcome name="Stop"/>
+                <core:outcome name="Wait"/>
+                <core:outcome name="Resume"/>
+                <core:outcome name="Pause"/>
+                <core:outcome name="Error"/>
+                <core:outcome name="Run"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>SetServiceAsPaused</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Pause</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>ClearCurrentActivity</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Stop</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>3</core:linkID>
+            <core:toStateID>DispatchDocuments</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Run</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>4</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>SetServiceAsRunning</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Resume</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>5</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>Wait</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Wait</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>6</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>Wait</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Error</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>ReadFromDocumentsIn</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.retailJInterface.document.actions.ReadBatchFromDocumentsInAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.notes</key>
+                <value>Note0</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>63</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2008</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>199</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="POSApplicationEvent,POSBasket,TerminalCMAction,SafeCMAction,POSBasketReversal,Dispatch" name="enactor.coreProcessing.DocumentTypes">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:param value="200" name="enactor.coreProcessing.BatchSize">
+            <core:interfaceName>java.lang.Integer</core:interfaceName>
+        </core:param>
+        <core:param value="true" name="enactor.coreProcessing.LimitQueryToBatchSize">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:param>
+        <core:param value="Completed,Processed" name="enactor.coreProcessing.ValidBasketStates">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:param value="java:/comp/env/RETAILJ" name="enactor.commonUI.DataSourceName">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:param value="Retail-J" name="enactor.coreProcessing.DocumentSource">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:param value="Enactor" name="enactor.coreProcessing.SourceSystemIgnores">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="false" name="enactor.commonUI.DataSourceName">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreProcessing.BatchSize">
+                    <core:interfaceName>java.lang.Integer</core:interfaceName>
+                </core:input>
+                <core:input required="false" name="enactor.coreProcessing.DocumentSource">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input required="false" name="enactor.coreProcessing.DocumentTypes">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreProcessing.ExtractionEndDate">
+                    <core:interfaceName>java.util.Date</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreProcessing.ExtractionStartDate">
+                    <core:interfaceName>java.util.Date</core:interfaceName>
+                </core:input>
+                <core:input required="false" name="enactor.coreProcessing.LastExtractedDate">
+                    <core:interfaceName>java.util.Date</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreProcessing.LimitQueryToBatchSize">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+                <core:input required="false" name="enactor.coreProcessing.RecentlyProcessedDocuments">
+                    <core:interfaceName>java.util.List</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreProcessing.SourceSystemIgnores">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreProcessing.ValidBasketStates">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="true" name="Exception">
+                    <core:interfaceName>java.lang.Throwable</core:interfaceName>
+                </core:output>
+                <core:output required="false" name="enactor.coreUI.Iterable">
+                    <core:interfaceName>java.lang.Iterable</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="ReadException"/>
+                <core:outcome name="NoSuchRecord"/>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>WriteExtractingActivity</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>Wait</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>NoSuchRecord</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>3</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>LogServiceException</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>ReadException</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>4</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>ClearCurrentActivity</core:toActionID>
+            <core:condition>process.extractionEndDate != null &amp;&amp; dates:compareDateTimes(dates:getNow(),process.extractionEndDate) &gt; 0</core:condition>
+            <core:outcome>NoSuchRecord</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>WriteExtractingActivity</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.SetControlServiceCurrentActivityAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>11</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2228</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>199</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="EstateDirector/Processing/DocumentProcessingMessages" name="enactor.coreUI.MessageBasename">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:param value="PROCESSING" name="enactor.coreUI.MessageId">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.coreUI.ControlService">
+                    <core:interfaceName>com.enactor.core.services.IControlService</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.MessageBasename">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.MessageId">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.MessageLocale">
+                    <core:interfaceName>java.util.Locale</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID>IterateOverDocuments</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>WriteIdleActivity</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.SetControlServiceCurrentActivityAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>11</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>667</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>8</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="EstateDirector/Processing/DocumentProcessingMessages" name="enactor.coreUI.MessageBasename">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:param value="IDLE" name="enactor.coreUI.MessageId">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.coreUI.ControlService">
+                    <core:interfaceName>com.enactor.core.services.IControlService</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.MessageBasename">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.MessageId">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.MessageLocale">
+                    <core:interfaceName>java.util.Locale</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID>Loop</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:assignAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>AssignLastExtractedDate</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIAssignAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>959</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2260</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>603</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.coreUI.IteratorItem">
+                    <core:interfaceName>com.enactor.coreProcessing.document.IDocument</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.coreProcessing.LastExtractedDate">
+                    <core:interfaceName>java.util.Date</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="true" name="enactor.coreProcessing.LastExtractedDate">
+                    <core:interfaceName>java.util.Date</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.Assign</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID>IterateOverDocuments</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>WriteLastExtractedDateToActivityLog</core:toActionID>
+            <core:condition>process.extractionEndDate != null &amp;&amp; dates:compareDateTimes(process.lastExtractedDate,process.extractionEndDate) &gt; 0</core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:dataAssignment toExpression="lastExtractedDate" fromExpression="iteratorItem.dateReceived"/>
+    </core:assignAction>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>WaitAfterException</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIWaitAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>63</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1365</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>8</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="60000" name="enactor.coreUI.WaitTimeMs">
+            <core:interfaceName>java.lang.Integer</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="false" name="enactor.coreUI.WaitTimeMs">
+                    <core:interfaceName>java.lang.Integer</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>WaitAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>Wait</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:assignAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>SetLastExtractedToStartDate</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIAssignAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>27</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>10</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>882</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.coreProcessing.LastExtractedDate">
+                    <core:interfaceName>java.util.Date</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.coreProcessing.ExtractionStartDate">
+                    <core:interfaceName>java.util.Date</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="true" name="enactor.coreProcessing.LastExtractedDate">
+                    <core:interfaceName>java.util.Date</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.Assign</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>LoadServiceLocation</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:dataAssignment toExpression="lastExtractedDate" fromExpression="extractionStartDate"/>
+    </core:assignAction>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>LogServiceException</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.commonUI.logging.actions.WriteApplicationProcessLogAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1598</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>28</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="EstateManagerCreditNoteDocumentExtractor" name="enactor.commonUI.logging.EntryType">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:param value="${Service.DeviceID}" name="enactor.coreUI.DeviceId">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:param value="SYSTEM" name="enactor.coreUI.UserId">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:param value="0" name="enactor.commonUI.logging.LogEntryType">
+            <core:interfaceName>java.lang.Integer</core:interfaceName>
+        </core:param>
+        <core:param value="EstateDirector/Imports/FileImportMessages" name="enactor.coreUI.MessageBasename">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:param value="DOCUMENTS_IN_READ_EXCEPTION" name="enactor.coreUI.MessageId">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:param value="EstateDirector/Imports/EstateManager/EstateManagerCreditNoteDocumentExtractor" name="enactor.coreUI.ProcessId">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input name="Exception">
+                    <core:interfaceName>java.lang.Throwable</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.MessageBasename">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.Message">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.MessageId">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.LoggingLocale">
+                    <core:interfaceName>java.util.Locale</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.ProcessId">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.ReferenceId">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.UserId">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.DeviceId">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.commonUI.logging.EntryType">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.commonUI.logging.LogEntryType">
+                    <core:interfaceName>java.lang.Integer</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+            <core:sessionManagementType>NONE</core:sessionManagementType>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>WaitAfterException</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>WaitOnStartUpError</core:actionID>
+        <core:name>UIWaitAction</core:name>
+        <core:className>com.enactor.coreUI.actions.UIWaitAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>11</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>228</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>1291</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="10" name="enactor.coreUI.WaitTimeSecs">
+            <core:interfaceName>java.lang.Integer</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input name="enactor.coreUI.WaitTimeSecs">
+                    <core:interfaceName>java.lang.Integer</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>TestDatabaseOnStartUpError</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>TestDatabaseOnStartUpError</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.commonUI.dataAccess.processes.TestDatabaseAvailableAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>3</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>447</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>1291</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+                <core:outcome name="Fail"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:expectedExecutionTime>100</core:expectedExecutionTime>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>WaitOnStartUpError</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Fail</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>ListRjCreditNoteActivityLogEntries</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>3</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>WaitOnStartUpError</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Exception</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>SetCurrentActivityErrorWaitingOnStartUp</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.SetControlServiceCurrentActivityAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>11</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>8</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>1291</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="ERROR_WAITING" name="enactor.coreUI.MessageId">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:param value="EstateDirector/Processing/DocumentProcessingMessages" name="enactor.coreUI.MessageBasename">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input name="enactor.coreUI.MessageId">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.MessageLocale">
+                    <core:interfaceName>java.util.Locale</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.coreUI.ControlService">
+                    <core:interfaceName>com.enactor.core.services.IControlService</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.MessageBasename">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>WaitOnStartUpError</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>LogException</core:actionID>
+        <core:name>UILogMessageAction</core:name>
+        <core:className>com.enactor.coreUI.actions.UILogMessageAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1023</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>212</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>70</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="Document Extractor Service Error." name="enactor.coreUI.LogMessage">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input name="enactor.coreUI.LogMessage">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:comment>An exception will get logged as an error</core:comment>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>APLogServiceFail</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Exception</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>APLogServiceFail</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>APLogServiceFail</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.commonUI.logging.actions.WriteApplicationProcessLogAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>11</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>418</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>71</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="MessageService/QueueConnectorMessages" name="enactor.coreUI.MessageBasename">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:param value="DOCUMENT_EXTRACTOR__SERVICE_FAIL" name="enactor.coreUI.MessageId">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:param value="documentExtractor" name="enactor.commonUI.logging.EntryType">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:param value="0" name="enactor.commonUI.logging.LogEntryType">
+            <core:interfaceName>java.lang.Integer</core:interfaceName>
+        </core:param>
+        <core:param value="#{getConfigValue('Service.DeviceID', null)}" name="enactor.coreUI.DeviceId">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input name="Exception">
+                    <core:interfaceName>java.lang.Throwable</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.commonUI.logging.EntryType">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.commonUI.logging.LogEntryType">
+                    <core:interfaceName>java.lang.Integer</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.DeviceId">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.LoggingLocale">
+                    <core:interfaceName>java.util.Locale</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.MessageBasename">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.MessageId">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+            <core:sessionManagementType>NONE</core:sessionManagementType>
+        </core:metaData>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>ClearCurrentActivityError</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>ClearCurrentActivityError</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Exception</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>ClearCurrentActivityError</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.SetControlServiceCurrentActivityAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>598</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>488</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="EstateDirector/Processing/DocumentProcessingMessages" name="enactor.coreUI.MessageBasename">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:param value="ERROR" name="enactor.coreUI.MessageId">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.coreUI.ControlService">
+                    <core:interfaceName>com.enactor.core.services.IControlService</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.Message">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.MessageBasename">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.MessageId">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.MessageLocale">
+                    <core:interfaceName>java.util.Locale</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>SetServiceAsStopped</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>SetServiceAsStopped</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Exception</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>ClearCurrentActivity</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.SetControlServiceCurrentActivityAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>955</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>488</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="EstateDirector/Processing/DocumentProcessingMessages" name="enactor.coreUI.MessageBasename">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:param value="NO_ACTIVITY" name="enactor.coreUI.MessageId">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.coreUI.ControlService">
+                    <core:interfaceName>com.enactor.core.services.IControlService</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.Message">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.MessageBasename">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.MessageId">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.MessageLocale">
+                    <core:interfaceName>java.util.Locale</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>SetServiceAsStopped</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>SetServiceAsStopped</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Exception</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:executeProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>ProcessCreditNoteTenders</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UICallProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>2047</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2882</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>205</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input name="enactor.processing.DateReceived">
+                    <core:interfaceName>java.util.Date</core:interfaceName>
+                </core:input>
+                <core:input required="false" name="enactor.coreUI.LoggingLocale">
+                    <core:interfaceName>java.util.Locale</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.coreUI.TransactionXML">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.coreProcessing.Document">
+                    <core:interfaceName>com.enactor.coreProcessing.document.IDocument</core:interfaceName>
+                </core:input>
+                <core:input required="false" name="enactor.mfc.Device">
+                    <core:interfaceName>com.enactor.mfc.device.IDevice</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.Location">
+                    <core:interfaceName>com.enactor.mfc.location.ILocation</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outcomes>
+                <core:outcome name="Fail"/>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.CallProcess</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>TestRecentlyProcessedNotEmpty2</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>WaitAfterException</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Fail</core:outcome>
+        </core:outcomeLink>
+        <core:executeProcessId>EstateDirector/Imports/EstateManager/CreditNote/ProcessCreditNoteTenders</core:executeProcessId>
+    </core:executeProcessAction>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>ListRjCreditNoteActivityLogEntries</core:actionID>
+        <core:name>ListActivityLogEntriesAction</core:name>
+        <core:className>com.enactor.mfc.activityLogEntry.actions.ListActivityLogEntriesAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>2047</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>218</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>882</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="rjCreditNoteDocumentExtractor" name="enactor.maintenance.activityLog.EntryEntityName">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:param value="#{enumValue('com.enactor.mfc.activityLogEntry.ActivityLogEntryType', 'OTHER')}" name="enactor.maintenance.activityLog.EntryType">
+            <core:interfaceName>com.enactor.mfc.activityLogEntry.ActivityLogEntryType</core:interfaceName>
+        </core:param>
+        <core:param value="1" name="enactor.coreUI.MaxItems">
+            <core:interfaceName>java.lang.Integer</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.maintenance.activityLog.EntryEntityName">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.maintenance.activityLog.EntryType">
+                    <core:interfaceName>com.enactor.mfc.activityLogEntry.ActivityLogEntryType</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.MaxItems">
+                    <core:interfaceName>java.lang.Integer</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output name="enactor.coreUI.List">
+                    <core:interfaceName>java.util.List</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+            <core:sessionManagementType>MAKE_SESSION_IF_NO_CURRENT</core:sessionManagementType>
+        </core:metaData>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>TestListHasItem</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>SetCurrentActivityErrorWaitingOnStartUp</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Exception</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>TestListHasItem</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UINullAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>2047</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>418</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>882</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.NullAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>SetDateUsingActivityLogEntry</core:toActionID>
+            <core:condition>notEmpty(state.rJCreditNoteActivityLogList)</core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>SetDateToBeginningOfDay</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:assignAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>SetDateToBeginningOfDay</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIAssignAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>959</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>636</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>1110</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="false" name="enactor.coreProcessing.LastExtractedDate">
+                    <core:interfaceName>java.util.Date</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="false" name="enactor.coreProcessing.LastExtractedDate">
+                    <core:interfaceName>java.util.Date</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.Assign</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>SetServiceAsRunning</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:dataAssignment toExpression="lastExtractedDate" fromExpression="dates:getDayStart(dates:getNow())"/>
+    </core:assignAction>
+    <core:assignAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>SetDateUsingActivityLogEntry</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIAssignAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>2047</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>636</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>882</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="false" name="enactor.coreUI.RJCreditNoteActivityLogList">
+                    <core:interfaceName>java.util.List</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="false" name="enactor.coreProcessing.LastExtractedDate">
+                    <core:interfaceName>java.util.Date</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.Assign</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>LoadServiceLocation</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:dataAssignment toExpression="lastExtractedDate" fromExpression="rJCreditNoteActivityLogList[0].entryDate"/>
+    </core:assignAction>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>WriteLastExtractedDateToActivityLog</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.mfc.activityLogEntry.actions.WriteActivityLogAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>943</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2008</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>593</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="#{enumValue('com.enactor.mfc.activityLogEntry.ActivityLogEntryType', 'OTHER')}" name="enactor.maintenance.activityLog.EntryType">
+            <core:interfaceName>com.enactor.mfc.activityLogEntry.ActivityLogEntryType</core:interfaceName>
+        </core:param>
+        <core:param value="RJ_CREDIT_NOTE_DOCUMENT_EXTRACTOR" name="enactor.coreUI.MessageId">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:param value="EstateDirector/Imports/FileImportMessages" name="enactor.coreUI.MessageBasename">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:param value="rjCreditNoteDocumentExtractor" name="enactor.maintenance.activityLog.EntryEntityName">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:param value="true" name="enactor.maintenance.activityLog.DontLogNoUser">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.coreUI.LoggingLocale">
+                    <core:interfaceName>java.util.Locale</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.maintenance.activityLog.EntryType">
+                    <core:interfaceName>com.enactor.mfc.activityLogEntry.ActivityLogEntryType</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.MessageId">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.User">
+                    <core:interfaceName>com.enactor.core.signOn.ISignedOnUser</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.MessageBasename">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.Location">
+                    <core:interfaceName>com.enactor.mfc.location.ILocation</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.mfc.Device">
+                    <core:interfaceName>com.enactor.mfc.device.IDevice</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.maintenance.activityLog.EntryEntityName">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.maintenance.activityLog.EntryDate">
+                    <core:interfaceName>java.util.Date</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.maintenance.activityLog.DontLogNoUser">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+            <core:sessionManagementType>MAKE_SESSION_IF_NO_CURRENT</core:sessionManagementType>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>WriteIdleActivity</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>ClearCurrentActivity</core:toActionID>
+            <core:condition>(process.extractionEndDate != null &amp;&amp; dates:compareDateTimes(process.lastExtractedDate,process.extractionEndDate) &gt; 0)
+||
+(process.extractionEndDate != null &amp;&amp; dates:compareDateTimes(state.iteratorItem.dateReceived,process.extractionEndDate) &gt; 0)</core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>AddToRecentlyProcessedDocs</core:actionID>
+        <core:name>AddToListAction</core:name>
+        <core:className>com.enactor.commonUI.list.processes.AddToListAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>2047</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2485</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>603</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input name="enactor.coreUI.List">
+                    <core:interfaceName>java.util.List</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.coreUI.Value">
+                    <core:interfaceName>java.lang.Object</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output name="enactor.coreUI.List">
+                    <core:interfaceName>java.util.List</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>AssignLastExtractedDate</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>EmptyRecentlyProcessedDocs</core:actionID>
+        <core:name>ClearCollectionAction</core:name>
+        <core:className>com.enactor.commonUI.actions.ClearCollectionAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>2047</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2785</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>607</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.commonUI.Collection">
+                    <core:interfaceName>java.lang.Object</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output name="enactor.commonUI.Collection">
+                    <core:interfaceName>java.lang.Object</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>AddToRecentlyProcessedDocs</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>DeepCopyRecentlyProcessedDocs</core:actionID>
+        <core:name>CopyCollectionAction</core:name>
+        <core:className>com.enactor.commonUI.list.processes.CopyCollectionAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.notes</key>
+                <value>Note0</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>2047</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1723</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>200</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="java.util.ArrayList" name="enactor.coreUI.CollectionClass">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:param value="true" name="enactor.commonUI.DeepCopy">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.coreUI.Collection">
+                    <core:interfaceName>java.util.Collection</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.CollectionClass">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.commonUI.DeepCopy">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output name="enactor.coreUI.Collection">
+                    <core:interfaceName>java.util.Collection</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>ReadFromDocumentsIn</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>TestRecentlyProcessedNotEmpty</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UINullAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>2047</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1430</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>202</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.NullAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>ReadFromDocumentsIn</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>DeepCopyRecentlyProcessedDocs</core:toActionID>
+            <core:condition>notEmpty(process.recentlyProcessedDocuments)</core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>TestRecentlyProcessedNotEmpty2</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UINullAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>2047</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>3003</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>610</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.NullAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>EmptyRecentlyProcessedDocs</core:toActionID>
+            <core:condition>notEmpty(process.recentlyProcessedDocuments)</core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>AddToRecentlyProcessedDocs</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>LoadServiceLocation</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.mfc.location.actions.LoadServiceLocationAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>19</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>450</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>685</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:outputs>
+                <core:output name="enactor.mfc.Device">
+                    <core:interfaceName>com.enactor.mfc.device.IDevice</core:interfaceName>
+                </core:output>
+                <core:output name="enactor.mfc.Location">
+                    <core:interfaceName>com.enactor.mfc.location.ILocation</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+                <core:outcome name="Fail"/>
+            </core:outcomes>
+            <core:sessionManagementType>MAKE_SESSION_IF_NO_CURRENT</core:sessionManagementType>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>SetServiceAsRunning</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>SetServiceAsRunning</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Fail</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:eventLink>
+        <core:linkID>1</core:linkID>
+        <core:toStateID></core:toStateID>
+        <core:toActionID>LogException</core:toActionID>
+        <core:condition></core:condition>
+        <core:event>Exception</core:event>
+    </core:eventLink>
+    <core:state>
+        <core:url></core:url>
+        <core:stateID>Start</core:stateID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.states.UIBasicState</core:className>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>37</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>10</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>644</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <handledEvents>
+                <handledEvent name="StateEntered"/>
+            </handledEvents>
+            <stateDataTypes>
+                <stateDataType required="true" name="enactor.coreProcessing.SourceId">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="false" name="enactor.coreUI.RJCreditNoteActivityLogList">
+                    <core:interfaceName>java.util.List</core:interfaceName>
+                </stateDataType>
+            </stateDataTypes>
+        </core:metaData>
+        <core:typeId>BasicState</core:typeId>
+        <core:singleInstance>false</core:singleInstance>
+        <core:respondToViewEvents>false</core:respondToViewEvents>
+        <core:actionInputMappings>
+            <core:actionMapping>
+                <core:actionID>SetCurrentActivityErrorWaitingOnStartUp</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="false" name="enactor.coreUI.ControlService">
+<core:interfaceName>com.enactor.core.services.IControlService</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.coreUI.ControlService">
+<core:interfaceName>com.enactor.core.services.IControlService</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.coreUI.LoggingLocale">
+<core:interfaceName>java.util.Locale</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType name="enactor.coreUI.MessageLocale">
+<core:interfaceName>java.util.Locale</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings/>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>ClearCurrentActivityError</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="false" name="enactor.coreUI.ControlService">
+<core:interfaceName>com.enactor.core.services.IControlService</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.coreUI.ControlService">
+<core:interfaceName>com.enactor.core.services.IControlService</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.coreUI.LoggingLocale">
+<core:interfaceName>java.util.Locale</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType name="enactor.coreUI.MessageLocale">
+<core:interfaceName>java.util.Locale</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.coreUI.Message">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+        </core:actionInputMappings>
+        <core:actionOutputMappings>
+            <core:actionMapping>
+                <core:actionID>ListRjCreditNoteActivityLogEntries</core:actionID>
+                <core:mappings>
+                    <core:processMappings/>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:sourceDataType name="enactor.coreUI.List">
+<core:interfaceName>java.util.List</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="false" name="enactor.coreUI.RJCreditNoteActivityLogList">
+<core:interfaceName>java.util.List</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+        </core:actionOutputMappings>
+        <core:eventLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>ListRjCreditNoteActivityLogEntries</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>StateEntered</core:event>
+        </core:eventLink>
+        <core:eventLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>SetLastExtractedToStartDate</core:toActionID>
+            <core:condition>process.extractionStartDate != null</core:condition>
+            <core:event>StateEntered</core:event>
+        </core:eventLink>
+    </core:state>
+    <core:state>
+        <core:url></core:url>
+        <core:stateID>Loop</core:stateID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.states.UILoopingState</core:className>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>63</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>667</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>205</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="-1" required="false" name="enactor.coreUI.LoopCount">
+            <core:interfaceName>java.lang.Integer</core:interfaceName>
+        </core:param>
+        <core:param value="true" required="false" name="enactor.coreUI.LoopControl">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="false" name="enactor.coreUI.LoopControl">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+                <core:input required="false" name="enactor.coreUI.LoopCount">
+                    <core:interfaceName>java.lang.Integer</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <handledEvents>
+                <handledEvent name="Execute"/>
+                <handledEvent name="Completed"/>
+            </handledEvents>
+            <stateDataTypes>
+                <stateDataType required="false" name="enactor.coreUI.LoopControl">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="false" name="enactor.coreUI.LoopCount">
+                    <core:interfaceName>java.lang.Integer</core:interfaceName>
+                </stateDataType>
+            </stateDataTypes>
+        </core:metaData>
+        <core:typeId>LoopState</core:typeId>
+        <core:singleInstance>false</core:singleInstance>
+        <core:respondToViewEvents>false</core:respondToViewEvents>
+        <core:actionInputMappings>
+            <core:actionMapping>
+                <core:actionID>WriteIdleActivity</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="false" name="enactor.coreUI.ControlService">
+<core:interfaceName>com.enactor.core.services.IControlService</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.coreUI.ControlService">
+<core:interfaceName>com.enactor.core.services.IControlService</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.coreUI.LoggingLocale">
+<core:interfaceName>java.util.Locale</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType name="enactor.coreUI.MessageLocale">
+<core:interfaceName>java.util.Locale</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings/>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>ClearCurrentActivity</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="false" name="enactor.coreUI.ControlService">
+<core:interfaceName>com.enactor.core.services.IControlService</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.coreUI.ControlService">
+<core:interfaceName>com.enactor.core.services.IControlService</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.coreUI.LoggingLocale">
+<core:interfaceName>java.util.Locale</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType name="enactor.coreUI.MessageLocale">
+<core:interfaceName>java.util.Locale</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.coreUI.Message">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>ClearCurrentActivityError</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="false" name="enactor.coreUI.ControlService">
+<core:interfaceName>com.enactor.core.services.IControlService</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.coreUI.ControlService">
+<core:interfaceName>com.enactor.core.services.IControlService</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.coreUI.LoggingLocale">
+<core:interfaceName>java.util.Locale</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType name="enactor.coreUI.MessageLocale">
+<core:interfaceName>java.util.Locale</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.coreUI.Message">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+        </core:actionInputMappings>
+        <core:actionOutputMappings/>
+        <core:eventLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>CheckServiceStatus</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>Execute</core:event>
+        </core:eventLink>
+        <core:eventLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>ClearCurrentActivity</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>Completed</core:event>
+        </core:eventLink>
+    </core:state>
+    <core:state>
+        <core:url></core:url>
+        <core:stateID>DispatchDocuments</core:stateID>
+        <core:name></core:name>
+        <core:className></core:className>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>53</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1171</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>202</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:outputs>
+                <core:output required="true" name="enactor.coreUI.Iterable">
+                    <core:interfaceName>java.lang.Iterable</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <handledEvents>
+                <handledEvent name="StateEntered"/>
+            </handledEvents>
+            <stateDataTypes>
+                <stateDataType required="false" name="enactor.coreUI.Iterable">
+                    <core:interfaceName>java.lang.Iterable</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="true" name="Exception">
+                    <core:interfaceName>java.lang.Throwable</core:interfaceName>
+                </stateDataType>
+            </stateDataTypes>
+        </core:metaData>
+        <core:typeId>enactor.types.SelectionState</core:typeId>
+        <core:singleInstance>false</core:singleInstance>
+        <core:respondToViewEvents>false</core:respondToViewEvents>
+        <core:actionInputMappings>
+            <core:actionMapping>
+                <core:actionID>WriteIdleActivity</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="false" name="enactor.coreUI.ControlService">
+<core:interfaceName>com.enactor.core.services.IControlService</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.coreUI.ControlService">
+<core:interfaceName>com.enactor.core.services.IControlService</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.coreUI.LoggingLocale">
+<core:interfaceName>java.util.Locale</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType name="enactor.coreUI.MessageLocale">
+<core:interfaceName>java.util.Locale</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings/>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>WriteExtractingActivity</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="false" name="enactor.coreUI.ControlService">
+<core:interfaceName>com.enactor.core.services.IControlService</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.coreUI.ControlService">
+<core:interfaceName>com.enactor.core.services.IControlService</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.coreUI.LoggingLocale">
+<core:interfaceName>java.util.Locale</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType name="enactor.coreUI.MessageLocale">
+<core:interfaceName>java.util.Locale</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings/>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>ClearCurrentActivity</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="false" name="enactor.coreUI.ControlService">
+<core:interfaceName>com.enactor.core.services.IControlService</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.coreUI.ControlService">
+<core:interfaceName>com.enactor.core.services.IControlService</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.coreUI.LoggingLocale">
+<core:interfaceName>java.util.Locale</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType name="enactor.coreUI.MessageLocale">
+<core:interfaceName>java.util.Locale</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.coreUI.Message">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>ClearCurrentActivityError</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="false" name="enactor.coreUI.ControlService">
+<core:interfaceName>com.enactor.core.services.IControlService</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.coreUI.ControlService">
+<core:interfaceName>com.enactor.core.services.IControlService</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.coreUI.LoggingLocale">
+<core:interfaceName>java.util.Locale</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType name="enactor.coreUI.MessageLocale">
+<core:interfaceName>java.util.Locale</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.coreUI.Message">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>DeepCopyRecentlyProcessedDocs</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="false" name="enactor.coreProcessing.RecentlyProcessedDocuments">
+<core:interfaceName>java.util.List</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.coreUI.Collection">
+<core:interfaceName>java.util.Collection</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings/>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>ReadFromDocumentsIn</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="false" name="enactor.coreProcessing.LastExtractedDate">
+<core:interfaceName>java.util.Date</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="false" name="enactor.coreProcessing.LastExtractedDate">
+<core:interfaceName>java.util.Date</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType name="enactor.coreProcessing.ExtractionEndDate">
+<core:interfaceName>java.util.Date</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType name="enactor.coreProcessing.ExtractionEndDate">
+<core:interfaceName>java.util.Date</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType name="enactor.coreProcessing.ExtractionStartDate">
+<core:interfaceName>java.util.Date</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType name="enactor.coreProcessing.ExtractionStartDate">
+<core:interfaceName>java.util.Date</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.coreProcessing.DeepCopyOfRecentlyProcessedDocuments">
+<core:interfaceName>java.util.List</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="false" name="enactor.coreProcessing.RecentlyProcessedDocuments">
+<core:interfaceName>java.util.List</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings/>
+                </core:mappings>
+            </core:actionMapping>
+        </core:actionInputMappings>
+        <core:actionOutputMappings>
+            <core:actionMapping>
+                <core:actionID>DeepCopyRecentlyProcessedDocs</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType name="enactor.coreUI.Collection">
+<core:interfaceName>java.util.Collection</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.coreProcessing.DeepCopyOfRecentlyProcessedDocuments">
+<core:interfaceName>java.util.List</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings/>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>ReadFromDocumentsIn</core:actionID>
+                <core:mappings>
+                    <core:processMappings/>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="false" name="enactor.coreUI.Iterable">
+<core:interfaceName>java.lang.Iterable</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="false" name="enactor.coreUI.Iterable">
+<core:interfaceName>java.lang.Iterable</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="Exception">
+<core:interfaceName>java.lang.Throwable</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="Exception">
+<core:interfaceName>java.lang.Throwable</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+        </core:actionOutputMappings>
+        <core:eventLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>TestRecentlyProcessedNotEmpty</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>StateEntered</core:event>
+        </core:eventLink>
+    </core:state>
+    <core:state>
+        <core:url></core:url>
+        <core:stateID>IterateOverDocuments</core:stateID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.states.UIIteratorState</core:className>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>45</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>2467</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>199</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="true" required="false" name="enactor.coreUI.LoopControl">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input name="enactor.coreUI.Iterable">
+                    <core:interfaceName>java.lang.Iterable</core:interfaceName>
+                </core:input>
+                <core:input required="false" name="enactor.coreUI.LoopControl">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <handledEvents>
+                <handledEvent name="Completed"/>
+                <handledEvent name="Execute"/>
+            </handledEvents>
+            <stateDataTypes>
+                <stateDataType required="true" name="enactor.coreUI.XML">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="true" name="enactor.coreUI.FailedFilename">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="false" name="enactor.coreUI.LoopControl">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="false" name="enactor.coreUI.Iterator">
+                    <core:interfaceName>java.util.Iterator</core:interfaceName>
+                </stateDataType>
+                <stateDataType name="enactor.coreUI.Iterable">
+                    <core:interfaceName>java.lang.Iterable</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="true" name="Exception">
+                    <core:interfaceName>java.lang.Throwable</core:interfaceName>
+                </stateDataType>
+                <stateDataType name="enactor.coreUI.IteratorItem">
+                    <core:interfaceName>com.enactor.coreProcessing.document.IDocument</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="true" name="enactor.coreUI.Entity">
+                    <core:interfaceName>com.enactor.core.entities.IEntity</core:interfaceName>
+                </stateDataType>
+            </stateDataTypes>
+        </core:metaData>
+        <core:typeId>Loop</core:typeId>
+        <core:singleInstance>false</core:singleInstance>
+        <core:respondToViewEvents>false</core:respondToViewEvents>
+        <core:actionInputMappings>
+            <core:actionMapping>
+                <core:actionID>WriteIdleActivity</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="false" name="enactor.coreUI.ControlService">
+<core:interfaceName>com.enactor.core.services.IControlService</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.coreUI.ControlService">
+<core:interfaceName>com.enactor.core.services.IControlService</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.coreUI.LoggingLocale">
+<core:interfaceName>java.util.Locale</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType name="enactor.coreUI.MessageLocale">
+<core:interfaceName>java.util.Locale</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings/>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>ClearCurrentActivity</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="false" name="enactor.coreUI.ControlService">
+<core:interfaceName>com.enactor.core.services.IControlService</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.coreUI.ControlService">
+<core:interfaceName>com.enactor.core.services.IControlService</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.coreUI.LoggingLocale">
+<core:interfaceName>java.util.Locale</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType name="enactor.coreUI.MessageLocale">
+<core:interfaceName>java.util.Locale</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.coreUI.Message">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>ClearCurrentActivityError</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="false" name="enactor.coreUI.ControlService">
+<core:interfaceName>com.enactor.core.services.IControlService</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.coreUI.ControlService">
+<core:interfaceName>com.enactor.core.services.IControlService</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.coreUI.LoggingLocale">
+<core:interfaceName>java.util.Locale</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType name="enactor.coreUI.MessageLocale">
+<core:interfaceName>java.util.Locale</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:targetDataType name="enactor.coreUI.Message">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>ProcessCreditNoteTenders</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.coreUI.LoggingLocale">
+<core:interfaceName>java.util.Locale</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="false" name="enactor.coreUI.LoggingLocale">
+<core:interfaceName>java.util.Locale</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="false" name="enactor.mfc.Device">
+<core:interfaceName>com.enactor.mfc.device.IDevice</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="false" name="enactor.mfc.Device">
+<core:interfaceName>com.enactor.mfc.device.IDevice</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.Location">
+<core:interfaceName>com.enactor.mfc.location.ILocation</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.Location">
+<core:interfaceName>com.enactor.mfc.location.ILocation</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:sourceDataType name="enactor.coreUI.IteratorItem">
+<core:interfaceName>com.enactor.coreProcessing.document.IDocument</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType name="enactor.processing.DateReceived">
+<core:interfaceName>java.util.Date</core:interfaceName>
+                            </core:targetDataType>
+                            <core:expression>iteratorItem.dateReceived</core:expression>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType name="enactor.coreUI.IteratorItem">
+<core:interfaceName>com.enactor.coreProcessing.document.IDocument</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.coreUI.TransactionXML">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:targetDataType>
+                            <core:expression>iteratorItem.content</core:expression>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType name="enactor.coreUI.IteratorItem">
+<core:interfaceName>com.enactor.coreProcessing.document.IDocument</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.coreProcessing.Document">
+<core:interfaceName>com.enactor.coreProcessing.document.IDocument</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>WriteLastExtractedDateToActivityLog</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="false" name="enactor.mfc.Device">
+<core:interfaceName>com.enactor.mfc.device.IDevice</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType name="enactor.mfc.Device">
+<core:interfaceName>com.enactor.mfc.device.IDevice</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.coreUI.LoggingLocale">
+<core:interfaceName>java.util.Locale</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.coreUI.LoggingLocale">
+<core:interfaceName>java.util.Locale</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.Location">
+<core:interfaceName>com.enactor.mfc.location.ILocation</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.Location">
+<core:interfaceName>com.enactor.mfc.location.ILocation</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="false" name="enactor.coreUI.User">
+<core:interfaceName>com.enactor.core.signOn.ISignedOnUser</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType name="enactor.coreUI.User">
+<core:interfaceName>com.enactor.core.signOn.ISignedOnUser</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="false" name="enactor.coreProcessing.LastExtractedDate">
+<core:interfaceName>java.util.Date</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.maintenance.activityLog.EntryDate">
+<core:interfaceName>java.util.Date</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings/>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>AddToRecentlyProcessedDocs</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="false" name="enactor.coreProcessing.RecentlyProcessedDocuments">
+<core:interfaceName>java.util.List</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType name="enactor.coreUI.List">
+<core:interfaceName>java.util.List</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:sourceDataType name="enactor.coreUI.IteratorItem">
+<core:interfaceName>com.enactor.coreProcessing.document.IDocument</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.coreUI.Value">
+<core:interfaceName>java.lang.Object</core:interfaceName>
+                            </core:targetDataType>
+                            <core:expression>iteratorItem.sourceId</core:expression>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>EmptyRecentlyProcessedDocs</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="false" name="enactor.coreProcessing.RecentlyProcessedDocuments">
+<core:interfaceName>java.util.List</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.commonUI.Collection">
+<core:interfaceName>java.lang.Object</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings/>
+                </core:mappings>
+            </core:actionMapping>
+        </core:actionInputMappings>
+        <core:actionOutputMappings>
+            <core:actionMapping>
+                <core:actionID>AddToRecentlyProcessedDocs</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType name="enactor.coreUI.List">
+<core:interfaceName>java.util.List</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="false" name="enactor.coreProcessing.RecentlyProcessedDocuments">
+<core:interfaceName>java.util.List</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings/>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>EmptyRecentlyProcessedDocs</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType name="enactor.commonUI.Collection">
+<core:interfaceName>java.lang.Object</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="false" name="enactor.coreProcessing.RecentlyProcessedDocuments">
+<core:interfaceName>java.util.List</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings/>
+                </core:mappings>
+            </core:actionMapping>
+        </core:actionOutputMappings>
+        <core:eventLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>WriteLastExtractedDateToActivityLog</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>Completed</core:event>
+        </core:eventLink>
+        <core:eventLink>
+            <core:linkID>4</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>TestRecentlyProcessedNotEmpty2</core:toActionID>
+            <core:condition>empty(state.iteratorItem.content)</core:condition>
+            <core:event>Execute</core:event>
+        </core:eventLink>
+        <core:eventLink>
+            <core:linkID>5</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>WriteLastExtractedDateToActivityLog</core:toActionID>
+            <core:condition>process.extractionEndDate != null &amp;&amp; dates:compareDateTimes(state.iteratorItem.dateReceived,process.extractionEndDate) &gt; 0</core:condition>
+            <core:event>Execute</core:event>
+        </core:eventLink>
+        <core:eventLink>
+            <core:linkID>7</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>ProcessCreditNoteTenders</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>Execute</core:event>
+        </core:eventLink>
+        <core:eventLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>LogServiceException</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>Exception</core:event>
+        </core:eventLink>
+    </core:state>
+    <core:stateTransitions/>
+</core:process>

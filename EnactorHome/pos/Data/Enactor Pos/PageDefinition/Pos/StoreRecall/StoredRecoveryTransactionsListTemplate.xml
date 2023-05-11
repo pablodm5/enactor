@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<core:documentTemplate xmlns:core="http://www.enactor.com/core" xmlns:retail="http://www.enactor.com/retail" xmlns:ns4="http://www.enactor.com/crm" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803" xmlns:ns6="http://www.apis-it.hr/fin/2012/types/f73" xmlns:ns7="http://www.w3.org/2000/09/xmldsig#" xmlns:ns8="http://www.enactor.com/retail/storedRetailTransaction/service" xmlns:ns9="http://www.fu.gov.si/" xmlns:ns10="http://www.enactor.com/addressLookup/service" xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:ns14="http://www.enactor.com/crm/customerLoyalty/service" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" paginated="false" messageBase="Pos/StoreRecall/StoreRecallMessages" title="Delete Stored List" url="Pos/StoreRecall/StoredRecoveryTransactionsListTemplate">
+    <core:elements>
+        <core:tableTemplate id="RecallList">
+            <core:formatElement applicableClassName="com.enactor.core.database.list.IKeyedListElement" formatId="recoveryListItem"/>
+            <core:formatElement applicableEntityName="listHeader" formatId="listHeader"/>
+            <core:formatElement applicableEntityName="listFooter"/>
+        </core:tableTemplate>
+    </core:elements>
+    <core:variables>
+        <core:variable required="true" name="enactor.pos.UserNamesMap">
+            <core:interfaceName>java.util.Map</core:interfaceName>
+        </core:variable>
+    </core:variables>
+    <core:columnDefs>
+        <core:columnDef id="TRANSACTION_TYPE" start="1" end="21"/>
+        <core:columnDef id="TRANSACTION_ID" start="21" end="54"/>
+        <core:columnDef id="DATE_STORED" start="54" end="66"/>
+        <core:columnDef id="TRANSACTION_TOTAL" start="66" end="79" align="RIGHT"/>
+        <core:columnDef id="STORED_BY" start="80" end="97"/>
+    </core:columnDefs>
+    <core:formatEntry id="recoveryListItem">
+        <core:elements>
+            <core:row styleClass="recallListItem">
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0">
+                            <core:elements>
+<core:imageElement>
+    <core:flowConstraint height="8"/>
+</core:imageElement>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="TRANSACTION_TYPE" id="TRANSACTION_TYPE">
+                            <core:elements>
+<core:text messageId="RECOVERY_TRANSACTION_TYPE.#{item.data['transactionType']}"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="TRANSACTION_ID" id="TRANSACTION_ID">
+                            <core:elements>
+<core:text>
+    <core:text>#{item.data['storageId.storageRef']}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="DATE_STORED" id="DATE_STORED">
+                            <core:elements>
+<core:text>
+    <core:formatters>
+        <core:formatDate pattern="shortDate"/>
+    </core:formatters>
+    <core:text>#{item.data['storageDate.localDateTime']}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="TRANSACTION_TOTAL" id="TRANSACTION_TOTAL">
+                            <core:elements>
+<core:text visibility="#{item.data['transaction.basket.total'] != null}">
+    <core:formatters>
+        <core:formatCurrencyAmount currencyId="#{item.data['transactionCurrency.currencyId']}"/>
+    </core:formatters>
+    <core:text>#{item.data['transaction.basket.total']}</core:text>
+</core:text>
+<core:text visibility="#{item.data['transaction.basket.total'] == null}">
+    <core:text>-</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="STORED_BY" id="STORED_BY">
+                            <core:elements>
+<core:text>
+    <core:text>#{userNamesMap[item.data['storedBy.userId']]}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0">
+                            <core:elements>
+<core:imageElement>
+    <core:flowConstraint height="8"/>
+</core:imageElement>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="listHeader">
+        <core:elements>
+            <core:row styleClass="listHeader" style="BOLD">
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0">
+                            <core:elements>
+<core:imageElement>
+    <core:flowConstraint height="8"/>
+</core:imageElement>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="TRANSACTION_TYPE" id="TRANSACTION_TYPE">
+                            <core:elements>
+<core:text messageId="RECOVERY_TRANSACTION_TYPE"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="TRANSACTION_ID" id="TRANSACTION_ID">
+                            <core:elements>
+<core:text messageId="RECOVERY_TRANSACTION_ID"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="DATE_STORED" id="DATE_STORED">
+                            <core:elements>
+<core:text messageId="RECOVERY_DATE_STORED"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="TRANSACTION_TOTAL" id="TRANSACTION_TOTAL">
+                            <core:elements>
+<core:text messageId="RECOVERY_TRANSACTION_TOTAL"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="STORED_BY" id="STORED_BY">
+                            <core:elements>
+<core:text messageId="RECOVERY_STORED_BY"/>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+            <core:formatElement formatId="lineSeparator"/>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="lineSeparator">
+        <core:elements>
+            <core:row>
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0">
+                            <core:elements>
+<core:imageElement>
+    <core:flowConstraint height="3"/>
+</core:imageElement>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+            <core:row selectable="false" backgroundColour="LIGHT_GREY" style="SOLID_BACKGROUND">
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="TableSeparator">
+                            <core:elements>
+<core:imageElement originalFilename="Pos/seperator.png">
+    <core:flowConstraint height="2"/>
+</core:imageElement>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+</core:documentTemplate>

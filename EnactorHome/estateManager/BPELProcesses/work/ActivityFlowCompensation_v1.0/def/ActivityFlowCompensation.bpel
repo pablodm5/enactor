@@ -1,0 +1,645 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<b:process targetNamespace="http://www.enactor.com/core" name="ActivityFlowCompensation" xmlns:action="http://www.enactor.com/coreui/InvokeActionService" xmlns:b="http://docs.oasis-open.org/wsbpel/2.0/process/executable" xmlns:b4p="http://docs.oasis-open.org/ns/bpel4people/bpel4people/200803" xmlns:bpel11="http://schemas.xmlsoap.org/ws/2003/03/business-process/" xmlns:cb="http://www.enactor.com/core/bpel" xmlns:core="http://www.enactor.com/core" xmlns:coreui="http://www.enactor.com/coreui" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803" xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:mfc="http://www.enactor.com/mfc" xmlns:mjbp11="http://www.enactor.com/bpel/1_1/activity" xmlns:mjxpbp11="http://www.enactor.com/xpath/bpel/1_1" xmlns:ns15="http://maven.apache.org/POM/4.0.0" xmlns:ns17="tools" xmlns:ns2="http://java.basic/xsd" xmlns:plnk="http://schemas.xmlsoap.org/ws/2003/05/partner-link/" xmlns:process="http://www.enactor.com/coreui/InvokeProcessService" xmlns:retail="http://www.enactor.com/retail" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:task="http://www.enactor.com/task" xmlns:tools="http://www.enactor.com/tools" xmlns:wb="http://www.enactor.com/tools/bpel/wb/">
+    <wb:vmodel>
+        <wb:layoutMode>AUTO</wb:layoutMode>
+        <wb:visualThemeID>built-in-default-theme</wb:visualThemeID>
+        <wb:orientation>NONE</wb:orientation>
+    </wb:vmodel>
+    <core:notes>
+        <core:note id="0">
+            <wb:vinfo xywh="13,303,113,57"/>
+            <cb:content xml:lang="en-GB">Compensate Request</cb:content>
+        </core:note>
+        <core:note id="1">
+            <wb:vinfo xywh="2267,4,150,75"/>
+            <cb:content xml:lang="en-GB">Move this to the front since compensation can take a long while</cb:content>
+        </core:note>
+    </core:notes>
+    <b:partnerLinks>
+        <b:partnerLink initializePartnerRole="yes" myRole="ActivityFlowCompensationImpl" partnerLinkType="core:ActivityFlowCompensationPLT" name="client"/>
+        <b:partnerLink initializePartnerRole="yes" partnerRole="GenericActivityFlowImpl" partnerLinkType="core:GenericActivityFlowPLT" name="genericActivityFlow"/>
+        <b:partnerLink initializePartnerRole="yes" partnerRole="BusinessProcessUtilServiceImpl" partnerLinkType="core:BusinessProcessUtilServicePLT" name="businessProcessUtil"/>
+        <b:partnerLink initializePartnerRole="yes" partnerRole="TaskManagerServiceImpl" partnerLinkType="task:TaskManagerPLT" name="taskManager"/>
+        <b:partnerLink initializePartnerRole="yes" partnerRole="InvokeActionServiceImpl" partnerLinkType="action:InvokeActionServicePLT" name="invokeAction"/>
+        <b:partnerLink initializePartnerRole="yes" partnerRole="InvokeProcessServiceImpl" partnerLinkType="process:InvokeProcessServicePLT" name="invokeApplicationProcess"/>
+    </b:partnerLinks>
+    <b:variables>
+        <b:variable messageType="core:compensateRequestMessage" name="compensateRequest"/>
+        <b:variable type="xsd:string" name="bpInstanceId" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
+        <b:variable type="xsd:string" name="compensateToActivity" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
+        <b:variable element="core:businessProcessData" name="data"/>
+        <b:variable type="xsd:boolean" name="reRun" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
+        <b:variable type="xsd:boolean" name="purge" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
+        <b:variable element="core:bpInstance" name="bpInstance"/>
+        <b:variable element="ns2:list" name="bpActivityInstances"/>
+        <b:variable messageType="core:compensateResponseMessage" name="compensateResponse"/>
+        <b:variable messageType="core:compensateFaultMessage" name="compensateFault"/>
+        <b:variable type="xsd:int" name="currentIndex" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
+        <b:variable type="xsd:string" name="currentActivityId" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
+        <b:variable element="core:bpActivityInstanceKey" name="currentActivityInstanceKey"/>
+        <b:variable type="xsd:string" name="userId" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
+        <b:variable element="core:locale" name="userLocale"/>
+    </b:variables>
+    <b:pick createInstance="yes" suppressJoinFailure="no" name="Receive">
+        <b:onMessage variable="compensateRequest" operation="compensate" portType="core:ActivityFlowCompensationPT" partnerLink="client">
+            <wb:vinfo xywh="0,0,2269,869" notes="0"/>
+            <b:scope name="Compensate">
+                <b:variables>
+                    <b:variable messageType="action:invokeActionRequestMessage" name="actionInputMessage"/>
+                    <b:variable element="core:invokeAction" name="actionInputElement"/>
+                    <b:variable element="core:xmlApplicationProcessData" name="actionInputData"/>
+                    <b:variable messageType="action:invokeActionResponseMessage" name="actionOutputMessage"/>
+                    <b:variable element="core:invokeActionResponse" name="actionOutputElement"/>
+                    <b:variable element="core:xmlApplicationProcessData" name="actionOutputData"/>
+                    <b:variable messageType="process:invokeProcessRequestMessage" name="processInputMessage"/>
+                    <b:variable element="core:xmlApplicationProcessData" name="processInputData"/>
+                    <b:variable messageType="process:invokeProcessResponseMessage" name="processOutputMessage"/>
+                    <b:variable element="core:businessProcessData" name="reRunData"/>
+                </b:variables>
+                <b:sequence name="Compensate">
+                    <b:scope name="ValidateAndReply">
+                        <b:faultHandlers>
+                            <b:catch faultName="core:applicationProcessException">
+                                <b:sequence name="ErrorReply">
+                                    <b:assign name="CreateReply">
+                                        <b:copy>
+                                            <b:from>
+                                                <b:query>mjxpbp11:instantiateMessage('compensateResponse')</b:query>
+											</b:from>
+                                            <b:to variable="compensateResponse"/>
+                                        </b:copy>
+                                        <b:copy>
+                                            <b:from>
+                                                <b:literal>Invalid Business Process instance ID</b:literal>
+											</b:from>
+                                            <b:to part="parameters" variable="compensateResponse">
+                                                <b:query>core:message</b:query>
+											</b:to>
+                                        </b:copy>
+                                    </b:assign>
+                                    <b:reply variable="compensateResponse" operation="compensate" portType="core:ActivityFlowCompensationPT" partnerLink="client" name="Reply"/>
+                                    <b:exit/>
+                                </b:sequence>
+                            </b:catch>
+                        </b:faultHandlers>
+                        <b:sequence name="ValidateAndReply">
+                            <b:assign name="ExtractInputs">
+                                <b:copy>
+                                    <b:from part="parameters" variable="compensateRequest">
+                                        <b:query>core:bpInstanceId</b:query>
+									</b:from>
+                                    <b:to variable="bpInstanceId"/>
+                                </b:copy>
+                                <b:copy ignoreMissingFromData="yes">
+                                    <b:from part="parameters" variable="compensateRequest">
+                                        <b:query>core:compensateToActivity</b:query>
+									</b:from>
+                                    <b:to variable="compensateToActivity"/>
+                                </b:copy>
+                                <b:copy>
+                                    <b:from part="parameters" variable="compensateRequest">
+                                        <b:query>core:reRun</b:query>
+									</b:from>
+                                    <b:to variable="reRun"/>
+                                </b:copy>
+                                <b:copy>
+                                    <b:from part="parameters" variable="compensateRequest">
+                                        <b:query>core:purge</b:query>
+                                    </b:from>
+                                    <b:to variable="purge"/>
+                                </b:copy>
+                                <b:copy>
+                                    <b:from part="parameters" variable="compensateRequest">
+                                        <b:query>core:userId</b:query>
+                                    </b:from>
+                                    <b:to variable="userId"/>
+                                </b:copy>
+                                <b:copy ignoreMissingFromData="yes">
+                                    <b:from part="parameters" variable="compensateRequest">
+                                        <b:query>core:userLocale</b:query>
+                                    </b:from>
+                                    <b:to variable="userLocale"/>
+                                </b:copy>
+                            </b:assign>
+                            <b:sequence name="CallValidateAndLoadDataProcess">
+                                <wb:vinfo xywh="160,0,228,588" orientation="VERTICAL"/>
+                                <b:assign name="CreateInput">
+                                    <b:copy>
+                                        <b:from>
+                                            <b:literal>&lt;execute xmlns="http://www.enactor.com/coreui/InvokeProcessService"&gt;&lt;core:invokeProcessServiceMessage xmlns:core="http://www.enactor.com/core"/&gt;&lt;/execute&gt;</b:literal>
+                                        </b:from>
+                                        <b:to part="parameters" variable="processInputMessage"/>
+                                    </b:copy>
+                                    <b:copy>
+                                        <b:from>
+                                            <b:literal>&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;
+&lt;core:xmlApplicationProcessData xmlns:b4p="http://docs.oasis-open.org/ns/bpel4people/bpel4people/200803" xmlns:bpel11="http://schemas.xmlsoap.org/ws/2003/03/business-process/" xmlns:bpel20="http://docs.oasis-open.org/wsbpel/2.0/process/executable" xmlns:cb="http://www.enactor.com/core/bpel" xmlns:core="http://www.enactor.com/core" xmlns:coreui="http://www.enactor.com/coreui" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803" xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:ns14="tools" xmlns:ns15="http://maven.apache.org/POM/4.0.0" xmlns:ns16="http://www.enactor.com/tools/bpel/wb/" xmlns:ns7="http://www.enactor.com/bpel/1_1/activity" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:task="http://www.enactor.com/task" xmlns:tools="http://www.enactor.com/tools"&gt;
+    &lt;core:dataItem&gt;
+        &lt;core:data xsi:type="core:WrappedNull" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/&gt;
+        &lt;core:type required="true" name="enactor.core.BPInstanceId"&gt;
+            &lt;core:interfaceName&gt;java.lang.String&lt;/core:interfaceName&gt;
+        &lt;/core:type&gt;
+    &lt;/core:dataItem&gt;
+&lt;/core:xmlApplicationProcessData&gt;
+</b:literal>
+                                        </b:from>
+                                        <b:to part="parameters" variable="processInputMessage">
+                                            <b:query>core:invokeProcessServiceMessage/core:inputData</b:query>
+                                        </b:to>
+                                    </b:copy>
+                                    <b:copy>
+                                        <b:from>
+                                            <b:literal>BusinessProcess/ActivityFlow/ValidateAndLoadBPInstanceData</b:literal>
+                                        </b:from>
+                                        <b:to part="parameters" variable="processInputMessage">
+                                            <b:query>core:invokeProcessServiceMessage/core:processId</b:query>
+                                        </b:to>
+                                    </b:copy>
+                                    <b:copy>
+                                        <b:from variable="bpInstanceId"/>
+                                        <b:to part="parameters" variable="processInputMessage">
+                                            <b:query>core:invokeProcessServiceMessage/core:inputData/enactor.core.BPInstanceId</b:query>
+                                        </b:to>
+                                    </b:copy>
+                                </b:assign>
+                                <b:invoke operation="execute" portType="process:InvokeProcessServicePT" partnerLink="invokeApplicationProcess" outputVariable="processOutputMessage" inputVariable="processInputMessage" name="CallValidateAndLoadProcess"/>
+                                <b:if name="ExtractDataAndReply">
+                                    <b:condition>$processOutputMessage.parameters/core:invokeProcessServiceResponse/core:outcome/core:name = 'Success'</b:condition>
+                                    <b:sequence>
+                                        <b:assign name="ExtractOutput">
+                                            <b:copy>
+                                                <b:from part="parameters" variable="processOutputMessage">
+                                                    <b:query>core:invokeProcessServiceResponse/core:outputData/enactor.core.BPInstance</b:query>
+                                        </b:from>
+                                                <b:to variable="bpInstance"/>
+                                            </b:copy>
+                                            <b:copy ignoreMissingFromData="yes">
+                                                <b:from part="parameters" variable="processOutputMessage">
+                                                    <b:query>core:invokeProcessServiceResponse/core:outputData/enactor.core.BPActivityInstances</b:query>
+                                        </b:from>
+                                                <b:to variable="bpActivityInstances"/>
+                                            </b:copy>
+                                            <b:copy ignoreMissingFromData="yes">
+                                                <b:from part="parameters" variable="processOutputMessage">
+                                                    <b:query>string(count(core:invokeProcessServiceResponse/core:outputData/enactor.core.BPActivityInstances)-1)</b:query>
+                                        </b:from>
+                                                <b:to variable="currentIndex"/>
+                                            </b:copy>
+                                        </b:assign>
+                                    </b:sequence>
+                                    <b:else>
+                                        <wb:vinfo xywh="10,177,150,50" minimized="true"/>
+                                        <b:sequence name="ErrorReply">
+                                            <wb:vinfo xywh="0,0,170,353" orientation="VERTICAL"/>
+                                            <b:assign name="CreateReply">
+                                                <b:copy>
+                                                    <b:from>
+                                                        <b:query>mjxpbp11:instantiateMessage('compensateResponse')</b:query>
+											</b:from>
+                                                    <b:to variable="compensateResponse"/>
+                                                </b:copy>
+                                                <b:copy ignoreMissingFromData="yes">
+                                                    <b:from part="parameters" variable="processOutputMessage">
+                                                        <b:query>core:invokeProcessServiceResponse/core:outputData/enactor.coreUI.ErrorMessage</b:query>
+											</b:from>
+                                                    <b:to part="parameters" variable="compensateResponse">
+                                                        <b:query>core:message</b:query>
+											</b:to>
+                                                </b:copy>
+                                            </b:assign>
+                                            <b:reply variable="compensateResponse" operation="compensate" portType="core:ActivityFlowCompensationPT" partnerLink="client" name="Reply"/>
+                                            <b:exit/>
+                                        </b:sequence>
+                                    </b:else>
+                                </b:if>
+                            </b:sequence>
+                        </b:sequence>
+                    </b:scope>
+                    <b:scope name="CompensateInReverseOrder">
+                        <b:variables/>
+                        <b:sequence>
+                            <b:if name="IfOneOrMoreActivityInstances">
+                                <b:condition>$currentIndex&gt;=0</b:condition>
+                                <b:repeatUntil name="CompensateInReverseOrder">
+                                    <b:sequence name="Compensation">
+                                        <wb:vinfo xywh="0,0,216,659" orientation="VERTICAL"/>
+                                        <b:assign name="ExtractCurrentActivity">
+                                            <b:copy>
+                                                <b:from>
+                                                    <b:query>mjxpbp11:elementAt($bpActivityInstances, $currentIndex)/core:data/core:activityId</b:query>
+                                            </b:from>
+                                                <b:to variable="currentActivityId"/>
+                                            </b:copy>
+                                            <b:copy>
+                                                <b:from>
+                                                    <b:query>mjxpbp11:elementAt($bpActivityInstances, $currentIndex)/core:key</b:query>
+                                            </b:from>
+                                                <b:to variable="currentActivityInstanceKey"/>
+                                            </b:copy>
+                                        </b:assign>
+                                        <b:if name="If STARTED/COMPLETED">
+                                            <b:condition>mjxpbp11:elementAt($bpActivityInstances, $currentIndex)/core:data/status = 'STARTED' or mjxpbp11:elementAt($bpActivityInstances, $currentIndex)/core:data/status = 'COMPLETED' or mjxpbp11:elementAt($bpActivityInstances, $currentIndex)/core:data/status = 'END_ERROR'</b:condition>
+                                            <b:sequence name="CallCompensateActivity">
+                                                <wb:vinfo xywh="0,0,176,363" orientation="VERTICAL"/>
+                                                <b:assign name="CreateInput">
+                                                    <b:copy>
+                                                        <b:from>
+                                                            <b:literal>&lt;execute xmlns="http://www.enactor.com/coreui/InvokeProcessService"&gt;&lt;core:invokeProcessServiceMessage xmlns:core="http://www.enactor.com/core"/&gt;&lt;/execute&gt;</b:literal>
+                                            </b:from>
+                                                        <b:to part="parameters" variable="processInputMessage"/>
+                                                    </b:copy>
+                                                    <b:copy>
+                                                        <b:from>
+                                                            <b:literal>&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;
+&lt;core:xmlApplicationProcessData xmlns:b4p="http://docs.oasis-open.org/ns/bpel4people/bpel4people/200803" xmlns:bpel11="http://schemas.xmlsoap.org/ws/2003/03/business-process/" xmlns:bpel20="http://docs.oasis-open.org/wsbpel/2.0/process/executable" xmlns:cb="http://www.enactor.com/core/bpel" xmlns:core="http://www.enactor.com/core" xmlns:coreui="http://www.enactor.com/coreui" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803" xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:ns14="tools" xmlns:ns15="http://maven.apache.org/POM/4.0.0" xmlns:ns16="http://www.enactor.com/tools/bpel/wb/" xmlns:ns7="http://www.enactor.com/bpel/1_1/activity" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:task="http://www.enactor.com/task" xmlns:tools="http://www.enactor.com/tools"&gt;
+    &lt;core:dataItem&gt;
+        &lt;core:data xsi:type="core:WrappedNull" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/&gt;
+        &lt;core:type required="true" name="enactor.core.BPInstance"&gt;
+            &lt;core:interfaceName&gt;com.enactor.core.business.process.IBPInstance&lt;/core:interfaceName&gt;
+        &lt;/core:type&gt;
+    &lt;/core:dataItem&gt;
+    &lt;core:dataItem&gt;
+        &lt;core:data xsi:type="core:WrappedNull" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/&gt;
+        &lt;core:type required="true" name="enactor.core.BPActivityInstanceKey"&gt;
+            &lt;core:interfaceName&gt;com.enactor.core.business.process.IBPActivityInstanceKey&lt;/core:interfaceName&gt;
+        &lt;/core:type&gt;
+    &lt;/core:dataItem&gt;
+    &lt;core:dataItem&gt;
+        &lt;core:data xsi:type="core:WrappedNull" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/&gt;
+        &lt;core:type required="true" name="enactor.signOn.UserId"&gt;
+            &lt;core:interfaceName&gt;java.lang.String&lt;/core:interfaceName&gt;
+        &lt;/core:type&gt;
+    &lt;/core:dataItem&gt;
+    &lt;core:dataItem&gt;
+        &lt;core:data xsi:type="core:WrappedNull" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/&gt;
+        &lt;core:type required="true" name="enactor.coreUI.UserLocale"&gt;
+            &lt;core:interfaceName&gt;com.enactor.core.localisation.ILocale&lt;/core:interfaceName&gt;
+        &lt;/core:type&gt;
+    &lt;/core:dataItem&gt;
+&lt;/core:xmlApplicationProcessData&gt;
+</b:literal>
+                                            </b:from>
+                                                        <b:to part="parameters" variable="processInputMessage">
+                                                            <b:query>core:invokeProcessServiceMessage/core:inputData</b:query>
+                                            </b:to>
+                                                    </b:copy>
+                                                    <b:copy>
+                                                        <b:from>
+                                                            <b:literal>BusinessProcess/ActivityFlow/CompensateActivity</b:literal>
+                                            </b:from>
+                                                        <b:to part="parameters" variable="processInputMessage">
+                                                            <b:query>core:invokeProcessServiceMessage/core:processId</b:query>
+                                            </b:to>
+                                                    </b:copy>
+                                                    <b:copy>
+                                                        <b:from variable="currentActivityInstanceKey"/>
+                                                        <b:to part="parameters" variable="processInputMessage">
+                                                            <b:query>core:invokeProcessServiceMessage/core:inputData/enactor.core.BPActivityInstanceKey</b:query>
+                                            </b:to>
+                                                    </b:copy>
+                                                    <b:copy>
+                                                        <b:from variable="bpInstance"/>
+                                                        <b:to part="parameters" variable="processInputMessage">
+                                                            <b:query>core:invokeProcessServiceMessage/core:inputData/enactor.core.BPInstance</b:query>
+                                            </b:to>
+                                                    </b:copy>
+                                                    <b:copy>
+                                                        <b:from variable="userId"/>
+                                                        <b:to part="parameters" variable="processInputMessage">
+                                                            <b:query>core:invokeProcessServiceMessage/core:inputData/enactor.signOn.UserId</b:query>
+                                            </b:to>
+                                                    </b:copy>
+                                                    <b:copy ignoreMissingFromData="yes">
+                                                        <b:from variable="userLocale"/>
+                                                        <b:to part="parameters" variable="processInputMessage">
+                                                            <b:query>core:invokeProcessServiceMessage/core:inputData/enactor.coreUI.UserLocale</b:query>
+                                            </b:to>
+                                                    </b:copy>
+                                                </b:assign>
+                                                <b:invoke operation="execute" portType="process:InvokeProcessServicePT" partnerLink="invokeApplicationProcess" outputVariable="processOutputMessage" inputVariable="processInputMessage" name="CallCompensateActivity"/>
+                                            </b:sequence>
+                                        </b:if>
+                                        <b:assign name="IncrementIndex">
+                                            <b:copy>
+                                                <b:from>
+                                                    <b:query>string($currentIndex - 1)</b:query>
+                                            		</b:from>
+                                                <b:to variable="currentIndex"/>
+                                            </b:copy>
+                                        </b:assign>
+                                    </b:sequence>
+                                    <b:condition>$currentIndex &lt; 0 or (not(mjxpbp11:empty($compensateToActivity)) and $currentActivityInstanceKey/core:activityInstanceId = $compensateToActivity)</b:condition>
+                                </b:repeatUntil>
+                            </b:if>
+                        </b:sequence>
+                    </b:scope>
+                    <b:scope name="BPStatus=COMPENSATED">
+                        <b:sequence name="BPStatus=COMPENSATED">
+                            <wb:vinfo xywh="0,0,185,196" orientation="VERTICAL"/>
+                            <b:assign name="BPStatus=COMPENSATED">
+                                <b:copy>
+                                    <b:from>
+                                        <b:literal>
+                                            <core:bpInstanceStatus>COMPENSATED</core:bpInstanceStatus>
+                                        </b:literal>
+                                    </b:from>
+                                    <b:to variable="bpInstance">
+                                        <b:query>core:status</b:query>
+                                    </b:to>
+                                </b:copy>
+                            </b:assign>
+                            <b:sequence name="SaveBPInstance">
+                                <wb:vinfo xywh="0,106,150,50" orientation="VERTICAL" minimized="true"/>
+                                <b:assign name="CreateInput">
+                                    <b:copy>
+                                        <b:from>
+                                            <b:literal>
+                                                <core:invokeAction>
+                                                    <core:inputData/>
+                                                </core:invokeAction>
+                                            </b:literal>
+                                        </b:from>
+                                        <b:to part="parameters" variable="actionInputMessage"/>
+                                    </b:copy>
+                                    <b:copy>
+                                        <b:from>
+                                            <b:literal>&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;
+&lt;core:xmlApplicationProcessData xmlns:b4p="http://docs.oasis-open.org/ns/bpel4people/bpel4people/200803" xmlns:bpel11="http://schemas.xmlsoap.org/ws/2003/03/business-process/" xmlns:bpel20="http://docs.oasis-open.org/wsbpel/2.0/process/executable" xmlns:cb="http://www.enactor.com/core/bpel" xmlns:core="http://www.enactor.com/core" xmlns:coreui="http://www.enactor.com/coreui" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803" xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:ns14="tools" xmlns:ns15="http://maven.apache.org/POM/4.0.0" xmlns:ns16="http://www.enactor.com/tools/bpel/wb/" xmlns:ns7="http://www.enactor.com/bpel/1_1/activity" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:task="http://www.enactor.com/task" xmlns:tools="http://www.enactor.com/tools"&gt;
+    &lt;core:dataItem&gt;
+        &lt;core:data xsi:type="core:WrappedNull" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/&gt;
+        &lt;core:type name="enactor.coreUI.Entity"&gt;
+            &lt;core:interfaceName&gt;com.enactor.core.entities.IEntity&lt;/core:interfaceName&gt;
+        &lt;/core:type&gt;
+    &lt;/core:dataItem&gt;
+    &lt;core:dataItem&gt;
+        &lt;core:data xsi:type="core:WrappedNull" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/&gt;
+        &lt;core:type name="enactor.coreUI.EndpointReference"&gt;
+            &lt;core:interfaceName&gt;com.enactor.core.webService.epr.IServiceEndpointReference&lt;/core:interfaceName&gt;
+        &lt;/core:type&gt;
+    &lt;/core:dataItem&gt;
+&lt;/core:xmlApplicationProcessData&gt;
+</b:literal>
+                                        </b:from>
+                                        <b:to part="parameters" variable="actionInputMessage">
+                                            <b:query>core:inputData</b:query>
+                                        </b:to>
+                                    </b:copy>
+                                    <b:copy>
+                                        <b:from>
+                                            <b:literal>com.enactor.commonUI.entities.processes.SaveEntityAction</b:literal>
+                                        </b:from>
+                                        <b:to part="parameters" variable="actionInputMessage">
+                                            <b:query>core:actionClassName</b:query>
+                                        </b:to>
+                                    </b:copy>
+                                    <b:copy>
+                                        <b:from variable="bpInstance"/>
+                                        <b:to part="parameters" variable="actionInputMessage">
+                                            <b:query>core:inputData/enactor.coreUI.Entity</b:query>
+                                        </b:to>
+                                    </b:copy>
+                                </b:assign>
+                                <b:invoke operation="invokeAction" portType="action:InvokeActionServicePT" partnerLink="invokeAction" outputVariable="actionOutputMessage" inputVariable="actionInputMessage" name="CallSaveEntityAction"/>
+                            </b:sequence>
+                        </b:sequence>
+                    </b:scope>
+                    <b:if name="Get ReRun Data">
+                        <b:condition>$reRun = 'true'</b:condition>
+                        <b:scope name="Get ReRun Data">
+                            <b:sequence name="Get ReRun Data">
+                                <b:sequence name="Get ReRun Data">
+                                    <wb:vinfo xywh="0,0,190,484" orientation="VERTICAL"/>
+                                    <b:assign name="CreateInput">
+                                        <b:copy>
+                                            <b:from>
+                                                <b:literal>&lt;execute xmlns="http://www.enactor.com/coreui/InvokeProcessService"&gt;&lt;core:invokeProcessServiceMessage xmlns:core="http://www.enactor.com/core"/&gt;&lt;/execute&gt;</b:literal>
+                                            </b:from>
+                                            <b:to part="parameters" variable="processInputMessage"/>
+                                        </b:copy>
+                                        <b:copy>
+                                            <b:from>
+                                                <b:literal>&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;
+&lt;core:xmlApplicationProcessData xmlns:b4p="http://docs.oasis-open.org/ns/bpel4people/bpel4people/200803" xmlns:bpel11="http://schemas.xmlsoap.org/ws/2003/03/business-process/" xmlns:bpel20="http://docs.oasis-open.org/wsbpel/2.0/process/executable" xmlns:cb="http://www.enactor.com/core/bpel" xmlns:core="http://www.enactor.com/core" xmlns:coreui="http://www.enactor.com/coreui" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803" xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:ns12="http://www.enactor.com/bpel/1_1/activity" xmlns:ns16="tools" xmlns:ns8="http://maven.apache.org/POM/4.0.0" xmlns:ns9="http://www.enactor.com/tools/bpel/wb/" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:task="http://www.enactor.com/task" xmlns:tools="http://www.enactor.com/tools"&gt;
+    &lt;core:dataItem&gt;
+        &lt;core:data xsi:type="core:WrappedNull" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/&gt;
+        &lt;core:type required="true" name="enactor.core.BPActivityInstanceId"&gt;
+            &lt;core:interfaceName&gt;java.lang.String&lt;/core:interfaceName&gt;
+        &lt;/core:type&gt;
+    &lt;/core:dataItem&gt;
+    &lt;core:dataItem&gt;
+        &lt;core:data xsi:type="core:WrappedNull" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/&gt;
+        &lt;core:type required="true" name="enactor.core.BPInstanceId"&gt;
+            &lt;core:interfaceName&gt;java.lang.String&lt;/core:interfaceName&gt;
+        &lt;/core:type&gt;
+    &lt;/core:dataItem&gt;
+&lt;/core:xmlApplicationProcessData&gt;
+</b:literal>
+                                            </b:from>
+                                            <b:to part="parameters" variable="processInputMessage">
+                                                <b:query>core:invokeProcessServiceMessage/core:inputData</b:query>
+                                            </b:to>
+                                        </b:copy>
+                                        <b:copy>
+                                            <b:from>
+                                                <b:literal>BusinessProcess/ActivityFlow/LoadReRunData</b:literal>
+                                            </b:from>
+                                            <b:to part="parameters" variable="processInputMessage">
+                                                <b:query>core:invokeProcessServiceMessage/core:processId</b:query>
+                                            </b:to>
+                                        </b:copy>
+                                        <b:copy>
+                                            <b:from variable="bpInstanceId"/>
+                                            <b:to part="parameters" variable="processInputMessage">
+                                                <b:query>core:invokeProcessServiceMessage/core:inputData/enactor.core.BPInstanceId</b:query>
+                                            </b:to>
+                                        </b:copy>
+                                        <b:copy ignoreMissingFromData="yes">
+                                            <b:from variable="compensateToActivity"/>
+                                            <b:to part="parameters" variable="processInputMessage">
+                                                <b:query>core:invokeProcessServiceMessage/core:inputData/enactor.core.BPActivityInstanceId</b:query>
+                                            </b:to>
+                                        </b:copy>
+                                    </b:assign>
+                                    <b:invoke operation="execute" portType="process:InvokeProcessServicePT" partnerLink="invokeApplicationProcess" outputVariable="processOutputMessage" inputVariable="processInputMessage" name="CallLoadReRunData"/>
+                                    <b:if>
+                                        <b:condition>$processOutputMessage.parameters/core:invokeProcessServiceResponse/core:outcome/core:name = 'Success'</b:condition>
+                                        <b:assign name="ExtractOutput">
+                                            <b:copy>
+                                                <b:from part="parameters" variable="processOutputMessage">
+                                                    <b:query>core:invokeProcessServiceResponse/core:outputData/enactor.core.business.process.BusinessProcessData</b:query>
+                                                </b:from>
+                                                <b:to variable="reRunData"/>
+                                            </b:copy>
+                                        </b:assign>
+                                    </b:if>
+                                </b:sequence>
+                            </b:sequence>
+                        </b:scope>
+                    </b:if>
+                    <b:if name="Purge">
+                        <b:condition>$purge = 'true' and mjxpbp11:empty($compensateToActivity)</b:condition>
+                        <b:scope name="Purge">
+                            <b:sequence name="Purge">
+                                <b:sequence name="PurgeBusinessProcessAction">
+                                    <b:assign name="CreateInput">
+                                        <b:copy>
+                                            <b:from>
+                                                <b:literal>&lt;core:invokeAction xmlns:core="http://www.enactor.com/core"/&gt;</b:literal>
+                                            </b:from>
+                                            <b:to part="parameters" variable="actionInputMessage"/>
+                                        </b:copy>
+                                        <b:copy>
+                                            <b:from>
+                                                <b:literal>&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;
+&lt;core:xmlApplicationProcessData xmlns:b4p="http://docs.oasis-open.org/ns/bpel4people/bpel4people/200803" xmlns:bpel11="http://schemas.xmlsoap.org/ws/2003/03/business-process/" xmlns:bpel20="http://docs.oasis-open.org/wsbpel/2.0/process/executable" xmlns:cb="http://www.enactor.com/core/bpel" xmlns:core="http://www.enactor.com/core" xmlns:coreui="http://www.enactor.com/coreui" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803" xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:ns12="http://www.enactor.com/bpel/1_1/activity" xmlns:ns16="tools" xmlns:ns8="http://maven.apache.org/POM/4.0.0" xmlns:ns9="http://www.enactor.com/tools/bpel/wb/" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:task="http://www.enactor.com/task" xmlns:tools="http://www.enactor.com/tools"&gt;
+    &lt;core:dataItem&gt;
+        &lt;core:data xsi:type="core:WrappedNull" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/&gt;
+        &lt;core:type required="true" name="enactor.core.bp.BusinessProcessInstanceId"&gt;
+            &lt;core:interfaceName&gt;java.lang.String&lt;/core:interfaceName&gt;
+        &lt;/core:type&gt;
+    &lt;/core:dataItem&gt;
+    &lt;core:dataItem&gt;
+        &lt;core:data xsi:type="core:WrappedNull" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/&gt;
+        &lt;core:type required="true" name="enactor.core.bp.BusinessProcessId"&gt;
+            &lt;core:interfaceName&gt;java.lang.String&lt;/core:interfaceName&gt;
+        &lt;/core:type&gt;
+    &lt;/core:dataItem&gt;
+&lt;/core:xmlApplicationProcessData&gt;
+</b:literal>
+                                            </b:from>
+                                            <b:to part="parameters" variable="actionInputMessage">
+                                                <b:query>core:inputData</b:query>
+                                            </b:to>
+                                        </b:copy>
+                                        <b:copy>
+                                            <b:from>
+                                                <b:literal>com.enactor.bpel.rt.business.process.PurgeBusinessProcessAction</b:literal>
+                                            </b:from>
+                                            <b:to part="parameters" variable="actionInputMessage">
+                                                <b:query>core:actionClassName</b:query>
+                                            </b:to>
+                                        </b:copy>
+                                        <b:copy>
+                                            <b:from variable="bpInstance">
+                                                <b:query>core:businessProcessId</b:query>
+                                            </b:from>
+                                            <b:to part="parameters" variable="actionInputMessage">
+                                                <b:query>core:inputData/enactor.core.bp.BusinessProcessID</b:query>
+                                            </b:to>
+                                        </b:copy>
+                                        <b:copy>
+                                            <b:from variable="bpInstanceId"/>
+                                            <b:to part="parameters" variable="actionInputMessage">
+                                                <b:query>core:inputData/enactor.core.bp.BusinessProcessInstanceID</b:query>
+                                            </b:to>
+                                        </b:copy>
+                                    </b:assign>
+                                    <b:invoke operation="invokeAction" portType="action:InvokeActionServicePT" partnerLink="invokeAction" outputVariable="actionOutputMessage" inputVariable="actionInputMessage" name="CallPurgeAction"/>
+                                </b:sequence>
+                            </b:sequence>
+                        </b:scope>
+                    </b:if>
+                    <b:if name="ReRun">
+                        <b:condition>$reRun = 'true' and not(mjxpbp11:empty($reRunData))</b:condition>
+                        <b:scope name="ReRun">
+                            <b:sequence name="ReRun">
+                                <b:sequence name="">
+                                    <wb:vinfo xywh="0,0,170,442" orientation="VERTICAL"/>
+                                    <b:assign name="CreateInput">
+                                        <b:copy>
+                                            <b:from>
+                                                <b:literal>&lt;execute xmlns="http://www.enactor.com/coreui/InvokeProcessService"&gt;&lt;core:invokeProcessServiceMessage xmlns:core="http://www.enactor.com/core"/&gt;&lt;/execute&gt;</b:literal>
+                                            </b:from>
+                                            <b:to part="parameters" variable="processInputMessage"/>
+                                        </b:copy>
+                                        <b:copy>
+                                            <b:from>
+                                                <b:literal>&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;
+&lt;core:xmlApplicationProcessData xmlns:b4p="http://docs.oasis-open.org/ns/bpel4people/bpel4people/200803" xmlns:bpel11="http://schemas.xmlsoap.org/ws/2003/03/business-process/" xmlns:bpel20="http://docs.oasis-open.org/wsbpel/2.0/process/executable" xmlns:cb="http://www.enactor.com/core/bpel" xmlns:core="http://www.enactor.com/core" xmlns:coreui="http://www.enactor.com/coreui" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803" xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:ns12="http://www.enactor.com/bpel/1_1/activity" xmlns:ns16="tools" xmlns:ns8="http://maven.apache.org/POM/4.0.0" xmlns:ns9="http://www.enactor.com/tools/bpel/wb/" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:task="http://www.enactor.com/task" xmlns:tools="http://www.enactor.com/tools"&gt;
+    &lt;core:dataItem&gt;
+        &lt;core:data xsi:type="core:WrappedNull" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/&gt;
+        &lt;core:type required="true" name="enactor.core.business.process.BusinessProcessData"&gt;
+            &lt;core:interfaceName&gt;com.enactor.core.business.process.IBusinessProcessData&lt;/core:interfaceName&gt;
+        &lt;/core:type&gt;
+    &lt;/core:dataItem&gt;
+    &lt;core:dataItem&gt;
+        &lt;core:data xsi:type="core:WrappedNull" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/&gt;
+        &lt;core:type required="true" name="enactor.core.BPActivityInstanceId"&gt;
+            &lt;core:interfaceName&gt;java.lang.String&lt;/core:interfaceName&gt;
+        &lt;/core:type&gt;
+    &lt;/core:dataItem&gt;
+    &lt;core:dataItem&gt;
+        &lt;core:data xsi:type="core:WrappedNull" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/&gt;
+        &lt;core:type required="true" name="enactor.core.BPInstanceId"&gt;
+            &lt;core:interfaceName&gt;java.lang.String&lt;/core:interfaceName&gt;
+        &lt;/core:type&gt;
+    &lt;/core:dataItem&gt;
+&lt;/core:xmlApplicationProcessData&gt;
+</b:literal>
+                                            </b:from>
+                                            <b:to part="parameters" variable="processInputMessage">
+                                                <b:query>core:invokeProcessServiceMessage/core:inputData</b:query>
+                                            </b:to>
+                                        </b:copy>
+                                        <b:copy>
+                                            <b:from>
+                                                <b:literal>BusinessProcess/ActivityFlow/ReRunBusinessProcess</b:literal>
+                                            </b:from>
+                                            <b:to part="parameters" variable="processInputMessage">
+                                                <b:query>core:invokeProcessServiceMessage/core:processId</b:query>
+                                            </b:to>
+                                        </b:copy>
+                                        <b:copy>
+                                            <b:from variable="bpInstance">
+                                                <b:query>core:businessProcessId</b:query>
+                                            </b:from>
+                                            <b:to part="parameters" variable="processInputMessage">
+                                                <b:query>core:invokeProcessServiceMessage/core:inputData/enactor.core.bp.BusinessProcessID</b:query>
+                                            </b:to>
+                                        </b:copy>
+                                        <b:copy ignoreMissingFromData="yes">
+                                            <b:from variable="currentActivityId"/>
+                                            <b:to part="parameters" variable="processInputMessage">
+                                                <b:query>core:invokeProcessServiceMessage/core:inputData/enactor.core.bp.BusinessProcessActivityID</b:query>
+                                            </b:to>
+                                        </b:copy>
+                                        <b:copy>
+                                            <b:from variable="reRunData"/>
+                                            <b:to part="parameters" variable="processInputMessage">
+                                                <b:query>core:invokeProcessServiceMessage/core:inputData/enactor.core.business.process.BusinessProcessData</b:query>
+                                            </b:to>
+                                        </b:copy>
+                                    </b:assign>
+                                    <b:invoke operation="execute" portType="process:InvokeProcessServicePT" partnerLink="invokeApplicationProcess" outputVariable="processOutputMessage" inputVariable="processInputMessage" name="CallReRunProcess"/>
+                                    <b:assign name="ExtractOutput"/>
+                                </b:sequence>
+                            </b:sequence>
+                        </b:scope>
+                    </b:if>
+                    <b:sequence>
+                        <b:sequence name="ValidateAndReply">
+                            <wb:vinfo xywh="0,0,330,139" notes="1"/>
+                            <b:assign name="CreateReply">
+                                <b:copy>
+                                    <b:from>
+                                        <b:query>mjxpbp11:instantiateMessage('compensateResponse')</b:query>
+									</b:from>
+                                    <b:to variable="compensateResponse"/>
+                                </b:copy>
+                                <b:copy>
+                                    <b:from>
+                                        <b:literal>Compensation started successfully</b:literal>
+									</b:from>
+                                    <b:to part="parameters" variable="compensateResponse">
+                                        <b:query>core:message</b:query>
+									</b:to>
+                                </b:copy>
+                            </b:assign>
+                            <b:reply variable="compensateResponse" operation="compensate" portType="core:ActivityFlowCompensationPT" partnerLink="client" name="Reply"/>
+                        </b:sequence>
+                    </b:sequence>
+                </b:sequence>
+            </b:scope>
+        </b:onMessage>
+    </b:pick>
+</b:process>

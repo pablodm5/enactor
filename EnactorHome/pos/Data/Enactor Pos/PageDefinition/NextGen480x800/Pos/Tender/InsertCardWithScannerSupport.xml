@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<retail:posPromptPage xmlns:core="http://www.enactor.com/core" xmlns:retail="http://www.enactor.com/retail" xmlns:ns4="http://www.enactor.com/crm" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803" xmlns:ns6="http://www.apis-it.hr/fin/2012/types/f73" xmlns:ns7="http://www.w3.org/2000/09/xmldsig#" xmlns:ns8="http://www.enactor.com/retail/storedRetailTransaction/service" xmlns:ns9="http://www.fu.gov.si/" xmlns:ns10="http://www.enactor.com/addressLookup/service" xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:ns14="http://www.enactor.com/crm/customerLoyalty/service" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" allowResize="true" allowMove="true" allowClose="true" height="800" width="480" messageBase="Pos/Tender/TenderMessages" titleId="INSERT_CARD_WITH_SCANNER_TITLE" url="NextGen480x800/Pos/Tender/InsertCardWithScannerSupport">
+    <core:elements>
+        <core:hidden id="DialogPanel"/>
+        <core:hidden id="ReceiptPanel"/>
+        <core:hidden id="SelectionList"/>
+        <core:button adjustImagesToSize="false" id="BackButton">
+            <core:text>CancelPressed</core:text>
+        </core:button>
+        <core:label messageBase="#{notEmpty(forLoyalty) and forLoyalty ? 'Pos/Loyalty/LoyaltyMessages' : 'Pos/Tender/TenderMessages'}" messageId="RESOURCE_FRIENDLY_NAME" id="TitleLabel">
+            <core:uiMessage messageId="RESOURCE_FRIENDLY_NAME" messageBase="Pos/Loyalty/LoyaltyMessages" applicability="#{(notEmpty(forLoyalty) &amp;&amp; forLoyalty) or (notEmpty(forNewLoyalty) and forNewLoyalty)}"/>
+        </core:label>
+        <core:panel namingContainer="false" styleClass="numericInputPanel" id="NumericInputPanel">
+            <core:elements/>
+        </core:panel>
+        <core:text id="NumericInputPanelPrompt">
+            <core:uiMessage messageId="#{messageId}" messageBase="#{messageBase}" applicability="#{notEmpty(messageId) &amp;&amp; notEmpty(messageBase)}"/>
+            <core:uiMessage value="#{message}" applicability="#{notEmpty(message)}"/>
+            <core:uiMessage messageId="INSERT_CARD_WITH_SCANNER_RETRY" messageBase="#{messageBase}" applicability="#{!empty (iCCRetryCount) &amp;&amp; iCCRetryCount &gt; 0}"/>
+            <core:uiMessage messageId="INSERT_CARD_WITH_SCANNER" messageBase="#{messageBase}"/>
+            <core:uiMessage messageId="#{((empty (forLoyalty) || !forLoyalty) &amp;&amp; (empty (forNewLoyalty) || !forNewLoyalty)) ? 'INSERT_CARD_WITH_SCANNER_RETRY' : ((empty (forNewLoyalty) || !forNewLoyalty) ? 'INSERT_CARD_LOYALTY_RETRY' : 'INSERT_CARD_NEW_LOYALTY_RETRY')}" applicability="#{!empty (iCCRetryCount) &amp;&amp; iCCRetryCount &gt; 0}"/>
+            <core:uiMessage messageId="#{((empty (forLoyalty) || !forLoyalty) &amp;&amp; (empty (forNewLoyalty) || !forNewLoyalty)) ? 'INSERT_CARD_WITH_SCANNER' : ((empty (forNewLoyalty) || !forNewLoyalty) ? 'INSERT_CARD_LOYALTY' : 'INSERT_CARD_NEW_LOYALTY')}"/>
+        </core:text>
+        <core:inputText type="textField" focusOrder="1" id="NumericInputPanelInputBox">
+            <core:text>${enactor.pos.CardNumberKeyed}</core:text>
+            <core:textElementEvents enterEvent="OKPressed"/>
+        </core:inputText>
+        <core:panel namingContainer="false" styleClass="footerOverridePanel" id="FooterOverridePanel">
+            <core:boundsConstraint height="87" width="480" y="713" x="0"/>
+            <core:elements>
+                <core:button messageBase="Pos/General/PosMessages" messageId="BUTTON_CANCEL" styleClass="footerOverrideButton" id="Button_1">
+                    <core:boundsConstraint height="87" width="120" y="0" x="0"/>
+                    <core:text>CancelPressed</core:text>
+                </core:button>
+                <core:button messageBase="Pos/Loyalty/LoyaltyMessages" messageId="BUTTON_NAME_SEARCH" styleClass="footerOverrideButton" visibility="#{!empty (showNameSearch) &amp;&amp; showNameSearch}" visible="true" id="Button_2">
+                    <core:boundsConstraint height="87" width="120" y="0" x="120"/>
+                    <core:text>NameSearch</core:text>
+                </core:button>
+                <core:button messageBase="Pos/Loyalty/LoyaltyMessages" messageId="BUTTON_POST_CODE_SEARCH" styleClass="footerOverrideButton" visibility="#{!empty (showPostCodeSearch) &amp;&amp; showPostCodeSearch}" visible="true" id="Button_3">
+                    <core:boundsConstraint height="87" width="120" y="0" x="240"/>
+                    <core:text>PostCodeSearch</core:text>
+                </core:button>
+                <core:button messageBase="Pos/General/PosMessages" messageId="BUTTON_OK" styleClass="footerOverrideButton" id="Button_4">
+                    <core:boundsConstraint height="87" width="120" y="0" x="360"/>
+                    <core:text>OKPressed</core:text>
+                </core:button>
+            </core:elements>
+        </core:panel>
+    </core:elements>
+    <core:templateURL>NextGen480x800/Pos/FullScreenTraditionalPosTemplate</core:templateURL>
+    <core:variables>
+        <core:variable name="enactor.pos.AllowCancel">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.pos.AllowSkip">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:variable>
+        <core:variable name="MessageBase">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.pos.ForLoyalty">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.pos.ShowPostCodeSearch">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.pos.ShowNameSearch">
+            <core:interfaceName>Java.lang.Boolean</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.pos.ShowCustomerAccountSearch">
+            <core:interfaceName>Java.lang.Boolean</core:interfaceName>
+        </core:variable>
+        <core:variable name="message">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:variable>
+    </core:variables>
+    <core:scannerEnabled>true</core:scannerEnabled>
+    <core:scannerDataName>enactor.pos.CardNumberScanned</core:scannerDataName>
+    <core:mSREnabled>true</core:mSREnabled>
+    <core:mSRDataName>enactor.pos.CardTrack2</core:mSRDataName>
+</retail:posPromptPage>

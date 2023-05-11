@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<retail:posPromptPage xmlns:core="http://www.enactor.com/core" xmlns:retail="http://www.enactor.com/retail" xmlns:ns4="http://www.enactor.com/crm" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803" xmlns:ns6="http://www.apis-it.hr/fin/2012/types/f73" xmlns:ns7="http://www.w3.org/2000/09/xmldsig#" xmlns:ns8="http://www.enactor.com/retail/storedRetailTransaction/service" xmlns:ns9="http://www.fu.gov.si/" xmlns:ns10="http://www.enactor.com/addressLookup/service" xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:ns14="http://www.enactor.com/crm/customerLoyalty/service" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" allowResize="true" allowMove="true" allowClose="true" height="768" width="1024" messageBase="POSInventoryManagement/AdjustStock/AdjustStockMessages" url="POSInventoryManagement/AdjustStock/AdjustmentSummary">
+    <core:elements>
+        <core:hidden id="Receipt"/>
+        <core:hidden id="SelectionList"/>
+        <core:hidden id="InputBox"/>
+        <core:hidden id="TotalLabel"/>
+        <core:hidden id="ToggleAlphaKeyboard"/>
+        <core:hidden id="ToggleKeyBoardEventPanel"/>
+        <core:button lineHeight="0" visibility="#{isEmpty(historyFlag) || historyFlag == false}" id="Button1">
+            <core:uiMessage messageId="APPROVE_BUTTON_LABEL" applicability="#{adjustStockHeader.status == 'AWAITING_APPROVAL'}"/>
+            <core:uiMessage messageId="SUBMIT_PICK_BUTTON_LABEL" applicability="#{adjustStockHeader.status == 'AWAITING_PICKING'}"/>
+            <core:uiMessage messageId="CONFIRM_BUTTON_LABEL" applicability="#{adjustStockHeader.status == 'CREATED'}"/>
+            <core:text>ConfirmPressed</core:text>
+        </core:button>
+        <core:button lineHeight="0" messageBase="POSInventoryManagement/Common/GeneralMessages" messageId="REMOVE_BUTTON_LABEL" visibility="#{isEmpty(isTask) || (notEmpty(isTask) &amp;&amp; isTask == false) || (notEmpty(isTask) &amp;&amp; isTask == true &amp;&amp; notEmpty(historyFlag) &amp;&amp; historyFlag == true)}" id="Button8">
+            <core:text>CancelPressed</core:text>
+        </core:button>
+        <core:text lineHeight="0" id="Prompt">
+            <core:uiMessage messageId="ABOUT_TO_CONFIRM_ADJUSTMENT_MESSAGE" applicability="adjustStockHeader.status == &quot;CREATED&quot;  &amp;&amp; !historyFlag"/>
+            <core:uiMessage messageId="ABOUT_TO_APPROVE_ADJUSTMENT_MESSAGE" applicability="adjustStockHeader.status == &quot;AWAITING_APPROVAL&quot; &amp;&amp; !historyFlag"/>
+            <core:uiMessage messageId="ABOUT_TO_APPLY_PICK_ADJUSTMENT_MESSAGE" applicability="adjustStockHeader.status == &quot;AWAITING_PICKING&quot;  &amp;&amp; !historyFlag"/>
+        </core:text>
+        <core:button lineHeight="0" messageBase="POSInventoryManagement/Common/GeneralMessages" messageId="BACK_BUTTON_LABEL" visibility="#{isEmpty(isTask) || isTask == false || (isTask == true &amp;&amp; (isEmpty(historyFlag) || historyFlag == false))}" id="Button7">
+            <core:text>BackPressed</core:text>
+        </core:button>
+        <core:button lineHeight="0" messageBase="POSInventoryManagement/Common/GeneralMessages" messageId="SUSPEND_BUTTON_LABEL" visibility="#{priv:checkPrivilege('enactor.inventoryManagement.pos.TransferOut.AllowTransferOutSuspend') &amp;&amp; (isEmpty(historyFlag) || historyFlag == false)}" id="Button3">
+            <core:text>SuspendPressed</core:text>
+        </core:button>
+        <core:panel id="PagingSelectionListPanel">
+            <core:elements>
+                <core:panel id="PagingSelectionHeaderPanelExtraLarge">
+                    <core:boundsConstraint height="165" width="821" y="0" x="0"/>
+                    <core:elements>
+                        <core:label messageId="#{notEmpty(historyFlag) &amp;&amp; historyFlag ? 'ADJUST_STOCK_HISTORY_TITLE' : 'SUBMIT_ADJUSTMENT_TITLE'}" styleClass="posPageHeading" id="SUBMIT_ADJUSTMENT_TITLE">
+                            <core:boundsConstraint height="30" width="500" y="4" x="5"/>
+                        </core:label>
+                        <core:label lineHeight="0" messageId="ADJUST_STOCK_ID_LABEL" styleClass="formFieldLabel" id="ADJUSTMENT_ID_LBL">
+                            <core:boundsConstraint height="22" width="120" y="50" x="25"/>
+                        </core:label>
+                        <core:inputText editable="false" borderStyle="Line" lineHeight="0" styleClass="formFieldInputText" id="ADJUSTMENT_ID">
+                            <core:boundsConstraint height="28" width="180" y="48" x="160"/>
+                            <core:text>#{notEmpty(adjustStockHeader.adjustmentId) ? adjustStockHeader.adjustmentId : adjustStockHeader.adjustStockHeaderId}</core:text>
+                        </core:inputText>
+                        <core:label lineHeight="0" messageId="REASON_LABEL" styleClass="formFieldLabel" id="REASON_LBL">
+                            <core:boundsConstraint height="22" width="120" y="85" x="25"/>
+                        </core:label>
+                        <core:inputText editable="false" borderStyle="Line" lineHeight="0" styleClass="formFieldInputText" id="REASON">
+                            <core:boundsConstraint height="28" width="180" y="83" x="160"/>
+                            <core:text>#{reason.description.string}</core:text>
+                        </core:inputText>
+                        <core:label lineHeight="0" messageId="NUMBER_OF_LINES_LABEL" styleClass="formFieldLabel" id="NUMBER_OF_LINES_LBL">
+                            <core:boundsConstraint height="22" width="160" y="50" x="370"/>
+                        </core:label>
+                        <core:label lineHeight="0" messageId="TOTAL_QUANTITY_ADJUSTED_LABEL" styleClass="formFieldLabel" id="TOTAL_QUANTITY_ADJUSTED_LBL">
+                            <core:boundsConstraint height="22" width="180" y="85" x="370"/>
+                        </core:label>
+                        <core:inputText editable="false" borderStyle="Line" lineHeight="0" styleClass="formFieldInputText" id="NUMBER_OF_LINES">
+                            <core:boundsConstraint height="28" width="160" y="48" x="555"/>
+                            <core:text>#{itemCount}</core:text>
+                        </core:inputText>
+                        <core:inputText editable="false" borderStyle="Line" lineHeight="0" styleClass="formFieldInputText" id="TOTAL_QUANTITY_ADJUSTED">
+                            <core:boundsConstraint height="28" width="160" y="83" x="555"/>
+                            <core:text>#{totalItemQuantity}</core:text>
+                        </core:inputText>
+                        <core:label allowWrap="true" lineHeight="0" messageId="SUMMARY_ORDER_ID_LABEL" styleClass="formFieldLabel" visibility="#{instanceOf(adjustStockHeader,'com.enactor.storeInventoryManagement.local.adjustStock.ICustomerAdjustStockHeader')}" id="CUSTOMER_ORDER_ID_LABEL">
+                            <core:boundsConstraint height="22" width="120" y="120" x="25"/>
+                        </core:label>
+                        <core:inputText editable="false" borderStyle="Line" lineHeight="0" styleClass="formFieldInputText" visibility="#{instanceOf(adjustStockHeader,'com.enactor.storeInventoryManagement.local.adjustStock.ICustomerAdjustStockHeader')}" id="CUSTOMER_ORDER_ID">
+                            <core:boundsConstraint height="28" width="180" y="118" x="160"/>
+                            <core:text>#{adjustStockHeader.customerOrderId}</core:text>
+                        </core:inputText>
+                        <core:label allowWrap="true" lineHeight="0" messageId="SUMMARY_NAME_LABEL" styleClass="formFieldLabel" visibility="#{notEmpty(adjustStockAddress)}" id="CUSTOMER_CONTACT_NAME_LABEL">
+                            <core:boundsConstraint height="22" width="160" y="120" x="370"/>
+                        </core:label>
+                        <core:inputText editable="false" borderStyle="Line" lineHeight="0" styleClass="formFieldInputText" visibility="#{notEmpty(adjustStockAddress)}" id="CUSTOMER_CONTACT_NAME">
+                            <core:boundsConstraint height="28" width="160" y="118" x="555"/>
+                            <core:text>#{concat(concat(adjustStockAddress.name.forename, ' '), adjustStockAddress.name.surname)}</core:text>
+                        </core:inputText>
+                    </core:elements>
+                </core:panel>
+                <core:listBox lazyLoad="false" listSelectionMethod="DEFAULT" documentTemplateUrl="POSInventoryManagement/AdjustStock/AdjustStockSummaryListTemplate" selectedIndex="0" renderedExpression="#{instanceOf(adjustStockHeader,'com.enactor.storeInventoryManagement.local.adjustStock.ICustomerAdjustStockHeader')}" styleClass="dataListBox" id="PagingSelectionListBoxNarrow">
+                    <core:boundsConstraint height="312" width="740" y="165" x="0"/>
+                    <core:elements/>
+                    <core:verticalScrollBar orientation="VERTICAL" id="PagingSelectionListBoxLargeVerticalScrollBar">
+                        <core:flowConstraint width="21" height="21"/>
+                    </core:verticalScrollBar>
+                    <core:listExpression>#{list}</core:listExpression>
+                    <core:dataExpression>item</core:dataExpression>
+                    <core:selectedIndices>
+                        <item>0</item>
+                    </core:selectedIndices>
+                </core:listBox>
+                <core:listBox lazyLoad="false" listSelectionMethod="DEFAULT" documentTemplateUrl="POSInventoryManagement/AdjustStock/AdjustStockSummaryListTemplate" selectedIndex="0" renderedExpression="#{! instanceOf(adjustStockHeader,'com.enactor.storeInventoryManagement.local.adjustStock.ICustomerAdjustStockHeader')}" styleClass="dataListBox" id="PagingSelectionListBoxCustom">
+                    <core:boundsConstraint height="337" width="740" y="130" x="0"/>
+                    <core:elements/>
+                    <core:verticalScrollBar orientation="VERTICAL" id="PagingSelectionListBoxLargeVerticalScrollBar">
+                        <core:flowConstraint width="21" height="21"/>
+                    </core:verticalScrollBar>
+                    <core:listExpression>#{list}</core:listExpression>
+                    <core:dataExpression>item</core:dataExpression>
+                    <core:selectedIndices>
+                        <item>0</item>
+                    </core:selectedIndices>
+                </core:listBox>
+                <core:panel id="PagingSelectionPageControlsPanel">
+                    <core:elements>
+                        <core:panel hAlign="CENTRE" id="PagingSelectionPageControlsReferencePanel">
+                            <core:flowConstraint width="100%" height="100%"/>
+                            <core:elements>
+<core:pageElementRef pageDefinitionURL="POSInventoryManagement/Common/POSInventoryManagementPagedListPageControl" id="PAGE_CONTROLS">
+    <core:flowConstraint/>
+    <core:elements/>
+    <core:parameter value="#{list}" name="enactor.coreUI.List ">
+        <core:interfaceName>com.enactor.core.database.list.IPagedList</core:interfaceName>
+    </core:parameter>
+    <core:parameter value="#{pageSize}" name="enactor.coreUI.PageSize">
+        <core:interfaceName>java.lang.Integer</core:interfaceName>
+    </core:parameter>
+</core:pageElementRef>
+                            </core:elements>
+                        </core:panel>
+                    </core:elements>
+                </core:panel>
+            </core:elements>
+        </core:panel>
+        <core:button lineHeight="0" messageBase="/POSInventoryManagement/AdjustStock/AdjustStockMessages" messageId="REJECT_BUTTON_LABEL" visibility="#{isEmpty(historyFlag) &amp;&amp; notEmpty(adjustStockHeader.adjustmentId) || historyFlag == false &amp;&amp; notEmpty(adjustStockHeader.adjustmentId)}" id="Button4">
+            <core:text>RejectedPressed</core:text>
+        </core:button>
+    </core:elements>
+    <core:templateURL>NextGen1024x768/Pos/FullScreenTraditionalPosTemplate</core:templateURL>
+    <core:preferredConstraintType>BOUNDS</core:preferredConstraintType>
+    <core:variables>
+        <core:variable required="true" name="enactor.inventoryManagement.local.AdjustStockHeader">
+            <core:interfaceName>com.enactor.storeInventoryManagement.local.adjustStock.IAdjustStockHeader</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.inventoryManagement.SubmissionButtonLabel">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.inventoryManagement.local.adjustStock.AdjustStockAddress">
+            <core:interfaceName>com.enactor.storeInventoryManagement.local.adjustStock.adjustStockAddress.IAdjustStockAddress</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.mfc.Reason">
+            <core:interfaceName>com.enactor.mfc.reason.Reason</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.inventoryManagement.local.ItemCount">
+            <core:interfaceName>java.lang.Integer</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.inventoryManagement.local.TotalItemQuantity">
+            <core:interfaceName>java.lang.Integer</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.coreUI.List">
+            <core:interfaceName>java.util.List</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.mfc.Device">
+            <core:interfaceName>com.enactor.mfc.device.IDevice</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.mfc.User">
+            <core:interfaceName>com.enactor.mfc.user.IUser</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.inventoryManagement.HistoryFlag">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.dynamicMap.DynamicMap">
+            <core:interfaceName>com.enactor.core.utilities.DynamicMap</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.coreUI.SKUProductsMap">
+            <core:interfaceName>java.util.Map</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.coreUI.Locale">
+            <core:interfaceName>java.util.Locale</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.inventoryManagement.SummaryMessage">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.pos.HideBackButton">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.inventoryManagement.IsTask">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:variable>
+    </core:variables>
+    <core:scannerEnabled>false</core:scannerEnabled>
+    <core:scannerDataName></core:scannerDataName>
+</retail:posPromptPage>

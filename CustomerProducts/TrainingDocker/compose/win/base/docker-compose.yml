@@ -1,0 +1,321 @@
+version: '3'
+
+networks:
+  default:
+    external:
+      name: nat
+ 
+services:
+
+##################################################################
+##             Estate Manager
+##################################################################
+
+  em-application:
+    image: ${REGISTRY_URL}/${REGISTRY_BASE}/${REGISTRY_OS}/${EMA_IMAGE_NAME}:${TAG}
+    container_name: ${EMA_NAME}
+    env_file:
+      - ./env/common.env
+      - ./env/common-em.env
+      - ./env/ema.env
+    ports:
+      - "${EMA_PORT}:${EMA_PORT}"
+    restart: unless-stopped 
+    hostname: ${EMA_HOSTNAME}
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "${LOG_MAX_FILE_SIZE}"
+        max-file: "${LOG_MAX_FILE_COUNT}"
+
+
+  em-processing:
+    image: ${REGISTRY_URL}/${REGISTRY_BASE}/${REGISTRY_OS}/${EMP_IMAGE_NAME}:${TAG}        
+    container_name: ${EMP_NAME}
+    env_file:
+      - ./env/common.env
+      - ./env/common-em.env
+      - ./env/emp.env
+    ports:
+      - "${EMP_PORT}:${EMP_PORT}"
+      - "39847:39847"
+    restart: unless-stopped
+    hostname: ${EMP_HOSTNAME}
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "${LOG_MAX_FILE_SIZE}"
+        max-file: "${LOG_MAX_FILE_COUNT}"
+    
+
+  em-services:
+    image: ${REGISTRY_URL}/${REGISTRY_BASE}/${REGISTRY_OS}/${EMS_IMAGE_NAME}:${TAG}        
+    container_name: ${EMS_NAME}
+    env_file:
+      - ./env/common.env
+      - ./env/common-em.env
+      - ./env/ems.env
+    ports:
+      - "${EMS_PORT}:${EMS_PORT}"
+    restart: unless-stopped
+    hostname: ${EMS_HOSTNAME}
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "${LOG_MAX_FILE_SIZE}"
+        max-file: "${LOG_MAX_FILE_COUNT}"
+             
+
+  em-reports:
+    image: ${REGISTRY_URL}/${REGISTRY_BASE}/${REGISTRY_OS}/${EMR_IMAGE_NAME}:${TAG}        
+    container_name: ${EMR_NAME}
+    env_file:
+      - ./env/common.env
+      - ./env/common-em.env
+      - ./env/emr.env
+    ports:
+      - "${EMR_PORT}:${EMR_PORT}"
+    restart: unless-stopped
+    hostname: ${EMR_HOSTNAME}
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "${LOG_MAX_FILE_SIZE}"
+        max-file: "${LOG_MAX_FILE_COUNT}"
+         
+
+  em-cardauth:
+    image: ${REGISTRY_URL}/${REGISTRY_BASE}/${REGISTRY_OS}/${EMC_IMAGE_NAME}:${TAG}        
+    container_name: ${EMC_NAME}
+    env_file:
+      - ./env/common.env
+      - ./env/common-em.env
+      - ./env/emc.env
+    ports:
+      - "${EMC_PORT}:${EMC_PORT}"
+    restart: unless-stopped
+    hostname: ${EMC_HOSTNAME}
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "${LOG_MAX_FILE_SIZE}"
+        max-file: "${LOG_MAX_FILE_COUNT}"
+             
+
+
+##################################################################
+##             Order Manager
+##################################################################
+
+  om-application:
+    image: ${REGISTRY_URL}/${REGISTRY_BASE}/${REGISTRY_OS}/${OMA_IMAGE_NAME}:${TAG}        
+    container_name: ${OMA_NAME}
+    env_file:
+      - ./env/common.env
+      - ./env/common-em.env
+      - ./env/oma.env
+    ports:
+      - "${OMA_PORT}:${OMA_PORT}"
+    restart: unless-stopped
+    hostname: ${OMA_HOSTNAME}
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "${LOG_MAX_FILE_SIZE}"
+        max-file: "${LOG_MAX_FILE_COUNT}"
+         
+
+  om-processing:
+    image: ${REGISTRY_URL}/${REGISTRY_BASE}/${REGISTRY_OS}/${OMP_IMAGE_NAME}:${TAG}        
+    container_name: ${OMP_NAME}
+    env_file:
+      - ./env/common.env
+      - ./env/common-em.env
+      - ./env/omp.env
+    ports:
+      - "${OMP_PORT}:${OMP_PORT}"
+    restart: unless-stopped
+    hostname: ${OMP_HOSTNAME}
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "${LOG_MAX_FILE_SIZE}"
+        max-file: "${LOG_MAX_FILE_COUNT}"
+
+
+  om-services:
+    image: ${REGISTRY_URL}/${REGISTRY_BASE}/${REGISTRY_OS}/${OMS_IMAGE_NAME}:${TAG}        
+    container_name: ${OMS_NAME}
+    env_file:
+      - ./env/common.env
+      - ./env/common-om.env
+      - ./env/oms.env
+    ports:
+      - "${OMS_PORT}:${OMS_PORT}"
+    restart: unless-stopped
+    hostname: ${OMS_HOSTNAME}
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "${LOG_MAX_FILE_SIZE}"
+        max-file: "${LOG_MAX_FILE_COUNT}"
+                  
+##################################################################
+##             Web Shop
+##################################################################
+
+  web-shop:
+    image: ${REGISTRY_URL}/${REGISTRY_BASE}/${REGISTRY_OS}/${WS_IMAGE_NAME}:${TAG}        
+    container_name: ${WS_NAME}
+    env_file:
+      - ./env/common.env
+      - ./env/common-em.env      
+      - ./env/ws.env
+    ports:
+      - "${WS_PORT}:${WS_PORT}"
+    restart: unless-stopped
+    hostname: ${WS_HOSTNAME}
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "${LOG_MAX_FILE_SIZE}"
+        max-file: "${LOG_MAX_FILE_COUNT}"
+
+##################################################################
+##             Store Servers
+##################################################################
+
+  store-server:
+    image: ${REGISTRY_URL}/${REGISTRY_BASE}/${REGISTRY_OS}/${SS_IMAGE_NAME}:${TAG}        
+    container_name: ${SS_NAME}
+    env_file:
+      - ./env/common.env
+      - ./env/common-ss.env      
+      - ./env/ss.env
+    ports:
+      - "${SS_PORT}:${SS_CONTAINER}"
+    restart: unless-stopped
+    hostname: ${SS_HOSTNAME}
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "${LOG_MAX_FILE_SIZE}"
+        max-file: "${LOG_MAX_FILE_COUNT}"
+
+##################################################################
+##             PDP Servers
+##################################################################
+
+  pdp-server:
+    image: ${REGISTRY_URL}/${REGISTRY_BASE}/${REGISTRY_OS}/${PDP_IMAGE_NAME}:${TAG}        
+    container_name: ${PDP_NAME}
+    env_file:
+      - ./env/common.env
+      - ./env/common-pdp.env      
+      - ./env/pdp.env
+    ports:
+      - "${PDP_PORT}:${PDP_CONTAINER}"
+    restart: unless-stopped 
+    hostname: ${PDP_HOSTNAME}
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "${LOG_MAX_FILE_SIZE}"
+        max-file: "${LOG_MAX_FILE_COUNT}"
+     
+    
+##################################################################
+##             Customer App
+##################################################################
+
+  cm-application:
+    image: ${REGISTRY_URL}/${REGISTRY_BASE}/${REGISTRY_OS}/${CMA_IMAGE_NAME}:${TAG}
+    container_name: ${CMA_NAME}  
+    env_file:
+      - ./env/common.env
+      - ./env/common-cm.env
+      - ./env/cma.env
+    ports:
+      - "${CMA_PORT}:${CMA_PORT}"
+    restart: unless-stopped
+    hostname: ${CMA_HOSTNAME}
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "${LOG_MAX_FILE_SIZE}"
+        max-file: "${LOG_MAX_FILE_COUNT}"
+
+
+  cm-processing:
+    image: ${REGISTRY_URL}/${REGISTRY_BASE}/${REGISTRY_OS}/${CMP_IMAGE_NAME}:${TAG}   
+    container_name: ${CMP_NAME}
+    hostname: ${CMP_HOSTNAME}    
+    env_file:
+      - ./env/common.env
+      - ./env/common-cm.env
+      - ./env/cmp.env
+    ports:
+      - "${CMP_PORT}:${CMP_PORT}"
+    restart: unless-stopped
+    hostname: ${CMP_HOSTNAME}
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "${LOG_MAX_FILE_SIZE}"
+        max-file: "${LOG_MAX_FILE_COUNT}"
+
+
+  cm-services:
+    image: ${REGISTRY_URL}/${REGISTRY_BASE}/${REGISTRY_OS}/${CMS_IMAGE_NAME}:${TAG}
+    container_name: ${CMS_NAME}
+    hostname: ${CMS_HOSTNAME}    
+    env_file:
+      - ./env/common.env
+      - ./env/common-cm.env
+      - ./env/cms.env
+    ports:
+      - "${CMS_PORT}:${CMS_PORT}"
+    restart: unless-stopped
+    hostname: ${CMS_HOSTNAME}
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "${LOG_MAX_FILE_SIZE}"
+        max-file: "${LOG_MAX_FILE_COUNT}"
+ 
+
+##################################################################
+##             Consumer App
+##################################################################
+
+  can:
+    image: ${REGISTRY_URL}/${REGISTRY_BASE}/${REGISTRY_OS}/${CAN_IMAGE_NAME}:${TAG}
+    depends_on:
+      - mongodb
+    ports:
+      - "${CAN_PORT}:${CAN_PORT}"
+    restart: unless-stopped 
+    container_name: ${CAN_NAME}
+    hostname: ${CAN_HOSTNAME}    
+    env_file:
+      - ./env/can.env
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "${LOG_MAX_FILE_SIZE}"
+        max-file: "${LOG_MAX_FILE_COUNT}" 
+
+  mongodb:
+    image: enactordev-on.azurecr.io/base/db/win/mongodb:3.4
+    container_name: mongo-app
+    ports:
+      - "27017:27017"
+    volumes:
+      - c:\data\db:c:\data\db   
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "${LOG_MAX_FILE_SIZE}"
+        max-file: "${LOG_MAX_FILE_COUNT}"

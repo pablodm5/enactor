@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<core:documentTemplate xmlns:core="http://www.enactor.com/core" xmlns:retail="http://www.enactor.com/retail" xmlns:ns4="http://www.enactor.com/crm" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803" xmlns:ns6="http://www.apis-it.hr/fin/2012/types/f73" xmlns:ns7="http://www.w3.org/2000/09/xmldsig#" xmlns:ns8="http://www.enactor.com/retail/storedRetailTransaction/service" xmlns:ns9="http://www.fu.gov.si/" xmlns:ns10="http://www.enactor.com/addressLookup/service" xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:ns14="http://www.enactor.com/crm/customerLoyalty/service" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" paginated="false" messageBase="Pos/Product/ReturnItemMessages" title="Extended Return Details List Template" url="Pos/Return/ExtendedReturnDetailsListTemplate">
+    <core:elements>
+        <core:tableTemplate listVariableName="item" list="list" id="LIST">
+            <core:formatElement applicableEntityName="listHeader" formatId="listHeader"/>
+            <core:formatElement applicableEntityName="listFooter"/>
+            <core:formatElement applicability="#{!item.isHeader}" formatId="returnDetails"/>
+            <core:formatElement formatId="returnDetailsHeader"/>
+        </core:tableTemplate>
+    </core:elements>
+    <core:variables>
+        <core:variable name="enactor.mfc.ArchiveRetailSaleTransaction">
+            <core:interfaceName>com.enactor.mfc.retail.transaction.IRetailSaleTransaction</core:interfaceName>
+        </core:variable>
+    </core:variables>
+    <core:columnDefs>
+        <core:columnDef id="Selected" start="0" end="10"/>
+        <core:columnDef id="2" start="10" end="80"/>
+        <core:columnDef id="3" start="80" end="95" align="RIGHT"/>
+        <core:columnDef id="4" start="15" end="95" align="LEFT"/>
+    </core:columnDefs>
+    <core:formatEntry id="returnDetailsHeader">
+        <core:elements>
+            <core:row>
+                <core:rowLine>
+                    <core:elements/>
+                </core:rowLine>
+                <core:rowLine visibility="#{notEmpty(item.headerLabel) || notEmpty(item.headerReference)}">
+                    <core:elements>
+                        <core:column maxLines="0" align="CENTRE" columnDefId="0" style="BOLD">
+                            <core:elements>
+<core:text>
+    <core:text>#{item.headerLabel}</core:text>
+</core:text>
+<core:text visibility="#{notEmpty(item.headerLabel) &amp;&amp; notEmpty(item.headerReference)}">
+    <core:text> </core:text>
+</core:text>
+<core:text>
+    <core:text>#{item.headerReference}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="2" style="BOLD">
+                            <core:elements>
+<core:text>
+    <core:text>#{item.headerColumnDescription}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="3" style="BOLD">
+                            <core:elements>
+<core:text>
+    <core:text>#{item.headerColumnValue}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="returnDetails">
+        <core:elements>
+            <core:row style="#{item.selectable ? null : 'STRIKEOUT'}">
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0">
+                            <core:elements>
+<core:imageElement>
+    <core:flowConstraint height="8"/>
+</core:imageElement>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="Selected" id="selected">
+                            <core:elements>
+<core:text messageId="SELECTED_FOR_RETURN" visibility="#{item.selected}"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="2">
+                            <core:elements>
+<core:text>
+    <core:text>#{item.description}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="3">
+                            <core:elements>
+<core:text>
+    <core:text>#{format:formatCurrencyCurrency(-item.returnValue,archiveRetailSaleTransaction.basket.currencyId)}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0">
+                            <core:elements>
+<core:imageElement>
+    <core:flowConstraint height="8"/>
+</core:imageElement>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine visibility="#{notEmpty(item.basketItem.text)}">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="4">
+                            <core:elements>
+<core:text>
+    <core:text>#{item.basketItem.text}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine visibility="#{instanceOf(item.basketItem, 'com.enactor.mfc.basket.items.IStyleSizeItem')}">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="2" id="2">
+                            <core:elements>
+<core:text messageId="SCS_STYLE"/>
+<core:text>
+    <core:text> </core:text>
+</core:text>
+<core:text>
+    <core:text>#{item.basketItem.styleId}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine visibility="#{instanceOf(item.basketItem, 'com.enactor.mfc.basket.items.IStyleColourSizeItem')}">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="2" id="2">
+                            <core:elements>
+<core:text messageId="SCS_COLOUR"/>
+<core:text>
+    <core:text> </core:text>
+</core:text>
+<core:text>
+    <core:text>#{empty(item.basketItem.colourDescription) ? (item.basketItem.colourKey != null ? item.basketItem.colourKey.colourId : '') : item.basketItem.colourDescription}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine visibility="#{instanceOf(item.basketItem, 'com.enactor.mfc.basket.items.IStyleSizeItem')}">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="2" id="2">
+                            <core:elements>
+<core:text messageId="SCS_SIZE"/>
+<core:text>
+    <core:text> </core:text>
+</core:text>
+<core:text>
+    <core:text>#{empty(item.basketItem.sizeDescription) ? (item.basketItem.sizeKey != null ? item.basketItem.sizeKey.sizeId : '') : item.basketItem.sizeDescription}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="listHeader">
+        <core:elements>
+            <core:row styleClass="listHeader" style="BOLD">
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" align="CENTRE" columnDefId="0" id="Title">
+                            <core:elements>
+<core:text messageId="RECEIPT_RETURN_SELECTION_HEADING"/>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+</core:documentTemplate>

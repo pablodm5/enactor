@@ -1,0 +1,2796 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.23" id="1">
+    <property name="createdBy">Eclipse BIRT Designer Version 4.6.0.v201606072122</property>
+    <simple-property-list name="includeResource">
+        <value>Messages/InventoryManagement/StockTakeSummariesReportMessages</value>
+    </simple-property-list>
+    <property name="units">in</property>
+    <method name="initialize"><![CDATA[globalDataFormatter = Packages.com.enactor.coreUI.factories.DataFormatterFactory.getInstance().getFormatter(reportContext.getLocale());
+baseCurrencyId = globalDataFormatter.getBaseCurrencyId();
+
+startDateStr = "";
+
+if(params["startDate"].value != null){
+	startDateStr = globalDataFormatter.formatDate(params["startDate"].value);
+}
+else {
+	params["startDate"].value = Packages.com.enactor.core.utilities.DateUtils.beginningOfTime();
+	startDateStr = reportContext.getMessage("BLANK", reportContext.getLocale());
+}
+
+endDateStr = "";
+
+if(params["endDate"].value != null){
+	endDateStr = globalDataFormatter.formatDate(params["endDate"].value);
+}
+else {
+	params["endDate"].value = Packages.com.enactor.core.utilities.DateUtils.endOfTime();
+	endDateStr = reportContext.getMessage("BLANK", reportContext.getLocale());
+}
+
+	]]></method>
+    <property name="theme">InventoryManagementReportLibrary.BasicReportTheme</property>
+    <property name="iconFile">/templates/blank_report.gif</property>
+    <property name="layoutPreference">auto layout</property>
+    <property name="bidiLayoutOrientation">ltr</property>
+    <property name="imageDPI">96</property>
+    <list-property name="libraries">
+        <structure>
+            <property name="fileName">InventoryManagementReportLibrary.rptlibrary</property>
+            <property name="namespace">InventoryManagementReportLibrary</property>
+        </structure>
+    </list-property>
+    <parameters>
+        <scalar-parameter name="userName" id="8" extends="InventoryManagementReportLibrary.userName"/>
+        <scalar-parameter name="odaJndiName" id="9" extends="InventoryManagementReportLibrary.odaJndiName"/>
+        <scalar-parameter name="stockTakeId" id="1743">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant"></value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="startDate" id="1938">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">dateTime</property>
+            <property name="distinct">true</property>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="endDate" id="1939">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">dateTime</property>
+            <property name="distinct">true</property>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="locationId" id="2031">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant"></value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+    </parameters>
+    <data-sources>
+        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="Data Source" id="7"
+ extends="InventoryManagementReportLibrary.Data Source">
+            <list-property name="privateDriverProperties">
+                <ex-property>
+                    <name>contentBidiFormatStr</name>
+                    <value>ILYNN</value>
+                </ex-property>
+                <ex-property>
+                    <name>metadataBidiFormatStr</name>
+                    <value>ILYNN</value>
+                </ex-property>
+                <ex-property>
+                    <name>disabledMetadataBidiFormatStr</name>
+                </ex-property>
+                <ex-property>
+                    <name>disabledContentBidiFormatStr</name>
+                </ex-property>
+            </list-property>
+            <property name="odaDriverClass">com.mysql.jdbc.Driver</property>
+            <property name="odaURL">jdbc:mysql://localhost:3309/enactor_test</property>
+            <property name="odaUser">root</property>
+            <encrypted-property name="odaPassword" encryptionID="base64">YWRtaW4=</encrypted-property>
+        </oda-data-source>
+    </data-sources>
+    <data-sets>
+        <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="Header Query" id="1824">
+            <property name="eventHandlerClass">com.enactor.coreReporting.reportEventHandlers.DataSourceQueryTranslatorEventHandler</property>
+            <list-property name="computedColumns">
+                <structure>
+                    <property name="name">SET_BASE_CURRENCY_ID</property>
+                    <expression name="expression">baseCurrencyId = row["Currency_Id"];&#13;
+'';</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">FORMATTED_CREATED_DATE</property>
+                    <expression name="expression">var date = row["Created_Date"];&#13;
+Packages.com.enactor.core.utilities.DateUtils.formatMediumDateTime(reportContext.getLocale(), date) ;</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">FORMATTED_AUTHORISED_DATE</property>
+                    <expression name="expression">var date = row["Authorised_Date"];&#13;
+Packages.com.enactor.core.utilities.DateUtils.formatMediumDateTime(reportContext.getLocale(), date) ;</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">FORMATTED_CREATED_BY_USER</property>
+                    <expression name="expression">row["Created_By_Forename"] + " " + row["Created_By_Surname"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">FORMATTED_AUTHORISED_BY_USER</property>
+                    <expression name="expression">row["Authorised_By_Forename"] + " " + row["Authorised_By_Surname"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">FORMATTED_COUNT_START_DATE</property>
+                    <expression name="expression">var date = row["Count_Start_Date"];
+Packages.com.enactor.core.utilities.DateUtils.formatMediumDateTime(reportContext.getLocale(), date) ;</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">FORMATTED_COUNT_COMPLETE_DATE</property>
+                    <expression name="expression">var date = row["Count_Complete_Date"];
+Packages.com.enactor.core.utilities.DateUtils.formatMediumDateTime(reportContext.getLocale(), date) ;</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">FORMATTED_SNAPSHOT_START_DATE</property>
+                    <expression name="expression">var date = row["Snapshot_Start_Date"];
+Packages.com.enactor.core.utilities.DateUtils.formatMediumDateTime(reportContext.getLocale(), date) ;</expression>
+                    <property name="dataType">string</property>
+                </structure>
+            </list-property>
+            <list-property name="columnHints">
+                <structure>
+                    <property name="columnName">Description</property>
+                    <property name="alias">Count_Location_Description</property>
+                </structure>
+                <structure>
+                    <property name="columnName">Forename</property>
+                    <property name="alias">Created_By_Forename</property>
+                </structure>
+                <structure>
+                    <property name="columnName">Surname</property>
+                    <property name="alias">Created_By_Surname</property>
+                </structure>
+            </list-property>
+            <list-property name="parameters">
+                <structure>
+                    <property name="name">stockTakeId</property>
+                    <property name="paramName">stockTakeId</property>
+                    <property name="dataType">string</property>
+                    <property name="position">1</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+            </list-property>
+            <structure name="cachedMetaData">
+                <list-property name="resultSet">
+                    <structure>
+                        <property name="position">1</property>
+                        <property name="name">Created_At_Location_Id</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">2</property>
+                        <property name="name">Currency_Id</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">3</property>
+                        <property name="name">Count_Location_Id</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">4</property>
+                        <property name="name">Stock_Take_Id</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">5</property>
+                        <property name="name">Status</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">6</property>
+                        <property name="name">Created_Date</property>
+                        <property name="dataType">date-time</property>
+                    </structure>
+                    <structure>
+                        <property name="position">7</property>
+                        <property name="name">Snapshot_Start_Date</property>
+                        <property name="dataType">date-time</property>
+                    </structure>
+                    <structure>
+                        <property name="position">8</property>
+                        <property name="name">Count_Start_Date</property>
+                        <property name="dataType">date-time</property>
+                    </structure>
+                    <structure>
+                        <property name="position">9</property>
+                        <property name="name">Count_Complete_Date</property>
+                        <property name="dataType">date-time</property>
+                    </structure>
+                    <structure>
+                        <property name="position">10</property>
+                        <property name="name">Authorised_Date</property>
+                        <property name="dataType">date-time</property>
+                    </structure>
+                    <structure>
+                        <property name="position">11</property>
+                        <property name="name">Notes</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">12</property>
+                        <property name="name">Created_By_User_Id</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">13</property>
+                        <property name="name">Created_By_Forename</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">14</property>
+                        <property name="name">Created_By_Surname</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">15</property>
+                        <property name="name">Authorised_By_User_Id</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">16</property>
+                        <property name="name">Authorised_By_Forename</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">17</property>
+                        <property name="name">Authorised_By_Surname</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">18</property>
+                        <property name="name">Count_Location_Description</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">19</property>
+                        <property name="name">SET_BASE_CURRENCY_ID</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">20</property>
+                        <property name="name">FORMATTED_CREATED_DATE</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">21</property>
+                        <property name="name">FORMATTED_AUTHORISED_DATE</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">22</property>
+                        <property name="name">FORMATTED_CREATED_BY_USER</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">23</property>
+                        <property name="name">FORMATTED_AUTHORISED_BY_USER</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">24</property>
+                        <property name="name">FORMATTED_COUNT_START_DATE</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">25</property>
+                        <property name="name">FORMATTED_COUNT_COMPLETE_DATE</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">26</property>
+                        <property name="name">FORMATTED_SNAPSHOT_START_DATE</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                </list-property>
+            </structure>
+            <property name="dataSource">Data Source</property>
+            <list-property name="resultSet">
+                <structure>
+                    <property name="position">1</property>
+                    <property name="name">Created_At_Location_Id</property>
+                    <property name="nativeName">Created_At_Location_Id</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">2</property>
+                    <property name="name">Currency_Id</property>
+                    <property name="nativeName">Currency_Id</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">3</property>
+                    <property name="name">Count_Location_Id</property>
+                    <property name="nativeName">Count_Location_Id</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">4</property>
+                    <property name="name">Stock_Take_Id</property>
+                    <property name="nativeName">Stock_Take_Id</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">5</property>
+                    <property name="name">Status</property>
+                    <property name="nativeName">Status</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">6</property>
+                    <property name="name">Created_Date</property>
+                    <property name="nativeName">Created_Date</property>
+                    <property name="dataType">date-time</property>
+                </structure>
+                <structure>
+                    <property name="position">7</property>
+                    <property name="name">Snapshot_Start_Date</property>
+                    <property name="nativeName">Snapshot_Start_Date</property>
+                    <property name="dataType">date-time</property>
+                </structure>
+                <structure>
+                    <property name="position">8</property>
+                    <property name="name">Count_Start_Date</property>
+                    <property name="nativeName">Count_Start_Date</property>
+                    <property name="dataType">date-time</property>
+                </structure>
+                <structure>
+                    <property name="position">9</property>
+                    <property name="name">Count_Complete_Date</property>
+                    <property name="nativeName">Count_Complete_Date</property>
+                    <property name="dataType">date-time</property>
+                </structure>
+                <structure>
+                    <property name="position">10</property>
+                    <property name="name">Authorised_Date</property>
+                    <property name="nativeName">Authorised_Date</property>
+                    <property name="dataType">date-time</property>
+                </structure>
+                <structure>
+                    <property name="position">11</property>
+                    <property name="name">Notes</property>
+                    <property name="nativeName">Notes</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">12</property>
+                    <property name="name">Created_By_User_Id</property>
+                    <property name="nativeName">Created_By_User_Id</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">13</property>
+                    <property name="name">Forename</property>
+                    <property name="nativeName">Forename</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">14</property>
+                    <property name="name">Surname</property>
+                    <property name="nativeName">Surname</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">15</property>
+                    <property name="name">Authorised_By_User_Id</property>
+                    <property name="nativeName">Authorised_By_User_Id</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">16</property>
+                    <property name="name">Authorised_By_Forename</property>
+                    <property name="nativeName">Authorised_By_Forename</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">17</property>
+                    <property name="name">Authorised_By_Surname</property>
+                    <property name="nativeName">Authorised_By_Surname</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">18</property>
+                    <property name="name">Description</property>
+                    <property name="nativeName">Description</property>
+                    <property name="dataType">string</property>
+                </structure>
+            </list-property>
+            <xml-property name="queryText"><![CDATA[select sth.Created_At_Location_Id,
+	   sth.Currency_Id,
+	   sth.Count_Location_Id, 
+	   sth.Stock_Take_Id,
+	   sth.Status,
+	   sth.Created_Date,
+	   sth.Snapshot_Start_Date,
+	   sth.Count_Start_Date,
+	   sth.Count_Complete_Date,
+	   sth.Authorised_Date,
+	   COALESCE(sth.Notes, '') as Notes,
+	   sth.Created_By_User_Id,
+	   u1.Forename as Created_By_Forename,
+	   u1.Surname as Created_By_Surname,
+	   sth.Authorised_By_User_Id,
+	   COALESCE(u2.Forename, '') as Authorised_By_Forename,
+	   COALESCE(u2.Surname, '') as Authorised_By_Surname,
+	   l.Description as Count_Location_Description
+from StockTakeHeaders sth
+left outer join Locations l on sth.Count_Location_Id = l.Location_Id
+left outer join Users u1 on sth.Created_By_User_Id = u1.User_Id
+left outer join Users u2 on sth.Authorised_By_User_Id = u2.User_Id
+where Stock_Take_Id = ?
+
+]]></xml-property>
+            <xml-property name="designerValues"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<model:DesignValues xmlns:design="http://www.eclipse.org/datatools/connectivity/oda/design" xmlns:model="http://www.eclipse.org/birt/report/model/adapter/odaModel">
+  <Version>1.0</Version>
+  <design:ResultSets derivedMetaData="true">
+    <design:resultSetDefinitions>
+      <design:resultSetColumns>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:name>Created_At_Location_Id</design:name>
+            <design:position>1</design:position>
+            <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+            <design:precision>20</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>Created_At_Location_Id</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>Created_At_Location_Id</design:label>
+            <design:formattingHints>
+              <design:displaySize>20</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:name>Stock_Take_Id</design:name>
+            <design:position>2</design:position>
+            <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+            <design:precision>20</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>NotNullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>Stock_Take_Id</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>Stock_Take_Id</design:label>
+            <design:formattingHints>
+              <design:displaySize>20</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:name>Status</design:name>
+            <design:position>3</design:position>
+            <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+            <design:precision>20</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>Status</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>Status</design:label>
+            <design:formattingHints>
+              <design:displaySize>20</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:name>Created_Date</design:name>
+            <design:position>4</design:position>
+            <design:nativeDataTypeCode>93</design:nativeDataTypeCode>
+            <design:precision>23</design:precision>
+            <design:scale>3</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>Created_Date</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>Created_Date</design:label>
+            <design:formattingHints>
+              <design:displaySize>23</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:name>Authorised_Date</design:name>
+            <design:position>5</design:position>
+            <design:nativeDataTypeCode>93</design:nativeDataTypeCode>
+            <design:precision>23</design:precision>
+            <design:scale>3</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>Authorised_Date</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>Authorised_Date</design:label>
+            <design:formattingHints>
+              <design:displaySize>23</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:name>Notes</design:name>
+            <design:position>6</design:position>
+            <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+            <design:precision>1000</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>Notes</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>Notes</design:label>
+            <design:formattingHints>
+              <design:displaySize>1000</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:name>Created_By_User_Id</design:name>
+            <design:position>7</design:position>
+            <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+            <design:precision>20</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>Created_By_User_Id</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>Created_By_User_Id</design:label>
+            <design:formattingHints>
+              <design:displaySize>20</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:name>Authorised_By_User_Id</design:name>
+            <design:position>8</design:position>
+            <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+            <design:precision>20</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>Authorised_By_User_Id</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>Authorised_By_User_Id</design:label>
+            <design:formattingHints>
+              <design:displaySize>20</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+      </design:resultSetColumns>
+      <design:criteria/>
+    </design:resultSetDefinitions>
+  </design:ResultSets>
+</model:DesignValues>]]></xml-property>
+        </oda-data-set>
+        <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="Item Query" id="1838">
+            <property name="eventHandlerClass">com.enactor.coreReporting.reportEventHandlers.DataSourceQueryTranslatorEventHandler</property>
+            <list-property name="computedColumns">
+                <structure>
+                    <property name="name">FORMATTED_RETAIL_PRICE_INC_TAX</property>
+                    <expression name="expression">longVal = row["RETAIL_PRICE_INC_TAX"] != null ? row["RETAIL_PRICE_INC_TAX"]  : 0;&#13;
+globalDataFormatter.formatCurrencyAmount(longVal, baseCurrencyId);</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">FORMATTED_COST_PRICE</property>
+                    <expression name="expression">longVal = row["COST_PRICE"] != null ? row["COST_PRICE"]  : 0;&#13;
+globalDataFormatter.formatCurrencyAmount(longVal, baseCurrencyId);</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">TOTAL_RETAIL_PRICE_INC_TAX</property>
+                    <property name="dataType">decimal</property>
+                    <property name="aggregateFunction">SUM</property>
+                    <list-property name="arguments">
+                        <structure>
+                            <property name="name">Expression</property>
+                            <expression name="value">row["RETAIL_PRICE_INC_TAX"]</expression>
+                        </structure>
+                    </list-property>
+                </structure>
+                <structure>
+                    <property name="name">FORMATTED_TOTAL_RETAIL_PRICE_INC_TAX</property>
+                    <expression name="expression">longVal = row["TOTAL_RETAIL_PRICE_INC_TAX"] != null ? row["TOTAL_RETAIL_PRICE_INC_TAX"]  : 0;
+globalDataFormatter.formatCurrencyAmount(longVal, baseCurrencyId);</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">TOTAL_COST_PRICE</property>
+                    <property name="dataType">float</property>
+                    <property name="aggregateFunction">SUM</property>
+                    <list-property name="arguments">
+                        <structure>
+                            <property name="name">Expression</property>
+                            <expression name="value">row["COST_PRICE"]</expression>
+                        </structure>
+                    </list-property>
+                </structure>
+                <structure>
+                    <property name="name">FORMATTED_TOTAL_COST_PRICE</property>
+                    <expression name="expression">longVal = row["TOTAL_COST_PRICE"] != null ? row["TOTAL_COST_PRICE"]  : 0;
+globalDataFormatter.formatCurrencyAmount(longVal, baseCurrencyId);</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">TOTAL_DISCREPANCY</property>
+                    <property name="dataType">decimal</property>
+                    <property name="aggregateFunction">SUM</property>
+                    <list-property name="arguments">
+                        <structure>
+                            <property name="name">Expression</property>
+                            <expression name="value">row["DISCREPANCY"]</expression>
+                        </structure>
+                    </list-property>
+                </structure>
+            </list-property>
+            <list-property name="columnHints">
+                <structure>
+                    <property name="columnName">STOCK_TAKE_ID</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">STOCK_TAKE_ID</text-property>
+                    <text-property name="heading">STOCK_TAKE_ID</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">PRODUCT_ID</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">PRODUCT_ID</text-property>
+                    <text-property name="heading">PRODUCT_ID</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">GROUP_ID</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">GROUP_ID</text-property>
+                    <text-property name="heading">GROUP_ID</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">MMGROUP_HIERARCHY_ID</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">MMGROUP_HIERARCHY_ID</text-property>
+                    <text-property name="heading">MMGROUP_HIERARCHY_ID</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">GROUP_NAME</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">GROUP_NAME</text-property>
+                    <text-property name="heading">GROUP_NAME</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">PRODUCT_DESCRIPTION</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">PRODUCT_DESCRIPTION</text-property>
+                    <text-property name="heading">PRODUCT_DESCRIPTION</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">STYLE_ID</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">STYLE_ID</text-property>
+                    <text-property name="heading">STYLE_ID</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">SIZE_DESCRIPTION</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">SIZE_DESCRIPTION</text-property>
+                    <text-property name="heading">SIZE_DESCRIPTION</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">COLOUR_DESCRIPTION</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">COLOUR_DESCRIPTION</text-property>
+                    <text-property name="heading">COLOUR_DESCRIPTION</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">RETAIL_PRICE_INC_TAX</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">RETAIL_PRICE_INC_TAX</text-property>
+                    <text-property name="heading">RETAIL_PRICE_INC_TAX</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">COST_PRICE</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">COST_PRICE</text-property>
+                    <text-property name="heading">COST_PRICE</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">EXPECTED_QTY</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">EXPECTED_QTY</text-property>
+                    <text-property name="heading">EXPECTED_QTY</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">COUNTED_QTY</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">COUNTED_QTY</text-property>
+                    <text-property name="heading">COUNTED_QTY</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">DISCREPANCY</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">DISCREPANCY</text-property>
+                    <text-property name="heading">DISCREPANCY</text-property>
+                </structure>
+            </list-property>
+            <list-property name="parameters">
+                <structure>
+                    <property name="name">groupTypeId</property>
+                    <property name="nativeName"></property>
+                    <property name="dataType">string</property>
+                    <property name="position">1</property>
+                    <expression name="defaultValue" type="constant">mmGroup</expression>
+                    <property name="isOptional">false</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">locationId</property>
+                    <property name="paramName">locationId</property>
+                    <property name="nativeName"></property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">0</property>
+                    <property name="position">2</property>
+                    <property name="isOptional">false</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">locationId2</property>
+                    <property name="paramName">locationId</property>
+                    <property name="nativeName"></property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">0</property>
+                    <property name="position">3</property>
+                    <property name="isOptional">false</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">startDate</property>
+                    <property name="paramName">startDate</property>
+                    <property name="nativeName"></property>
+                    <property name="dataType">dateTime</property>
+                    <property name="position">4</property>
+                    <property name="isOptional">false</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">endDate</property>
+                    <property name="paramName">endDate</property>
+                    <property name="nativeName"></property>
+                    <property name="dataType">dateTime</property>
+                    <property name="position">5</property>
+                    <property name="isOptional">false</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+            </list-property>
+            <structure name="cachedMetaData">
+                <list-property name="resultSet">
+                    <structure>
+                        <property name="position">1</property>
+                        <property name="name">STOCK_TAKE_ID</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">2</property>
+                        <property name="name">PRODUCT_ID</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">3</property>
+                        <property name="name">GROUP_ID</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">4</property>
+                        <property name="name">MMGROUP_HIERARCHY_ID</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">5</property>
+                        <property name="name">GROUP_NAME</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">6</property>
+                        <property name="name">PRODUCT_DESCRIPTION</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">7</property>
+                        <property name="name">STYLE_ID</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">8</property>
+                        <property name="name">SIZE_DESCRIPTION</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">9</property>
+                        <property name="name">COLOUR_DESCRIPTION</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">10</property>
+                        <property name="name">RETAIL_PRICE_INC_TAX</property>
+                        <property name="dataType">decimal</property>
+                    </structure>
+                    <structure>
+                        <property name="position">11</property>
+                        <property name="name">COST_PRICE</property>
+                        <property name="dataType">float</property>
+                    </structure>
+                    <structure>
+                        <property name="position">12</property>
+                        <property name="name">EXPECTED_QTY</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                    <structure>
+                        <property name="position">13</property>
+                        <property name="name">COUNTED_QTY</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                    <structure>
+                        <property name="position">14</property>
+                        <property name="name">DISCREPANCY</property>
+                        <property name="dataType">decimal</property>
+                    </structure>
+                    <structure>
+                        <property name="position">15</property>
+                        <property name="name">FORMATTED_RETAIL_PRICE_INC_TAX</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">16</property>
+                        <property name="name">FORMATTED_COST_PRICE</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">17</property>
+                        <property name="name">TOTAL_RETAIL_PRICE_INC_TAX</property>
+                        <property name="dataType">decimal</property>
+                    </structure>
+                    <structure>
+                        <property name="position">18</property>
+                        <property name="name">FORMATTED_TOTAL_RETAIL_PRICE_INC_TAX</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">19</property>
+                        <property name="name">TOTAL_COST_PRICE</property>
+                        <property name="dataType">float</property>
+                    </structure>
+                    <structure>
+                        <property name="position">20</property>
+                        <property name="name">FORMATTED_TOTAL_COST_PRICE</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">21</property>
+                        <property name="name">TOTAL_DISCREPANCY</property>
+                        <property name="dataType">decimal</property>
+                    </structure>
+                </list-property>
+            </structure>
+            <property name="dataSource">Data Source</property>
+            <list-property name="resultSet">
+                <structure>
+                    <property name="position">1</property>
+                    <property name="name">STOCK_TAKE_ID</property>
+                    <property name="nativeName">Stock_Take_Id</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">0</property>
+                </structure>
+                <structure>
+                    <property name="position">2</property>
+                    <property name="name">PRODUCT_ID</property>
+                    <property name="nativeName">Product_Id</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">0</property>
+                </structure>
+                <structure>
+                    <property name="position">3</property>
+                    <property name="name">GROUP_ID</property>
+                    <property name="nativeName">MMGroup_Id</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">0</property>
+                </structure>
+                <structure>
+                    <property name="position">4</property>
+                    <property name="name">MMGROUP_HIERARCHY_ID</property>
+                    <property name="nativeName">MMGroup_Hierarchy_Id</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">0</property>
+                </structure>
+                <structure>
+                    <property name="position">5</property>
+                    <property name="name">GROUP_NAME</property>
+                    <property name="nativeName">Name</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">0</property>
+                </structure>
+                <structure>
+                    <property name="position">6</property>
+                    <property name="name">PRODUCT_DESCRIPTION</property>
+                    <property name="nativeName">Description</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">0</property>
+                </structure>
+                <structure>
+                    <property name="position">7</property>
+                    <property name="name">STYLE_ID</property>
+                    <property name="nativeName">Style_Id</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">0</property>
+                </structure>
+                <structure>
+                    <property name="position">8</property>
+                    <property name="name">SIZE_DESCRIPTION</property>
+                    <property name="nativeName">Description</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">0</property>
+                </structure>
+                <structure>
+                    <property name="position">9</property>
+                    <property name="name">COLOUR_DESCRIPTION</property>
+                    <property name="nativeName">Description</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">0</property>
+                </structure>
+                <structure>
+                    <property name="position">10</property>
+                    <property name="name">RETAIL_PRICE_INC_TAX</property>
+                    <property name="nativeName">Retail_Price_Inc_Tax</property>
+                    <property name="dataType">decimal</property>
+                    <property name="nativeDataType">0</property>
+                </structure>
+                <structure>
+                    <property name="position">11</property>
+                    <property name="name">COST_PRICE</property>
+                    <property name="nativeName">Cost_Price</property>
+                    <property name="dataType">float</property>
+                    <property name="nativeDataType">0</property>
+                </structure>
+                <structure>
+                    <property name="position">12</property>
+                    <property name="name">EXPECTED_QTY</property>
+                    <property name="nativeName">Expected_Qty</property>
+                    <property name="dataType">integer</property>
+                    <property name="nativeDataType">0</property>
+                </structure>
+                <structure>
+                    <property name="position">13</property>
+                    <property name="name">COUNTED_QTY</property>
+                    <property name="nativeName">Counted_Qty</property>
+                    <property name="dataType">integer</property>
+                    <property name="nativeDataType">0</property>
+                </structure>
+                <structure>
+                    <property name="position">14</property>
+                    <property name="name">DISCREPANCY</property>
+                    <property name="nativeName">DISCREPANCY</property>
+                    <property name="dataType">decimal</property>
+                    <property name="nativeDataType">0</property>
+                </structure>
+            </list-property>
+            <xml-property name="queryText"><![CDATA[SELECT stsi.Stock_Take_Id AS STOCK_TAKE_ID, 
+    stsi.Product_Id AS PRODUCT_ID, 
+    stsi.MMGroup_Id AS GROUP_ID, 
+    stsi.MMGroup_Hierarchy_Id AS MMGROUP_HIERARCHY_ID, 
+    g.Name AS GROUP_NAME, 
+    p.Description AS PRODUCT_DESCRIPTION, 
+    skup.Style_Id AS STYLE_ID, 
+    s.Description AS SIZE_DESCRIPTION, 
+    c.Description AS COLOUR_DESCRIPTION, 
+    stsi.Retail_Price_Inc_Tax AS RETAIL_PRICE_INC_TAX, 
+    stsi.Cost_Price as COST_PRICE,
+    stsi.Expected_Qty AS EXPECTED_QTY, 
+    stci.Counted_Qty AS COUNTED_QTY, 
+    stci.Counted_Qty - stsi.Expected_Qty AS DISCREPANCY
+ FROM StockTakeSnapshotItems stsi
+ JOIN (select stock_take_id,product_id,sum(ci.counted_qty) as COUNTED_QTY from StockTakeCountItems ci group by stock_take_id,product_id) stci
+ on stsi.stock_take_id = stci.stock_take_id and stsi.product_id = stci.product_id
+LEFT OUTER JOIN Products p ON stsi.Product_Id = p.Product_Id
+LEFT OUTER JOIN SKUProducts skup ON skup.Product_Id = stsi.Product_Id
+LEFT OUTER JOIN Sizes s ON s.Size_Id = skup.Size_Id AND s.Size_Range_Id = skup.Size_Range_Id
+LEFT OUTER JOIN Colours c ON c.Colour_Id = skup.Colour_Id AND c.Colour_Range_Id = skup.Colour_Range_Id
+LEFT OUTER JOIN Groups g ON g.Group_Id = stsi.MMGroup_Id AND g.Group_Type_Id = ?
+where stci.Counted_Qty != stsi.Expected_Qty
+and (? = !~''~! or ? = stsi.Location_id)
+and ? <= stsi.Snapshot_Date and stsi.Snapshot_Date < ?
+]]></xml-property>
+            <xml-property name="designerValues"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<model:DesignValues xmlns:design="http://www.eclipse.org/datatools/connectivity/oda/design" xmlns:model="http://www.eclipse.org/birt/report/model/adapter/odaModel">
+  <Version>2.0</Version>
+  <design:ResultSets derivedMetaData="true">
+    <design:resultSetDefinitions>
+      <design:resultSetColumns>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>GROUP_ID</design:name>
+              <design:position>1</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+            <design:precision>20</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>NotNullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>GROUP_ID</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>GROUP_ID</design:label>
+            <design:formattingHints>
+              <design:displaySize>20</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>MMGROUP_HIERARCHY_ID</design:name>
+              <design:position>2</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+            <design:precision>20</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>NotNullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>MMGROUP_HIERARCHY_ID</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>MMGROUP_HIERARCHY_ID</design:label>
+            <design:formattingHints>
+              <design:displaySize>20</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>PRODUCT_ID</design:name>
+              <design:position>3</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+            <design:precision>20</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>PRODUCT_ID</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>PRODUCT_ID</design:label>
+            <design:formattingHints>
+              <design:displaySize>20</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>PRODUCT_DESCRIPTION</design:name>
+              <design:position>4</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+            <design:precision>30</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>PRODUCT_DESCRIPTION</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>PRODUCT_DESCRIPTION</design:label>
+            <design:formattingHints>
+              <design:displaySize>30</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>STYLE_ID</design:name>
+              <design:position>5</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+            <design:precision>20</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>STYLE_ID</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>STYLE_ID</design:label>
+            <design:formattingHints>
+              <design:displaySize>20</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>SIZE_DESCRIPTION</design:name>
+              <design:position>6</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+            <design:precision>30</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>SIZE_DESCRIPTION</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>SIZE_DESCRIPTION</design:label>
+            <design:formattingHints>
+              <design:displaySize>30</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>COLOUR_DESCRIPTION</design:name>
+              <design:position>7</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+            <design:precision>30</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>COLOUR_DESCRIPTION</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>COLOUR_DESCRIPTION</design:label>
+            <design:formattingHints>
+              <design:displaySize>30</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>RETAIL_PRICE_INC_TAX</design:name>
+              <design:position>8</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>-5</design:nativeDataTypeCode>
+            <design:precision>19</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>RETAIL_PRICE_INC_TAX</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>RETAIL_PRICE_INC_TAX</design:label>
+            <design:formattingHints>
+              <design:displaySize>20</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>EXPECTED_QTY</design:name>
+              <design:position>9</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>4</design:nativeDataTypeCode>
+            <design:precision>10</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>EXPECTED_QTY</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>EXPECTED_QTY</design:label>
+            <design:formattingHints>
+              <design:displaySize>11</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>COUNTED_QTY</design:name>
+              <design:position>10</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>4</design:nativeDataTypeCode>
+            <design:precision>10</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>COUNTED_QTY</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>COUNTED_QTY</design:label>
+            <design:formattingHints>
+              <design:displaySize>11</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>DISCREPANCY</design:name>
+              <design:position>11</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>4</design:nativeDataTypeCode>
+            <design:precision>10</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>DISCREPANCY</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>DISCREPANCY</design:label>
+            <design:formattingHints>
+              <design:displaySize>11</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+      </design:resultSetColumns>
+      <design:criteria/>
+    </design:resultSetDefinitions>
+  </design:ResultSets>
+</model:DesignValues>]]></xml-property>
+        </oda-data-set>
+        <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="Test Query" id="2005">
+            <list-property name="columnHints">
+                <structure>
+                    <property name="columnName">ID</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">ID</text-property>
+                    <text-property name="heading">ID</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">Entity_Name</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">Entity_Name</text-property>
+                    <text-property name="heading">Entity_Name</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">Stock_Take_Id</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">Stock_Take_Id</text-property>
+                    <text-property name="heading">Stock_Take_Id</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">Product_Id</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">Product_Id</text-property>
+                    <text-property name="heading">Product_Id</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">Inventory_Type</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">Inventory_Type</text-property>
+                    <text-property name="heading">Inventory_Type</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">Location_Id</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">Location_Id</text-property>
+                    <text-property name="heading">Location_Id</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">Location_Area_Id</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">Location_Area_Id</text-property>
+                    <text-property name="heading">Location_Area_Id</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">Container_Id</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">Container_Id</text-property>
+                    <text-property name="heading">Container_Id</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">Expected_Qty</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">Expected_Qty</text-property>
+                    <text-property name="heading">Expected_Qty</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">Counted_Qty</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">Counted_Qty</text-property>
+                    <text-property name="heading">Counted_Qty</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">Ad_Hoc</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">Ad_Hoc</text-property>
+                    <text-property name="heading">Ad_Hoc</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">Snapshot_Date</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">Snapshot_Date</text-property>
+                    <text-property name="heading">Snapshot_Date</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">Snapshot_Date_Offset</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">Snapshot_Date_Offset</text-property>
+                    <text-property name="heading">Snapshot_Date_Offset</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">Cost_Price</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">Cost_Price</text-property>
+                    <text-property name="heading">Cost_Price</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">Retail_Price_Ex_Tax</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">Retail_Price_Ex_Tax</text-property>
+                    <text-property name="heading">Retail_Price_Ex_Tax</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">Retail_Price_Inc_Tax</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">Retail_Price_Inc_Tax</text-property>
+                    <text-property name="heading">Retail_Price_Inc_Tax</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">MMGroup_Id</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">MMGroup_Id</text-property>
+                    <text-property name="heading">MMGroup_Id</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">MMGroup_Hierarchy_Id</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">MMGroup_Hierarchy_Id</text-property>
+                    <text-property name="heading">MMGroup_Hierarchy_Id</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">MMGroup_Region_Id</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">MMGroup_Region_Id</text-property>
+                    <text-property name="heading">MMGroup_Region_Id</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">MMGroup_Region_Hierarchy_Id</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">MMGroup_Region_Hierarchy_Id</text-property>
+                    <text-property name="heading">MMGroup_Region_Hierarchy_Id</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">Last_Updated</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">Last_Updated</text-property>
+                    <text-property name="heading">Last_Updated</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">Timestamp</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">Timestamp</text-property>
+                    <text-property name="heading">Timestamp</text-property>
+                </structure>
+            </list-property>
+            <structure name="cachedMetaData">
+                <list-property name="resultSet">
+                    <structure>
+                        <property name="position">1</property>
+                        <property name="name">ID</property>
+                        <property name="dataType">decimal</property>
+                    </structure>
+                    <structure>
+                        <property name="position">2</property>
+                        <property name="name">Entity_Name</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">3</property>
+                        <property name="name">Stock_Take_Id</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">4</property>
+                        <property name="name">Product_Id</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">5</property>
+                        <property name="name">Inventory_Type</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">6</property>
+                        <property name="name">Location_Id</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">7</property>
+                        <property name="name">Location_Area_Id</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">8</property>
+                        <property name="name">Container_Id</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">9</property>
+                        <property name="name">Expected_Qty</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                    <structure>
+                        <property name="position">10</property>
+                        <property name="name">Counted_Qty</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                    <structure>
+                        <property name="position">11</property>
+                        <property name="name">Ad_Hoc</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                    <structure>
+                        <property name="position">12</property>
+                        <property name="name">Snapshot_Date</property>
+                        <property name="dataType">date-time</property>
+                    </structure>
+                    <structure>
+                        <property name="position">13</property>
+                        <property name="name">Snapshot_Date_Offset</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                    <structure>
+                        <property name="position">14</property>
+                        <property name="name">Cost_Price</property>
+                        <property name="dataType">float</property>
+                    </structure>
+                    <structure>
+                        <property name="position">15</property>
+                        <property name="name">Retail_Price_Ex_Tax</property>
+                        <property name="dataType">decimal</property>
+                    </structure>
+                    <structure>
+                        <property name="position">16</property>
+                        <property name="name">Retail_Price_Inc_Tax</property>
+                        <property name="dataType">decimal</property>
+                    </structure>
+                    <structure>
+                        <property name="position">17</property>
+                        <property name="name">MMGroup_Id</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">18</property>
+                        <property name="name">MMGroup_Hierarchy_Id</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">19</property>
+                        <property name="name">MMGroup_Region_Id</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">20</property>
+                        <property name="name">MMGroup_Region_Hierarchy_Id</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">21</property>
+                        <property name="name">Last_Updated</property>
+                        <property name="dataType">date-time</property>
+                    </structure>
+                    <structure>
+                        <property name="position">22</property>
+                        <property name="name">Timestamp</property>
+                        <property name="dataType">decimal</property>
+                    </structure>
+                </list-property>
+            </structure>
+            <property name="dataSource">Data Source</property>
+            <list-property name="resultSet">
+                <structure>
+                    <property name="position">1</property>
+                    <property name="name">ID</property>
+                    <property name="nativeName">ID</property>
+                    <property name="dataType">decimal</property>
+                    <property name="nativeDataType">-5</property>
+                </structure>
+                <structure>
+                    <property name="position">2</property>
+                    <property name="name">Entity_Name</property>
+                    <property name="nativeName">Entity_Name</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">3</property>
+                    <property name="name">Stock_Take_Id</property>
+                    <property name="nativeName">Stock_Take_Id</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">4</property>
+                    <property name="name">Product_Id</property>
+                    <property name="nativeName">Product_Id</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">5</property>
+                    <property name="name">Inventory_Type</property>
+                    <property name="nativeName">Inventory_Type</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">6</property>
+                    <property name="name">Location_Id</property>
+                    <property name="nativeName">Location_Id</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">7</property>
+                    <property name="name">Location_Area_Id</property>
+                    <property name="nativeName">Location_Area_Id</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">8</property>
+                    <property name="name">Container_Id</property>
+                    <property name="nativeName">Container_Id</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">9</property>
+                    <property name="name">Expected_Qty</property>
+                    <property name="nativeName">Expected_Qty</property>
+                    <property name="dataType">integer</property>
+                    <property name="nativeDataType">4</property>
+                </structure>
+                <structure>
+                    <property name="position">10</property>
+                    <property name="name">Counted_Qty</property>
+                    <property name="nativeName">Counted_Qty</property>
+                    <property name="dataType">integer</property>
+                    <property name="nativeDataType">4</property>
+                </structure>
+                <structure>
+                    <property name="position">11</property>
+                    <property name="name">Ad_Hoc</property>
+                    <property name="nativeName">Ad_Hoc</property>
+                    <property name="dataType">integer</property>
+                    <property name="nativeDataType">-7</property>
+                </structure>
+                <structure>
+                    <property name="position">12</property>
+                    <property name="name">Snapshot_Date</property>
+                    <property name="nativeName">Snapshot_Date</property>
+                    <property name="dataType">date-time</property>
+                    <property name="nativeDataType">93</property>
+                </structure>
+                <structure>
+                    <property name="position">13</property>
+                    <property name="name">Snapshot_Date_Offset</property>
+                    <property name="nativeName">Snapshot_Date_Offset</property>
+                    <property name="dataType">integer</property>
+                    <property name="nativeDataType">4</property>
+                </structure>
+                <structure>
+                    <property name="position">14</property>
+                    <property name="name">Cost_Price</property>
+                    <property name="nativeName">Cost_Price</property>
+                    <property name="dataType">float</property>
+                    <property name="nativeDataType">8</property>
+                </structure>
+                <structure>
+                    <property name="position">15</property>
+                    <property name="name">Retail_Price_Ex_Tax</property>
+                    <property name="nativeName">Retail_Price_Ex_Tax</property>
+                    <property name="dataType">decimal</property>
+                    <property name="nativeDataType">-5</property>
+                </structure>
+                <structure>
+                    <property name="position">16</property>
+                    <property name="name">Retail_Price_Inc_Tax</property>
+                    <property name="nativeName">Retail_Price_Inc_Tax</property>
+                    <property name="dataType">decimal</property>
+                    <property name="nativeDataType">-5</property>
+                </structure>
+                <structure>
+                    <property name="position">17</property>
+                    <property name="name">MMGroup_Id</property>
+                    <property name="nativeName">MMGroup_Id</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">18</property>
+                    <property name="name">MMGroup_Hierarchy_Id</property>
+                    <property name="nativeName">MMGroup_Hierarchy_Id</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">19</property>
+                    <property name="name">MMGroup_Region_Id</property>
+                    <property name="nativeName">MMGroup_Region_Id</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">20</property>
+                    <property name="name">MMGroup_Region_Hierarchy_Id</property>
+                    <property name="nativeName">MMGroup_Region_Hierarchy_Id</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">21</property>
+                    <property name="name">Last_Updated</property>
+                    <property name="nativeName">Last_Updated</property>
+                    <property name="dataType">date-time</property>
+                    <property name="nativeDataType">93</property>
+                </structure>
+                <structure>
+                    <property name="position">22</property>
+                    <property name="name">Timestamp</property>
+                    <property name="nativeName">Timestamp</property>
+                    <property name="dataType">decimal</property>
+                    <property name="nativeDataType">-5</property>
+                </structure>
+            </list-property>
+            <xml-property name="queryText"><![CDATA[select * from stocktakesnapshotitems where Product_Id like 'MB709SN%';
+]]></xml-property>
+            <xml-property name="designerValues"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<model:DesignValues xmlns:design="http://www.eclipse.org/datatools/connectivity/oda/design" xmlns:model="http://www.eclipse.org/birt/report/model/adapter/odaModel">
+  <Version>2.0</Version>
+  <design:ResultSets derivedMetaData="true">
+    <design:resultSetDefinitions>
+      <design:resultSetColumns>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>ID</design:name>
+              <design:position>1</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>-5</design:nativeDataTypeCode>
+            <design:precision>20</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>NotNullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>ID</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>ID</design:label>
+            <design:formattingHints>
+              <design:displaySize>20</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>Entity_Name</design:name>
+              <design:position>2</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+            <design:precision>255</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>NotNullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>Entity_Name</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>Entity_Name</design:label>
+            <design:formattingHints>
+              <design:displaySize>255</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>Stock_Take_Id</design:name>
+              <design:position>3</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+            <design:precision>20</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>NotNullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>Stock_Take_Id</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>Stock_Take_Id</design:label>
+            <design:formattingHints>
+              <design:displaySize>20</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>Product_Id</design:name>
+              <design:position>4</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+            <design:precision>20</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>Product_Id</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>Product_Id</design:label>
+            <design:formattingHints>
+              <design:displaySize>20</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>Inventory_Type</design:name>
+              <design:position>5</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+            <design:precision>20</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>Inventory_Type</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>Inventory_Type</design:label>
+            <design:formattingHints>
+              <design:displaySize>20</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>Location_Id</design:name>
+              <design:position>6</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+            <design:precision>20</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>Location_Id</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>Location_Id</design:label>
+            <design:formattingHints>
+              <design:displaySize>20</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>Location_Area_Id</design:name>
+              <design:position>7</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+            <design:precision>20</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>Location_Area_Id</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>Location_Area_Id</design:label>
+            <design:formattingHints>
+              <design:displaySize>20</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>Container_Id</design:name>
+              <design:position>8</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+            <design:precision>20</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>Container_Id</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>Container_Id</design:label>
+            <design:formattingHints>
+              <design:displaySize>20</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>Expected_Qty</design:name>
+              <design:position>9</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>4</design:nativeDataTypeCode>
+            <design:precision>11</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>Expected_Qty</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>Expected_Qty</design:label>
+            <design:formattingHints>
+              <design:displaySize>11</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>Counted_Qty</design:name>
+              <design:position>10</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>4</design:nativeDataTypeCode>
+            <design:precision>11</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>Counted_Qty</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>Counted_Qty</design:label>
+            <design:formattingHints>
+              <design:displaySize>11</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>Ad_Hoc</design:name>
+              <design:position>11</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>-7</design:nativeDataTypeCode>
+            <design:precision>1</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>Ad_Hoc</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>Ad_Hoc</design:label>
+            <design:formattingHints>
+              <design:displaySize>1</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>Snapshot_Date</design:name>
+              <design:position>12</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>93</design:nativeDataTypeCode>
+            <design:precision>19</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>Snapshot_Date</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>Snapshot_Date</design:label>
+            <design:formattingHints>
+              <design:displaySize>19</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>Snapshot_Date_Offset</design:name>
+              <design:position>13</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>4</design:nativeDataTypeCode>
+            <design:precision>11</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>Snapshot_Date_Offset</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>Snapshot_Date_Offset</design:label>
+            <design:formattingHints>
+              <design:displaySize>11</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>Cost_Price</design:name>
+              <design:position>14</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>8</design:nativeDataTypeCode>
+            <design:precision>22</design:precision>
+            <design:scale>31</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>Cost_Price</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>Cost_Price</design:label>
+            <design:formattingHints>
+              <design:displaySize>22</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>Retail_Price_Ex_Tax</design:name>
+              <design:position>15</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>-5</design:nativeDataTypeCode>
+            <design:precision>20</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>Retail_Price_Ex_Tax</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>Retail_Price_Ex_Tax</design:label>
+            <design:formattingHints>
+              <design:displaySize>20</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>Retail_Price_Inc_Tax</design:name>
+              <design:position>16</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>-5</design:nativeDataTypeCode>
+            <design:precision>20</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>Retail_Price_Inc_Tax</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>Retail_Price_Inc_Tax</design:label>
+            <design:formattingHints>
+              <design:displaySize>20</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>MMGroup_Id</design:name>
+              <design:position>17</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+            <design:precision>20</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>NotNullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>MMGroup_Id</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>MMGroup_Id</design:label>
+            <design:formattingHints>
+              <design:displaySize>20</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>MMGroup_Hierarchy_Id</design:name>
+              <design:position>18</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+            <design:precision>20</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>NotNullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>MMGroup_Hierarchy_Id</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>MMGroup_Hierarchy_Id</design:label>
+            <design:formattingHints>
+              <design:displaySize>20</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>MMGroup_Region_Id</design:name>
+              <design:position>19</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+            <design:precision>20</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>NotNullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>MMGroup_Region_Id</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>MMGroup_Region_Id</design:label>
+            <design:formattingHints>
+              <design:displaySize>20</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>MMGroup_Region_Hierarchy_Id</design:name>
+              <design:position>20</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+            <design:precision>20</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>NotNullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>MMGroup_Region_Hierarchy_Id</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>MMGroup_Region_Hierarchy_Id</design:label>
+            <design:formattingHints>
+              <design:displaySize>20</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>Last_Updated</design:name>
+              <design:position>21</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>93</design:nativeDataTypeCode>
+            <design:precision>19</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>Last_Updated</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>Last_Updated</design:label>
+            <design:formattingHints>
+              <design:displaySize>19</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>Timestamp</design:name>
+              <design:position>22</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>-5</design:nativeDataTypeCode>
+            <design:precision>20</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>NotNullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>Timestamp</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>Timestamp</design:label>
+            <design:formattingHints>
+              <design:displaySize>20</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+      </design:resultSetColumns>
+      <design:criteria/>
+    </design:resultSetDefinitions>
+  </design:ResultSets>
+</model:DesignValues>]]></xml-property>
+        </oda-data-set>
+    </data-sets>
+    <styles>
+        <style name="report" id="4">
+            <property name="fontFamily">sans-serif</property>
+            <property name="fontSize">10pt</property>
+        </style>
+        <style name="crosstab" id="5">
+            <property name="borderBottomColor">#CCCCCC</property>
+            <property name="borderBottomStyle">solid</property>
+            <property name="borderBottomWidth">1pt</property>
+            <property name="borderLeftColor">#CCCCCC</property>
+            <property name="borderLeftStyle">solid</property>
+            <property name="borderLeftWidth">1pt</property>
+            <property name="borderRightColor">#CCCCCC</property>
+            <property name="borderRightStyle">solid</property>
+            <property name="borderRightWidth">1pt</property>
+            <property name="borderTopColor">#CCCCCC</property>
+            <property name="borderTopStyle">solid</property>
+            <property name="borderTopWidth">1pt</property>
+        </style>
+        <style name="crosstab-cell" id="6">
+            <property name="borderBottomColor">#CCCCCC</property>
+            <property name="borderBottomStyle">solid</property>
+            <property name="borderBottomWidth">1pt</property>
+            <property name="borderLeftColor">#CCCCCC</property>
+            <property name="borderLeftStyle">solid</property>
+            <property name="borderLeftWidth">1pt</property>
+            <property name="borderRightColor">#CCCCCC</property>
+            <property name="borderRightStyle">solid</property>
+            <property name="borderRightWidth">1pt</property>
+            <property name="borderTopColor">#CCCCCC</property>
+            <property name="borderTopStyle">solid</property>
+            <property name="borderTopWidth">1pt</property>
+        </style>
+    </styles>
+    <page-setup>
+        <simple-master-page name="Simple MasterPage" id="2">
+            <property name="type">a4</property>
+            <property name="orientation">portrait</property>
+            <property name="leftMargin">0.25in</property>
+            <page-footer>
+                <grid id="522">
+                    <property name="width">7.635416666666667in</property>
+                    <column id="523">
+                        <property name="width">3.0625in</property>
+                    </column>
+                    <column id="524">
+                        <property name="width">3.8854166666666665in</property>
+                    </column>
+                    <column id="525">
+                        <property name="width">0.6875in</property>
+                    </column>
+                    <row id="526">
+                        <cell id="527">
+                            <text name="GeneratedOnText" id="531">
+                                <property name="style">reportFooterLeft</property>
+                                <property name="marginTop">0pt</property>
+                                <property name="paddingTop">1pt</property>
+                                <property name="textAlign">left</property>
+                                <property name="contentType">html</property>
+                                <text-property name="content"><![CDATA[
+<value-of>l10nParams = new Array(1); l10nParams[0] = Packages.com.enactor.core.utilities.DateUtils.formatShortDateMediumTime(reportContext.getLocale(), new Date) ; reportContext.getMessage("GENERATED_ON", reportContext.getLocale(), l10nParams);</value-of>
+]]></text-property>
+                            </text>
+                        </cell>
+                        <cell id="528"/>
+                        <cell id="529">
+                            <grid id="532">
+                                <property name="width">100%</property>
+                                <column id="533"/>
+                                <column id="534"/>
+                                <column id="535"/>
+                                <row id="536">
+                                    <cell id="537">
+                                        <auto-text id="538">
+                                            <property name="style">reportFooterRight</property>
+                                            <property name="type">page-number</property>
+                                        </auto-text>
+                                    </cell>
+                                    <cell id="539">
+                                        <text id="540">
+                                            <property name="style">reportFooterCentre</property>
+                                            <property name="contentType">plain</property>
+                                            <text-property name="content"><![CDATA[/]]></text-property>
+                                        </text>
+                                    </cell>
+                                    <cell id="541">
+                                        <auto-text id="542">
+                                            <property name="style">reportFooterRight</property>
+                                            <property name="type">total-page</property>
+                                        </auto-text>
+                                    </cell>
+                                </row>
+                            </grid>
+                        </cell>
+                    </row>
+                </grid>
+            </page-footer>
+        </simple-master-page>
+    </page-setup>
+    <body>
+        <grid name="ReportTitleGrid" id="362">
+            <property name="width">100%</property>
+            <column id="363"/>
+            <row id="364">
+                <cell id="365">
+                    <property name="paddingTop">1pt</property>
+                    <label name="ReportTitleLabel" id="521">
+                        <property name="style">reportTitle</property>
+                        <property name="fontFamily">sans-serif</property>
+                        <property name="fontSize">larger</property>
+                        <property name="paddingTop">1pt</property>
+                        <property name="textAlign">center</property>
+                        <text-property name="text" key="TITLE"></text-property>
+                    </label>
+                </cell>
+            </row>
+        </grid>
+        <grid name="CriteriaGrid" id="502">
+            <property name="marginTop">0pt</property>
+            <property name="width">100%</property>
+            <list-property name="visibility">
+                <structure>
+                    <property name="format">all</property>
+                    <expression name="valueExpr">if (pageNumber > 1) {
+ true;
+} else {
+ false;
+}</expression>
+                </structure>
+            </list-property>
+            <column id="377">
+                <property name="width">11%</property>
+            </column>
+            <column id="567">
+                <property name="width">39%</property>
+            </column>
+            <column id="993">
+                <property name="width">11%</property>
+            </column>
+            <column id="578">
+                <property name="width">39%</property>
+            </column>
+            <row id="992">
+                <cell id="991">
+                    <property name="colSpan">4</property>
+                    <property name="rowSpan">1</property>
+                    <label id="990">
+                        <property name="style">subReportHeader</property>
+                        <property name="marginTop">0pt</property>
+                        <property name="paddingTop">1pt</property>
+                        <property name="textAlign">center</property>
+                        <text-property name="text" key="REPORT_CRITERIA"></text-property>
+                    </label>
+                </cell>
+            </row>
+            <row id="989">
+                <cell id="988">
+                    <property name="paddingTop">1pt</property>
+                    <label id="568">
+                        <property name="style">criteriaLabel</property>
+                        <text-property name="text" key="CRITERIA_1"></text-property>
+                    </label>
+                </cell>
+                <cell id="562">
+                    <property name="paddingTop">1pt</property>
+                    <text-data id="1035">
+                        <property name="style">criteriaLabel</property>
+                        <expression name="valueExpr">startDateStr;</expression>
+                        <property name="contentType">html</property>
+                    </text-data>
+                </cell>
+                <cell id="985">
+                    <label id="437">
+                        <property name="style">criteriaLabel</property>
+                        <text-property name="text" key="CRITERIA_2"></text-property>
+                    </label>
+                </cell>
+                <cell id="573">
+                    <text-data id="1036">
+                        <property name="style">criteriaLabel</property>
+                        <expression name="valueExpr">endDateStr;</expression>
+                        <property name="contentType">html</property>
+                    </text-data>
+                </cell>
+            </row>
+            <row id="984">
+                <cell id="983">
+                    <label id="438">
+                        <property name="style">criteriaLabel</property>
+                        <text-property name="text" key="CRITERIA_3"></text-property>
+                    </label>
+                </cell>
+                <cell id="563"/>
+                <cell id="982"/>
+                <cell id="574"/>
+            </row>
+            <row id="981">
+                <cell id="980">
+                    <label id="440">
+                        <property name="style">criteriaLabel</property>
+                        <text-property name="text" key="CRITERIA_5"></text-property>
+                    </label>
+                </cell>
+                <cell id="564"/>
+                <cell id="979">
+                    <label id="441">
+                        <property name="style">criteriaLabel</property>
+                        <text-property name="text" key="CRITERIA_6"></text-property>
+                    </label>
+                </cell>
+                <cell id="575"/>
+            </row>
+            <row id="420">
+                <cell id="421"/>
+                <cell id="566"/>
+                <cell id="422"/>
+                <cell id="577">
+                    <data id="2010">
+                        <property name="fontStyle">italic</property>
+                        <property name="resultSetColumn">SET_BASE_CURRENCY_ID</property>
+                    </data>
+                </cell>
+            </row>
+        </grid>
+        <grid id="1744">
+            <column id="1745"/>
+            <row id="1748">
+                <cell id="1749"/>
+            </row>
+            <row id="1750">
+                <cell id="1751">
+                    <table id="1839">
+                        <property name="dataSet">Item Query</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">GROUP_ID</property>
+                                <expression name="expression" type="javascript">dataSetRow["GROUP_ID"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">MMGROUP_HIERARCHY_ID</property>
+                                <expression name="expression" type="javascript">dataSetRow["MMGROUP_HIERARCHY_ID"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">PRODUCT_ID</property>
+                                <expression name="expression" type="javascript">dataSetRow["PRODUCT_ID"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">PRODUCT_DESCRIPTION</property>
+                                <expression name="expression" type="javascript">dataSetRow["PRODUCT_DESCRIPTION"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">STYLE_ID</property>
+                                <expression name="expression" type="javascript">dataSetRow["STYLE_ID"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">SIZE_DESCRIPTION</property>
+                                <expression name="expression" type="javascript">dataSetRow["SIZE_DESCRIPTION"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">COLOUR_DESCRIPTION</property>
+                                <expression name="expression" type="javascript">dataSetRow["COLOUR_DESCRIPTION"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">RETAIL_PRICE_INC_TAX</property>
+                                <expression name="expression" type="javascript">dataSetRow["RETAIL_PRICE_INC_TAX"]</expression>
+                                <property name="dataType">decimal</property>
+                            </structure>
+                            <structure>
+                                <property name="name">EXPECTED_QTY</property>
+                                <expression name="expression" type="javascript">dataSetRow["EXPECTED_QTY"]</expression>
+                                <property name="dataType">integer</property>
+                            </structure>
+                            <structure>
+                                <property name="name">COUNTED_QTY</property>
+                                <expression name="expression" type="javascript">dataSetRow["COUNTED_QTY"]</expression>
+                                <property name="dataType">integer</property>
+                            </structure>
+                            <structure>
+                                <property name="name">DISCREPANCY</property>
+                                <expression name="expression" type="javascript">dataSetRow["DISCREPANCY"]</expression>
+                                <property name="dataType">integer</property>
+                            </structure>
+                            <structure>
+                                <property name="name">FORMATTED_RETAIL_PRICE_INC_TAX</property>
+                                <text-property name="displayName">FORMATTED_RETAIL_PRICE_INC_TAX</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["FORMATTED_RETAIL_PRICE_INC_TAX"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">FORMATTED_COST_PRICE</property>
+                                <text-property name="displayName">FORMATTED_COST_PRICE</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["FORMATTED_COST_PRICE"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">FORMATTED_TOTAL_RETAIL_PRICE_INC_TAX</property>
+                                <text-property name="displayName">FORMATTED_TOTAL_RETAIL_PRICE_INC_TAX</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["FORMATTED_TOTAL_RETAIL_PRICE_INC_TAX"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">FORMATTED_TOTAL_COST_PRICE</property>
+                                <text-property name="displayName">FORMATTED_TOTAL_COST_PRICE</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["FORMATTED_TOTAL_COST_PRICE"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">TOTAL_DISCREPANCY</property>
+                                <text-property name="displayName">TOTAL_DISCREPANCY</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["TOTAL_DISCREPANCY"]</expression>
+                                <property name="dataType">decimal</property>
+                            </structure>
+                            <structure>
+                                <property name="name">STOCK_TAKE_ID</property>
+                                <text-property name="displayName">STOCK_TAKE_ID</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["STOCK_TAKE_ID"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">GROUP_NAME</property>
+                                <text-property name="displayName">GROUP_NAME</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["GROUP_NAME"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">COST_PRICE</property>
+                                <text-property name="displayName">COST_PRICE</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["COST_PRICE"]</expression>
+                                <property name="dataType">float</property>
+                            </structure>
+                            <structure>
+                                <property name="name">DISCREPANCY_1</property>
+                                <text-property name="displayName">DISCREPANCY</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["DISCREPANCY"]</expression>
+                                <property name="dataType">decimal</property>
+                            </structure>
+                            <structure>
+                                <property name="name">TOTAL_RETAIL_PRICE_INC_TAX</property>
+                                <text-property name="displayName">TOTAL_RETAIL_PRICE_INC_TAX</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["TOTAL_RETAIL_PRICE_INC_TAX"]</expression>
+                                <property name="dataType">decimal</property>
+                            </structure>
+                            <structure>
+                                <property name="name">TOTAL_COST_PRICE</property>
+                                <text-property name="displayName">TOTAL_COST_PRICE</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["TOTAL_COST_PRICE"]</expression>
+                                <property name="dataType">float</property>
+                            </structure>
+                        </list-property>
+                        <column id="1985"/>
+                        <column id="1867"/>
+                        <column id="1868"/>
+                        <column id="1869"/>
+                        <column id="1870"/>
+                        <column id="1871"/>
+                        <column id="1872"/>
+                        <column id="1873"/>
+                        <column id="2017"/>
+                        <column id="2024"/>
+                        <column id="1874"/>
+                        <header>
+                            <row id="1925">
+                                <cell id="1979"/>
+                                <cell id="1926"/>
+                                <cell id="1927"/>
+                                <cell id="1928"/>
+                                <cell id="1929"/>
+                                <cell id="1930">
+                                    <label id="1934">
+                                        <property name="style">columnHeaderRight</property>
+                                        <text-property name="text" key="TOTAL"></text-property>
+                                    </label>
+                                </cell>
+                                <cell id="1931">
+                                    <data id="1935">
+                                        <property name="style">reportColumnTotalNoOverline</property>
+                                        <property name="resultSetColumn">FORMATTED_TOTAL_RETAIL_PRICE_INC_TAX</property>
+                                    </data>
+                                </cell>
+                                <cell id="1932">
+                                    <data id="1936">
+                                        <property name="style">reportColumnTotalNoOverline</property>
+                                        <property name="resultSetColumn">FORMATTED_TOTAL_COST_PRICE</property>
+                                    </data>
+                                </cell>
+                                <cell id="2011"/>
+                                <cell id="2018"/>
+                                <cell id="1933">
+                                    <data id="1937">
+                                        <property name="style">reportColumnTotalNoOverline</property>
+                                        <property name="resultSetColumn">TOTAL_DISCREPANCY</property>
+                                    </data>
+                                </cell>
+                            </row>
+                            <row id="1840">
+                                <cell id="1980">
+                                    <label id="1986">
+                                        <property name="style">columnHeader</property>
+                                        <text-property name="text" key="STOCK_TAKE_ID"></text-property>
+                                    </label>
+                                </cell>
+                                <cell id="1841">
+                                    <label id="1875">
+                                        <property name="style">columnHeader</property>
+                                        <text-property name="text" key="PRODUCT_ID"></text-property>
+                                    </label>
+                                </cell>
+                                <cell id="1842">
+                                    <label id="1876">
+                                        <property name="style">columnHeader</property>
+                                        <text-property name="text" key="DESCRIPTION"></text-property>
+                                    </label>
+                                </cell>
+                                <cell id="1843">
+                                    <label id="1877">
+                                        <property name="style">columnHeader</property>
+                                        <text-property name="text" key="STYLE"></text-property>
+                                    </label>
+                                </cell>
+                                <cell id="1844">
+                                    <label id="1878">
+                                        <property name="style">columnHeader</property>
+                                        <text-property name="text" key="COLOUR"></text-property>
+                                    </label>
+                                </cell>
+                                <cell id="1845">
+                                    <label id="1879">
+                                        <property name="style">columnHeader</property>
+                                        <text-property name="text" key="SIZE"></text-property>
+                                    </label>
+                                </cell>
+                                <cell id="1846">
+                                    <label id="1880">
+                                        <property name="style">columnHeaderRight</property>
+                                        <text-property name="text" key="RETAIL"></text-property>
+                                    </label>
+                                </cell>
+                                <cell id="1847">
+                                    <label id="1881">
+                                        <property name="style">columnHeaderRight</property>
+                                        <text-property name="text" key="COST"></text-property>
+                                    </label>
+                                </cell>
+                                <cell id="2012">
+                                    <label id="2026">
+                                        <property name="style">columnHeaderRight</property>
+                                        <text-property name="text" key="EXPECTED_QTY"></text-property>
+                                    </label>
+                                </cell>
+                                <cell id="2019">
+                                    <label id="2025">
+                                        <property name="style">columnHeaderRight</property>
+                                        <text-property name="text" key="COUNTED_QTY"></text-property>
+                                    </label>
+                                </cell>
+                                <cell id="1848">
+                                    <label id="1882">
+                                        <property name="style">columnHeaderRight</property>
+                                        <text-property name="text" key="ADJUST_QTY"></text-property>
+                                    </label>
+                                </cell>
+                            </row>
+                        </header>
+                        <group id="1959">
+                            <property name="groupName">StockTakeIdGroup</property>
+                            <expression name="keyExpr" type="javascript">row["STOCK_TAKE_ID"]</expression>
+                            <structure name="toc">
+                                <expression name="expressionValue" type="javascript">row["STOCK_TAKE_ID"]</expression>
+                            </structure>
+                            <property name="hideDetail">false</property>
+                            <header>
+                                <row id="1960">
+                                    <cell id="1981">
+                                        <data id="1978">
+                                            <property name="style">reportColumn</property>
+                                            <property name="resultSetColumn">STOCK_TAKE_ID</property>
+                                        </data>
+                                    </cell>
+                                    <cell id="1961"/>
+                                    <cell id="1962"/>
+                                    <cell id="1963"/>
+                                    <cell id="1964"/>
+                                    <cell id="1965"/>
+                                    <cell id="1966"/>
+                                    <cell id="1967"/>
+                                    <cell id="2013"/>
+                                    <cell id="2020"/>
+                                    <cell id="1968"/>
+                                </row>
+                            </header>
+                            <footer>
+                                <row id="1969">
+                                    <cell id="1983"/>
+                                    <cell id="1970"/>
+                                    <cell id="1971"/>
+                                    <cell id="1972"/>
+                                    <cell id="1973"/>
+                                    <cell id="1974"/>
+                                    <cell id="1975"/>
+                                    <cell id="1976"/>
+                                    <cell id="2015"/>
+                                    <cell id="2022"/>
+                                    <cell id="1977"/>
+                                </row>
+                            </footer>
+                        </group>
+                        <detail>
+                            <row id="1849">
+                                <cell id="1982"/>
+                                <cell id="1850">
+                                    <data id="1883">
+                                        <property name="style">reportColumn</property>
+                                        <property name="resultSetColumn">PRODUCT_ID</property>
+                                    </data>
+                                </cell>
+                                <cell id="1851">
+                                    <data id="1884">
+                                        <property name="style">reportColumn</property>
+                                        <property name="resultSetColumn">PRODUCT_DESCRIPTION</property>
+                                    </data>
+                                </cell>
+                                <cell id="1852">
+                                    <data id="1885">
+                                        <property name="style">reportColumn</property>
+                                        <property name="resultSetColumn">STYLE_ID</property>
+                                    </data>
+                                </cell>
+                                <cell id="1853">
+                                    <data id="1886">
+                                        <property name="style">reportColumn</property>
+                                        <property name="resultSetColumn">COLOUR_DESCRIPTION</property>
+                                    </data>
+                                </cell>
+                                <cell id="1854">
+                                    <data id="1887">
+                                        <property name="style">reportColumn</property>
+                                        <property name="resultSetColumn">SIZE_DESCRIPTION</property>
+                                    </data>
+                                </cell>
+                                <cell id="1855">
+                                    <data id="1890">
+                                        <property name="style">reportColumnRight</property>
+                                        <property name="resultSetColumn">FORMATTED_RETAIL_PRICE_INC_TAX</property>
+                                    </data>
+                                </cell>
+                                <cell id="1856">
+                                    <data id="1891">
+                                        <property name="style">reportColumnRight</property>
+                                        <property name="resultSetColumn">FORMATTED_COST_PRICE</property>
+                                    </data>
+                                </cell>
+                                <cell id="2014">
+                                    <data id="2028">
+                                        <property name="style">reportColumnRight</property>
+                                        <property name="resultSetColumn">EXPECTED_QTY</property>
+                                    </data>
+                                </cell>
+                                <cell id="2021">
+                                    <data id="2030">
+                                        <property name="style">reportColumnRight</property>
+                                        <property name="resultSetColumn">COUNTED_QTY</property>
+                                    </data>
+                                </cell>
+                                <cell id="1857">
+                                    <data id="1889">
+                                        <property name="style">reportColumnRight</property>
+                                        <property name="resultSetColumn">DISCREPANCY</property>
+                                    </data>
+                                </cell>
+                            </row>
+                        </detail>
+                        <footer>
+                            <row id="1858">
+                                <cell id="1984"/>
+                                <cell id="1859"/>
+                                <cell id="1860"/>
+                                <cell id="1861"/>
+                                <cell id="1862"/>
+                                <cell id="1863"/>
+                                <cell id="1864"/>
+                                <cell id="1865"/>
+                                <cell id="2016"/>
+                                <cell id="2023"/>
+                                <cell id="1866"/>
+                            </row>
+                        </footer>
+                    </table>
+                </cell>
+            </row>
+        </grid>
+    </body>
+</report>

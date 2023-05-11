@@ -1,0 +1,344 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<core:simpleActivityFlowBusinessProcess xmlns:core="http://www.enactor.com/core" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803" xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:ns10="http://maven.apache.org/POM/4.0.0" xmlns:ns8="tools" xmlns:retail="http://www.enactor.com/retail" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:tools="http://www.enactor.com/tools">
+    <core:processId>InventoryManagement/RequestStockTake</core:processId>
+    <core:name>Request Stock Take</core:name>
+    <core:businessProcessTypeId>InventoryManagement/RequestStockTakeType</core:businessProcessTypeId>
+    <core:startPrivilege>enactor.inventoryManagement.RequestStockTake.Run</core:startPrivilege>
+    <core:administerPrivilege>enactor.inventoryManagement.RequestStockTake.Admin</core:administerPrivilege>
+    <core:deprecated>false</core:deprecated>
+    <core:uiSettings xsi:type="tools:BusinessProcessSettings" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <core:constraint xsi:type="core:UIPositionConstraint">
+            <core:x>12</core:x>
+            <core:y>64</core:y>
+        </core:constraint>
+        <tools:swimLanes>
+            <tools:lane label="Head Office" height="590" id="Lane 1"/>
+            <tools:lane label="Store" height="37" id="Lane 2"/>
+        </tools:swimLanes>
+        <tools:notes xsi:type="core:WrappedList">
+            <core:listElement>
+                <core:value xsi:type="tools:BPNote">
+                    <tools:noteId>Note0</tools:noteId>
+                    <tools:swimLaneId>default</tools:swimLaneId>
+                    <tools:description>Creates or uses a stock take template. The template defines the MMGs to count and any thresholds.</tools:description>
+                    <tools:constraint>
+                        <core:x>14</core:x>
+                        <core:y>439</core:y>
+                        <core:height>113</core:height>
+                        <core:width>146</core:width>
+                    </tools:constraint>
+                </core:value>
+                <core:index>0</core:index>
+            </core:listElement>
+            <core:listElement>
+                <core:value xsi:type="tools:BPNote">
+                    <tools:noteId>Note2</tools:noteId>
+                    <tools:swimLaneId>default</tools:swimLaneId>
+                    <tools:description>Starts a business process for each of the locations specified.</tools:description>
+                    <tools:constraint>
+                        <core:x>678</core:x>
+                        <core:y>412</core:y>
+                        <core:height>107</core:height>
+                        <core:width>150</core:width>
+                    </tools:constraint>
+                </core:value>
+                <core:index>1</core:index>
+            </core:listElement>
+        </tools:notes>
+        <tools:style>1</tools:style>
+    </core:uiSettings>
+    <core:activities xsi:type="core:WrappedList" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <core:listElement>
+            <core:value xsi:type="core:HTActivity">
+                <core:activityId>CreateStockTakeRequest</core:activityId>
+                <core:name>Create Stock Take Request</core:name>
+                <core:description>UI to create a stock take request</core:description>
+                <core:activityTypeId>InventoryManagement/CreateStockTakeRequestActivityType</core:activityTypeId>
+                <core:activityOutcome name="RequestStarted">
+                    <core:toActivity>SubmitRequests</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:suspendActivityOutcome name="Suspended">
+                    <core:toActivity>CreateStockTakeRequest</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:suspendActivityOutcome>
+                <core:activityOutcome name="Cancelled">
+                    <core:toActivity>Cancelled</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>204</core:x>
+                        <core:y>233</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>default</tools:swimLaneId>
+                    <tools:noteReference name="Note Link">
+                        <core:toActivity>Note0</core:toActivity>
+                        <core:proceedImmediately>true</core:proceedImmediately>
+                    </tools:noteReference>
+                </core:uiSettings>
+                <core:metaData>
+                    <core:outputs>
+                        <core:output required="true" name="enactor.inventoryManagement.StockTakeRequestId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:output>
+                    </core:outputs>
+                </core:metaData>
+                <core:jobType>Stock Take</core:jobType>
+                <core:jobHeader>Create Stock Take Request</core:jobHeader>
+                <core:displayTitleMessageBase>InventoryManagement/StockTake/CreateStockTakeRequestMessages</core:displayTitleMessageBase>
+                <core:displayTitleMessageId>STOCK_TAKE_REQUEST</core:displayTitleMessageId>
+                <core:priority>5</core:priority>
+                <core:peopleGroupEvaluator>{http://www.enactor.com/task}SimpleUserEvaluator</core:peopleGroupEvaluator>
+            </core:value>
+            <core:index>0</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:StartActivity">
+                <core:activityId>StartActivity-1</core:activityId>
+                <core:name>Start Stock Take</core:name>
+                <core:activityTypeId>Generic/StartProcessActivityType</core:activityTypeId>
+                <core:activityOutcome name="Success">
+                    <core:toActivity>CreateStockTakeRequest</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>23</core:x>
+                        <core:y>288</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>default</tools:swimLaneId>
+                </core:uiSettings>
+            </core:value>
+            <core:index>1</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:CallProcessActivity">
+                <core:activityId>SubmitRequests</core:activityId>
+                <core:name>Submit Requests</core:name>
+                <core:activityTypeId>InventoryManagement/GenerateStockTakeTasksActivityType</core:activityTypeId>
+                <core:activityOutcome name="Success">
+                    <core:toActivity>End</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:activityOutcome name="Error">
+                    <core:toActivity>SubmitRequestError</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:executeBusinessProcessActivityOutcome name="ScheduleStockTake">
+                    <core:toActivity>ExecuteStockTake</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                    <core:toBusinessProcess></core:toBusinessProcess>
+                    <core:startActivity></core:startActivity>
+                </core:executeBusinessProcessActivityOutcome>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>438</core:x>
+                        <core:y>233</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>default</tools:swimLaneId>
+                    <tools:noteReference name="Note Link">
+                        <core:toActivity>Note2</core:toActivity>
+                        <core:proceedImmediately>true</core:proceedImmediately>
+                    </tools:noteReference>
+                </core:uiSettings>
+                <core:metaData>
+                    <core:inputs>
+                        <core:input required="true" name="enactor.inventoryManagement.StockTakeRequestId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                    </core:inputs>
+                    <core:outputs>
+                        <core:output required="true" name="enactor.core.ErrorDetails">
+                            <core:interfaceName>com.enactor.core.application.process.IErrorDetails</core:interfaceName>
+                        </core:output>
+                    </core:outputs>
+                </core:metaData>
+            </core:value>
+            <core:index>2</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:EndProcessActivity">
+                <core:activityId>End</core:activityId>
+                <core:name>End</core:name>
+                <core:activityTypeId>Generic/EndProcessActivityType</core:activityTypeId>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>693</core:x>
+                        <core:y>233</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>default</tools:swimLaneId>
+                    <tools:style>1</tools:style>
+                </core:uiSettings>
+                <core:discard>false</core:discard>
+            </core:value>
+            <core:index>3</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:EndProcessActivity">
+                <core:activityId>Cancelled</core:activityId>
+                <core:name>Cancelled</core:name>
+                <core:activityTypeId>Generic/EndProcessActivityType</core:activityTypeId>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>204</core:x>
+                        <core:y>127</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>default</tools:swimLaneId>
+                    <tools:style>1</tools:style>
+                </core:uiSettings>
+                <core:discard>true</core:discard>
+            </core:value>
+            <core:index>4</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:ExecuteBusinessProcessActivity">
+                <core:activityId>ExecuteStockTake</core:activityId>
+                <core:name>Execute Stock Take</core:name>
+                <core:activityTypeId>InventoryManagement/ExecuteStockTakeActivityType</core:activityTypeId>
+                <core:activityOutcome name="Success">
+                    <core:toActivity>Success</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>438</core:x>
+                        <core:y>17</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 2</tools:swimLaneId>
+                </core:uiSettings>
+                <core:metaData>
+                    <core:inputs>
+                        <core:input required="true" name="enactor.mfc.LocationId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.inventoryManagement.RequestedByUserId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.inventoryManagement.StockTakeRequestId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.inventoryManagement.StockTakeSnapshotDate">
+                            <core:interfaceName>java.util.Date</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.inventoryManagement.StockTakeLatestCountCompletionDate">
+                            <core:interfaceName>java.util.Date</core:interfaceName>
+                        </core:input>
+                    </core:inputs>
+                </core:metaData>
+                <core:toBusinessProcess>InventoryManagement/StockTake</core:toBusinessProcess>
+                <core:startActivity>StartActivity-1</core:startActivity>
+            </core:value>
+            <core:index>5</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:EndProcessActivity">
+                <core:activityId>Success</core:activityId>
+                <core:name>Success</core:name>
+                <core:activityTypeId>Generic/EndProcessActivityType</core:activityTypeId>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>678</core:x>
+                        <core:y>17</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 2</tools:swimLaneId>
+                    <tools:style>1</tools:style>
+                </core:uiSettings>
+                <core:discard>false</core:discard>
+            </core:value>
+            <core:index>6</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:HTActivity">
+                <core:activityId>SubmitRequestError</core:activityId>
+                <core:name>Submit Requests Error</core:name>
+                <core:description>Allow the task to be re-run or suspended. If the inventory receipt is interactive only the user that created it can re-run it.  If the inventory receipt is automatic, any user (at the server's location) with the correct privilege can re-run it.</core:description>
+                <core:activityTypeId>InventoryManagement/ShowMessageActivityType</core:activityTypeId>
+                <core:suspendActivityOutcome name="Suspended">
+                    <core:toActivity>SubmitRequestError</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:suspendActivityOutcome>
+                <core:activityOutcome name="Retry">
+                    <core:toActivity>SubmitRequests</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:catchAllOutcome xsi:type="core:ActivityOutcome" name="Error">
+                    <core:toActivity></core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:catchAllOutcome>
+                <core:parameters>
+                    <core:parameter name="enactor.inventoryManagement.DisallowOK">
+                        <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                        <core:value>true</core:value>
+                    </core:parameter>
+                    <core:parameter name="enactor.coreUI.MessageBasename">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>InventoryManagement/StockTransfer/ReceiveDistributionMessages</core:value>
+                    </core:parameter>
+                    <core:parameter name="enactor.coreUI.MessageId">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>SET_INVENTORY_RECEIPT_ITEMS_ERROR</core:value>
+                    </core:parameter>
+                </core:parameters>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>438</core:x>
+                        <core:y>1</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>default</tools:swimLaneId>
+                    <tools:style>7</tools:style>
+                </core:uiSettings>
+                <core:metaData>
+                    <core:inputs>
+                        <core:input name="enactor.coreUI.MessageBasename">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input name="enactor.coreUI.MessageId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input name="enactor.inventoryManagement.DisallowOK">
+                            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.core.ErrorDetails">
+                            <core:interfaceName>com.enactor.core.application.process.IErrorDetails</core:interfaceName>
+                        </core:input>
+                    </core:inputs>
+                </core:metaData>
+                <core:jobType>Submit Requests</core:jobType>
+                <core:jobHeader>Submit Requests Error (Stock Take Request ID: #{stockTakeRequestId})</core:jobHeader>
+                <core:displayDescriptionMessageBase>InventoryManagement/StockTake/StockTakeMessages</core:displayDescriptionMessageBase>
+                <core:displayDescriptionMessageId>#{errorDetails.messageId}</core:displayDescriptionMessageId>
+                <core:displayTitleMessageBase>InventoryManagement/StockTake/StockTakeMessages</core:displayTitleMessageBase>
+                <core:displayTitleMessageId>SUBMIT_REQUESTS_ERROR</core:displayTitleMessageId>
+                <core:priority>5</core:priority>
+                <core:peopleGroupEvaluator>{http://www.enactor.com/task}SimpleUserEvaluator</core:peopleGroupEvaluator>
+                <core:peopleGroupParameters>
+                    <core:parameter name="privilegeId">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>enactor.inventoryManagement.RequestStockTake.Rerun</core:value>
+                    </core:parameter>
+                    <core:parameter name="fallbackToAllLocations">
+                        <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                        <core:value>true</core:value>
+                    </core:parameter>
+                    <core:parameter name="locationId">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>#{serverLocationKey.locationId}</core:value>
+                    </core:parameter>
+                    <core:parameter name="userId">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>#{userId}</core:value>
+                    </core:parameter>
+                    <core:parameter name="allPrivilegeUsers">
+                        <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                        <core:value>#{automaticMode}</core:value>
+                    </core:parameter>
+                </core:peopleGroupParameters>
+            </core:value>
+            <core:index>7</core:index>
+        </core:listElement>
+        <core:listImplClass>java.util.LinkedList</core:listImplClass>
+    </core:activities>
+    <core:defaultStartActivityId>HumanTaskActivity-1</core:defaultStartActivityId>
+    <core:defaultOutcomes/>
+</core:simpleActivityFlowBusinessProcess>

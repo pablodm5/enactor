@@ -1,0 +1,919 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.21" id="1">
+    <property name="author">David Bull</property>
+    <property name="comments">Copyright (c) 2011 Enactor</property>
+    <property name="createdBy">Eclipse BIRT Designer Version 2.5.2.v20100208 Build &lt;2.5.2.v20100210-0630></property>
+    <text-property name="title">Receipt Discrepancy Report</text-property>
+    <simple-property-list name="includeResource">
+        <value>Messages/InventoryManagement/ReceiptDiscrepancyReportMessages</value>
+    </simple-property-list>
+    <property name="units">in</property>
+    <method name="initialize"><![CDATA[globalDataFormatter = Packages.com.enactor.coreUI.factories.DataFormatterFactory.getInstance().getFormatter(reportContext.getLocale());
+baseCurrencyId = globalDataFormatter.getBaseCurrencyId();
+
+if(params["destinationLocationId"].value == null){
+	params["destinationLocationId"].value = "";
+}
+
+if(params["sourceLocationId"].value == null){
+	params["sourceLocationId"].value = "";
+}
+
+if(params["userName"].value == null){
+	params["userName"].value = "";
+}
+
+startDateStr = "";
+
+if(params["startDate"].value != null){
+	startDateStr = globalDataFormatter.formatDate(params["startDate"].value);
+}
+else {
+	params["startDate"].value = Packages.com.enactor.core.utilities.DateUtils.beginningOfTime();
+	startDateStr = reportContext.getMessage("BLANK", reportContext.getLocale());
+}
+
+endDateStr = "";
+
+if(params["endDate"].value != null){
+	endDateStr = globalDataFormatter.formatDate(params["endDate"].value);
+}
+else {
+	params["endDate"].value = Packages.com.enactor.core.utilities.DateUtils.endOfTime();
+	endDateStr = reportContext.getMessage("BLANK", reportContext.getLocale());
+}]]></method>
+    <property name="theme">InventoryManagementReportLibrary.EnactorReportTheme</property>
+    <text-property name="displayName">Receipt Discrepancy Report</text-property>
+    <property name="layoutPreference">auto layout</property>
+    <property name="imageDPI">96</property>
+    <list-property name="libraries">
+        <structure>
+            <property name="fileName">InventoryManagementReportLibrary.rptlibrary</property>
+            <property name="namespace">InventoryManagementReportLibrary</property>
+        </structure>
+    </list-property>
+    <parameters>
+        <scalar-parameter name="odaJndiName" id="367">
+            <text-property name="promptText">ODA JNDI Name</text-property>
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant"></value>
+            </simple-property-list>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="destinationLocationId" id="500">
+            <text-property name="promptText">Destination Location Id</text-property>
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="startDate" id="518">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">dateTime</property>
+            <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="concealValue">false</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="endDate" id="519">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">dateTime</property>
+            <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="sourceLocationId" id="3642">
+            <text-property name="promptText">Source Location ID</text-property>
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="sourceType" id="3693">
+            <property name="valueType">static</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="userName" id="3698" extends="InventoryManagementReportLibrary.userName"/>
+        <scalar-parameter name="discrepancyGreaterThan" id="3705">
+            <property name="valueType">static</property>
+            <property name="isRequired">true</property>
+            <property name="dataType">integer</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant">0</value>
+            </simple-property-list>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+    </parameters>
+    <data-sources>
+        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="Data Source" id="3634"
+ extends="InventoryManagementReportLibrary.Data Source">
+            <list-property name="privateDriverProperties">
+                <ex-property>
+                    <name>contentBidiFormatStr</name>
+                    <value>ILYNN</value>
+                </ex-property>
+                <ex-property>
+                    <name>metadataBidiFormatStr</name>
+                    <value>ILYNN</value>
+                </ex-property>
+            </list-property>
+            <property name="odaDriverClass">com.mysql.jdbc.Driver</property>
+            <property name="odaURL">jdbc:mysql://localhost:3306/enactor_trunk</property>
+            <property name="odaUser">enactor</property>
+            <encrypted-property name="odaPassword" encryptionID="base64">ZW5hY3Rvcg==</encrypted-property>
+        </oda-data-source>
+    </data-sources>
+    <data-sets>
+        <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="MainQuery" id="266">
+            <property name="eventHandlerClass">com.enactor.coreReporting.reportEventHandlers.DataSourceQueryTranslatorEventHandler</property>
+            <property name="newHandlerOnEachEvent">true</property>
+            <list-property name="computedColumns">
+                <structure>
+                    <property name="name">FORMATTED_DATE</property>
+                    <expression name="expression">var date = row["Date_Received"];
+Packages.com.enactor.core.utilities.DateUtils.formatMediumDate(reportContext.getLocale(), date) ;</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">FORMATTED_TIME</property>
+                    <expression name="expression">var date = row["Date_Received"];
+Packages.com.enactor.core.utilities.DateUtils.formatMediumTime(reportContext.getLocale(), date) ;</expression>
+                    <property name="dataType">string</property>
+                </structure>
+            </list-property>
+            <list-property name="parameters">
+                <structure>
+                    <property name="name">sourceType</property>
+                    <property name="paramName">sourceType</property>
+                    <property name="dataType">string</property>
+                    <property name="position">1</property>
+                    <expression name="defaultValue" type="javascript">'LOCATION'</expression>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">sourceLocationId</property>
+                    <property name="paramName">sourceLocationId</property>
+                    <property name="dataType">string</property>
+                    <property name="position">2</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">sourceLocationId1</property>
+                    <property name="paramName">sourceLocationId</property>
+                    <property name="dataType">string</property>
+                    <property name="position">3</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">destinationLocationId</property>
+                    <property name="paramName">destinationLocationId</property>
+                    <property name="dataType">string</property>
+                    <property name="position">4</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">destinationLocationId1</property>
+                    <property name="paramName">destinationLocationId</property>
+                    <property name="dataType">string</property>
+                    <property name="position">5</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">startDate</property>
+                    <property name="paramName">startDate</property>
+                    <property name="dataType">dateTime</property>
+                    <property name="position">6</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">endDate</property>
+                    <property name="paramName">endDate</property>
+                    <property name="dataType">dateTime</property>
+                    <property name="position">7</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">discrepancyGreaterThan</property>
+                    <property name="paramName">discrepancyGreaterThan</property>
+                    <property name="dataType">integer</property>
+                    <property name="position">8</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">discrepancyGreaterThan1</property>
+                    <property name="paramName">discrepancyGreaterThan</property>
+                    <property name="dataType">integer</property>
+                    <property name="position">9</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+            </list-property>
+            <structure name="cachedMetaData"/>
+            <property name="dataSource">Data Source</property>
+            <xml-property name="queryText"><![CDATA[select IRH.Date_Received,
+       IRH.Source_Location_Id,
+       IRH.Destination_Location_Id,
+       IDH.Distribution_Order_Id,
+       IDH.Inventory_Dispatch_Id,
+       IRI.Inventory_Receipt_Id, 
+       IRI.Product_Id,
+       P.Description as DESCRIPTION,
+       SKUP.Style_Id as STYLE,
+       S.Description AS SIZE_DESCRIPTION, 
+       C.Description AS COLOUR_DESCRIPTION, 
+       IRI.Dispatched_Qty,
+       IRI.Advised_Qty,
+       IRI.Received_Qty
+from InventoryReceiptItems IRI
+left outer join InventoryReceiptHeaders IRH on IRI.Inventory_Receipt_Id = IRH.Inventory_Receipt_Id
+left outer join InventoryDispatchHeaders IDH on IDH.Inventory_Dispatch_Id = IRH.Inventory_Dispatch_id
+left outer join Products P on IRI.Product_Id = P.Product_Id
+left outer join SKUProducts SKUP on IRI.Product_Id = SKUP.Product_Id
+left outer join Sizes S ON S.Size_Id = SKUP.Size_Id AND S.Size_Range_Id = SKUP.Size_Range_Id
+left outer join Colours C ON C.Colour_Id = SKUP.Colour_Id AND C.Colour_Range_Id = SKUP.Colour_Range_Id
+where IRI.Dispatched_Qty != IRI.Received_Qty
+and IRH.Source_Type = ?
+and (? = !~''~! or IRH.Source_Location_Id = ?)
+and (? = !~''~! or IRH.Destination_Location_Id = ?)
+and IRH.Date_Received >= ?
+and IRH.Date_Received <= ?
+and (IRI.Received_Qty - IRI.Dispatched_Qty > ? OR IRI.Dispatched_Qty - IRI.Received_Qty > ?)]]></xml-property>
+        </oda-data-set>
+        <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="LocationDescription" id="3636"
+ extends="InventoryManagementReportLibrary.LocationDescription"/>
+        <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="UserDescription" id="3637"
+ extends="InventoryManagementReportLibrary.UserDescription"/>
+    </data-sets>
+    <page-setup>
+        <simple-master-page name="Simple MasterPage" id="2">
+            <property name="type">a4</property>
+            <property name="orientation">landscape</property>
+            <property name="topMargin">0.75in</property>
+            <property name="leftMargin">0.75in</property>
+            <property name="bottomMargin">0.75in</property>
+            <property name="rightMargin">0.75in</property>
+            <page-header>
+                <grid name="ReportHeader" id="3704" extends="InventoryManagementReportLibrary.ReportHeader">
+                    <overridden-values>
+                        <ref-entry baseId="316" id="316"/>
+                        <ref-entry baseId="317" id="317"/>
+                        <ref-entry baseId="318" id="318"/>
+                        <ref-entry baseId="319" id="319"/>
+                        <ref-entry baseId="327" name="CompanyLogoWide" id="327"/>
+                        <ref-entry baseId="380" name="NewImage" id="380"/>
+                        <ref-entry baseId="320" id="320"/>
+                        <ref-entry baseId="481" name="PoweredBy" id="481"/>
+                        <ref-entry baseId="328" name="CompanyTitle" id="328"/>
+                    </overridden-values>
+                </grid>
+            </page-header>
+            <page-footer>
+                <grid id="3">
+                    <property name="width">100%</property>
+                    <column id="523">
+                        <property name="width">45%</property>
+                    </column>
+                    <column id="524">
+                        <property name="width">4.3020833333in</property>
+                    </column>
+                    <column id="525">
+                        <property name="width">5%</property>
+                    </column>
+                    <row id="526">
+                        <cell id="527">
+                            <text name="GeneratedOnText" id="3701" extends="InventoryManagementReportLibrary.GeneratedOnText">
+                                <property name="style">reportFooterLeft</property>
+                            </text>
+                        </cell>
+                        <cell id="528">
+                            <text name="GeneratedByText" id="3702" extends="InventoryManagementReportLibrary.GeneratedByText">
+                                <property name="style">reportFooterLeft</property>
+                            </text>
+                        </cell>
+                        <cell id="529">
+                            <grid id="532">
+                                <property name="width">100%</property>
+                                <column id="533"/>
+                                <column id="534"/>
+                                <column id="535"/>
+                                <row id="536">
+                                    <cell id="537">
+                                        <auto-text id="538">
+                                            <property name="style">reportFooterRight</property>
+                                            <property name="type">page-number</property>
+                                        </auto-text>
+                                    </cell>
+                                    <cell id="539">
+                                        <text id="540">
+                                            <property name="style">reportFooterCentre</property>
+                                            <property name="contentType">plain</property>
+                                            <text-property name="content"><![CDATA[/]]></text-property>
+                                        </text>
+                                    </cell>
+                                    <cell id="541">
+                                        <auto-text id="542">
+                                            <property name="style">reportFooterRight</property>
+                                            <property name="type">total-page</property>
+                                        </auto-text>
+                                    </cell>
+                                </row>
+                            </grid>
+                        </cell>
+                    </row>
+                </grid>
+            </page-footer>
+        </simple-master-page>
+    </page-setup>
+    <body>
+        <grid name="ReportTitleGrid" id="362">
+            <property name="width">100%</property>
+            <column id="363"/>
+            <row id="364">
+                <cell id="365">
+                    <property name="paddingTop">1pt</property>
+                    <label name="ReportTitleLabel" id="521">
+                        <property name="style">reportTitle</property>
+                        <property name="backgroundColor">silver</property>
+                        <property name="fontFamily">sans-serif</property>
+                        <property name="fontSize">larger</property>
+                        <property name="paddingTop">1pt</property>
+                        <property name="textAlign">center</property>
+                        <text-property name="text" key="TITLE"></text-property>
+                    </label>
+                </cell>
+            </row>
+        </grid>
+        <grid name="CriteriaGrid" id="502">
+            <property name="marginTop">0pt</property>
+            <property name="width">100%</property>
+            <list-property name="visibility">
+                <structure>
+                    <property name="format">all</property>
+                    <expression name="valueExpr">if (pageNumber > 1) {
+ true;
+} else {
+ false;
+}</expression>
+                </structure>
+            </list-property>
+            <column id="377">
+                <property name="width">11%</property>
+            </column>
+            <column id="567">
+                <property name="width">39%</property>
+            </column>
+            <column id="993">
+                <property name="width">11%</property>
+            </column>
+            <column id="578">
+                <property name="width">39%</property>
+            </column>
+            <row id="992">
+                <cell id="991">
+                    <property name="colSpan">4</property>
+                    <property name="rowSpan">1</property>
+                    <label id="990">
+                        <property name="style">subReportHeader</property>
+                        <property name="marginTop">0pt</property>
+                        <property name="paddingTop">1pt</property>
+                        <property name="textAlign">center</property>
+                        <text-property name="text" key="REPORT_CRITERIA">The Report Criteria</text-property>
+                    </label>
+                </cell>
+            </row>
+            <row id="989">
+                <cell id="988">
+                    <property name="paddingTop">1pt</property>
+                    <label id="437">
+                        <property name="style">criteriaLabel</property>
+                        <text-property name="text" key="CRITERIA_2"></text-property>
+                    </label>
+                </cell>
+                <cell id="562">
+                    <property name="paddingTop">1pt</property>
+                    <data id="3703">
+                        <property name="style">reportCriteria</property>
+                        <list-property name="mapRules">
+                            <structure>
+                                <expression name="testExpr" type="javascript">row["destinationLocationId"]</expression>
+                                <property name="operator">eq</property>
+                                <simple-property-list name="value1">
+                                    <value type="javascript">""</value>
+                                </simple-property-list>
+                                <text-property name="display" key="BLANK"></text-property>
+                            </structure>
+                        </list-property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">destinationLocationId</property>
+                                <expression name="expression" type="javascript">params["destinationLocationId"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                        </list-property>
+                        <property name="resultSetColumn">destinationLocationId</property>
+                    </data>
+                </cell>
+                <cell id="985">
+                    <label id="3624">
+                        <property name="style">criteriaLabel</property>
+                        <text-property name="text" key="CRITERIA_3"></text-property>
+                    </label>
+                </cell>
+                <cell id="573">
+                    <data id="3644">
+                        <property name="style">reportCriteria</property>
+                        <list-property name="mapRules">
+                            <structure>
+                                <expression name="testExpr" type="javascript">row["sourceLocationId"]</expression>
+                                <property name="operator">eq</property>
+                                <simple-property-list name="value1">
+                                    <value type="javascript">""</value>
+                                </simple-property-list>
+                                <text-property name="display" key="BLANK"></text-property>
+                            </structure>
+                        </list-property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">sourceLocationId</property>
+                                <expression name="expression" type="javascript">params["sourceLocationId"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                        </list-property>
+                        <property name="resultSetColumn">sourceLocationId</property>
+                    </data>
+                </cell>
+            </row>
+            <row id="984">
+                <cell id="983">
+                    <label id="1420">
+                        <property name="style">criteriaLabel</property>
+                        <text-property name="text" key="CRITERIA_9"></text-property>
+                    </label>
+                </cell>
+                <cell id="563">
+                    <text-data id="1035">
+                        <property name="style">reportCriteria</property>
+                        <expression name="valueExpr">startDateStr;</expression>
+                        <property name="contentType">html</property>
+                    </text-data>
+                </cell>
+                <cell id="982">
+                    <label id="1422">
+                        <property name="style">criteriaLabel</property>
+                        <text-property name="text" key="CRITERIA_10"></text-property>
+                    </label>
+                </cell>
+                <cell id="574">
+                    <text-data id="1036">
+                        <property name="style">reportCriteria</property>
+                        <expression name="valueExpr">endDateStr;</expression>
+                        <property name="contentType">html</property>
+                    </text-data>
+                </cell>
+            </row>
+            <row id="981">
+                <cell id="980">
+                    <label id="3722">
+                        <property name="style">criteriaLabel</property>
+                        <text-property name="text" key="CRITERIA_6"></text-property>
+                    </label>
+                </cell>
+                <cell id="564">
+                    <data id="3723">
+                        <property name="style">reportCriteria</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">discrepancyGreaterThan</property>
+                                <expression name="expression" type="javascript">params["discrepancyGreaterThan"]</expression>
+                                <property name="dataType">integer</property>
+                            </structure>
+                        </list-property>
+                        <property name="resultSetColumn">discrepancyGreaterThan</property>
+                    </data>
+                </cell>
+                <cell id="979"/>
+                <cell id="575"/>
+            </row>
+            <row id="1415">
+                <cell id="1416"/>
+                <cell id="1417"/>
+                <cell id="1418"/>
+                <cell id="1419"/>
+            </row>
+            <row id="420">
+                <cell id="421"/>
+                <cell id="566"/>
+                <cell id="422"/>
+                <cell id="577"/>
+            </row>
+        </grid>
+        <grid name="ResultsGrid" id="998">
+            <property name="width">100%</property>
+            <column id="997"/>
+            <row id="996">
+                <cell id="995"/>
+            </row>
+            <row id="425">
+                <cell id="426"/>
+            </row>
+            <row id="1429">
+                <cell id="1430"/>
+            </row>
+            <row id="1431">
+                <cell id="1432">
+                    <table id="2375">
+                        <property name="width">100%</property>
+                        <property name="dataSet">MainQuery</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">Date_Received</property>
+                                <expression name="expression" type="javascript">dataSetRow["Date_Received"]</expression>
+                                <property name="dataType">date-time</property>
+                            </structure>
+                            <structure>
+                                <property name="name">Source_Location_Id</property>
+                                <expression name="expression" type="javascript">dataSetRow["Source_Location_Id"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">Destination_Location_Id</property>
+                                <expression name="expression" type="javascript">dataSetRow["Destination_Location_Id"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">Distribution_Order_Id</property>
+                                <expression name="expression" type="javascript">dataSetRow["Distribution_Order_Id"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">Inventory_Dispatch_Id</property>
+                                <expression name="expression" type="javascript">dataSetRow["Inventory_Dispatch_Id"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">Inventory_Receipt_Id</property>
+                                <expression name="expression" type="javascript">dataSetRow["Inventory_Receipt_Id"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">Product_Id</property>
+                                <expression name="expression" type="javascript">dataSetRow["Product_Id"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">DESCRIPTION</property>
+                                <expression name="expression" type="javascript">dataSetRow["DESCRIPTION"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">STYLE</property>
+                                <expression name="expression" type="javascript">dataSetRow["STYLE"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">SIZE_DESCRIPTION</property>
+                                <expression name="expression" type="javascript">dataSetRow["SIZE_DESCRIPTION"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">COLOUR_DESCRIPTION</property>
+                                <expression name="expression" type="javascript">dataSetRow["COLOUR_DESCRIPTION"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">Dispatched_Qty</property>
+                                <expression name="expression" type="javascript">dataSetRow["Dispatched_Qty"]</expression>
+                                <property name="dataType">integer</property>
+                            </structure>
+                            <structure>
+                                <property name="name">Advised_Qty</property>
+                                <expression name="expression" type="javascript">dataSetRow["Advised_Qty"]</expression>
+                                <property name="dataType">integer</property>
+                            </structure>
+                            <structure>
+                                <property name="name">Received_Qty</property>
+                                <expression name="expression" type="javascript">dataSetRow["Received_Qty"]</expression>
+                                <property name="dataType">integer</property>
+                            </structure>
+                            <structure>
+                                <property name="name">FORMATTED_DATE</property>
+                                <expression name="expression" type="javascript">dataSetRow["FORMATTED_DATE"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">FORMATTED_TIME</property>
+                                <expression name="expression" type="javascript">dataSetRow["FORMATTED_TIME"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">Discrepancy</property>
+                                <expression name="expression" type="javascript">dataSetRow["Dispatched_Qty"] - dataSetRow["Received_Qty"]</expression>
+                                <property name="dataType">integer</property>
+                            </structure>
+                        </list-property>
+                        <column id="2544"/>
+                        <column id="2514"/>
+                        <column id="2516"/>
+                        <column id="2536"/>
+                        <column id="2537"/>
+                        <column id="2538"/>
+                        <column id="3672"/>
+                        <column id="3668"/>
+                        <column id="3664"/>
+                        <column id="3690"/>
+                        <column id="3660"/>
+                        <column id="3656"/>
+                        <column id="3652"/>
+                        <column id="3709"/>
+                        <column id="3648"/>
+                        <column id="3717"/>
+                        <header>
+                            <row id="2376">
+                                <cell id="2541">
+                                    <label id="2545">
+                                        <property name="style">columnHeader</property>
+                                        <text-property name="text" key="DATE">TRANSACTION_NUMBER</text-property>
+                                        <text-property name="helpText" key="TOOLTIP_TRANSACTION_NUMBER"></text-property>
+                                    </label>
+                                </cell>
+                                <cell id="2377">
+                                    <label id="2378">
+                                        <property name="style">columnHeader</property>
+                                        <text-property name="text" key="TIME">LOCATION_ID</text-property>
+                                        <text-property name="helpText" key="TOOLTIP_LOCATION"></text-property>
+                                    </label>
+                                </cell>
+                                <cell id="2381">
+                                    <label id="2382">
+                                        <property name="style">columnHeader</property>
+                                        <text-property name="text" key="SOURCE_LOCATION">TERMINAL_NUMBER</text-property>
+                                        <text-property name="helpText" key="TOOLTIP_TERMINAL"></text-property>
+                                    </label>
+                                </cell>
+                                <cell id="2421">
+                                    <label id="2422">
+                                        <property name="style">columnHeader</property>
+                                        <text-property name="text" key="DESTINATION_LOCATION">FORMATTED_DISCOUNTS_VALUE</text-property>
+                                        <text-property name="helpText" key="TOOLTIP_DISCOUNTS_VALUE"></text-property>
+                                    </label>
+                                </cell>
+                                <cell id="2423">
+                                    <label id="2424">
+                                        <property name="style">columnHeader</property>
+                                        <text-property name="text" key="DISTRIBUTION_ORDER_ID">FORMATTED_PROMOTIONS_VALUE</text-property>
+                                        <text-property name="helpText" key="TOOLTIP_PROMOTIONS_VALUE"></text-property>
+                                    </label>
+                                </cell>
+                                <cell id="2425">
+                                    <label id="2426">
+                                        <property name="style">columnHeader</property>
+                                        <text-property name="text" key="DISPATCH_ID">FORMATTED_NET_VALUE</text-property>
+                                        <text-property name="helpText" key="TOOLTIP_NET_VALUE"></text-property>
+                                    </label>
+                                </cell>
+                                <cell id="3669">
+                                    <label id="3673">
+                                        <property name="style">columnHeader</property>
+                                        <text-property name="text" key="RECEIPT_ID">FORMATTED_NET_VALUE</text-property>
+                                        <text-property name="helpText" key="TOOLTIP_NET_VALUE"></text-property>
+                                    </label>
+                                </cell>
+                                <cell id="3665">
+                                    <label id="3674">
+                                        <property name="style">columnHeader</property>
+                                        <text-property name="text" key="PRODUCT_ID">FORMATTED_NET_VALUE</text-property>
+                                        <text-property name="helpText" key="TOOLTIP_NET_VALUE"></text-property>
+                                    </label>
+                                </cell>
+                                <cell id="3661">
+                                    <label id="3675">
+                                        <property name="style">columnHeader</property>
+                                        <text-property name="text" key="DESCRIPTION">FORMATTED_NET_VALUE</text-property>
+                                        <text-property name="helpText" key="TOOLTIP_NET_VALUE"></text-property>
+                                    </label>
+                                </cell>
+                                <cell id="3687">
+                                    <label id="3691">
+                                        <property name="style">columnHeader</property>
+                                        <text-property name="text" key="STYLE">FORMATTED_NET_VALUE</text-property>
+                                        <text-property name="helpText" key="TOOLTIP_NET_VALUE"></text-property>
+                                    </label>
+                                </cell>
+                                <cell id="3657">
+                                    <label id="3676">
+                                        <property name="style">columnHeader</property>
+                                        <text-property name="text" key="COLOUR">FORMATTED_NET_VALUE</text-property>
+                                        <text-property name="helpText" key="TOOLTIP_NET_VALUE"></text-property>
+                                    </label>
+                                </cell>
+                                <cell id="3653">
+                                    <label id="3677">
+                                        <property name="style">columnHeader</property>
+                                        <text-property name="text" key="SIZE">FORMATTED_NET_VALUE</text-property>
+                                        <text-property name="helpText" key="TOOLTIP_NET_VALUE"></text-property>
+                                    </label>
+                                </cell>
+                                <cell id="3649">
+                                    <label id="3678">
+                                        <property name="style">columnHeader</property>
+                                        <text-property name="text" key="EXPECTED_QTY">FORMATTED_NET_VALUE</text-property>
+                                        <text-property name="helpText" key="TOOLTIP_NET_VALUE"></text-property>
+                                    </label>
+                                </cell>
+                                <cell id="3706">
+                                    <label id="3710">
+                                        <property name="style">columnHeader</property>
+                                        <text-property name="text" key="DISPATCHED_QTY">FORMATTED_NET_VALUE</text-property>
+                                        <text-property name="helpText" key="TOOLTIP_NET_VALUE"></text-property>
+                                    </label>
+                                </cell>
+                                <cell id="3645">
+                                    <label id="3679">
+                                        <property name="style">columnHeader</property>
+                                        <text-property name="text" key="RECEIVED_QTY">FORMATTED_NET_VALUE</text-property>
+                                        <text-property name="helpText" key="TOOLTIP_NET_VALUE"></text-property>
+                                    </label>
+                                </cell>
+                                <cell id="3714">
+                                    <label id="3718">
+                                        <property name="style">columnHeader</property>
+                                        <text-property name="text" key="DISCREPANCY">FORMATTED_NET_VALUE</text-property>
+                                        <text-property name="helpText" key="TOOLTIP_NET_VALUE"></text-property>
+                                    </label>
+                                </cell>
+                            </row>
+                        </header>
+                        <detail>
+                            <row id="2431">
+                                <cell id="2542">
+                                    <data id="3630">
+                                        <property name="style">reportColumn</property>
+                                        <property name="resultSetColumn">FORMATTED_DATE</property>
+                                    </data>
+                                </cell>
+                                <cell id="2432">
+                                    <data id="3631">
+                                        <property name="style">reportColumn</property>
+                                        <property name="resultSetColumn">FORMATTED_TIME</property>
+                                    </data>
+                                </cell>
+                                <cell id="2436">
+                                    <data id="3638">
+                                        <property name="style">reportColumnCentre</property>
+                                        <property name="resultSetColumn">Source_Location_Id</property>
+                                    </data>
+                                </cell>
+                                <cell id="2476">
+                                    <data id="3639">
+                                        <property name="style">reportColumnCentre</property>
+                                        <property name="resultSetColumn">Destination_Location_Id</property>
+                                    </data>
+                                </cell>
+                                <cell id="2478">
+                                    <data id="3640">
+                                        <property name="style">reportColumn</property>
+                                        <property name="resultSetColumn">Distribution_Order_Id</property>
+                                    </data>
+                                </cell>
+                                <cell id="2480">
+                                    <data id="3641">
+                                        <property name="style">reportColumn</property>
+                                        <property name="resultSetColumn">Inventory_Dispatch_Id</property>
+                                    </data>
+                                </cell>
+                                <cell id="3670">
+                                    <data id="3680">
+                                        <property name="style">reportColumn</property>
+                                        <property name="resultSetColumn">Inventory_Receipt_Id</property>
+                                    </data>
+                                </cell>
+                                <cell id="3666">
+                                    <data id="3681">
+                                        <property name="style">reportColumn</property>
+                                        <property name="resultSetColumn">Product_Id</property>
+                                    </data>
+                                </cell>
+                                <cell id="3662">
+                                    <data id="3696">
+                                        <property name="style">reportColumn</property>
+                                        <property name="resultSetColumn">DESCRIPTION</property>
+                                    </data>
+                                </cell>
+                                <cell id="3688">
+                                    <data id="3697">
+                                        <property name="style">reportColumn</property>
+                                        <property name="resultSetColumn">STYLE</property>
+                                    </data>
+                                </cell>
+                                <cell id="3658">
+                                    <data id="3694">
+                                        <property name="style">reportColumn</property>
+                                        <property name="resultSetColumn">COLOUR_DESCRIPTION</property>
+                                    </data>
+                                </cell>
+                                <cell id="3654">
+                                    <data id="3695">
+                                        <property name="style">reportColumn</property>
+                                        <property name="resultSetColumn">SIZE_DESCRIPTION</property>
+                                    </data>
+                                </cell>
+                                <cell id="3650">
+                                    <data id="3685">
+                                        <property name="style">reportColumnCentre</property>
+                                        <property name="resultSetColumn">Advised_Qty</property>
+                                    </data>
+                                </cell>
+                                <cell id="3707">
+                                    <data id="3712">
+                                        <property name="style">reportColumnCentre</property>
+                                        <property name="resultSetColumn">Dispatched_Qty</property>
+                                    </data>
+                                </cell>
+                                <cell id="3646">
+                                    <data id="3686">
+                                        <property name="style">reportColumnCentre</property>
+                                        <property name="resultSetColumn">Received_Qty</property>
+                                    </data>
+                                </cell>
+                                <cell id="3715">
+                                    <data id="3721">
+                                        <property name="style">reportColumnCentre</property>
+                                        <property name="fontWeight">bold</property>
+                                        <property name="fontStyle">italic</property>
+                                        <property name="color">#FF0000</property>
+                                        <property name="resultSetColumn">Discrepancy</property>
+                                    </data>
+                                </cell>
+                            </row>
+                        </detail>
+                        <footer>
+                            <row id="2486">
+                                <cell id="2543"/>
+                                <cell id="2487"/>
+                                <cell id="2489"/>
+                                <cell id="2509"/>
+                                <cell id="2510"/>
+                                <cell id="2511"/>
+                                <cell id="3671"/>
+                                <cell id="3667"/>
+                                <cell id="3663"/>
+                                <cell id="3689"/>
+                                <cell id="3659"/>
+                                <cell id="3655"/>
+                                <cell id="3651"/>
+                                <cell id="3708"/>
+                                <cell id="3647"/>
+                                <cell id="3716"/>
+                            </row>
+                        </footer>
+                    </table>
+                </cell>
+            </row>
+        </grid>
+    </body>
+</report>

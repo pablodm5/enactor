@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<core:documentTemplate xmlns:core="http://www.enactor.com/core" xmlns:retail="http://www.enactor.com/retail" xmlns:ns4="http://www.enactor.com/crm" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:ns6="http://www.apis-it.hr/fin/2012/types/f73" xmlns:ns7="http://www.w3.org/2000/09/xmldsig#" xmlns:ns8="http://www.fu.gov.si/" xmlns:ns9="http://www.enactor.com/addressLookup/service" xmlns:ns10="http://www.enactor.com/retail/storedRetailTransaction/service" xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:ns14="http://www.enactor.com/crm/customerLoyalty/service" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" paginated="false" messageBase="Pos/Order/CustomerOrderCollectionMessages" title="Collection Select Item List Template" url="Pos/Order/CollectionSelectItemListTemplate">
+    <core:elements>
+        <core:tableTemplate id="OrderList">
+            <core:formatElement applicableClassName="com.enactor.core.database.list.ISimpleListElement" formatId="listItem"/>
+            <core:formatElement applicableEntityName="listHeader" formatId="listHeader"/>
+            <core:formatElement applicableEntityName="listFooter"/>
+        </core:tableTemplate>
+    </core:elements>
+    <core:variables>
+        <core:variable required="true" name="enactor.pos.ForReturn">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:variable>
+    </core:variables>
+    <core:columnDefs>
+        <core:columnDef id="1" start="0" end="20"/>
+        <core:columnDef id="2" start="20" end="40"/>
+        <core:columnDef id="3" start="40" end="75"/>
+        <core:columnDef id="4" start="75" end="95" align="RIGHT"/>
+    </core:columnDefs>
+    <core:formatEntry id="listItem">
+        <core:elements>
+            <core:assign to="orderItem" value="item.key"/>
+            <core:row>
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="1" id="1">
+                            <core:elements>
+<core:text visibility="#{!empty (item.data['collectionValue'].orderNotes)}">
+    <core:text>*</core:text>
+</core:text>
+<core:text visibility="#{!empty (item.data['selectionValue'].orderNotes)}">
+    <core:text>*</core:text>
+</core:text>
+<core:text messageId="ITEM_STATUS_COLLECT" visibility="#{item.selectable &amp;&amp; item.selected}" colour="blue">
+    <core:uiMessage messageId="ITEM_STATUS_CANCEL" applicability="#{notEmpty(forCancellation) &amp;&amp; forCancellation}"/>
+    <core:uiMessage messageId="ITEM_STATUS_RETURN" applicability="#{notEmpty(forReturn) &amp;&amp; forReturn}"/>
+</core:text>
+<core:text visibility="#{!item.selected}">
+    <core:uiMessage messageId="ITEM_STATUS.UNSUBMITTED" applicability="#{orderItem.status == 'UNSUBMITTED'}"/>
+    <core:uiMessage messageId="ITEM_STATUS.NEW" applicability="#{orderItem.status == 'NEW'}"/>
+    <core:uiMessage messageId="ITEM_STATUS.IN_PROGRESS" applicability="#{orderItem.status == 'IN_PROGRESS'}"/>
+    <core:uiMessage messageId="ITEM_STATUS.AVAILABLE" applicability="#{orderItem.status == 'AVAILABLE'}"/>
+    <core:uiMessage messageId="ITEM_STATUS.COMPLETED" applicability="#{orderItem.status == 'COMPLETED'}"/>
+    <core:uiMessage messageId="ITEM_STATUS.ATTENTION" applicability="#{orderItem.status == 'ATTENTION'}"/>
+    <core:uiMessage messageId="ITEM_STATUS.CANCELLED" applicability="#{orderItem.status == 'CANCELLED'}"/>
+    <core:uiMessage messageId="ITEM_STATUS.SUBMITTED" applicability="#{orderItem.status == 'SUBMITTED'}"/>
+    <core:uiMessage messageId="ITEM_STATUS.DISPATCHED" applicability="#{orderItem.status == 'DISPATCHED'}"/>
+    <core:uiMessage messageId="ITEM_STATUS.COLLECTING" applicability="#{orderItem.status == 'COLLECTING'}"/>
+    <core:uiMessage messageId="ITEM_STATUS.RETURNED" applicability="#{orderItem.status == 'RETURNED'}"/>
+    <core:uiMessage messageId="ITEM_STATUS.CANCELLING" applicability="#{orderItem.status == 'CANCELLING'}"/>
+    <core:text>#{orderItem.status}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="2" id="2">
+                            <core:elements>
+<core:text>
+    <core:text>#{orderItem.productKey.productId}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="3" id="3">
+                            <core:elements>
+<core:text>
+    <core:text>#{item.data['collectionValue'].productDescription}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="4" id="4">
+                            <core:elements>
+<core:text>
+    <core:formatters>
+        <core:formatCurrencyAmount/>
+    </core:formatters>
+    <core:text>#{orderItem.netPrice}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="listHeader">
+        <core:elements>
+            <core:row styleClass="listHeader" style="BOLD">
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="1" id="1">
+                            <core:elements>
+<core:text messageId="COLLECTION_LIST_STATUS"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="2" id="2">
+                            <core:elements>
+<core:text messageId="COLLECTION_LIST_PRODUCT"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="3" id="3">
+                            <core:elements>
+<core:text messageId="COLLECTION_LIST_PRODUCT_DESCRIPTION"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="4" id="4">
+                            <core:elements>
+<core:text messageId="COLLECTION_LIST_VALUE"/>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+</core:documentTemplate>

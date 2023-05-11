@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<retail:posPromptPage xmlns:core="http://www.enactor.com/core" xmlns:retail="http://www.enactor.com/retail" xmlns:ns4="http://www.enactor.com/crm" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803" xmlns:ns6="http://www.apis-it.hr/fin/2012/types/f73" xmlns:ns7="http://www.w3.org/2000/09/xmldsig#" xmlns:ns8="http://www.enactor.com/retail/storedRetailTransaction/service" xmlns:ns9="http://www.fu.gov.si/" xmlns:ns10="http://www.enactor.com/addressLookup/service" xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:ns14="http://www.enactor.com/crm/customerLoyalty/service" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" allowResize="true" allowMove="true" hasBorders="FALSE" allowClose="true" windowtype="view-panel" height="0" width="0" messageBase="Pos/Maintenance/UserMaintenanceMessages" titleId="SELECT_USER_TITLE" url="NextGen1024x768/Pos/User/SelectUser">
+    <core:elements>
+        <core:listBox lazyLoad="false" listSelectionMethod="DEFAULT" documentTemplateUrl="Pos/User/UserListTemplate" selectedIndex="0" borderStyle="None" styleClass="dataListBox" id="listBox">
+            <core:elements/>
+            <core:verticalScrollBar orientation="VERTICAL" id="LISTBOX_SCROLL_BAR">
+                <core:flowConstraint width="21" height="21"/>
+            </core:verticalScrollBar>
+            <core:listExpression>#{list}</core:listExpression>
+            <core:listingElementEvents>
+                <core:selectionEvent>enactor.userMaintenance.UserSelected</core:selectionEvent>
+            </core:listingElementEvents>
+        </core:listBox>
+        <core:panel adjustImagesToSize="true" namingContainer="false" styleClass="rpsSidePanel" transparentBackground="false" visible="true" id="SidePanel">
+            <core:elements>
+                <core:label lineHeight="0" messageId="SELECT_USER" styleClass="rpsPromptText" id="Prompt"/>
+                <core:label lineHeight="0" messageId="PAGE_NUMBER" styleClass="pageNumber" id="PageNumber">
+                    <core:boundsConstraint height="33" width="233" y="634" x="18"/>
+                    <core:alignment>LEFT</core:alignment>
+                </core:label>
+            </core:elements>
+            <core:listTemplateConstraints allowChangeBounds="true" allowEdit="true"/>
+        </core:panel>
+        <core:panel adjustImagesToSize="true" namingContainer="false" backgroundImageURL="NextGen1024x768/Pos/FooterBackground10x10.png" id="FooterPanel">
+            <core:elements>
+                <core:button lineHeight="0" messageId="BUTTON_UP" styleClass="navigation-up blackButton" visibility="#{page.listBox.visible &amp;&amp; page.listBox.moveUp}" id="Button1">
+                    <core:updateTriggers>
+                        <core:element>listBox</core:element>
+                    </core:updateTriggers>
+                    <core:text>page.listBox.up</core:text>
+                </core:button>
+                <core:button lineHeight="0" messageBase="Pos/Maintenance/MaintenanceMessages" messageId="BUTTON_OTHER_OPTIONS" styleClass="blackButton" id="Button2">
+                    <core:updateTriggers>
+                        <core:element>listBox</core:element>
+                    </core:updateTriggers>
+                    <core:text>OtherOptionsPressed</core:text>
+                </core:button>
+                <core:button lineHeight="0" messageBase="Pos/Maintenance/MaintenanceMessages" messageId="#{mainPage ? 'BUTTON_FILTERS' : 'BUTTON_EDIT'}" styleClass="blackButton" visibility="#{mainPage || (!empty (selectedItem) &amp;&amp; priv:checkPrivilege('enactor.userMaintenance.Edit') &amp;&amp; (selectedItem.data['locationKey.locationId'] == location.locationId || priv:checkPrivilege('enactor.userMaintenance.EditOtherLocationUsers')))}" id="Button3">
+                    <core:updateTriggers>
+                        <core:element>listBox</core:element>
+                    </core:updateTriggers>
+                    <core:text>#{mainPage ? 'FiltersPressed' : 'enactor.maintenance.Edit'}</core:text>
+                </core:button>
+                <core:button lineHeight="0" messageBase="Pos/Maintenance/MaintenanceMessages" messageId="#{mainPage ? 'BUTTON_VIEW' : 'BUTTON_NEW'}" styleClass="blackButton" visibility="#{mainPage ? (!empty (selectedItem) &amp;&amp; priv:checkPrivilege('enactor.userMaintenance.View') &amp;&amp; (selectedItem.data['locationKey.locationId'] == location.locationId || priv:checkPrivilege('enactor.userMaintenance.ViewOtherLocationUsers'))) : priv:checkPrivilege('enactor.userMaintenance.New')}" id="Button4">
+                    <core:updateTriggers>
+                        <core:element>listBox</core:element>
+                    </core:updateTriggers>
+                    <core:text>#{mainPage ? 'enactor.maintenance.View' : 'enactor.maintenance.New'}</core:text>
+                </core:button>
+                <core:button lineHeight="0" messageBase="Pos/Maintenance/MaintenanceMessages" messageId="#{mainPage ? 'BUTTON_PREVIOUS_PAGE' : 'BUTTON_COPY'}" styleClass="blackButton" visibility="#{mainPage ? (list.currentRowOffset &gt; 0) : (!empty (selectedItem) &amp;&amp; priv:checkPrivilege('enactor.userMaintenance.New'))}" id="Button5">
+                    <core:updateTriggers>
+                        <core:element>listBox</core:element>
+                    </core:updateTriggers>
+                    <core:text>#{mainPage ? 'PreviousPressed' : 'enactor.maintenance.Copy'}</core:text>
+                </core:button>
+                <core:button lineHeight="0" messageBase="Pos/Maintenance/MaintenanceMessages" messageId="#{mainPage ? 'BUTTON_NEXT_PAGE' : 'BUTTON_REMOVE'}" styleClass="blackButton" visibility="#{mainPage ? (list.currentRowOffset + list.rowsPerPage &lt; list.totalRows) : (!empty (selectedItem) &amp;&amp; priv:checkPrivilege('enactor.userMaintenance.Remove') &amp;&amp; (selectedItem.data['locationKey.locationId'] == location.locationId || priv:checkPrivilege('enactor.userMaintenance.RemoveOtherLocationUsers')))}" id="Button6">
+                    <core:updateTriggers>
+                        <core:element>listBox</core:element>
+                    </core:updateTriggers>
+                    <core:text>#{mainPage ? 'NextPressed' : 'enactor.maintenance.Remove'}</core:text>
+                </core:button>
+                <core:button lineHeight="0" messageId="BUTTON_DOWN" styleClass="navigation-down blackButton" visibility="#{page.listBox.visible &amp;&amp; page.listBox.moveDown}" id="Button7">
+                    <core:updateTriggers>
+                        <core:element>listBox</core:element>
+                    </core:updateTriggers>
+                    <core:text>page.listBox.down</core:text>
+                </core:button>
+                <core:button lineHeight="0" messageId="BUTTON_BACK" styleClass="blackButton" id="Button8">
+                    <core:text>BackPressed</core:text>
+                </core:button>
+            </core:elements>
+        </core:panel>
+    </core:elements>
+    <core:templateURL>NextGen1024x768/Pos/StandardButtonsTemplate</core:templateURL>
+    <core:events>
+        <core:event destination="listBox" event="key.UpPressed">up</core:event>
+        <core:event destination="listBox" event="key.DownPressed">down</core:event>
+    </core:events>
+    <core:variables>
+        <core:variable required="true" name="enactor.coreUI.List">
+            <core:interfaceName>com.enactor.core.database.list.IPagedList</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.pos.MainPage">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:variable>
+    </core:variables>
+</retail:posPromptPage>

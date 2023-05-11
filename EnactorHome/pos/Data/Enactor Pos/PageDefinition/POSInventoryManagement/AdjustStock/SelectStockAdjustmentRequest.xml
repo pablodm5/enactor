@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<retail:posPromptPage xmlns:core="http://www.enactor.com/core" xmlns:retail="http://www.enactor.com/retail" xmlns:ns4="http://www.enactor.com/crm" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803" xmlns:ns6="http://www.apis-it.hr/fin/2012/types/f73" xmlns:ns7="http://www.w3.org/2000/09/xmldsig#" xmlns:ns8="http://www.enactor.com/retail/storedRetailTransaction/service" xmlns:ns9="http://www.fu.gov.si/" xmlns:ns10="http://www.enactor.com/addressLookup/service" xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:ns14="http://www.enactor.com/crm/customerLoyalty/service" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" messageBase="POSInventoryManagement/AdjustStock/AdjustStockMessages" url="POSInventoryManagement/AdjustStock/SelectStockAdjustmentRequest">
+    <core:elements>
+        <core:hidden id="InputBox"/>
+        <core:hidden id="TotalLabel"/>
+        <core:hidden id="Receipt"/>
+        <core:hidden id="SelectionList"/>
+        <core:button lineHeight="0" messageBase="POSInventoryManagement/Common/GeneralMessages" messageId="SELECT_BUTTON_LABEL" visibility="#{notEmpty(list)}" id="Button1">
+            <core:text>SelectPressed</core:text>
+        </core:button>
+        <core:button lineHeight="0" messageBase="POSInventoryManagement/Common/GeneralMessages" messageId="UP_BUTTON_LABEL" visibility="#{page['PagingSelectionListPanel.PagingSelectionListBoxMedium'].visible &amp;&amp; page['PagingSelectionListPanel.PagingSelectionListBoxMedium'].moveUp}" id="Button2">
+            <core:updateTriggers>
+                <core:element>PagingSelectionListBoxMedium</core:element>
+            </core:updateTriggers>
+            <core:text>page.PagingSelectionListPanel.PagingSelectionListBoxMedium.up</core:text>
+        </core:button>
+        <core:button lineHeight="0" messageBase="POSInventoryManagement/Common/GeneralMessages" messageId="DOWN_BUTTON_LABEL" visibility="#{page['PagingSelectionListPanel.PagingSelectionListBoxMedium'].visible &amp;&amp; page['PagingSelectionListPanel.PagingSelectionListBoxMedium'].moveDown}" id="Button3">
+            <core:updateTriggers>
+                <core:element>PagingSelectionListBoxMedium</core:element>
+            </core:updateTriggers>
+            <core:text>page.PagingSelectionListPanel.PagingSelectionListBoxMedium.down</core:text>
+        </core:button>
+        <core:button lineHeight="0" messageBase="POSInventoryManagement/Common/GeneralMessages" messageId="ADHOC_BUTTON_LABEL" id="Button5">
+            <core:text>AdhocPressed</core:text>
+        </core:button>
+        <core:button lineHeight="0" messageBase="POSInventoryManagement/Common/GeneralMessages" messageId="BACK_BUTTON_LABEL" id="Button7">
+            <core:text>BackPressed</core:text>
+        </core:button>
+        <core:button lineHeight="0" messageBase="POSInventoryManagement/Common/GeneralMessages" messageId="CANCEL_BUTTON_LABEL" id="Button8">
+            <core:text>CancelPressed</core:text>
+        </core:button>
+        <core:text lineHeight="0" messageId="SELECT_ADJUST_STOCK_TO_PROGRESS" id="Prompt"/>
+        <core:panel id="PagingSelectionListPanel">
+            <core:elements>
+                <core:panel id="PagingSelectionHeaderPanelLarge">
+                    <core:boundsConstraint height="60" width="821" y="35" x="0"/>
+                    <core:elements>
+                        <core:label messageId="REQUESTED_ADJUSTMENTS_TITLE" styleClass="posPageHeading" id="REQUESTED_ADJUSTMENTS_TITLE">
+                            <core:boundsConstraint height="25" width="600" y="8" x="5"/>
+                        </core:label>
+                        <core:label lineHeight="0" messageId="STATUS_LABEL" styleClass="formFieldLabel" id="STATUS_LABEL">
+                            <core:boundsConstraint height="22" width="80" y="48" x="20"/>
+                        </core:label>
+                        <core:comboBox manualDropDownDisabled="false" lazyLoad="false" allowBlank="true" lineHeight="0" focusOrder="20" styleClass="formCombo" id="STATUS">
+                            <core:boundsConstraint height="28" width="200" y="45" x="100"/>
+                            <core:text>#{status}</core:text>
+                            <core:listExpression>#{statusesList}</core:listExpression>
+                            <core:listingElementEvents>
+<core:selectionEvent>filterValueSelected</core:selectionEvent>
+                            </core:listingElementEvents>
+                        </core:comboBox>
+                        <core:label lineHeight="0" messageId="ADJUSTMENT_TYPE_LABEL" styleClass="formFieldLabel" id="ADJUST_TYPE_LABEL">
+                            <core:boundsConstraint height="22" width="135" y="48" x="370"/>
+                        </core:label>
+                        <core:comboBox manualDropDownDisabled="false" lazyLoad="false" allowBlank="true" lineHeight="0" focusOrder="20" styleClass="formCombo" id="ADJUSTMENT_TYPE">
+                            <core:boundsConstraint height="28" width="200" y="45" x="510"/>
+                            <core:text>#{selectedHeaderType}</core:text>
+                            <core:listExpression>#{adjustmentTypeList}</core:listExpression>
+                            <core:listingElementEvents>
+<core:selectionEvent>filterAdjustTypeSelected</core:selectionEvent>
+                            </core:listingElementEvents>
+                        </core:comboBox>
+                    </core:elements>
+                </core:panel>
+                <core:listBox lazyLoad="false" listSelectionMethod="DEFAULT" documentTemplateUrl="POSInventoryManagement/AdjustStock/StockAdjustmentRequestListTemplate" selectedIndex="0" styleClass="dataListBox" id="PagingSelectionListBoxLarge">
+                    <core:elements/>
+                    <core:listExpression>#{list}</core:listExpression>
+                    <core:dataExpression>item</core:dataExpression>
+                    <core:selectedIndices>
+                        <item>0</item>
+                    </core:selectedIndices>
+                </core:listBox>
+                <core:panel id="PagingSelectionPageControlsPanel">
+                    <core:elements>
+                        <core:panel hAlign="CENTRE" id="PagingSelectionPageControlsReferencePanel">
+                            <core:flowConstraint width="100%" height="100%"/>
+                            <core:elements>
+<core:pageElementRef pageDefinitionURL="POSInventoryManagement/Common/POSInventoryManagementPagedListPageControl" id="PAGE_CONTROLS">
+    <core:flowConstraint/>
+    <core:elements/>
+    <core:parameter value="#{list}" name="enactor.coreUI.List">
+        <core:interfaceName>com.enactor.core.database.list.IPagedList</core:interfaceName>
+    </core:parameter>
+    <core:parameter value="#{pageSize}" name="enactor.coreUI.PageSize">
+        <core:interfaceName>java.lang.Integer</core:interfaceName>
+    </core:parameter>
+</core:pageElementRef>
+                            </core:elements>
+                        </core:panel>
+                    </core:elements>
+                </core:panel>
+            </core:elements>
+        </core:panel>
+    </core:elements>
+    <core:templateURL>Standard1024x768/Pos/FullScreenTraditionalPosTemplate</core:templateURL>
+    <core:events>
+        <core:event destination="Button1" event="key.EnterPressed">press</core:event>
+        <core:event destination="Button2" event="key.UpPressed">press</core:event>
+        <core:event destination="Button3" event="key.DownPressed">press</core:event>
+        <core:event destination="Button8" event="key.KeyCode27Pressed">press</core:event>
+    </core:events>
+    <core:preferredConstraintType>BOUNDS</core:preferredConstraintType>
+    <core:variables>
+        <core:variable required="true" name="enactor.coreUI.List">
+            <core:interfaceName>java.util.List</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.inventoryManagement.local.SelectedHeaderType">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.InventoryManagement.AdjustmentTypeList">
+            <core:interfaceName>java.util.List</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.InventoryManagement.AdjustmentType">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.mfc.Device">
+            <core:interfaceName>com.enactor.mfc.device.IDevice</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.coreUI.User">
+            <core:interfaceName>com.enactor.core.signOn.ISignedOnUser</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.coreUI.ItemCountMap">
+            <core:interfaceName>java.util.Map</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.coreUI.PageSize">
+            <core:interfaceName>java.lang.Integer</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.inventoryManagement.StatusesList">
+            <core:interfaceName>java.util.List</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.mfc.Status">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:variable>
+    </core:variables>
+    <core:scannerEnabled>false</core:scannerEnabled>
+    <core:scannerDataName></core:scannerDataName>
+</retail:posPromptPage>

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<retail:posPromptPage xmlns:core="http://www.enactor.com/core" xmlns:retail="http://www.enactor.com/retail" xmlns:ns4="http://www.enactor.com/crm" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803" xmlns:ns6="http://www.apis-it.hr/fin/2012/types/f73" xmlns:ns7="http://www.w3.org/2000/09/xmldsig#" xmlns:ns8="http://www.enactor.com/retail/storedRetailTransaction/service" xmlns:ns9="http://www.fu.gov.si/" xmlns:ns10="http://www.enactor.com/addressLookup/service" xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:ns14="http://www.enactor.com/crm/customerLoyalty/service" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" allowResize="true" allowMove="true" hasBorders="FALSE" allowClose="true" height="1136" width="640" messageBase="Pos/Tender/TenderPromptMessages" titleId="ENTER_TENDER_AMOUNT_TITLE" url="NextGen640x1136/Pos/Tender/EnterCashTenderAmount">
+    <core:elements>
+        <core:hidden id="DialogPanel"/>
+        <core:hidden id="ReceiptPanel"/>
+        <core:hidden id="OverflowButton"/>
+        <core:label messageBase="NextGen/PosMessages" messageId="CASH_PAYMENT" id="TitleLabel"/>
+        <core:button adjustImagesToSize="false" styleClass="backButton" visible="true" id="BackButton">
+            <core:text>CancelPressed</core:text>
+        </core:button>
+        <core:panel namingContainer="false" styleClass="numericInputPanel" id="NumericInputPanel">
+            <core:elements/>
+        </core:panel>
+        <core:text messageBase="#{messageBase}" messageId="ENTER_TENDER_AMOUNT" styleClass="promptLabel" id="NumericInputPanelPrompt">
+            <core:uiMessage messageId="ENTER_RETURN_ORIGINAL_TENDER_AMOUNT" messageBase="#{messageBase}" applicability="#{empty (messageText) &amp;&amp; !empty (returnOriginalTenderDetail) &amp;&amp; returnOriginalTenderDetail.amountDue &gt; 0 &amp;&amp; transactionHandler.model.basket.currencyId==returnOriginalTenderDetail.originalTenderCurrencyId}"/>
+            <core:uiMessage messageId="ENTER_FOREIGN_RETURN_ORIGINAL_TENDER_AMOUNT" messageBase="#{messageBase}" applicability="#{empty (messageText) &amp;&amp; !empty (returnOriginalTenderDetail) &amp;&amp; returnOriginalTenderDetail.amountDue &gt; 0 &amp;&amp; transactionHandler.model.basket.currencyId!=returnOriginalTenderDetail.originalTenderCurrencyId}"/>
+            <core:uiMessage messageId="ENTER_REDEEM_AMOUNT_LIMITED" messageBase="#{messageBase}" applicability="#{empty (messageText) &amp;&amp; !empty (isLoyaltyRedemption) &amp;&amp; isLoyaltyRedemption}"/>
+            <core:uiMessage messageId="ENTER_REFUND_AMOUNT" messageBase="#{messageBase}" applicability="#{empty (messageText) &amp;&amp; isRefund &amp;&amp; !tenderValueLimited}"/>
+            <core:uiMessage messageId="ENTER_REFUND_AMOUNT_LIMITED" messageBase="#{messageBase}" applicability="#{empty (messageText) &amp;&amp; isRefund &amp;&amp; tenderValueLimited}"/>
+            <core:uiMessage messageId="ENTER_TENDER_AMOUNT" messageBase="#{messageBase}" applicability="#{empty (messageText) &amp;&amp; !tenderValueLimited &amp;&amp; transactionHandler.model.basket.currencyId==tenderCurrency.currencyId}"/>
+            <core:uiMessage messageId="ENTER_FOREIGN_TENDER_AMOUNT" messageBase="#{messageBase}" applicability="#{empty (messageText) &amp;&amp; !tenderValueLimited &amp;&amp; transactionHandler.model.basket.currencyId!=tenderCurrency.currencyId}"/>
+            <core:uiMessage messageId="ENTER_TENDER_AMOUNT_LIMITED" messageBase="#{messageBase}" applicability="#{empty (messageText) &amp;&amp; tenderValueLimited &amp;&amp; transactionHandler.model.basket.currencyId==tenderCurrency.currencyId}"/>
+            <core:uiMessage messageId="ENTER_FOREIGN_TENDER_AMOUNT_LIMITED" messageBase="#{messageBase}" applicability="#{empty (messageText) &amp;&amp; tenderValueLimited &amp;&amp; transactionHandler.model.basket.currencyId!=tenderCurrency.currencyId}"/>
+            <core:uiMessage value="#{messageText}" applicability="#{notEmpty(messageText)}"/>
+        </core:text>
+        <core:inputText overwrite="true" type="textField" focusOrder="1" id="NumericInputPanelInputBox">
+            <core:text>${enactor.pos.TenderAmount}</core:text>
+            <core:textElementEvents enterEvent="OKPressed"/>
+            <core:validationData>
+                <core:currencyFieldValidationData>
+                    <core:type>CurrencyAmount</core:type>
+                    <core:inputMask></core:inputMask>
+                    <core:validationClassname></core:validationClassname>
+                    <core:maxValue>99999999</core:maxValue>
+                    <core:currencyId>#{!empty(tenderCurrency.currencyId) ? tenderCurrency.currencyId : ''}</core:currencyId>
+                </core:currencyFieldValidationData>
+            </core:validationData>
+        </core:inputText>
+        <core:panel namingContainer="false" id="FooterPanel">
+            <core:elements>
+                <core:pageElementRef pageDefinitionURL="Pos/FooterButtons" elementIdRef="FooterRefPanelDisabled" transparentBackground="true" id="FOOTER_BUTTONS_PAGE_REFERENCE">
+                    <core:boundsConstraint height="120" width="640" y="0" x="0"/>
+                    <core:elements/>
+                    <core:parameter value="BAG" name="enactor.pos.DisplayHint">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                    </core:parameter>
+                </core:pageElementRef>
+            </core:elements>
+        </core:panel>
+        <core:hidden id="PROMPT_BORDER_PANEL"/>
+        <core:hidden id="InputBoxBorderPanel"/>
+    </core:elements>
+    <core:templateURL>NextGen640x1136/Pos/FullScreenTraditionalPosTemplate</core:templateURL>
+    <core:variables>
+        <core:variable name="enactor.pos.IsRefund">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.pos.TenderValueLimited">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.pos.IsLoyaltyRedemption">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:variable>
+        <core:variable name="MessageBase">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:variable>
+        <core:variable name="MessageText">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.mfc.ReturnOriginalTenderDetail">
+            <core:interfaceName>com.enactor.mfc.basket.items.IReturnOriginalTenderDetail</core:interfaceName>
+        </core:variable>
+    </core:variables>
+</retail:posPromptPage>

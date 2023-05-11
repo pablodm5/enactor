@@ -1,0 +1,923 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<core:simpleActivityFlowBusinessProcess xmlns:core="http://www.enactor.com/core" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803" xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:ns8="http://maven.apache.org/POM/4.0.0" xmlns:ns9="tools" xmlns:retail="http://www.enactor.com/retail" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:tools="http://www.enactor.com/tools">
+    <core:processId>CRM/Loyalty/Registration/CustomerRegistrationBusinessProcess</core:processId>
+    <core:name>Customer Registration Process</core:name>
+    <core:description>Invitation based customer registration process</core:description>
+    <core:businessProcessTypeId>CRM/Loyalty/Registration/CustomerRegistrationBusinessProcessType</core:businessProcessTypeId>
+    <core:startPrivilege>enactor.crm.customerRegistration.Run</core:startPrivilege>
+    <core:administerPrivilege>enactor.crm.customerRegistration.Admin</core:administerPrivilege>
+    <core:deprecated>false</core:deprecated>
+    <core:metaData>
+        <core:inputs>
+            <core:input required="true" name="enactor.mfc.CustomerNumber">
+                <core:interfaceName>java.lang.String</core:interfaceName>
+            </core:input>
+            <core:input required="true" name="enactor.mfc.LoyaltyAccountId">
+                <core:interfaceName>java.lang.String</core:interfaceName>
+            </core:input>
+        </core:inputs>
+    </core:metaData>
+    <core:uiSettings xsi:type="tools:BusinessProcessSettings" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <core:constraint xsi:type="core:UIPositionConstraint">
+            <core:x>14</core:x>
+            <core:y>120</core:y>
+        </core:constraint>
+        <tools:swimLanes>
+            <tools:lane label="System" height="314" id="Lane 1"/>
+            <tools:lane label="Customer" height="31" id="Lane 4"/>
+            <tools:lane label="Salesperson" height="89" id="Lane 3"/>
+            <tools:lane label="Administrator" height="510" id="Lane 2"/>
+        </tools:swimLanes>
+        <tools:notes xsi:type="core:WrappedList">
+            <core:listElement>
+                <core:value xsi:type="tools:BPNote">
+                    <tools:noteId>Note0</tools:noteId>
+                    <tools:swimLaneId>Lane 1</tools:swimLaneId>
+                    <tools:description>Currently this is hardcoded to use a user account with ID 'CUST_SERVICE_TEST1' with a valid email address 'cust.service.test1@enactor.co.uk'. This also requires a communication script with ID 'CUST_REG_INV_1', unless one is selected via manual set up.
+
+Note : All of these are configured as parameters of this activity</tools:description>
+                    <tools:constraint>
+                        <core:x>944</core:x>
+                        <core:y>-89</core:y>
+                        <core:height>146</core:height>
+                        <core:width>310</core:width>
+                    </tools:constraint>
+                </core:value>
+                <core:index>0</core:index>
+            </core:listElement>
+            <core:listElement>
+                <core:value xsi:type="tools:BPNote">
+                    <tools:noteId>Note1</tools:noteId>
+                    <tools:swimLaneId>Lane 3</tools:swimLaneId>
+                    <tools:description>Currently this is hardcoded to use a user account with ID 'CUST_SERVICE_TEST1' with a valid email address 'cust.service.test1@enactor.co.uk'. This also requires a communication script with ID 'CUST_SEND_LOY_CARD1'
+
+Note : All of these are configured as parameters of this activity</tools:description>
+                    <tools:constraint>
+                        <core:x>1810</core:x>
+                        <core:y>-45</core:y>
+                        <core:height>146</core:height>
+                        <core:width>310</core:width>
+                    </tools:constraint>
+                </core:value>
+                <core:index>1</core:index>
+            </core:listElement>
+            <core:listElement>
+                <core:value xsi:type="tools:BPNote">
+                    <tools:noteId>Note2</tools:noteId>
+                    <tools:swimLaneId>Lane 3</tools:swimLaneId>
+                    <tools:description>Currently this is hardcoded to use a user account with ID 'CUST_SERVICE_TEST1' with a valid email address 'cust.service.test1@enactor.co.uk'. This also requires a communication script with ID 'LOY_CARD_SUP_REQ1'. The supplier email is assumed to be 'sid.test1@enactor.co.uk'
+
+Note : All of these are configured as parameters of this activity</tools:description>
+                    <tools:constraint>
+                        <core:x>2190</core:x>
+                        <core:y>-34</core:y>
+                        <core:height>146</core:height>
+                        <core:width>310</core:width>
+                    </tools:constraint>
+                </core:value>
+                <core:index>2</core:index>
+            </core:listElement>
+        </tools:notes>
+        <tools:style>17</tools:style>
+    </core:uiSettings>
+    <core:activities xsi:type="core:WrappedList" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <core:listElement>
+            <core:value xsi:type="core:CallProcessActivity">
+                <core:activityId>CreateInvitation</core:activityId>
+                <core:name>Create Invitation</core:name>
+                <core:activityTypeId>CRM/Loyalty/Registration/CreateInvitationToRegisterActivityType</core:activityTypeId>
+                <core:activityOutcome name="Success">
+                    <core:toActivity>SendLinkToCustomer</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:activityOutcome name="Fail">
+                    <core:toActivity>NotifySalesperson</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:catchAllOutcome xsi:type="core:ActivityOutcome" name="Error">
+                    <core:toActivity>NotifySalesperson</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:catchAllOutcome>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>654</core:x>
+                        <core:y>89</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 1</tools:swimLaneId>
+                    <tools:style>3</tools:style>
+                </core:uiSettings>
+                <core:metaData>
+                    <core:inputs>
+                        <core:input required="true" name="enactor.mfc.CustomerNumber">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.mfc.LoyaltyAccountId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                    </core:inputs>
+                    <core:outputs>
+                        <core:output required="true" name="enactor.core.NavigationLinkId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:output>
+                        <core:output required="true" name="enactor.core.NavigationLinkReference">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:output>
+                    </core:outputs>
+                </core:metaData>
+            </core:value>
+            <core:index>0</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:CallProcessActivity">
+                <core:activityId>SendLinkToCustomer</core:activityId>
+                <core:name>Send Link to Customer</core:name>
+                <core:description>Emails the link to the invitation to the customer</core:description>
+                <core:activityTypeId>CRM/Loyalty/Registration/SendEmailInvitationToCustomerActivityType</core:activityTypeId>
+                <core:activityOutcome name="Success">
+                    <core:toActivity>CompleteRegistration</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:activityOutcome name="Fail">
+                    <core:toActivity>Notify Error Sending Invitation</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:activityOutcome name="NoSuchCustomer">
+                    <core:toActivity>Notify Error Sending Invitation</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:activityOutcome name="NoSuchScript">
+                    <core:toActivity>Notify Error Sending Invitation</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:catchAllOutcome xsi:type="core:ActivityOutcome" name="Error">
+                    <core:toActivity>Notify Error Sending Invitation</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:catchAllOutcome>
+                <core:parameters>
+                    <core:parameter name="enactor.mfc.CommunicationScriptId">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>#{empty(communicationScriptId) ? 'CUST_REG_INV_1' : communicationScriptId}</core:value>
+                    </core:parameter>
+                    <core:parameter name="enactor.crm.customer.registration.LinkAddress">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>http://localhost:8080/WebCustomerAccountManagement</core:value>
+                    </core:parameter>
+                    <core:parameter name="enactor.crm.customer.registration.SiteAddress">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>www.enactor.co.uk</core:value>
+                    </core:parameter>
+                    <core:parameter name="enactor.core.email.MailBoxName">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>CUST_SERVICE_TEST1</core:value>
+                    </core:parameter>
+                    <core:parameter name="enactor.crm.customer.registration.SenderAddress">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>cust.service.test1@enactor.co.uk</core:value>
+                    </core:parameter>
+                </core:parameters>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>853</core:x>
+                        <core:y>89</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 1</tools:swimLaneId>
+                    <tools:style>3</tools:style>
+                    <tools:noteReference name="Note Link">
+                        <core:toActivity>Note0</core:toActivity>
+                        <core:proceedImmediately>true</core:proceedImmediately>
+                    </tools:noteReference>
+                </core:uiSettings>
+                <core:metaData>
+                    <core:inputs>
+                        <core:input required="true" name="enactor.mfc.CustomerNumber">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.core.NavigationLinkId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.core.NavigationLinkReference">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.mfc.LoyaltyAccountId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.mfc.CommunicationScriptId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                    </core:inputs>
+                    <core:outputs>
+                        <core:output required="true" name="enactor.core.mail.store.EmailMessageId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:output>
+                    </core:outputs>
+                </core:metaData>
+            </core:value>
+            <core:index>1</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:EndProcessActivity">
+                <core:activityId>DidNotComplete</core:activityId>
+                <core:activityTypeId>Generic/EndProcessActivityType</core:activityTypeId>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>1277</core:x>
+                        <core:y>191</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 3</tools:swimLaneId>
+                    <tools:style>1</tools:style>
+                </core:uiSettings>
+                <core:discard>false</core:discard>
+            </core:value>
+            <core:index>2</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:HTActivity">
+                <core:activityId>NotifySalesperson</core:activityId>
+                <core:name>Notify Error Creating Invitation</core:name>
+                <core:activityTypeId>CRM/NotifyFailureActivityType</core:activityTypeId>
+                <core:activityOutcome name="Complete">
+                    <core:toActivity>InformComplete</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:activityOutcome name="Retry">
+                    <core:toActivity>CreateInvitation</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:suspendActivityOutcome name="Suspend">
+                    <core:toActivity>NotifySalesperson</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:suspendActivityOutcome>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>654</core:x>
+                        <core:y>23</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 3</tools:swimLaneId>
+                    <tools:style>3</tools:style>
+                </core:uiSettings>
+                <core:jobType>Customer Registration</core:jobType>
+                <core:jobHeader>Failed to Set Up Invitation for #{customerName}</core:jobHeader>
+                <core:priority>5</core:priority>
+                <core:peopleGroupEvaluator>{http://www.enactor.com/crm}CustomerSalesPerson</core:peopleGroupEvaluator>
+                <core:peopleGroupParameters>
+                    <core:parameter required="true" name="customerId">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>#{customerNumber}</core:value>
+                    </core:parameter>
+                </core:peopleGroupParameters>
+            </core:value>
+            <core:index>3</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:HTActivity">
+                <core:activityId>InformComplete</core:activityId>
+                <core:name>Notify Customer Registration</core:name>
+                <core:activityTypeId>Generic/ShowMessageActivityType</core:activityTypeId>
+                <core:suspendActivityOutcome name="Suspend">
+                    <core:toActivity>InformComplete</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:suspendActivityOutcome>
+                <core:activityOutcome name="OK">
+                    <core:toActivity>CreateTemporaryLoyaltyCard</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:parameters>
+                    <core:parameter required="true" name="enactor.task.maintenance.Message">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>#{concat(concat('Customer ',customerName),' has accepted the invitation to register.')}</core:value>
+                    </core:parameter>
+                    <core:parameter required="true" name="enactor.task.maintenance.MessageTitle">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>Customer Registration</core:value>
+                    </core:parameter>
+                </core:parameters>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>1277</core:x>
+                        <core:y>23</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 3</tools:swimLaneId>
+                    <tools:style>3</tools:style>
+                </core:uiSettings>
+                <core:jobType>Customer Registration</core:jobType>
+                <core:jobHeader>#{customerName} Registered.</core:jobHeader>
+                <core:priority>5</core:priority>
+                <core:peopleGroupEvaluator>{http://www.enactor.com/crm}CustomerSalesPerson</core:peopleGroupEvaluator>
+                <core:peopleGroupParameters>
+                    <core:parameter required="true" name="customerId">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>#{customerNumber}</core:value>
+                    </core:parameter>
+                </core:peopleGroupParameters>
+            </core:value>
+            <core:index>4</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:HTActivity">
+                <core:activityId>CompleteRegistration</core:activityId>
+                <core:name>Online Customer Registration</core:name>
+                <core:activityTypeId>CRM/Loyalty/Registration/CustomerRegistrationActivityType</core:activityTypeId>
+                <core:activityOutcome name="Timeout">
+                    <core:toActivity>InformTimeout</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:activityOutcome name="Success">
+                    <core:toActivity>IssueVoucher</core:toActivity>
+                    <core:proceedImmediately>false</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:suspendActivityOutcome name="Cancel">
+                    <core:toActivity>CompleteRegistration</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:suspendActivityOutcome>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>1058</core:x>
+                        <core:y>-2</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 4</tools:swimLaneId>
+                    <tools:style>3</tools:style>
+                </core:uiSettings>
+                <core:timeoutDuration>P0Y0M7DT0H0M</core:timeoutDuration>
+                <core:jobType>Complete Registration</core:jobType>
+                <core:jobHeader>Respond to Registration Invitation</core:jobHeader>
+                <core:jobDescription>Please complete your account registration</core:jobDescription>
+                <core:priority>5</core:priority>
+                <core:peopleGroupEvaluator>{http://www.enactor.com/task}SimpleUserEvaluator</core:peopleGroupEvaluator>
+                <core:peopleGroupParameters>
+                    <core:parameter required="true" name="userId">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>CUST_USER</core:value>
+                    </core:parameter>
+                </core:peopleGroupParameters>
+            </core:value>
+            <core:index>5</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:HTActivity">
+                <core:activityId>Notify Error Sending Invitation</core:activityId>
+                <core:activityTypeId>CRM/NotifyFailureActivityType</core:activityTypeId>
+                <core:suspendActivityOutcome name="Suspend">
+                    <core:toActivity>Notify Error Sending Invitation</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:suspendActivityOutcome>
+                <core:activityOutcome name="Retry">
+                    <core:toActivity>SendLinkToCustomer</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:activityOutcome name="Complete">
+                    <core:toActivity>InformComplete</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>853</core:x>
+                        <core:y>23</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 3</tools:swimLaneId>
+                    <tools:style>3</tools:style>
+                </core:uiSettings>
+                <core:jobType>Customer Registration</core:jobType>
+                <core:jobHeader>Failed to Email Invitation to #{customerName}</core:jobHeader>
+                <core:priority>5</core:priority>
+                <core:peopleGroupEvaluator>{http://www.enactor.com/crm}CustomerSalesPerson</core:peopleGroupEvaluator>
+                <core:peopleGroupParameters>
+                    <core:parameter required="true" name="customerId">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>#{customerNumber}</core:value>
+                    </core:parameter>
+                </core:peopleGroupParameters>
+            </core:value>
+            <core:index>6</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:HTActivity">
+                <core:activityId>InformTimeout</core:activityId>
+                <core:name>Invitation Expired</core:name>
+                <core:activityTypeId>Generic/ShowMessageActivityType</core:activityTypeId>
+                <core:suspendActivityOutcome name="Suspend">
+                    <core:toActivity>InformTimeout</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:suspendActivityOutcome>
+                <core:activityOutcome name="OK">
+                    <core:toActivity>DidNotComplete</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:parameters>
+                    <core:parameter required="true" name="enactor.task.maintenance.Message">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>#{concat(concat('Invitation to register sent to customer ',customerName),' has expired.')}</core:value>
+                    </core:parameter>
+                    <core:parameter required="true" name="enactor.task.maintenance.MessageTitle">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>Customer Registration</core:value>
+                    </core:parameter>
+                </core:parameters>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>1079</core:x>
+                        <core:y>191</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 3</tools:swimLaneId>
+                    <tools:style>3</tools:style>
+                </core:uiSettings>
+                <core:jobType>Customer Registration</core:jobType>
+                <core:jobHeader>Registration Invitation Expired. (#{customerName})</core:jobHeader>
+                <core:priority>3</core:priority>
+                <core:peopleGroupEvaluator>{http://www.enactor.com/crm}CustomerSalesPerson</core:peopleGroupEvaluator>
+                <core:peopleGroupParameters>
+                    <core:parameter required="true" name="customerId">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>#{customerNumber}</core:value>
+                    </core:parameter>
+                </core:peopleGroupParameters>
+            </core:value>
+            <core:index>7</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:CallProcessActivity">
+                <core:activityId>CreateTemporaryLoyaltyCard</core:activityId>
+                <core:name>Create Temporary Loyalty Card</core:name>
+                <core:activityTypeId>CRM/Loyalty/Registration/CreateTemporaryLoyaltyCardActivityType</core:activityTypeId>
+                <core:activityOutcome name="Success">
+                    <core:toActivity>SendLoyaltyCardToCustomer</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:activityOutcome name="Fail">
+                    <core:toActivity>NotifyCardCreateFailure</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>1605</core:x>
+                        <core:y>167</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 3</tools:swimLaneId>
+                    <tools:style>3</tools:style>
+                </core:uiSettings>
+                <core:metaData>
+                    <core:inputs>
+                        <core:input required="true" name="enactor.mfc.CustomerNumber">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                    </core:inputs>
+                    <core:outputs>
+                        <core:output required="true" name="enactor.coreUI.PdfDocument">
+                            <core:interfaceName>java.lang.Object</core:interfaceName>
+                        </core:output>
+                    </core:outputs>
+                </core:metaData>
+            </core:value>
+            <core:index>8</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:HTActivity">
+                <core:activityId>NotifyCardCreateFailure</core:activityId>
+                <core:name>Failed to create card PDF</core:name>
+                <core:activityTypeId>CRM/NotifyFailureActivityType</core:activityTypeId>
+                <core:activityOutcome name="Complete">
+                    <core:toActivity>Failed</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:activityOutcome name="Retry">
+                    <core:toActivity>CreateTemporaryLoyaltyCard</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:suspendActivityOutcome name="Suspend">
+                    <core:toActivity>NotifyCardCreateFailure</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:suspendActivityOutcome>
+                <core:parameters>
+                    <core:parameter required="true" name="enactor.task.maintenance.Message">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>Failed to create the temporary loyalty card PDF.</core:value>
+                    </core:parameter>
+                    <core:parameter required="true" name="enactor.task.maintenance.MessageTitle">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>Error in sending Loyalty Card.</core:value>
+                    </core:parameter>
+                </core:parameters>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>1594</core:x>
+                        <core:y>-14</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 2</tools:swimLaneId>
+                    <tools:style>1</tools:style>
+                </core:uiSettings>
+                <core:jobType>Send Loyalty Card</core:jobType>
+                <core:jobHeader>Failed to print card PDF</core:jobHeader>
+                <core:jobDescription>Failed to print the temporary loyalty card in PDF form</core:jobDescription>
+                <core:priority>5</core:priority>
+                <core:peopleGroupEvaluator>{http://www.enactor.com/crm}CustomerSalesPerson</core:peopleGroupEvaluator>
+                <core:peopleGroupParameters>
+                    <core:parameter required="true" name="customerId">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>#{customerNumber}</core:value>
+                    </core:parameter>
+                </core:peopleGroupParameters>
+            </core:value>
+            <core:index>9</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:HTActivity">
+                <core:activityId>NotifyEmailSendFailure</core:activityId>
+                <core:name>Faild to email customer</core:name>
+                <core:activityTypeId>CRM/NotifyFailureActivityType</core:activityTypeId>
+                <core:suspendActivityOutcome name="Suspend">
+                    <core:toActivity>NotifyEmailSendFailure</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:suspendActivityOutcome>
+                <core:activityOutcome name="Retry">
+                    <core:toActivity>SendLoyaltyCardToCustomer</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:activityOutcome name="Complete">
+                    <core:toActivity>Failed</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:parameters>
+                    <core:parameter required="true" name="enactor.task.maintenance.Message">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>Failed to email the temporary loyalty card to the customer</core:value>
+                    </core:parameter>
+                    <core:parameter required="true" name="enactor.task.maintenance.MessageTitle">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>Error in sending Loyalty Card.</core:value>
+                    </core:parameter>
+                </core:parameters>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>1801</core:x>
+                        <core:y>-14</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 2</tools:swimLaneId>
+                    <tools:style>1</tools:style>
+                </core:uiSettings>
+                <core:jobType>Send Loyalty Card</core:jobType>
+                <core:jobHeader>Failed to Email Customer</core:jobHeader>
+                <core:jobDescription>Failed to send the temporary loyalty card PDF to customer</core:jobDescription>
+                <core:priority>5</core:priority>
+                <core:peopleGroupEvaluator>{http://www.enactor.com/crm}CustomerSalesPerson</core:peopleGroupEvaluator>
+                <core:peopleGroupParameters>
+                    <core:parameter required="true" name="customerId">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>#{customerNumber}</core:value>
+                    </core:parameter>
+                </core:peopleGroupParameters>
+            </core:value>
+            <core:index>10</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:CallProcessActivity">
+                <core:activityId>SendLoyaltyCardToCustomer</core:activityId>
+                <core:name>Send Loyalty Card to Customer</core:name>
+                <core:activityTypeId>CRM/Loyalty/Registration/SendTempLoyaltyCardToCustomerActivityType</core:activityTypeId>
+                <core:activityOutcome name="Success">
+                    <core:toActivity>EmailCardSupplier</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:activityOutcome name="Fail">
+                    <core:toActivity>NotifyEmailSendFailure</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:activityOutcome name="NoSuchCustomer">
+                    <core:toActivity>NotifyEmailSendFailure</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:activityOutcome name="NoSuchScript">
+                    <core:toActivity>NotifyEmailSendFailure</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:parameters>
+                    <core:parameter required="true" name="enactor.mfc.CommunicationScriptId">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>CUST_SEND_LOY_CARD1</core:value>
+                    </core:parameter>
+                    <core:parameter required="true" name="enactor.crm.customer.registration.LinkAddress">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>http://www.enactor.co.uk/cam/register</core:value>
+                    </core:parameter>
+                    <core:parameter required="true" name="enactor.crm.customer.registration.SiteAddress">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>www.enactor.co.uk</core:value>
+                    </core:parameter>
+                    <core:parameter required="true" name="enactor.core.email.MailBoxName">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>CUST_SERVICE_TEST1</core:value>
+                    </core:parameter>
+                    <core:parameter required="true" name="enactor.crm.customer.registration.SenderAddress">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>cust.service.test1@enactor.co.uk</core:value>
+                    </core:parameter>
+                </core:parameters>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>1812</core:x>
+                        <core:y>165</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 3</tools:swimLaneId>
+                    <tools:style>3</tools:style>
+                    <tools:noteReference name="Note Link">
+                        <core:toActivity>Note1</core:toActivity>
+                        <core:proceedImmediately>true</core:proceedImmediately>
+                    </tools:noteReference>
+                </core:uiSettings>
+                <core:metaData>
+                    <core:inputs>
+                        <core:input required="true" name="enactor.mfc.CustomerNumber">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.coreUI.PdfDocument">
+                            <core:interfaceName>java.lang.Object</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.crm.customer.registration.SenderAddress">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.mfc.CustomerName">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.mfc.CommunicationScriptId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                    </core:inputs>
+                </core:metaData>
+            </core:value>
+            <core:index>11</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:CallProcessActivity">
+                <core:activityId>EmailCardSupplier</core:activityId>
+                <core:name>Request Loyalty Card from Supplier</core:name>
+                <core:activityTypeId>CRM/Loyalty/Registration/SendLoyaltyCardRequestToSupplierActivityType</core:activityTypeId>
+                <core:activityOutcome name="Success">
+                    <core:toActivity>Completed</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:activityOutcome name="Fail">
+                    <core:toActivity>NotifySendEmailToCardSupplierFailure</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:activityOutcome name="NoSuchCustomer">
+                    <core:toActivity>NotifySendEmailToCardSupplierFailure</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:activityOutcome name="NoSuchScript">
+                    <core:toActivity>NotifySendEmailToCardSupplierFailure</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:parameters>
+                    <core:parameter required="true" name="enactor.mfc.CommunicationScriptId">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>LOY_CARD_SUP_REQ1</core:value>
+                    </core:parameter>
+                    <core:parameter required="true" name="enactor.core.email.MailBoxName">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>CUST_SERVICE_TEST1</core:value>
+                    </core:parameter>
+                    <core:parameter required="true" name="enactor.core.email.SenderAddress">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>cust.service.test1@enactor.co.uk</core:value>
+                    </core:parameter>
+                    <core:parameter required="true" name="enactor.core.email.RecipientAddress">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>sid.test1@enactor.co.uk</core:value>
+                    </core:parameter>
+                </core:parameters>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>2027</core:x>
+                        <core:y>167</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 3</tools:swimLaneId>
+                    <tools:style>3</tools:style>
+                    <tools:noteReference name="Note Link">
+                        <core:toActivity>Note2</core:toActivity>
+                        <core:proceedImmediately>true</core:proceedImmediately>
+                    </tools:noteReference>
+                </core:uiSettings>
+            </core:value>
+            <core:index>12</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:HTActivity">
+                <core:activityId>NotifySendEmailToCardSupplierFailure</core:activityId>
+                <core:name>Failed to email Card Supplier</core:name>
+                <core:activityTypeId>CRM/NotifyFailureActivityType</core:activityTypeId>
+                <core:suspendActivityOutcome name="Suspend">
+                    <core:toActivity>NotifySendEmailToCardSupplierFailure</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:suspendActivityOutcome>
+                <core:activityOutcome name="Complete">
+                    <core:toActivity>Failed</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:activityOutcome name="Retry">
+                    <core:toActivity>EmailCardSupplier</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:parameters>
+                    <core:parameter required="true" name="enactor.task.maintenance.Message">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>Failed to send the loyalty card request to the card supplier</core:value>
+                    </core:parameter>
+                    <core:parameter required="true" name="enactor.task.maintenance.MessageTitle">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>Error in sending Loyalty Card.</core:value>
+                    </core:parameter>
+                </core:parameters>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>2016</core:x>
+                        <core:y>-14</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 2</tools:swimLaneId>
+                    <tools:style>1</tools:style>
+                </core:uiSettings>
+                <core:jobType>Send Loyalty Card</core:jobType>
+                <core:jobHeader>Failed to Email Card Supplier</core:jobHeader>
+                <core:jobDescription>Failed to email the card request to the card supplier</core:jobDescription>
+                <core:priority>5</core:priority>
+                <core:peopleGroupEvaluator>{http://www.enactor.com/crm}CustomerSalesPerson</core:peopleGroupEvaluator>
+                <core:peopleGroupParameters>
+                    <core:parameter required="true" name="customerId">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>#{customerNumber}</core:value>
+                    </core:parameter>
+                </core:peopleGroupParameters>
+            </core:value>
+            <core:index>13</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:EndProcessActivity">
+                <core:activityId>Completed</core:activityId>
+                <core:activityTypeId>Generic/EndProcessActivityType</core:activityTypeId>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>2369</core:x>
+                        <core:y>255</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 3</tools:swimLaneId>
+                    <tools:style>1</tools:style>
+                </core:uiSettings>
+                <core:discard>false</core:discard>
+            </core:value>
+            <core:index>14</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:EndProcessActivity">
+                <core:activityId>Failed</core:activityId>
+                <core:activityTypeId></core:activityTypeId>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>2236</core:x>
+                        <core:y>-14</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 2</tools:swimLaneId>
+                    <tools:style>1</tools:style>
+                </core:uiSettings>
+                <core:discard>false</core:discard>
+            </core:value>
+            <core:index>15</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:HTActivity">
+                <core:activityId>SetUpCustomerInvitation</core:activityId>
+                <core:name>Set up Customer Invitation</core:name>
+                <core:activityTypeId>CRM/SetUpCustomerInvitationActivityType</core:activityTypeId>
+                <core:suspendActivityOutcome name="Suspend">
+                    <core:toActivity>SetUpCustomerInvitation</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:suspendActivityOutcome>
+                <core:activityOutcome name="Cancel">
+                    <core:toActivity></core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:activityOutcome name="Success">
+                    <core:toActivity>CreateInvitation</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>361</core:x>
+                        <core:y>93</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 3</tools:swimLaneId>
+                </core:uiSettings>
+                <core:metaData>
+                    <core:outputs>
+                        <core:output required="true" name="enactor.mfc.CustomerNumber">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:output>
+                        <core:output required="true" name="enactor.mfc.LoyaltyAccountId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:output>
+                        <core:output required="true" name="enactor.mfc.CommunicationScriptId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:output>
+                        <core:output required="true" name="enactor.mfc.CustomerName">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:output>
+                    </core:outputs>
+                </core:metaData>
+                <core:jobType>Customer Registration</core:jobType>
+                <core:jobHeader>Set Up Customer Registration Invitation</core:jobHeader>
+                <core:jobDescription>Set Up Customer Registration Invitation</core:jobDescription>
+                <core:displayDescriptionMessageBase>CRM/CustomerRegistrationMessages</core:displayDescriptionMessageBase>
+                <core:displayDescriptionMessageId>SETUP_REGISTRATION_SUBTITLE</core:displayDescriptionMessageId>
+                <core:displayTitleMessageBase>CRM/CustomerRegistrationMessages</core:displayTitleMessageBase>
+                <core:displayTitleMessageId>SETUP_REGISTRATION_TITLE</core:displayTitleMessageId>
+                <core:priority>5</core:priority>
+                <core:peopleGroupEvaluator>{http://www.enactor.com/task}SimpleUserEvaluator</core:peopleGroupEvaluator>
+            </core:value>
+            <core:index>16</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:StartActivity">
+                <core:activityId>StartCustomerInvitation</core:activityId>
+                <core:name>Start</core:name>
+                <core:activityTypeId>Generic/StartProcessActivityType</core:activityTypeId>
+                <core:activityOutcome name="Success">
+                    <core:toActivity>SetUpCustomerInvitation</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>138</core:x>
+                        <core:y>104</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 3</tools:swimLaneId>
+                </core:uiSettings>
+            </core:value>
+            <core:index>17</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:StartActivity">
+                <core:activityId>StartActivity-1</core:activityId>
+                <core:activityTypeId>Generic/StartProcessActivityType</core:activityTypeId>
+                <core:activityOutcome name="Success">
+                    <core:toActivity>CreateInvitation</core:toActivity>
+                    <core:proceedImmediately>false</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>526</core:x>
+                        <core:y>109</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 1</tools:swimLaneId>
+                </core:uiSettings>
+            </core:value>
+            <core:index>18</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:CallProcessActivity">
+                <core:activityId>IssueVoucher</core:activityId>
+                <core:name>Issue Voucher</core:name>
+                <core:activityTypeId>CRM/Loyalty/Registration/IssueCompletedRegistrationVoucherActivityType</core:activityTypeId>
+                <core:activityOutcome name="Success">
+                    <core:toActivity>InformComplete</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:parameters>
+                    <core:parameter name="enactor.mfc.VoucherTypeId">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>LOY_REG</core:value>
+                    </core:parameter>
+                    <core:parameter name="enactor.mfc.voucher.VoucherValue">
+                        <core:interfaceName>java.lang.Long</core:interfaceName>
+                        <core:value>1000</core:value>
+                    </core:parameter>
+                </core:parameters>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>1277</core:x>
+                        <core:y>-2</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>Lane 4</tools:swimLaneId>
+                    <tools:style>3</tools:style>
+                </core:uiSettings>
+                <core:metaData>
+                    <core:inputs>
+                        <core:input required="true" name="enactor.mfc.CustomerNumber">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.mfc.VoucherTypeId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.mfc.voucher.VoucherValue">
+                            <core:interfaceName>java.lang.Long</core:interfaceName>
+                        </core:input>
+                    </core:inputs>
+                    <core:outputs>
+                        <core:output required="true" name="enactor.coreUI.PdfDocument">
+                            <core:interfaceName>java.lang.Object</core:interfaceName>
+                        </core:output>
+                    </core:outputs>
+                </core:metaData>
+            </core:value>
+            <core:index>19</core:index>
+        </core:listElement>
+        <core:listImplClass>java.util.LinkedList</core:listImplClass>
+    </core:activities>
+    <core:defaultStartActivityId>StartActivity-1</core:defaultStartActivityId>
+    <core:defaultOutcomes/>
+</core:simpleActivityFlowBusinessProcess>

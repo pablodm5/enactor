@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:plnk="http://schemas.xmlsoap.org/ws/2003/05/partner-link/" xmlns:java="http://schemas.xmlsoap.org/wsdl/java/"
+	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:format="http://schemas.xmlsoap.org/wsdl/formatbinding/"
+	xmlns:mjstring="com.enactor.tools.core.util.JavaCodeGenUtils" name="InvokeProcessService"
+	targetNamespace="http://www.enactor.com/coreui/InvokeProcessService"
+	xmlns:service="http://www.enactor.com/coreui/InvokeProcessService"
+	xmlns:core="http://www.enactor.com/core"
+	xmlns:coreui="http://www.enactor.com/coreui">
+	<wsdl:types>
+		<xsd:schema>
+			<xsd:import namespace="http://www.enactor.com/coreui/InvokeProcessService" schemaLocation="coreui/InvokeProcessService.xsd" />
+			<xsd:import namespace="http://www.enactor.com/coreui" schemaLocation="coreui/coreui.xsd" />
+		</xsd:schema>
+	</wsdl:types>
+	<wsdl:message name="invokeProcessRequestMessage">
+		<wsdl:part name="parameters" element="service:execute" />
+	</wsdl:message>
+	<wsdl:message name="invokeProcessResponseMessage">
+		<wsdl:part name="parameters" element="service:executeResponse" />
+	</wsdl:message>>
+	<wsdl:message name="uiProcessException">
+		<wsdl:part name="parameters" element="coreui:uiProcessException" xmlns:coreui="http://www.enactor.com/coreui" />
+	</wsdl:message>
+	<wsdl:portType name="InvokeProcessServicePT">
+		<wsdl:operation name="execute">
+			<wsdl:input message="service:invokeProcessRequestMessage" name="invokeProcessRequestMessage" />
+			<wsdl:output message="service:invokeProcessResponseMessage" name="invokeProcessResponseMessage" />
+			<wsdl:fault message="service:uiProcessException" name="uiProcessException" />
+		</wsdl:operation>
+	</wsdl:portType>
+	<wsdl:binding name="SOAPBinding" type="service:InvokeProcessServicePT">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+		<wsdl:operation name="execute">
+			<soap:operation
+				soapAction="http://www.enactor.com/coreui/InvokeProcessService/InvokeProcessService/soapAction" />
+			<wsdl:input name="invokeProcessRequestMessage">
+				<soap:body use="literal" parts="parameters" />
+			</wsdl:input>
+			<wsdl:output name="invokeProcessResponseMessage">
+				<soap:body use="literal" parts="parameters" />
+			</wsdl:output>
+			<wsdl:fault name="uiProcessException">
+				<soap:fault use="literal" name="uiProcessException" />
+			</wsdl:fault>
+		</wsdl:operation>
+	</wsdl:binding>
+	<wsdl:binding name="JavaBinding" type="service:InvokeProcessServicePT">
+		<java:binding />
+		<format:typeMapping encoding="Java" style="Java">
+			<format:typeMap typeName="xsd:string" formatType="java.lang.String" />
+			<format:typeMap elementName="core:applicationProcessData"
+				formatType="com.enactor.core.application.process.IApplicationProcessData" xmlns:core="http://www.enactor.com/core" />
+			<format:typeMap elementName="coreui:uiProcessException"
+				formatType="com.enactor.coreUI.processes.UIProcessException" xmlns:coreui="http://www.enactor.com/coreui" />
+			<format:typeMap elementName="core:invokeProcessServiceMessage"
+				formatType="com.enactor.core.entities.IEntity" xmlns:core="http://www.enactor.com/core" />
+			<format:typeMap elementName="core:invokeProcessServiceResponse"
+				formatType="com.enactor.core.entities.IEntity" xmlns:coreui="http://www.enactor.com/core" />
+		</format:typeMapping>
+		<wsdl:operation name="execute">
+			<java:operation methodType="instance" methodName="execute" />
+			<wsdl:input />
+			<wsdl:output />
+			<wsdl:fault name="uiProcessException" />
+		</wsdl:operation>
+	</wsdl:binding>
+	<wsdl:service name="InvokeProcessService">
+		<wsdl:port name="SOAPPort" binding="service:SOAPBinding">
+			<soap:address location="http://localhost:8080/axis2/InvokeProcessService" />
+		</wsdl:port>
+		<wsdl:port name="JavaPort" binding="service:JavaBinding">
+			<java:address className="com.enactor.coreUI.processes.service.InvokeProcessService" />
+		</wsdl:port>
+	</wsdl:service>
+	<plnk:partnerLinkType name="InvokeProcessServicePLT">
+		<plnk:role name="InvokeProcessServiceImpl">
+			<plnk:portType name="service:InvokeProcessServicePT" />
+		</plnk:role>
+	</plnk:partnerLinkType>
+</wsdl:definitions>

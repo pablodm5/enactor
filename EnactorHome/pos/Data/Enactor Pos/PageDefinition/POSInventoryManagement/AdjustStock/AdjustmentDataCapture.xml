@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<retail:posPromptPage xmlns:core="http://www.enactor.com/core" xmlns:retail="http://www.enactor.com/retail" xmlns:ns4="http://www.enactor.com/crm" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803" xmlns:ns6="http://www.apis-it.hr/fin/2012/types/f73" xmlns:ns7="http://www.w3.org/2000/09/xmldsig#" xmlns:ns8="http://www.enactor.com/retail/storedRetailTransaction/service" xmlns:ns9="http://www.fu.gov.si/" xmlns:ns10="http://www.enactor.com/addressLookup/service" xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:ns14="http://www.enactor.com/crm/customerLoyalty/service" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" allowResize="true" allowMove="true" allowClose="true" messageBase="POSInventoryManagement/AdjustStock/AdjustStockMessages" url="POSInventoryManagement/AdjustStock/AdjustmentDataCapture">
+    <core:elements>
+        <core:hidden id="SelectionList"/>
+        <core:hidden id="Receipt"/>
+        <core:hidden id="InputBox"/>
+        <core:hidden id="TotalLabel"/>
+        <core:panel id="DialogPanel">
+            <core:elements>
+                <core:label messageId="ADJUSTMENT_SUMMARY_TITLE" styleClass="posPageHeading" id="UNSUBMITTED_ADJUSTMENTS_TITLE">
+                    <core:boundsConstraint height="25" width="600" y="4" x="22"/>
+                </core:label>
+                <core:label lineHeight="0" messageId="ADJUST_STOCK_ID_LABEL" styleClass="formFieldLabel" id="ADJUSTMENT_ID">
+                    <core:boundsConstraint height="28" width="140" y="60" x="24"/>
+                </core:label>
+                <core:label lineHeight="0" messageId="REASON_LABEL" styleClass="formFieldLabel" id="REASON_LABEL">
+                    <core:boundsConstraint height="28" width="140" y="98" x="24"/>
+                </core:label>
+                <core:button lineHeight="0" messageId="SELECT_REASON_BUTTON_LABEL" styleClass="buttonLight" skipPageValidation="true" visibility="#{displaySelectReasonButton}" id="SELECT_REASON_BUTTON">
+                    <core:boundsConstraint height="28" width="130" y="98" x="518"/>
+                    <core:text>SelectReasonPressed</core:text>
+                </core:button>
+                <core:label lineHeight="0" messageId="NOTES_LABEL" styleClass="formFieldLabel" id="NOTES_LABEL">
+                    <core:boundsConstraint height="22" width="140" y="136" x="24"/>
+                </core:label>
+                <core:inputText allowWrap="true" borderSize="1" lineHeight="0" type="textArea" styleClass="formInputTextMultiLine" transparentBackground="false" id="NOTES_INPUT_TEXT">
+                    <core:boundsConstraint height="131" width="470" y="134" x="178"/>
+                    <core:text>#{adjustStockHeader.notes}</core:text>
+                </core:inputText>
+                <core:errorLabel errorFieldId="REASON_INPUT_TEXT" allowWrap="true" lineHeight="0" styleClass="formErrorLabel" id="REASON_INPUT_TEXT_ERROR">
+                    <core:boundsConstraint height="28" width="160" y="98" x="334"/>
+                    <core:text>#{formErrors != null ? formErrors['REASON_INPUT_TEXT'] : null}</core:text>
+                </core:errorLabel>
+                <core:errorLabel errorFieldId="NOTES_INPUT_TEXT" allowWrap="true" lineHeight="0" styleClass="formErrorLabel" id="NOTES_INPUT_TEXT_ERROR">
+                    <core:boundsConstraint height="22" width="300" y="265" x="324"/>
+                    <core:text>#{formErrors != null ? formErrors['NOTES_INPUT_TEXT'] : null}</core:text>
+                </core:errorLabel>
+                <core:inputText editable="false" lineHeight="0" styleClass="formFieldInputText" enabled="true" id="ADJUSTMENT_ID_TEXT">
+                    <core:boundsConstraint height="32" width="263" y="58" x="178"/>
+                    <core:text>#{notEmpty(adjustStockHeader.adjustmentId) ? adjustStockHeader.adjustmentId : adjustStockHeader.adjustStockHeaderId}</core:text>
+                </core:inputText>
+                <core:inputText editable="false" lineHeight="0" styleClass="formFieldInputText" enabled="true" id="REASON_ID_TEXT">
+                    <core:boundsConstraint height="32" width="150" y="96" x="178"/>
+                    <core:text>#{isEmpty(reason) &amp;&amp; isEmpty(reason.reasonId) ? adjustStockHeader.reasonKey.reasonId : reason.reasonId}</core:text>
+                </core:inputText>
+                <core:label lineHeight="0" styleClass="formDescriptionLabel" visibility="#{notEmpty(reason)}" id="REASON_DESCRIPTION_TEXT">
+                    <core:boundsConstraint height="28" width="180" y="98" x="336"/>
+                    <core:text>#{getLocalisedString(reason.description, userLocale)}</core:text>
+                </core:label>
+                <core:label fontStyle="BOLD" lineHeight="0" messageId="CUSTOMER_DETAILS" styleClass="formFieldLabel" visibility="#{instanceOf(adjustStockHeader,'com.enactor.storeInventoryManagement.local.adjustStock.ICustomerAdjustStockHeader') &amp;&amp; notEmpty(adjustStockAddress)}" id="CUSTOMER_DETAILS">
+                    <core:boundsConstraint height="22" width="273" y="287" x="24"/>
+                </core:label>
+                <core:label allowWrap="true" lineHeight="0" messageId="SUMMARY_ORDER_ID_LABEL" styleClass="formFieldLabel" visibility="#{instanceOf(adjustStockHeader,'com.enactor.storeInventoryManagement.local.adjustStock.ICustomerAdjustStockHeader')}" id="CUSTOMER_ORDER_ID_LABEL">
+                    <core:boundsConstraint height="22" width="94" y="314" x="24"/>
+                </core:label>
+                <core:label allowWrap="true" lineHeight="0" messageId="SUMMARY_CUSTOMER_NUMBER_LABEL" styleClass="formFieldLabel" visibility="#{instanceOf(adjustStockHeader,'com.enactor.storeInventoryManagement.local.adjustStock.ICustomerAdjustStockHeader')}" id="CUSTOMER_NUMBER_LABEL">
+                    <core:boundsConstraint height="22" width="225" y="341" x="24"/>
+                </core:label>
+                <core:label allowWrap="true" lineHeight="0" messageId="SUMMARY_NAME_LABEL" styleClass="formFieldLabel" visibility="#{notEmpty(adjustStockAddress)}" id="CUSTOMER_CONTACT_NAME_LABEL">
+                    <core:boundsConstraint height="22" width="91" y="368" x="25"/>
+                </core:label>
+                <core:label allowWrap="true" lineHeight="0" messageId="SUMMARY_PHONE_LABEL" styleClass="formFieldLabel" visibility="#{notEmpty(adjustStockAddress)}" id="CUSTOMER_CONTACT_PHONE_LABEL">
+                    <core:boundsConstraint height="22" width="91" y="395" x="25"/>
+                </core:label>
+                <core:label allowWrap="true" lineHeight="0" messageId="SUMMARY_EMAIL_LABEL" styleClass="formFieldLabel" visibility="#{notEmpty(adjustStockAddress)}" id="CUSTOMER_CONTACT_EMAIL_LABEL">
+                    <core:boundsConstraint height="22" width="91" y="422" x="25"/>
+                </core:label>
+                <core:label lineHeight="0" visibility="#{instanceOf(adjustStockHeader,'com.enactor.storeInventoryManagement.local.adjustStock.ICustomerAdjustStockHeader')}" id="CUSTOMER_ORDER_ID">
+                    <core:boundsConstraint height="22" width="216" y="314" x="178"/>
+                    <core:text>#{adjustStockHeader.customerOrderId}</core:text>
+                </core:label>
+                <core:label lineHeight="0" visibility="#{instanceOf(adjustStockHeader,'com.enactor.storeInventoryManagement.local.adjustStock.ICustomerAdjustStockHeader') &amp;&amp; notEmpty(adjustStockHeader.customerNumber)}" id="CUSTOMER_NUMBER">
+                    <core:boundsConstraint height="22" width="216" y="341" x="178"/>
+                    <core:text>#{adjustStockHeader.customerNumber}</core:text>
+                </core:label>
+                <core:label lineHeight="0" visibility="#{notEmpty(adjustStockAddress)}" id="CUSTOMER_CONTACT_NAME">
+                    <core:boundsConstraint height="22" width="216" y="368" x="178"/>
+                    <core:text>#{concat(concat(adjustStockAddress.name.forename, ' '), adjustStockAddress.name.surname)}</core:text>
+                </core:label>
+                <core:label lineHeight="0" visibility="#{notEmpty(adjustStockAddress)}" id="CUSTOMER_CONTACT_PHONE">
+                    <core:boundsConstraint height="22" width="216" y="395" x="178"/>
+                    <core:text>#{adjustStockAddress.address.phone1}</core:text>
+                </core:label>
+                <core:label lineHeight="0" visibility="#{notEmpty(adjustStockAddress)}" id="CUSTOMER_CONTACT_EMAIL">
+                    <core:boundsConstraint height="22" width="284" y="422" x="178"/>
+                    <core:text>#{adjustStockAddress.address.email}</core:text>
+                </core:label>
+                <core:label lineHeight="0" visibility="#{notEmpty(adjustStockAddress)}" id="CUSTOMER_CONTACT_STREET1">
+                    <core:boundsConstraint height="28" width="198" y="314" x="520"/>
+                    <core:text>#{concat(concat(adjustStockAddress.address.street1, ' '), adjustStockAddress.address.street2)}</core:text>
+                </core:label>
+                <core:label allowWrap="true" lineHeight="0" messageId="SUMMARY_ADDRESS_LABEL" styleClass="formFieldLabel" visibility="#{notEmpty(adjustStockAddress)}" id="CUSTOMER_CONTACT_ADDRESS_LABEL">
+                    <core:boundsConstraint height="28" width="100" y="314" x="420"/>
+                </core:label>
+                <core:label lineHeight="0" visibility="#{notEmpty(adjustStockAddress)}" id="CUSTOMER_CONTACT_TOWN">
+                    <core:boundsConstraint height="28" width="180" y="341" x="520"/>
+                    <core:text>#{adjustStockAddress.address.town}</core:text>
+                </core:label>
+                <core:label lineHeight="0" visibility="#{notEmpty(adjustStockAddress)}" id="CUSTOMER_CONTACT_COUNTY">
+                    <core:boundsConstraint height="28" width="180" y="368" x="520"/>
+                    <core:text>#{adjustStockAddress.address.county}</core:text>
+                </core:label>
+                <core:label lineHeight="0" visibility="#{notEmpty(adjustStockAddress)}" id="CUSTOMER_CONTACT_POST_CODE">
+                    <core:boundsConstraint height="28" width="180" y="395" x="520"/>
+                    <core:text>#{adjustStockAddress.address.postCode}</core:text>
+                </core:label>
+                <core:label fontStyle="BOLD" lineHeight="0" messageId="CUSTOMER_AUTHORISE_ADJUST_STOCK_DATA_CAPTURE_TITLE" styleClass="formFieldLabel" visibility="#{notEmpty(adjustStockAddress) &amp;&amp; adjustStockHeader.status == 'AWAITING_APPROVAL'}" id="CUSTOMER_AUTHORISE_ADJUST_STOCK_DATA_CAPTURE_TITLE">
+                    <core:boundsConstraint height="18" width="396" y="32" x="22"/>
+                </core:label>
+                <core:label fontStyle="BOLD" lineHeight="0" messageId="CUSTOMER_PICK_ADJUST_STOCK_DATA_CAPTURE_TITLE" styleClass="formFieldLabel" visibility="#{notEmpty(adjustStockAddress) &amp;&amp; adjustStockHeader.status == 'AWAITING_PICKING'}" id="CUSTOMER_PICK_ADJUST_STOCK_DATA_CAPTURE_TITLE">
+                    <core:boundsConstraint height="18" width="396" y="32" x="22"/>
+                </core:label>
+            </core:elements>
+        </core:panel>
+        <core:button lineHeight="0" messageId="CONTINUE_BUTTON_LABEL" id="Button1">
+            <core:text>ConfirmPressed</core:text>
+        </core:button>
+        <core:button lineHeight="0" messageId="EDIT_ITEMS_BUTTON_LABEL" skipPageValidation="true" visibility="#{allowItemAmendment}" id="Button2">
+            <core:text>EditItemsPressed</core:text>
+        </core:button>
+        <core:button lineHeight="0" messageBase="POSInventoryManagement/AdjustStock/AdjustStockMessages" messageId="REMOVE_BUTTON_LABEL" skipPageValidation="true" visibility="#{isEmpty(isTask) || (notEmpty(isTask) &amp;&amp; isTask == false)}" id="Button8">
+            <core:text>CancelPressed</core:text>
+        </core:button>
+        <core:text lineHeight="0" messageId="ENTER_NOTES_MESSAGE" id="Prompt"/>
+        <core:button lineHeight="0" messageId="SUSPEND_BUTTON_LABEL" visibility="#{priv:checkPrivilege('enactor.inventoryManagement.pos.TransferOut.AllowTransferOutSuspend') &amp;&amp; (isEmpty(historyFlag) || historyFlag == false)}" id="Button4">
+            <core:text>SuspendPressed</core:text>
+        </core:button>
+        <core:button lineHeight="0" messageBase="POSInventoryManagement/Common/GeneralMessages" messageId="BACK_BUTTON_LABEL" visibility="#{isEmpty(isTask) ||  isTask == false}" id="Button7">
+            <core:text>BackPressed</core:text>
+        </core:button>
+    </core:elements>
+    <core:templateURL>NextGen1024x768/Pos/FullScreenTraditionalPosTemplate</core:templateURL>
+    <core:events>
+        <core:event destination="Button1" event="key.EnterPressed">press</core:event>
+        <core:event destination="Button8" event="key.KeyCode27Pressed">press</core:event>
+    </core:events>
+    <core:validationEvents>
+        <core:event>ConfirmPressed</core:event>
+    </core:validationEvents>
+    <core:preferredConstraintType>BOUNDS</core:preferredConstraintType>
+    <core:variables>
+        <core:variable name="enactor.inventoryManagement.IsTask">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.coreUI.UserLocale">
+            <core:interfaceName>com.enactor.core.localisation.ILocale</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.inventoryManagement.local.adjustStock.AdjustStockAddress">
+            <core:interfaceName>com.enactor.storeInventoryManagement.local.adjustStock.adjustStockAddress.IAdjustStockAddress</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.inventoryManagement.AllowItemAmendment">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.mfc.Reason">
+            <core:interfaceName>com.enactor.mfc.reason.IReason</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="FormErrors">
+            <core:interfaceName>com.enactor.coreUI.processes.IFormErrors</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.inventoryManagement.local.AdjustStockHeader">
+            <core:interfaceName>com.enactor.storeInventoryManagement.local.adjustStock.IAdjustStockHeader</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.inventoryManagement.HistoryFlag">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.inventoryManagement.DisplaySelectReasonButton">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:variable>
+    </core:variables>
+    <core:scannerEnabled>false</core:scannerEnabled>
+    <core:scannerDataName></core:scannerDataName>
+</retail:posPromptPage>

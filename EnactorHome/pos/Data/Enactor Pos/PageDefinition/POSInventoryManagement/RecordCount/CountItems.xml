@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<retail:posPromptPage xmlns:core="http://www.enactor.com/core" xmlns:retail="http://www.enactor.com/retail" xmlns:ns4="http://www.enactor.com/crm" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803" xmlns:ns6="http://www.apis-it.hr/fin/2012/types/f73" xmlns:ns7="http://www.w3.org/2000/09/xmldsig#" xmlns:ns8="http://www.enactor.com/retail/storedRetailTransaction/service" xmlns:ns9="http://www.fu.gov.si/" xmlns:ns10="http://www.enactor.com/addressLookup/service" xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:ns14="http://www.enactor.com/crm/customerLoyalty/service" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" allowResize="true" allowMove="true" allowClose="true" updateMode="REDRAW_PAGE" messageBase="POSInventoryManagement/RecordCount/RecordCountMessages" url="POSInventoryManagement/RecordCount/CountItems">
+    <core:elements>
+        <core:hidden id="Receipt"/>
+        <core:hidden id="SelectionList"/>
+        <core:button messageId="ADD_ITEM_BUTTON" id="Button1">
+            <core:text>KeyIDPressed</core:text>
+        </core:button>
+        <core:button messageId="UP_BUTTON" visibility="#{page['PagingSelectionListPanel.PagingSelectionListBoxTall'].visible &amp;&amp; page['PagingSelectionListPanel.PagingSelectionListBoxTall'].moveUp}" id="Button2">
+            <core:updateTriggers>
+                <core:element>PagingSelectionListBoxTall</core:element>
+            </core:updateTriggers>
+            <core:text>page.PagingSelectionListPanel.PagingSelectionListBoxTall.up</core:text>
+        </core:button>
+        <core:button messageId="DOWN_BUTTON" visibility="#{page['PagingSelectionListPanel.PagingSelectionListBoxTall'].visible &amp;&amp; page['PagingSelectionListPanel.PagingSelectionListBoxTall'].moveDown}" id="Button3">
+            <core:updateTriggers>
+                <core:element>PagingSelectionListBoxTall</core:element>
+            </core:updateTriggers>
+            <core:text>page.PagingSelectionListPanel.PagingSelectionListBoxTall.down</core:text>
+        </core:button>
+        <core:button messageId="FINISH_BUTTON" id="Button4">
+            <core:text>FinishPressed</core:text>
+        </core:button>
+        <core:button messageId="EDIT_ITEM_BUTTON" visibility="#{notEmpty(recordCountItemsList)}" id="Button5">
+            <core:text>EditPressed</core:text>
+        </core:button>
+        <core:button messageId="REMOVE_ITEM_BUTTON" visibility="#{notEmpty(recordCountItemsList)}" id="Button6">
+            <core:text>VoidItemPressed</core:text>
+        </core:button>
+        <core:button messageId="SUSPEND_BUTTON" id="Button7">
+            <core:text>SuspendPressed</core:text>
+        </core:button>
+        <core:button messageId="CLEAR_COUNT_BUTTON" id="Button8">
+            <core:text>CancelPressed</core:text>
+        </core:button>
+        <core:text messageId="PLEASE_SCAN_PRODUCT_ID_TO_BE_COUNTED" id="Prompt"/>
+        <core:inputText id="InputBox">
+            <core:text>#{productId}</core:text>
+        </core:inputText>
+        <core:hidden id="TotalLabel"/>
+        <core:panel id="PagingSelectionListPanel">
+            <core:elements>
+                <core:label lineHeight="0" messageId="ITEMS_TITLE" styleClass="posPageHeading" id="TITLE">
+                    <core:boundsConstraint height="30" width="400" y="8" x="5"/>
+                </core:label>
+                <core:label lineHeight="0" messageId="STOCK_TAKE_REQUEST_DESCRIPTION" styleClass="formFieldLabel" id="LABEL_STOCK_TAKE_REQUEST_DESCRIPTION">
+                    <core:boundsConstraint height="22" width="160" y="50" x="5"/>
+                </core:label>
+                <core:label lineHeight="0" styleClass="" id="DESCRIPTION">
+                    <core:boundsConstraint height="30" width="635" y="46" x="105"/>
+                    <core:text>#{localStockTakeHeader.stockTakeRequestDescription}</core:text>
+                </core:label>
+                <core:label lineHeight="0" messageId="STOCK_TAKE_REQUEST_INSTRUCTIONS" styleClass="formFieldLabel" id="LABEL_STOCK_TAKE_REQUEST_INSTRUCTIONS">
+                    <core:boundsConstraint height="15" width="160" y="100" x="5"/>
+                </core:label>
+                <core:label allowWrap="true" lineHeight="0" styleClass="" id="STOCK_TAKE_REQUEST_INSTRUCTIONS">
+                    <core:boundsConstraint height="60" width="635" y="77" x="105"/>
+                    <core:text>#{length(localStockTakeHeader.stockTakeRequestInstructions) &gt; 220 ? concatenate(strings:substring(localStockTakeHeader.stockTakeRequestInstructions, 0, 220), '...') : localStockTakeHeader.stockTakeRequestInstructions}</core:text>
+                </core:label>
+                <core:listBox lazyLoad="false" listSelectionMethod="DEFAULT" documentTemplateUrl="POSInventoryManagement/RecordCount/CountItemsListTemplate" selectedIndex="0" styleClass="dataListBox" id="PagingSelectionListBoxNarrow">
+                    <core:elements/>
+                    <core:listExpression>#{recordCountItemsList}</core:listExpression>
+                    <core:dataExpression>item</core:dataExpression>
+                    <core:selectedIndices>
+                        <item>0</item>
+                    </core:selectedIndices>
+                </core:listBox>
+                <core:panel id="PagingSelectionPageControlsPanel">
+                    <core:elements>
+                        <core:panel hAlign="CENTRE" id="PagingSelectionPageControlsReferencePanel">
+                            <core:flowConstraint width="100%" height="100%"/>
+                            <core:elements>
+<core:pageElementRef pageDefinitionURL="POSInventoryManagement/Common/POSInventoryManagementPagedListPageControl" id="PAGE_CONTROLS">
+    <core:flowConstraint/>
+    <core:elements/>
+    <core:parameter value="#{recordCountItemsList}" name="enactor.coreUI.List">
+        <core:interfaceName>com.enactor.core.database.list.IPagedList</core:interfaceName>
+    </core:parameter>
+    <core:parameter value="#{pageSize}" name="enactor.coreUI.PageSize">
+        <core:interfaceName>java.lang.Integer</core:interfaceName>
+    </core:parameter>
+</core:pageElementRef>
+                            </core:elements>
+                        </core:panel>
+                    </core:elements>
+                </core:panel>
+            </core:elements>
+        </core:panel>
+    </core:elements>
+    <core:templateURL>Standard1024x768/Pos/FullScreenTraditionalPosTemplate</core:templateURL>
+    <core:events>
+        <core:event destination="Button7" event="key.KeyCode27Pressed">press</core:event>
+        <core:event destination="Button1" event="key.EnterPressed">press</core:event>
+        <core:event destination="Button2" event="key.UpPressed">press</core:event>
+        <core:event destination="Button3" event="key.DownPressed">press</core:event>
+    </core:events>
+    <core:preferredConstraintType>BOUNDS</core:preferredConstraintType>
+    <core:variables>
+        <core:variable required="true" name="enactor.inventoryManagement.RecordCountHeader">
+            <core:interfaceName>com.enactor.storeInventoryManagement.local.recordCount.IRecordCountHeader</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.mfc.ProductId">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.inventoryManagement.local.RecordCountItemsList">
+            <core:interfaceName>java.util.List</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.coreUI.ListCriteria">
+            <core:interfaceName>com.enactor.core.servers.IListCriteria</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.mfc.Device">
+            <core:interfaceName>com.enactor.mfc.device.IDevice</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.mfc.User">
+            <core:interfaceName>com.enactor.mfc.user.IUser</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.inventoryManagement.ScannerData">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.inventoryManagement.local.LocalStockTakeHeader">
+            <core:interfaceName>com.enactor.storeInventoryManagement.local.stockTake.LocalStockTakeHeaderListElement</core:interfaceName>
+        </core:variable>
+    </core:variables>
+    <core:scannerEnabled>true</core:scannerEnabled>
+    <core:scannerDataName>enactor.inventoryManagement.ScannerData</core:scannerDataName>
+</retail:posPromptPage>

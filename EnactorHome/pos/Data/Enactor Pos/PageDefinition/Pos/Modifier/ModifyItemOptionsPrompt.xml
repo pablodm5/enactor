@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<retail:posPromptPage xmlns:core="http://www.enactor.com/core" xmlns:retail="http://www.enactor.com/retail" xmlns:ns4="http://www.enactor.com/crm" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803" xmlns:ns6="http://www.apis-it.hr/fin/2012/types/f73" xmlns:ns7="http://www.w3.org/2000/09/xmldsig#" xmlns:ns8="http://www.enactor.com/retail/storedRetailTransaction/service" xmlns:ns9="http://www.fu.gov.si/" xmlns:ns10="http://www.enactor.com/addressLookup/service" xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:ns14="http://www.enactor.com/crm/customerLoyalty/service" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" allowResize="true" allowMove="true" hasBorders="TRUE" allowClose="true" windowtype="view-panel" height="593" width="801" messageBase="Pos/Sale/SaleMessages" title="Discount Options" url="Pos/Modifier/ModifyItemOptionsPrompt">
+    <core:elements>
+        <retail:menuPageElement menuExpression="#{menu}" id="MODIFIER_ITEM">
+            <retail:menu menuCatagory="RETAIL" menuType="TREE">
+                <retail:menuSetId></retail:menuSetId>
+                <retail:roleId>
+                    <retail:roleId></retail:roleId>
+                    <retail:regionId groupTypeId="region"></retail:regionId>
+                </retail:roleId>
+                <retail:menuGroupId groupTypeId="menuGroup"></retail:menuGroupId>
+                <retail:menuDefaultGroupId groupTypeId="menuGroup"/>
+                <retail:localeId></retail:localeId>
+                <retail:buttonMenuItem event="PriceOverride" position="1" visibility="#{notEmpty(priceOverrideAllowed) &amp;&amp; priceOverrideAllowed &amp;&amp; priv:checkPrivilege('enactor.pos.PriceOverrideAllowed')}" messageId="PRICE_OVERRIDE_BUTTON" label="" id="PriceOverride"/>
+                <retail:buttonMenuItem event="ItemDiscount" position="2" visibility="#{notEmpty(discountAllowed) &amp;&amp; discountAllowed &amp;&amp; priv:checkPrivilege('enactor.pos.DiscountItemAllowed') &amp;&amp; (isEmpty(selectedItem) || !instanceOf(selectedItem, 'com.enactor.customerOrders.retail.basket.items.ICustomerOrderPaymentBasketItem'))}" messageId="ITEM_DISCOUNT_BUTTON" label="" id="ItemDiscount"/>
+                <retail:buttonMenuItem event="ModifyQuantity" position="3" visibility="#{notEmpty(modifyQuantityAllowed) &amp;&amp; modifyQuantityAllowed &amp;&amp; priv:checkPrivilege('enactor.pos.ModifyQuantityAllowed') &amp;&amp; (isEmpty(selectedItem) || !instanceOf(selectedItem, 'com.enactor.customerOrders.retail.basket.items.ICustomerOrderPaymentBasketItem')) &amp;&amp; (isEmpty(selectedItem) || !instanceOf(selectedItem, 'com.enactor.mfc.basket.items.IUnknownItem')  || (instanceOf(selectedItem, 'com.enactor.mfc.basket.items.IUnknownItem') &amp;&amp; priv:checkPrivilege('enactor.pos.UnknowProductQuantiyAllowed')))}" messageId="MODIFY_QUANTITY_BUTTON" label="" id="ModifyQuantity"/>
+                <retail:buttonMenuItem event="SelectedItemVoid" position="4" visibility="#{notEmpty(voidAllowed) &amp;&amp; voidAllowed &amp;&amp; priv:checkPrivilege('enactor.pos.VoidItemAllowed')}" messageId="ITEM_VOID_BUTTON" label="" id="ItemVoid"/>
+                <retail:buttonMenuItem event="ItemTaxExempt" position="5" visibility="#{notEmpty(taxExemptAllowed) &amp;&amp; taxExemptAllowed &amp;&amp; priv:checkPrivilege('enactor.pos.TaxExemptLineItemAllowed')}" messageId="ITEM_TAX_EXEMPT" label="" id="TaxExempt"/>
+                <retail:buttonMenuItem event="ProductDetails" position="6" visibility="#{instanceOf(selectedItem, 'com.enactor.mfc.basket.items.ISalesItem') &amp;&amp; !instanceOf(selectedItem, 'com.enactor.mfc.basket.items.INonMerchandiseItem') &amp;&amp; !instanceOf(selectedItem, 'com.enactor.mfc.basket.items.IUnknownItem') }" messageId="PRODUCT_DETAILS_BUTTON" label="" id="ProductDetails"/>
+                <retail:buttonMenuItem event="ItemTaxOverride" position="7" visibility="#{notEmpty(taxOverrideAllowed) &amp;&amp; taxOverrideAllowed &amp;&amp; priv:checkPrivilege('enactor.pos.TaxOverrideLineItemAllowed')}" messageId="TAX_OVERRIDE_BUTTON" label="" id="TaxOverride"/>
+                <retail:buttonMenuItem event="CancelPressed" position="8" messageBase="Pos/General/PosMessages" messageId="BUTTON_CANCEL" label="" id=""/>
+            </retail:menu>
+            <retail:renderElement>Button1</retail:renderElement>
+            <retail:renderElement>Button2</retail:renderElement>
+            <retail:renderElement>Button3</retail:renderElement>
+            <retail:renderElement>Button4</retail:renderElement>
+            <retail:renderElement>Button5</retail:renderElement>
+            <retail:renderElement>Button6</retail:renderElement>
+            <retail:renderElement>Button7</retail:renderElement>
+            <retail:renderElement>Button8</retail:renderElement>
+        </retail:menuPageElement>
+        <core:button id="Button1"/>
+        <core:button id="Button8"/>
+        <core:button id="Button2"/>
+        <core:button id="Button3"/>
+        <core:button id="Button5"/>
+        <core:button id="Button6"/>
+        <core:button id="Button4"/>
+        <core:button id="Button7"/>
+        <core:hidden id="InputBox"/>
+        <core:text messageId="#{operatorMessageID}" id="Prompt">
+            <core:text></core:text>
+        </core:text>
+        <core:hidden id="Receipt"/>
+        <core:listBox lazyLoad="false" listSelectionMethod="DEFAULT" documentTemplateUrl="#{view.itemsFormatter}" styleClass="#{notEmpty(view.currentlyInTrainingMode) &amp;&amp; view.currentlyInTrainingMode ? 'receiptTraining' : ((instanceOf(view.transactionHandler.transaction, 'com.enactor.mfc.retail.transaction.IRetailSaleTransaction') &amp;&amp; view.transactionHandler.transaction.isTransactionReversal) ? 'receiptReversal' : 'receipt')}" id="SelectionList">
+            <core:elements/>
+            <core:listExpression>#{transactionHandler.transaction.basket.itemsList}</core:listExpression>
+            <core:listingElementEvents>
+                <core:selectionEvent>DisplayModifyItemFunctions</core:selectionEvent>
+            </core:listingElementEvents>
+            <core:selectableExpression>#{instanceOf(selectedItem, 'com.enactor.mfc.basket.items.IModifiableItem') &amp;&amp; !selectedItem.voided}</core:selectableExpression>
+            <core:headerExpression>#{listHeader}</core:headerExpression>
+            <core:footerExpression>#{listFooter}</core:footerExpression>
+        </core:listBox>
+    </core:elements>
+    <core:templateURL>Pos/StandardPosTemplate</core:templateURL>
+    <core:variables>
+        <core:variable required="true" name="enactor.mfc.TransactionHandler">
+            <core:interfaceName>com.enactor.mfc.retail.transaction.IRetailTransactionHandler</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.coreUI.User">
+            <core:interfaceName>com.enactor.core.signOn.ISignedOnUser</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="OperatorMessageID">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.coreUI.SelectedItem">
+            <core:interfaceName>java.lang.Object</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.pos.PriceOverrideAllowed">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.pos.DiscountAllowed">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.pos.ModifyQuantityAllowed">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.pos.VoidAllowed">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.pos.TaxExemptAllowed">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.pos.SavedSelectedItem">
+            <core:interfaceName>java.lang.Object</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.coreUI.ListHeader">
+            <core:interfaceName>java.lang.Object</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.coreUI.ListFooter">
+            <core:interfaceName>java.lang.Object</core:interfaceName>
+        </core:variable>
+    </core:variables>
+</retail:posPromptPage>

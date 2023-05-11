@@ -1,0 +1,2691 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.21" id="1">
+    <property name="author">Rob Harot</property>
+    <property name="comments">Copyright (c) 2010 Enactor Ltd.</property>
+    <property name="createdBy">Eclipse BIRT Designer Version 2.5.2.v20100208 Build &lt;2.5.2.v20100210-0630></property>
+    <text-property name="title">Stock Adjustment Print</text-property>
+    <html-property name="description">Stock Adjustment Print report</html-property>
+    <simple-property-list name="includeResource">
+        <value>Messages/InventoryManagement/StockAdjustmentPrintMessages</value>
+    </simple-property-list>
+    <property name="units">in</property>
+    <list-property name="propertyBindings">
+        <structure>
+            <property name="name">queryText</property>
+            <property name="id">2165</property>
+        </structure>
+        <structure>
+            <property name="name">queryTimeOut</property>
+            <property name="id">2165</property>
+        </structure>
+    </list-property>
+    <method name="initialize"><![CDATA[globalDataFormatter = Packages.com.enactor.coreUI.factories.DataFormatterFactory.getInstance().getFormatter(reportContext.getLocale());]]></method>
+    <property name="theme">ReportLibrary.EnactorReportTheme</property>
+    <text-property name="displayName">Stock Adjustment Print</text-property>
+    <property name="layoutPreference">auto layout</property>
+    <property name="imageDPI">96</property>
+    <list-property name="libraries">
+        <structure>
+            <property name="fileName">../InventoryManagementReportLibrary.rptlibrary</property>
+            <property name="namespace">ReportLibrary</property>
+        </structure>
+    </list-property>
+    <parameters>
+        <scalar-parameter name="odaJndiName" id="367">
+            <text-property name="promptText">ODA JNDI Name</text-property>
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant"></value>
+            </simple-property-list>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="stockAdjustmentId" id="551">
+            <text-property name="promptText">Stock Adjustment Id</text-property>
+            <property name="valueType">static</property>
+            <property name="isRequired">true</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="companyId" id="2164">
+            <property name="valueType">static</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant">1</value>
+            </simple-property-list>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+    </parameters>
+    <data-sources>
+        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="Data Source" id="374"
+ extends="ReportLibrary.Data Source">
+            <list-property name="privateDriverProperties">
+                <ex-property>
+                    <name>contentBidiFormatStr</name>
+                    <value>ILYNN</value>
+                </ex-property>
+                <ex-property>
+                    <name>metadataBidiFormatStr</name>
+                    <value>ILYNN</value>
+                </ex-property>
+            </list-property>
+            <property name="odaDriverClass">com.microsoft.sqlserver.jdbc.SQLServerDriver</property>
+            <property name="odaURL">jdbc:sqlserver://localhost:1433;responseBuffering=adaptive;DatabaseName=Enactor</property>
+            <property name="odaUser">sa</property>
+        </oda-data-source>
+    </data-sources>
+    <data-sets>
+        <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="HeaderQuery" id="1750">
+            <list-property name="computedColumns">
+                <structure>
+                    <property name="name">SET_BASE_CURRENCY_ID</property>
+                    <expression name="expression">baseCurrencyId = row["CURRENCY_ID"];</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">USER_NAME</property>
+                    <expression name="expression">forename = row["USER_FORENAME"] != null ? row["USER_FORENAME"] : '';
+surname = row["USER_SURNAME"] != null ? row["USER_SURNAME"] : '';
+result = forename + ' ' + surname;
+
+result == ' ' ? '-' : result;</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">AUTH_USER_NAME</property>
+                    <expression name="expression">forename = row["AUTH_USER_FORENAME"] != null ? row["AUTH_USER_FORENAME"] : '';
+surname = row["AUTH_USER_SURNAME"] != null ? row["AUTH_USER_SURNAME"] : '';
+result = forename + ' ' + surname;
+
+result == ' ' ? '-' : result;</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">FORMATTED_CREATED_DATE</property>
+                    <expression name="expression">var date = row["CREATED_DATE"];&#13;
+Packages.com.enactor.core.utilities.DateUtils.formatMediumDate(reportContext.getLocale(), date) ;</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">FORMATTED_AUTHORISED_DATE</property>
+                    <expression name="expression">var date = row["AUTHORISED_DATE"];&#13;
+Packages.com.enactor.core.utilities.DateUtils.formatMediumDate(reportContext.getLocale(), date) ;</expression>
+                    <property name="dataType">string</property>
+                </structure>
+            </list-property>
+            <list-property name="columnHints">
+                <structure>
+                    <property name="columnName">LOCATION_DESCRIPTION</property>
+                    <text-property name="displayName">LOCATION_DESCRIPTION</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">REASON_DESCRIPTION</property>
+                    <text-property name="displayName">REASON_DESCRIPTION</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">COMMENTS</property>
+                    <text-property name="displayName">COMMENTS</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">USER_FORENAME</property>
+                    <text-property name="displayName">USER_FORENAME</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">USER_SURNAME</property>
+                    <text-property name="displayName">USER_SURNAME</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">AUTH_USER_FORENAME</property>
+                    <text-property name="displayName">AUTH_USER_FORENAME</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">AUTH_USER_SURNAME</property>
+                    <text-property name="displayName">AUTH_USER_SURNAME</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">FROM_LOCATION_AREA_NAME</property>
+                    <text-property name="displayName">FROM_LOCATION_AREA_NAME</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">FROM_INVENTORY_CONTAINER_NAME</property>
+                    <text-property name="displayName">FROM_INVENTORY_CONTAINER_NAME</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">TO_LOCATION_AREA_NAME</property>
+                    <text-property name="displayName">TO_LOCATION_AREA_NAME</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">TO_INVENTORY_CONTAINER_NAME</property>
+                    <text-property name="displayName">TO_INVENTORY_CONTAINER_NAME</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">SET_BASE_CURRENCY_ID</property>
+                    <property name="alias">SET_BASE_CURRENCY_ID</property>
+                </structure>
+                <structure>
+                    <property name="columnName">USER_NAME</property>
+                    <property name="alias">USER_NAME</property>
+                </structure>
+                <structure>
+                    <property name="columnName">AUTH_USER_NAME</property>
+                    <property name="alias">AUTH_USER_NAME</property>
+                </structure>
+                <structure>
+                    <property name="columnName">FORMATTED_CREATED_DATE</property>
+                    <property name="alias">FORMATTED_CREATED_DATE</property>
+                </structure>
+                <structure>
+                    <property name="columnName">FORMATTED_AUTHORISED_DATE</property>
+                    <property name="alias">FORMATTED_AUTHORISED_DATE</property>
+                </structure>
+                <structure>
+                    <property name="columnName">Currency_Id</property>
+                    <property name="alias">CURRENCY_ID</property>
+                </structure>
+                <structure>
+                    <property name="columnName">Created_Date</property>
+                    <property name="alias">CREATED_DATE</property>
+                </structure>
+                <structure>
+                    <property name="columnName">Authorised_Date</property>
+                    <property name="alias">AUTHORISED_DATE</property>
+                </structure>
+                <structure>
+                    <property name="columnName">Authorised_Comments</property>
+                    <property name="alias">AUTHORISED_COMMENTS</property>
+                </structure>
+                <structure>
+                    <property name="columnName">Stock_Adjustment_Id</property>
+                    <property name="alias">STOCK_ADJUSTMENT_ID</property>
+                </structure>
+                <structure>
+                    <property name="columnName">Street1</property>
+                    <property name="alias">STREET1</property>
+                </structure>
+                <structure>
+                    <property name="columnName">Street2</property>
+                    <property name="alias">STREET2</property>
+                </structure>
+                <structure>
+                    <property name="columnName">Street3</property>
+                    <property name="alias">STREET3</property>
+                </structure>
+                <structure>
+                    <property name="columnName">Town</property>
+                    <property name="alias">TOWN</property>
+                </structure>
+                <structure>
+                    <property name="columnName">County</property>
+                    <property name="alias">COUNTY</property>
+                </structure>
+                <structure>
+                    <property name="columnName">Country</property>
+                    <property name="alias">COUNTRY</property>
+                </structure>
+                <structure>
+                    <property name="columnName">Post_Code</property>
+                    <property name="alias">POST_CODE</property>
+                </structure>
+                <structure>
+                    <property name="columnName">Status</property>
+                    <property name="alias">STATUS</property>
+                </structure>
+            </list-property>
+            <list-property name="parameters">
+                <structure>
+                    <property name="name">stockAdjustmentId</property>
+                    <property name="paramName">stockAdjustmentId</property>
+                    <property name="dataType">string</property>
+                    <property name="position">1</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+            </list-property>
+            <structure name="cachedMetaData">
+                <list-property name="resultSet">
+                    <structure>
+                        <property name="position">1</property>
+                        <property name="name">STOCK_ADJUSTMENT_ID</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">2</property>
+                        <property name="name">LOCATION_DESCRIPTION</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">3</property>
+                        <property name="name">STREET1</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">4</property>
+                        <property name="name">STREET2</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">5</property>
+                        <property name="name">STREET3</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">6</property>
+                        <property name="name">TOWN</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">7</property>
+                        <property name="name">COUNTY</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">8</property>
+                        <property name="name">COUNTRY</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">9</property>
+                        <property name="name">POST_CODE</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">10</property>
+                        <property name="name">STATUS</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">11</property>
+                        <property name="name">REASON_DESCRIPTION</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">12</property>
+                        <property name="name">CREATED_DATE</property>
+                        <property name="dataType">date-time</property>
+                    </structure>
+                    <structure>
+                        <property name="position">13</property>
+                        <property name="name">AUTHORISED_DATE</property>
+                        <property name="dataType">date-time</property>
+                    </structure>
+                    <structure>
+                        <property name="position">14</property>
+                        <property name="name">COMMENTS</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">15</property>
+                        <property name="name">AUTHORISED_COMMENTS</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">16</property>
+                        <property name="name">USER_FORENAME</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">17</property>
+                        <property name="name">USER_SURNAME</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">18</property>
+                        <property name="name">AUTH_USER_FORENAME</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">19</property>
+                        <property name="name">AUTH_USER_SURNAME</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">20</property>
+                        <property name="name">CURRENCY_ID</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">21</property>
+                        <property name="name">FROM_LOCATION_AREA_NAME</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">22</property>
+                        <property name="name">FROM_INVENTORY_CONTAINER_NAME</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">23</property>
+                        <property name="name">TO_LOCATION_AREA_NAME</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">24</property>
+                        <property name="name">TO_INVENTORY_CONTAINER_NAME</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">25</property>
+                        <property name="name">SET_BASE_CURRENCY_ID</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">26</property>
+                        <property name="name">USER_NAME</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">27</property>
+                        <property name="name">AUTH_USER_NAME</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">28</property>
+                        <property name="name">FORMATTED_CREATED_DATE</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">29</property>
+                        <property name="name">FORMATTED_AUTHORISED_DATE</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                </list-property>
+            </structure>
+            <property name="dataSource">Data Source</property>
+            <list-property name="resultSet">
+                <structure>
+                    <property name="position">1</property>
+                    <property name="name">Stock_Adjustment_Id</property>
+                    <property name="nativeName">STOCK_ADJUSTMENT_ID</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">2</property>
+                    <property name="name">LOCATION_DESCRIPTION</property>
+                    <property name="nativeName">LOCATION_DESCRIPTION</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">3</property>
+                    <property name="name">Street1</property>
+                    <property name="nativeName">STREET1</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">4</property>
+                    <property name="name">Street2</property>
+                    <property name="nativeName">STREET2</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">5</property>
+                    <property name="name">Street3</property>
+                    <property name="nativeName">STREET3</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">6</property>
+                    <property name="name">Town</property>
+                    <property name="nativeName">TOWN</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">7</property>
+                    <property name="name">County</property>
+                    <property name="nativeName">COUNTY</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">8</property>
+                    <property name="name">Country</property>
+                    <property name="nativeName">COUNTRY</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">9</property>
+                    <property name="name">Post_Code</property>
+                    <property name="nativeName">POST_CODE</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">10</property>
+                    <property name="name">Status</property>
+                    <property name="nativeName">STATUS</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">11</property>
+                    <property name="name">REASON_DESCRIPTION</property>
+                    <property name="nativeName">REASON_DESCRIPTION</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">12</property>
+                    <property name="name">Created_Date</property>
+                    <property name="nativeName">CREATED_DATE</property>
+                    <property name="dataType">date-time</property>
+                    <property name="nativeDataType">93</property>
+                </structure>
+                <structure>
+                    <property name="position">13</property>
+                    <property name="name">Authorised_Date</property>
+                    <property name="nativeName">AUTHORISED_DATE</property>
+                    <property name="dataType">date-time</property>
+                    <property name="nativeDataType">93</property>
+                </structure>
+                <structure>
+                    <property name="position">14</property>
+                    <property name="name">COMMENTS</property>
+                    <property name="nativeName">COMMENTS</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">15</property>
+                    <property name="name">Authorised_Comments</property>
+                    <property name="nativeName">AUTHORISED_COMMENTS</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">16</property>
+                    <property name="name">USER_FORENAME</property>
+                    <property name="nativeName">USER_FORENAME</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">17</property>
+                    <property name="name">USER_SURNAME</property>
+                    <property name="nativeName">USER_SURNAME</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">18</property>
+                    <property name="name">AUTH_USER_FORENAME</property>
+                    <property name="nativeName">AUTH_USER_FORENAME</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">19</property>
+                    <property name="name">AUTH_USER_SURNAME</property>
+                    <property name="nativeName">AUTH_USER_SURNAME</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">20</property>
+                    <property name="name">Currency_Id</property>
+                    <property name="nativeName">CURRENCY_ID</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">21</property>
+                    <property name="name">FROM_LOCATION_AREA_NAME</property>
+                    <property name="nativeName">FROM_LOCATION_AREA_NAME</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">22</property>
+                    <property name="name">FROM_INVENTORY_CONTAINER_NAME</property>
+                    <property name="nativeName">FROM_INVENTORY_CONTAINER_NAME</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">23</property>
+                    <property name="name">TO_LOCATION_AREA_NAME</property>
+                    <property name="nativeName">TO_LOCATION_AREA_NAME</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">24</property>
+                    <property name="name">TO_INVENTORY_CONTAINER_NAME</property>
+                    <property name="nativeName">TO_INVENTORY_CONTAINER_NAME</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+            </list-property>
+            <xml-property name="queryText"><![CDATA[select	SAH.Stock_Adjustment_Id as STOCK_ADJUSTMENT_ID,
+		L.Description as LOCATION_DESCRIPTION,
+		L.Street1 as STREET1,
+		L.Street2 as STREET2,
+		L.Street3 as STREET3,
+		L.Town as TOWN,
+		L.County as COUNTY,
+		L.Country as COUNTRY,
+		L.Post_Code as POST_CODE,
+		SAH.Status as STATUS,
+		R.Description as REASON_DESCRIPTION,
+		SAH.Created_Date as CREATED_DATE,
+		SAH.Authorised_Date as AUTHORISED_DATE,
+		SAH.Notes as COMMENTS,
+		SAH.Authorised_Comments as AUTHORISED_COMMENTS,
+		U.Forename as USER_FORENAME,
+		U.Surname as USER_SURNAME,
+		U2.Forename as AUTH_USER_FORENAME,
+		U2.Surname as AUTH_USER_SURNAME,
+		SAH.Currency_Id as CURRENCY_ID,
+		FLA.Name as FROM_LOCATION_AREA_NAME,
+		FIC.Name as FROM_INVENTORY_CONTAINER_NAME,
+		TLA.Name as TO_LOCATION_AREA_NAME,
+		TIC.Name as TO_INVENTORY_CONTAINER_NAME
+from 	StockAdjustmentHeaders SAH
+left outer join Locations L on SAH.FROM_Location_Id = L.Location_Id
+left outer join Reasons R on SAH.Reason_Code_Id = R.Reason_Id and SAH.Reason_Group_Id = R.Group_Id and SAH.Reason_Group_Type = R.Group_Type_Id and SAH.Reason_Hierarchy_Id = R.Group_Hierarchy_Id
+left outer join Users U on SAH.Created_By_User_Id = U.User_Id
+left outer join Users U2 on SAH.Authorised_By_User_Id = U2.User_Id
+left outer join Groups FLA on SAH.From_Location_Id = FLA.Group_Hierarchy_Id 
+			AND SAH.From_Location_Area_Id = FLA.Group_Id
+			AND FLA.Group_Type_Id = 'locationArea'
+left outer join InventoryContainers FIC on SAH.From_Location_Id = FIC.Location_Id
+			AND SAH.From_Location_Area_Id = FIC.Location_Area_Id
+			AND SAH.From_Container_Id = FIC.Inventory_Container_Id
+left outer join Groups TLA on SAH.To_Location_Id = TLA.Group_Hierarchy_Id 
+			AND SAH.To_Location_Area_Id = TLA.Group_Id
+			AND TLA.Group_Type_Id = 'locationArea'
+left outer join InventoryContainers TIC on SAH.To_Location_Id = TIC.Location_Id
+			AND SAH.To_Location_Area_Id = TIC.Location_Area_Id
+			AND SAH.To_Container_Id = TIC.Inventory_Container_Id
+where 	(SAH.Stock_Adjustment_Id = ?) ]]></xml-property>
+        </oda-data-set>
+        <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="ItemQuery" id="2031">
+            <list-property name="computedColumns">
+                <structure>
+                    <property name="name">TOTAL_RETAIL</property>
+                    <property name="dataType">decimal</property>
+                    <property name="aggregateFunction">SUM</property>
+                    <list-property name="arguments">
+                        <structure>
+                            <property name="name">Expression</property>
+                            <expression name="value">row["RETAIL"]</expression>
+                        </structure>
+                    </list-property>
+                </structure>
+                <structure>
+                    <property name="name">TOTAL_COST</property>
+                    <property name="dataType">decimal</property>
+                    <property name="aggregateFunction">SUM</property>
+                    <list-property name="arguments">
+                        <structure>
+                            <property name="name">Expression</property>
+                            <expression name="value">row["COST"]</expression>
+                        </structure>
+                    </list-property>
+                </structure>
+                <structure>
+                    <property name="name">TOTAL_QTY</property>
+                    <property name="dataType">integer</property>
+                    <property name="aggregateFunction">SUM</property>
+                    <list-property name="arguments">
+                        <structure>
+                            <property name="name">Expression</property>
+                            <expression name="value">row["QTY"]</expression>
+                        </structure>
+                    </list-property>
+                </structure>
+                <structure>
+                    <property name="name">FORMATTED_RETAIL</property>
+                    <expression name="expression">longVal = row["RETAIL"] != null ? row["RETAIL"]  : 0;
+globalDataFormatter.formatCurrencyAmount(longVal, baseCurrencyId);</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">FORMATTED_COST</property>
+                    <expression name="expression">longVal = row["COST"] != null ? row["COST"]  : 0;
+globalDataFormatter.formatCurrencyAmount(longVal, baseCurrencyId);</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">FORMATTED_TOTAL_RETAIL</property>
+                    <expression name="expression">longVal = row["TOTAL_RETAIL"] != null ? row["TOTAL_RETAIL"]  : 0;
+globalDataFormatter.formatCurrencyAmount(longVal, baseCurrencyId);</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">FORMATTED_TOTAL_COST</property>
+                    <expression name="expression">longVal = row["TOTAL_COST"] != null ? row["TOTAL_COST"]  : 0;
+globalDataFormatter.formatCurrencyAmount(longVal, baseCurrencyId);</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">BLANK_STYLE</property>
+                    <expression name="expression">row["STYLE"] == '-' ? null : row["STYLE"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">BLANK_COLOUR</property>
+                    <expression name="expression">row["COLOUR"] == '-' ? null : row["COLOUR"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">BLANK_SIZE</property>
+                    <expression name="expression">row["SIZE"] == '-' ? null : row["SIZE"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+            </list-property>
+            <list-property name="columnHints">
+                <structure>
+                    <property name="columnName">Product_Id</property>
+                    <property name="alias">PRODUCT_ID</property>
+                </structure>
+                <structure>
+                    <property name="columnName">Description</property>
+                    <property name="alias">DESCRIPTION</property>
+                </structure>
+                <structure>
+                    <property name="columnName">Style_Id</property>
+                    <property name="alias">STYLE</property>
+                </structure>
+                <structure>
+                    <property name="columnName">Colour_Id</property>
+                    <property name="alias">COLOUR</property>
+                </structure>
+                <structure>
+                    <property name="columnName">Size_Id</property>
+                    <property name="alias">SIZE</property>
+                </structure>
+                <structure>
+                    <property name="columnName">Retail_Ex_Tax_Raw</property>
+                    <property name="alias">RETAIL</property>
+                </structure>
+                <structure>
+                    <property name="columnName">Cost_Raw</property>
+                    <property name="alias">COST</property>
+                </structure>
+                <structure>
+                    <property name="columnName">Qty</property>
+                    <property name="alias">QTY</property>
+                </structure>
+            </list-property>
+            <list-property name="parameters">
+                <structure>
+                    <property name="name">stockAdjustmentId</property>
+                    <property name="paramName">stockAdjustmentId</property>
+                    <property name="dataType">string</property>
+                    <property name="position">1</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+            </list-property>
+            <structure name="cachedMetaData">
+                <list-property name="resultSet">
+                    <structure>
+                        <property name="position">1</property>
+                        <property name="name">PRODUCT_ID</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">2</property>
+                        <property name="name">DESCRIPTION</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">3</property>
+                        <property name="name">STYLE</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">4</property>
+                        <property name="name">COLOUR</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">5</property>
+                        <property name="name">SIZE</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">6</property>
+                        <property name="name">RETAIL</property>
+                        <property name="dataType">decimal</property>
+                    </structure>
+                    <structure>
+                        <property name="position">7</property>
+                        <property name="name">COST</property>
+                        <property name="dataType">decimal</property>
+                    </structure>
+                    <structure>
+                        <property name="position">8</property>
+                        <property name="name">QTY</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                    <structure>
+                        <property name="position">9</property>
+                        <property name="name">TOTAL_RETAIL</property>
+                        <property name="dataType">decimal</property>
+                    </structure>
+                    <structure>
+                        <property name="position">10</property>
+                        <property name="name">TOTAL_COST</property>
+                        <property name="dataType">decimal</property>
+                    </structure>
+                    <structure>
+                        <property name="position">11</property>
+                        <property name="name">TOTAL_QTY</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                    <structure>
+                        <property name="position">12</property>
+                        <property name="name">FORMATTED_RETAIL</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">13</property>
+                        <property name="name">FORMATTED_COST</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">14</property>
+                        <property name="name">FORMATTED_TOTAL_RETAIL</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">15</property>
+                        <property name="name">FORMATTED_TOTAL_COST</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">16</property>
+                        <property name="name">BLANK_STYLE</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">17</property>
+                        <property name="name">BLANK_COLOUR</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">18</property>
+                        <property name="name">BLANK_SIZE</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                </list-property>
+            </structure>
+            <property name="dataSource">Data Source</property>
+            <list-property name="resultSet">
+                <structure>
+                    <property name="position">1</property>
+                    <property name="name">Product_Id</property>
+                    <property name="nativeName">Product_Id</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">2</property>
+                    <property name="name">Description</property>
+                    <property name="nativeName">Description</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">3</property>
+                    <property name="name">Style_Id</property>
+                    <property name="nativeName">Style_Id</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">4</property>
+                    <property name="name">Colour_Id</property>
+                    <property name="nativeName">Colour_Id</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">5</property>
+                    <property name="name">Size_Id</property>
+                    <property name="nativeName">Size_Id</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">6</property>
+                    <property name="name">Retail_Ex_Tax_Raw</property>
+                    <property name="nativeName">Retail_Ex_Tax_Raw</property>
+                    <property name="dataType">decimal</property>
+                    <property name="nativeDataType">-5</property>
+                </structure>
+                <structure>
+                    <property name="position">7</property>
+                    <property name="name">Cost_Raw</property>
+                    <property name="nativeName">Cost_Raw</property>
+                    <property name="dataType">decimal</property>
+                    <property name="nativeDataType">-5</property>
+                </structure>
+                <structure>
+                    <property name="position">8</property>
+                    <property name="name">Qty</property>
+                    <property name="nativeName">Qty</property>
+                    <property name="dataType">integer</property>
+                    <property name="nativeDataType">4</property>
+                </structure>
+            </list-property>
+            <xml-property name="queryText"><![CDATA[SELECT	sai.Product_Id as PRODUCT_ID,
+		P.Description as DESCRIPTION,
+		SKUP.Style_Id as STYLE,
+		SKUP.Colour_Id as COLOUR,
+		SKUP.Size_Id as SIZE,
+		sai.Retail_Ex_Tax_Raw as RETAIL,
+		sai.Cost_Raw as COST,
+		sai.Qty as QTY
+FROM 	StockAdjustmentItems sai
+LEFT OUTER JOIN Products P ON sai.Product_Id = P.Product_Id
+LEFT OUTER JOIN SKUProducts SKUP ON sai.Product_Id = SKUP.Product_Id
+WHERE	sai.Stock_Adjustment_Id = ?
+AND		(sai.Voided IS NULL OR sai.Voided = 0)
+]]></xml-property>
+        </oda-data-set>
+        <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="CompanyQuery" id="2165">
+            <list-property name="computedColumns">
+                <structure>
+                    <property name="name">BLANK_ORGANISATION</property>
+                    <expression name="expression">row["Address_Organisation"] != '-' ? row["Address_Organisation"] : ''</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">BLANK_STREET1</property>
+                    <expression name="expression">row["Address_Street1"] != '-' ? row["Address_Street1"] : ''</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">BLANK_STREET2</property>
+                    <expression name="expression">row["Address_Street2"] != '-' ? row["Address_Street2"] : ''</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">BLANK_STREET3</property>
+                    <expression name="expression">row["Address_Street3"] != '-' ? row["Address_Street3"] : ''</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">BLANK_TOWN</property>
+                    <expression name="expression">row["Address_Town"] != '-' ? row["Address_Town"] : ''</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">BLANK_COUNTY</property>
+                    <expression name="expression">row["Address_County"] != '-' ? row["Address_County"] : ''</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">BLANK_COUNTRY</property>
+                    <expression name="expression">row["Address_Country"] != '-' ? row["Address_Country"] : ''</expression>
+                    <property name="dataType">string</property>
+                </structure>
+            </list-property>
+            <list-property name="columnHints">
+                <structure>
+                    <property name="columnName">ID</property>
+                    <text-property name="displayName">ID</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">Timestamp</property>
+                    <text-property name="displayName">Timestamp</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">Entity_Name</property>
+                    <text-property name="displayName">Entity_Name</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">Last_Updated</property>
+                    <text-property name="displayName">Last_Updated</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">Name</property>
+                    <text-property name="displayName">Name</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">Currency_Id</property>
+                    <text-property name="displayName">Currency_Id</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">Company_Id</property>
+                    <text-property name="displayName">Company_Id</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">XML</property>
+                    <text-property name="displayName">XML</text-property>
+                </structure>
+            </list-property>
+            <list-property name="filter">
+                <structure>
+                    <property name="operator">eq</property>
+                    <expression name="expr" type="javascript">row["Company_Id"]</expression>
+                    <simple-property-list name="value1">
+                        <value>params["companyId"].value</value>
+                    </simple-property-list>
+                </structure>
+            </list-property>
+            <structure name="cachedMetaData">
+                <list-property name="resultSet">
+                    <structure>
+                        <property name="position">1</property>
+                        <property name="name">ID</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">2</property>
+                        <property name="name">Timestamp</property>
+                        <property name="dataType">decimal</property>
+                    </structure>
+                    <structure>
+                        <property name="position">3</property>
+                        <property name="name">Entity_Name</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">4</property>
+                        <property name="name">Last_Updated</property>
+                        <property name="dataType">date-time</property>
+                    </structure>
+                    <structure>
+                        <property name="position">5</property>
+                        <property name="name">Name</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">6</property>
+                        <property name="name">Currency_Id</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">7</property>
+                        <property name="name">Company_Id</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">8</property>
+                        <property name="name">Email_Address</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">9</property>
+                        <property name="name">Registration_Info</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">10</property>
+                        <property name="name">Website_URL</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">11</property>
+                        <property name="name">Phone_Number</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">12</property>
+                        <property name="name">Address_Organisation</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">13</property>
+                        <property name="name">Address_Street1</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">14</property>
+                        <property name="name">Address_Street2</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">15</property>
+                        <property name="name">Address_Street3</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">16</property>
+                        <property name="name">Address_Town</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">17</property>
+                        <property name="name">Address_County</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">18</property>
+                        <property name="name">Address_Country</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">19</property>
+                        <property name="name">Address_Postcode</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">20</property>
+                        <property name="name">Logo_Type</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">21</property>
+                        <property name="name">Logo_Id</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">22</property>
+                        <property name="name">Logo_Category</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">23</property>
+                        <property name="name">XML</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">24</property>
+                        <property name="name">BLANK_ORGANISATION</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">25</property>
+                        <property name="name">BLANK_STREET1</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">26</property>
+                        <property name="name">BLANK_STREET2</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">27</property>
+                        <property name="name">BLANK_STREET3</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">28</property>
+                        <property name="name">BLANK_TOWN</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">29</property>
+                        <property name="name">BLANK_COUNTY</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">30</property>
+                        <property name="name">BLANK_COUNTRY</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                </list-property>
+            </structure>
+            <property name="dataSource">Data Source</property>
+            <list-property name="resultSet">
+                <structure>
+                    <property name="position">1</property>
+                    <property name="name">ID</property>
+                    <property name="nativeName">ID</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">2</property>
+                    <property name="name">Timestamp</property>
+                    <property name="nativeName">Timestamp</property>
+                    <property name="dataType">decimal</property>
+                </structure>
+                <structure>
+                    <property name="position">3</property>
+                    <property name="name">Entity_Name</property>
+                    <property name="nativeName">Entity_Name</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">4</property>
+                    <property name="name">Last_Updated</property>
+                    <property name="nativeName">Last_Updated</property>
+                    <property name="dataType">date-time</property>
+                </structure>
+                <structure>
+                    <property name="position">5</property>
+                    <property name="name">Name</property>
+                    <property name="nativeName">Name</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">6</property>
+                    <property name="name">Currency_Id</property>
+                    <property name="nativeName">Currency_Id</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">7</property>
+                    <property name="name">Company_Id</property>
+                    <property name="nativeName">Company_Id</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">8</property>
+                    <property name="name">Email_Address</property>
+                    <property name="nativeName">Email_Address</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">9</property>
+                    <property name="name">Registration_Info</property>
+                    <property name="nativeName">Registration_Info</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">10</property>
+                    <property name="name">Website_URL</property>
+                    <property name="nativeName">Website_URL</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">11</property>
+                    <property name="name">Phone_Number</property>
+                    <property name="nativeName">Phone_Number</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">12</property>
+                    <property name="name">Address_Organisation</property>
+                    <property name="nativeName">Address_Organisation</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">13</property>
+                    <property name="name">Address_Street1</property>
+                    <property name="nativeName">Address_Street1</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">14</property>
+                    <property name="name">Address_Street2</property>
+                    <property name="nativeName">Address_Street2</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">15</property>
+                    <property name="name">Address_Street3</property>
+                    <property name="nativeName">Address_Street3</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">16</property>
+                    <property name="name">Address_Town</property>
+                    <property name="nativeName">Address_Town</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">17</property>
+                    <property name="name">Address_County</property>
+                    <property name="nativeName">Address_County</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">18</property>
+                    <property name="name">Address_Country</property>
+                    <property name="nativeName">Address_Country</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">19</property>
+                    <property name="name">Address_Postcode</property>
+                    <property name="nativeName">Address_Postcode</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">20</property>
+                    <property name="name">Logo_Type</property>
+                    <property name="nativeName">Logo_Type</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">21</property>
+                    <property name="name">Logo_Id</property>
+                    <property name="nativeName">Logo_Id</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">22</property>
+                    <property name="name">Logo_Category</property>
+                    <property name="nativeName">Logo_Category</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">23</property>
+                    <property name="name">XML</property>
+                    <property name="nativeName">XML</property>
+                    <property name="dataType">string</property>
+                </structure>
+            </list-property>
+            <xml-property name="queryText"><![CDATA[select *
+from companies]]></xml-property>
+            <xml-property name="designerValues"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<model:DesignValues xmlns:design="http://www.eclipse.org/datatools/connectivity/oda/design" xmlns:model="http://www.eclipse.org/birt/report/model/adapter/odaModel">
+  <Version>1.0</Version>
+  <design:ResultSets derivedMetaData="true">
+    <design:resultSetDefinitions>
+      <design:resultSetColumns>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:name>ID</design:name>
+            <design:position>1</design:position>
+            <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+            <design:precision>44</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>NotNullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>ID</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>ID</design:label>
+            <design:formattingHints>
+              <design:displaySize>44</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:name>Timestamp</design:name>
+            <design:position>2</design:position>
+            <design:nativeDataTypeCode>-5</design:nativeDataTypeCode>
+            <design:precision>20</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>NotNullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>Timestamp</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>Timestamp</design:label>
+            <design:formattingHints>
+              <design:displaySize>20</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:name>Entity_Name</design:name>
+            <design:position>3</design:position>
+            <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+            <design:precision>255</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>NotNullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>Entity_Name</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>Entity_Name</design:label>
+            <design:formattingHints>
+              <design:displaySize>255</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:name>Last_Updated</design:name>
+            <design:position>4</design:position>
+            <design:nativeDataTypeCode>93</design:nativeDataTypeCode>
+            <design:precision>19</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>Last_Updated</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>Last_Updated</design:label>
+            <design:formattingHints>
+              <design:displaySize>19</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:name>Name</design:name>
+            <design:position>5</design:position>
+            <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+            <design:precision>40</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>NotNullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>Name</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>Name</design:label>
+            <design:formattingHints>
+              <design:displaySize>40</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:name>Currency_Id</design:name>
+            <design:position>6</design:position>
+            <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+            <design:precision>20</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>NotNullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>Currency_Id</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>Currency_Id</design:label>
+            <design:formattingHints>
+              <design:displaySize>20</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:name>Company_Id</design:name>
+            <design:position>7</design:position>
+            <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+            <design:precision>20</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>Company_Id</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>Company_Id</design:label>
+            <design:formattingHints>
+              <design:displaySize>20</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:name>XML</design:name>
+            <design:position>8</design:position>
+            <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+            <design:precision>2147483647</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>NotNullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>XML</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>XML</design:label>
+            <design:formattingHints>
+              <design:displaySize>2147483647</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+      </design:resultSetColumns>
+      <design:criteria/>
+    </design:resultSetDefinitions>
+  </design:ResultSets>
+</model:DesignValues>]]></xml-property>
+        </oda-data-set>
+        <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="ImageQuery" id="2166">
+            <list-property name="columnHints">
+                <structure>
+                    <property name="columnName">Company_Id</property>
+                    <text-property name="displayName">Company_Id</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">Data</property>
+                    <property name="alias">ImageData</property>
+                    <text-property name="displayName">Data</text-property>
+                </structure>
+            </list-property>
+            <list-property name="filter">
+                <structure>
+                    <property name="operator">eq</property>
+                    <expression name="expr" type="javascript">row["Company_Id"]</expression>
+                    <simple-property-list name="value1">
+                        <value>params["companyId"].value</value>
+                    </simple-property-list>
+                </structure>
+            </list-property>
+            <structure name="cachedMetaData">
+                <list-property name="resultSet">
+                    <structure>
+                        <property name="position">1</property>
+                        <property name="name">Company_Id</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">2</property>
+                        <property name="name">ImageData</property>
+                        <property name="dataType">blob</property>
+                    </structure>
+                </list-property>
+            </structure>
+            <property name="dataSource">Data Source</property>
+            <list-property name="resultSet">
+                <structure>
+                    <property name="position">1</property>
+                    <property name="name">Company_Id</property>
+                    <property name="nativeName">Company_Id</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">2</property>
+                    <property name="name">Data</property>
+                    <property name="nativeName">Data</property>
+                    <property name="dataType">blob</property>
+                </structure>
+            </list-property>
+            <xml-property name="queryText"><![CDATA[select c.Company_Id, i.Data
+from images i
+inner join companies c
+	on i.Type = c.Logo_Type
+	and i.Image_Id = c.Logo_Id
+	and i.Category = c.Logo_Category]]></xml-property>
+            <xml-property name="designerValues"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<model:DesignValues xmlns:design="http://www.eclipse.org/datatools/connectivity/oda/design" xmlns:model="http://www.eclipse.org/birt/report/model/adapter/odaModel">
+  <Version>1.0</Version>
+  <design:ResultSets derivedMetaData="true">
+    <design:resultSetDefinitions>
+      <design:resultSetColumns>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:name>Data</design:name>
+            <design:position>1</design:position>
+            <design:nativeDataTypeCode>-4</design:nativeDataTypeCode>
+            <design:precision>16777215</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>data</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>data</design:label>
+            <design:formattingHints>
+              <design:displaySize>16777215</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+      </design:resultSetColumns>
+      <design:criteria/>
+    </design:resultSetDefinitions>
+  </design:ResultSets>
+</model:DesignValues>]]></xml-property>
+        </oda-data-set>
+    </data-sets>
+    <page-setup>
+        <simple-master-page name="Simple MasterPage" id="2">
+            <property name="type">a4</property>
+            <property name="orientation">portrait</property>
+            <property name="topMargin">0.75in</property>
+            <property name="leftMargin">0.75in</property>
+            <property name="bottomMargin">0.75in</property>
+            <property name="rightMargin">0.75in</property>
+            <property name="borderBottomStyle">solid</property>
+            <property name="borderBottomWidth">thin</property>
+            <property name="borderLeftStyle">solid</property>
+            <property name="borderLeftWidth">thin</property>
+            <property name="borderRightStyle">solid</property>
+            <property name="borderRightWidth">thin</property>
+            <property name="borderTopStyle">solid</property>
+            <property name="borderTopWidth">thin</property>
+            <property name="marginLeft">0pt</property>
+            <property name="headerHeight">0in</property>
+            <page-footer>
+                <grid id="522">
+                    <property name="width">100%</property>
+                    <column id="523">
+                        <property name="width">45%</property>
+                    </column>
+                    <column id="524">
+                        <property name="width">4.3020833333in</property>
+                        <property name="textAlign">center</property>
+                    </column>
+                    <column id="525">
+                        <property name="width">5%</property>
+                    </column>
+                    <row id="2206">
+                        <cell id="2207">
+                            <property name="colSpan">3</property>
+                            <property name="rowSpan">1</property>
+                            <data id="2208">
+                                <property name="style">reportFooterWebsite</property>
+                                <property name="dataSet">CompanyQuery</property>
+                                <list-property name="boundDataColumns">
+                                    <structure>
+                                        <property name="name">Website_URL</property>
+                                        <text-property name="displayName">Website_URL</text-property>
+                                        <expression name="expression" type="javascript">dataSetRow["Website_URL"]</expression>
+                                        <property name="dataType">string</property>
+                                    </structure>
+                                </list-property>
+                                <property name="resultSetColumn">Website_URL</property>
+                            </data>
+                        </cell>
+                    </row>
+                    <row id="2209">
+                        <cell id="2210">
+                            <property name="colSpan">3</property>
+                            <property name="rowSpan">1</property>
+                            <property name="textAlign">center</property>
+                            <label id="2211">
+                                <property name="style">reportFooterCentre</property>
+                                <property name="borderBottomColor">black</property>
+                                <property name="marginRight">0.5mm</property>
+                                <property name="display">inline</property>
+                                <text-property name="text" key="REGISTERED_OFFICE">REGISTERED_OFFICE</text-property>
+                            </label>
+                            <data id="2212">
+                                <property name="style">reportFooterCentre</property>
+                                <property name="marginRight">0.5mm</property>
+                                <property name="display">inline</property>
+                                <property name="canShrink">false</property>
+                                <property name="dataSet">CompanyQuery</property>
+                                <list-property name="visibility">
+                                    <structure>
+                                        <property name="format">all</property>
+                                        <expression name="valueExpr" type="javascript">row["BLANK_ORGANISATION"] == ''</expression>
+                                    </structure>
+                                </list-property>
+                                <list-property name="boundDataColumns">
+                                    <structure>
+                                        <property name="name">BLANK_ORGANISATION</property>
+                                        <text-property name="displayName">BLANK_ORGANISATION</text-property>
+                                        <expression name="expression" type="javascript">dataSetRow["BLANK_ORGANISATION"]</expression>
+                                        <property name="dataType">string</property>
+                                    </structure>
+                                </list-property>
+                                <property name="resultSetColumn">BLANK_ORGANISATION</property>
+                            </data>
+                            <data id="2213">
+                                <property name="style">reportFooterCentre</property>
+                                <property name="marginRight">0.5mm</property>
+                                <property name="display">inline</property>
+                                <property name="canShrink">false</property>
+                                <property name="dataSet">CompanyQuery</property>
+                                <list-property name="visibility">
+                                    <structure>
+                                        <property name="format">all</property>
+                                        <expression name="valueExpr" type="javascript">row["BLANK_STREET1"] == ''</expression>
+                                    </structure>
+                                </list-property>
+                                <list-property name="boundDataColumns">
+                                    <structure>
+                                        <property name="name">BLANK_STREET1</property>
+                                        <text-property name="displayName">BLANK_STREET1</text-property>
+                                        <expression name="expression" type="javascript">dataSetRow["BLANK_STREET1"]</expression>
+                                        <property name="dataType">string</property>
+                                    </structure>
+                                </list-property>
+                                <property name="resultSetColumn">BLANK_STREET1</property>
+                            </data>
+                            <data id="2214">
+                                <property name="style">reportFooterCentre</property>
+                                <property name="marginRight">0.5mm</property>
+                                <property name="display">inline</property>
+                                <property name="canShrink">false</property>
+                                <property name="dataSet">CompanyQuery</property>
+                                <list-property name="visibility">
+                                    <structure>
+                                        <property name="format">all</property>
+                                        <expression name="valueExpr" type="javascript">row["BLANK_STREET2"] == ''</expression>
+                                    </structure>
+                                </list-property>
+                                <list-property name="boundDataColumns">
+                                    <structure>
+                                        <property name="name">BLANK_STREET2</property>
+                                        <text-property name="displayName">BLANK_STREET2</text-property>
+                                        <expression name="expression" type="javascript">dataSetRow["BLANK_STREET2"]</expression>
+                                        <property name="dataType">string</property>
+                                    </structure>
+                                </list-property>
+                                <property name="resultSetColumn">BLANK_STREET2</property>
+                            </data>
+                            <data id="2014">
+                                <property name="style">reportFooterCentre</property>
+                                <property name="marginRight">0.5mm</property>
+                                <property name="display">inline</property>
+                                <property name="canShrink">false</property>
+                                <property name="dataSet">CompanyQuery</property>
+                                <list-property name="visibility">
+                                    <structure>
+                                        <property name="format">all</property>
+                                        <expression name="valueExpr" type="javascript">row["BLANK_STREET3"] == ''</expression>
+                                    </structure>
+                                </list-property>
+                                <list-property name="boundDataColumns">
+                                    <structure>
+                                        <property name="name">BLANK_STREET3</property>
+                                        <text-property name="displayName">BLANK_STREET3</text-property>
+                                        <expression name="expression" type="javascript">dataSetRow["BLANK_STREET3"]</expression>
+                                        <property name="dataType">string</property>
+                                    </structure>
+                                </list-property>
+                                <property name="resultSetColumn">BLANK_STREET3</property>
+                            </data>
+                            <data id="2015">
+                                <property name="style">reportFooterCentre</property>
+                                <property name="marginRight">0.5mm</property>
+                                <property name="display">inline</property>
+                                <property name="canShrink">false</property>
+                                <property name="dataSet">CompanyQuery</property>
+                                <list-property name="visibility">
+                                    <structure>
+                                        <property name="format">all</property>
+                                        <expression name="valueExpr" type="javascript">row["BLANK_TOWN"] == ''</expression>
+                                    </structure>
+                                </list-property>
+                                <list-property name="boundDataColumns">
+                                    <structure>
+                                        <property name="name">BLANK_TOWN</property>
+                                        <text-property name="displayName">BLANK_TOWN</text-property>
+                                        <expression name="expression" type="javascript">dataSetRow["BLANK_TOWN"]</expression>
+                                        <property name="dataType">string</property>
+                                    </structure>
+                                </list-property>
+                                <property name="resultSetColumn">BLANK_TOWN</property>
+                            </data>
+                            <data id="2016">
+                                <property name="style">reportFooterCentre</property>
+                                <property name="marginRight">0.5mm</property>
+                                <property name="display">inline</property>
+                                <property name="canShrink">false</property>
+                                <property name="dataSet">CompanyQuery</property>
+                                <list-property name="visibility">
+                                    <structure>
+                                        <property name="format">all</property>
+                                        <expression name="valueExpr" type="javascript">row["BLANK_COUNTY"] == ''</expression>
+                                    </structure>
+                                </list-property>
+                                <list-property name="boundDataColumns">
+                                    <structure>
+                                        <property name="name">BLANK_COUNTY</property>
+                                        <text-property name="displayName">BLANK_COUNTY</text-property>
+                                        <expression name="expression" type="javascript">dataSetRow["BLANK_COUNTY"]</expression>
+                                        <property name="dataType">string</property>
+                                    </structure>
+                                </list-property>
+                                <property name="resultSetColumn">BLANK_COUNTY</property>
+                            </data>
+                            <data id="2017">
+                                <property name="style">reportFooterCentre</property>
+                                <property name="marginRight">0.5mm</property>
+                                <property name="display">inline</property>
+                                <property name="canShrink">false</property>
+                                <property name="dataSet">CompanyQuery</property>
+                                <list-property name="visibility">
+                                    <structure>
+                                        <property name="format">all</property>
+                                        <expression name="valueExpr" type="javascript">row["BLANK_COUNTRY"] == ''</expression>
+                                    </structure>
+                                </list-property>
+                                <list-property name="boundDataColumns">
+                                    <structure>
+                                        <property name="name">BLANK_COUNTRY</property>
+                                        <text-property name="displayName">BLANK_COUNTRY</text-property>
+                                        <expression name="expression" type="javascript">dataSetRow["BLANK_COUNTRY"]</expression>
+                                        <property name="dataType">string</property>
+                                    </structure>
+                                </list-property>
+                                <property name="resultSetColumn">BLANK_COUNTRY</property>
+                            </data>
+                            <data id="2215">
+                                <property name="style">reportFooterCentre</property>
+                                <property name="display">inline</property>
+                                <property name="canShrink">false</property>
+                                <property name="dataSet">CompanyQuery</property>
+                                <list-property name="boundDataColumns">
+                                    <structure>
+                                        <property name="name">Address_Postcode</property>
+                                        <text-property name="displayName">Address_Postcode</text-property>
+                                        <expression name="expression" type="javascript">dataSetRow["Address_Postcode"]</expression>
+                                        <property name="dataType">string</property>
+                                    </structure>
+                                </list-property>
+                                <property name="resultSetColumn">Address_Postcode</property>
+                            </data>
+                        </cell>
+                    </row>
+                    <row id="2216">
+                        <cell id="2217">
+                            <property name="colSpan">3</property>
+                            <property name="rowSpan">1</property>
+                            <property name="textAlign">center</property>
+                            <data id="2218">
+                                <property name="style">reportFooterCentre</property>
+                                <property name="marginRight">1mm</property>
+                                <property name="display">inline</property>
+                                <property name="dataSet">CompanyQuery</property>
+                                <list-property name="boundDataColumns">
+                                    <structure>
+                                        <property name="name">Registration_Info</property>
+                                        <text-property name="displayName">Registration_Info</text-property>
+                                        <expression name="expression" type="javascript">dataSetRow["Registration_Info"]</expression>
+                                        <property name="dataType">string</property>
+                                    </structure>
+                                </list-property>
+                                <property name="resultSetColumn">Registration_Info</property>
+                            </data>
+                            <label id="2008">
+                                <property name="style">reportFooterCentre</property>
+                                <property name="marginRight">0.5mm</property>
+                                <property name="display">inline</property>
+                                <text-property name="text" key="EMAIL">EMAIL</text-property>
+                            </label>
+                            <data id="2219">
+                                <property name="style">reportFooterCentre</property>
+                                <property name="display">inline</property>
+                                <property name="dataSet">CompanyQuery</property>
+                                <list-property name="boundDataColumns">
+                                    <structure>
+                                        <property name="name">Email_Address</property>
+                                        <text-property name="displayName">Email_Address</text-property>
+                                        <expression name="expression" type="javascript">dataSetRow["Email_Address"]</expression>
+                                        <property name="dataType">string</property>
+                                    </structure>
+                                </list-property>
+                                <property name="resultSetColumn">Email_Address</property>
+                            </data>
+                        </cell>
+                    </row>
+                    <row id="526">
+                        <cell id="527">
+                            <text name="GeneratedOnText" id="531">
+                                <property name="style">reportFooterLeft</property>
+                                <property name="marginTop">0pt</property>
+                                <property name="paddingTop">1pt</property>
+                                <property name="textAlign">left</property>
+                                <property name="contentType">html</property>
+                                <text-property name="content"><![CDATA[
+<value-of>l10nParams = new Array(1); l10nParams[0] = Packages.com.enactor.core.utilities.DateUtils.formatShortDateMediumTime(reportContext.getLocale(), new Date) ; reportContext.getMessage("GENERATED_ON", reportContext.getLocale(), l10nParams);</value-of>
+]]></text-property>
+                            </text>
+                        </cell>
+                        <cell id="528"/>
+                        <cell id="529">
+                            <grid id="532">
+                                <property name="width">100%</property>
+                                <column id="533"/>
+                                <column id="534"/>
+                                <column id="535"/>
+                                <row id="536">
+                                    <cell id="537">
+                                        <auto-text id="538">
+                                            <property name="style">reportFooterRight</property>
+                                            <property name="type">page-number</property>
+                                        </auto-text>
+                                    </cell>
+                                    <cell id="539">
+                                        <text id="540">
+                                            <property name="style">reportFooterCentre</property>
+                                            <property name="contentType">plain</property>
+                                            <text-property name="content"><![CDATA[/]]></text-property>
+                                        </text>
+                                    </cell>
+                                    <cell id="541">
+                                        <auto-text id="542">
+                                            <property name="style">reportFooterRight</property>
+                                            <property name="type">total-page</property>
+                                        </auto-text>
+                                    </cell>
+                                </row>
+                            </grid>
+                        </cell>
+                    </row>
+                </grid>
+            </page-footer>
+        </simple-master-page>
+    </page-setup>
+    <body>
+        <grid name="ReportTitleGrid1" id="1929">
+            <property name="height">0.2916666666666667in</property>
+            <property name="width">6.552083333333333in</property>
+            <column id="1930">
+                <property name="width">6.552083333333333in</property>
+            </column>
+            <row id="1931">
+                <cell id="1932">
+                    <property name="paddingTop">1pt</property>
+                    <grid id="1823">
+                        <column id="1824">
+                            <property name="width">25%</property>
+                        </column>
+                        <column id="1825"/>
+                        <column id="1840">
+                            <property name="width">15%</property>
+                        </column>
+                        <row id="1826">
+                            <cell id="1827">
+                                <property name="colSpan">1</property>
+                                <property name="rowSpan">3</property>
+                                <property name="textAlign">center</property>
+                                <property name="verticalAlign">middle</property>
+                                <image id="1933">
+                                    <property name="height">85px</property>
+                                    <property name="width">113px</property>
+                                    <property name="dataSet">ImageQuery</property>
+                                    <list-property name="boundDataColumns">
+                                        <structure>
+                                            <property name="name">Company_Id</property>
+                                            <expression name="expression" type="javascript">dataSetRow["Company_Id"]</expression>
+                                            <property name="dataType">string</property>
+                                        </structure>
+                                        <structure>
+                                            <property name="name">Data</property>
+                                            <expression name="expression" type="javascript">dataSetRow["Data"]</expression>
+                                            <property name="dataType">blob</property>
+                                        </structure>
+                                    </list-property>
+                                    <property name="source">expr</property>
+                                    <expression name="valueExpr">row["Data"]</expression>
+                                </image>
+                            </cell>
+                            <cell id="1828">
+                                <property name="colSpan">2</property>
+                                <property name="rowSpan">1</property>
+                                <text id="1934">
+                                    <property name="style">reportTitle</property>
+                                    <property name="contentType">auto</property>
+                                    <text-property name="content" key="TITLE"><![CDATA[]]></text-property>
+                                </text>
+                            </cell>
+                        </row>
+                        <row id="1834">
+                            <cell id="1836">
+                                <label id="1535">
+                                    <property name="style">criteriaLabelRight</property>
+                                    <text-property name="text" key="DATE_CREATED">DATE_CREATED</text-property>
+                                </label>
+                            </cell>
+                            <cell id="1838">
+                                <data id="1935">
+                                    <property name="style">reportCriteria</property>
+                                    <property name="dataSet">HeaderQuery</property>
+                                    <list-property name="boundDataColumns">
+                                        <structure>
+                                            <property name="name">FORMATTED_CREATED_DATE</property>
+                                            <text-property name="displayName">FORMATTED_CREATED_DATE</text-property>
+                                            <expression name="expression" type="javascript">dataSetRow["FORMATTED_CREATED_DATE"]</expression>
+                                            <property name="dataType">string</property>
+                                        </structure>
+                                    </list-property>
+                                    <property name="resultSetColumn">FORMATTED_CREATED_DATE</property>
+                                </data>
+                            </cell>
+                        </row>
+                        <row id="1831">
+                            <cell id="1833">
+                                <label id="1822">
+                                    <property name="style">criteriaLabelRight</property>
+                                    <text-property name="text" key="STOCK_ADJUSTMENT_NO">SA_NUMBER</text-property>
+                                </label>
+                            </cell>
+                            <cell id="1839">
+                                <data id="2163">
+                                    <property name="style">reportCriteria</property>
+                                    <list-property name="boundDataColumns">
+                                        <structure>
+                                            <property name="name">stockAdjustmentId</property>
+                                            <expression name="expression" type="javascript">params["stockAdjustmentId"]</expression>
+                                            <property name="dataType">string</property>
+                                        </structure>
+                                    </list-property>
+                                    <property name="resultSetColumn">stockAdjustmentId</property>
+                                </data>
+                            </cell>
+                        </row>
+                    </grid>
+                </cell>
+            </row>
+        </grid>
+        <label id="1741"/>
+        <grid name="ResultsGrid" id="384">
+            <property name="height">4in</property>
+            <property name="width">8.96875in</property>
+            <column id="385"/>
+            <row id="386">
+                <cell id="387">
+                    <table id="1960">
+                        <property name="width">6.7in</property>
+                        <property name="dataSet">HeaderQuery</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">STOCK_ADJUSTMENT_ID</property>
+                                <expression name="expression" type="javascript">dataSetRow["STOCK_ADJUSTMENT_ID"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">STREET1</property>
+                                <expression name="expression" type="javascript">dataSetRow["STREET1"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">STREET2</property>
+                                <expression name="expression" type="javascript">dataSetRow["STREET2"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">STREET3</property>
+                                <expression name="expression" type="javascript">dataSetRow["STREET3"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">TOWN</property>
+                                <expression name="expression" type="javascript">dataSetRow["TOWN"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">COUNTY</property>
+                                <expression name="expression" type="javascript">dataSetRow["COUNTY"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">COUNTRY</property>
+                                <expression name="expression" type="javascript">dataSetRow["COUNTRY"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">POST_CODE</property>
+                                <expression name="expression" type="javascript">dataSetRow["POST_CODE"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">STATUS</property>
+                                <expression name="expression" type="javascript">dataSetRow["STATUS"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">REASON_DESCRIPTION</property>
+                                <expression name="expression" type="javascript">dataSetRow["REASON_DESCRIPTION"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">CREATED_DATE</property>
+                                <expression name="expression" type="javascript">dataSetRow["CREATED_DATE"]</expression>
+                                <property name="dataType">date-time</property>
+                            </structure>
+                            <structure>
+                                <property name="name">AUTHORISED_DATE</property>
+                                <expression name="expression" type="javascript">dataSetRow["AUTHORISED_DATE"]</expression>
+                                <property name="dataType">date-time</property>
+                            </structure>
+                            <structure>
+                                <property name="name">COMMENTS</property>
+                                <expression name="expression" type="javascript">dataSetRow["COMMENTS"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">AUTHORISED_COMMENTS</property>
+                                <expression name="expression" type="javascript">dataSetRow["AUTHORISED_COMMENTS"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">USER_FORENAME</property>
+                                <expression name="expression" type="javascript">dataSetRow["USER_FORENAME"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">USER_SURNAME</property>
+                                <expression name="expression" type="javascript">dataSetRow["USER_SURNAME"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">AUTH_USER_FORENAME</property>
+                                <expression name="expression" type="javascript">dataSetRow["AUTH_USER_FORENAME"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">AUTH_USER_SURNAME</property>
+                                <expression name="expression" type="javascript">dataSetRow["AUTH_USER_SURNAME"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">CURRENCY_ID</property>
+                                <expression name="expression" type="javascript">dataSetRow["CURRENCY_ID"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">SET_BASE_CURRENCY_ID</property>
+                                <expression name="expression" type="javascript">dataSetRow["SET_BASE_CURRENCY_ID"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">USER_NAME</property>
+                                <expression name="expression" type="javascript">dataSetRow["USER_NAME"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">AUTH_USER_NAME</property>
+                                <expression name="expression" type="javascript">dataSetRow["AUTH_USER_NAME"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">FORMATTED_CREATED_DATE</property>
+                                <expression name="expression" type="javascript">dataSetRow["FORMATTED_CREATED_DATE"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">FORMATTED_AUTHORISED_DATE</property>
+                                <expression name="expression" type="javascript">dataSetRow["FORMATTED_AUTHORISED_DATE"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">Column Binding</property>
+                                <text-property name="displayName">USER_NAME</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["USER_NAME"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">FROM_LOCATION_AREA_NAME</property>
+                                <expression name="expression" type="javascript">dataSetRow["FROM_LOCATION_AREA_NAME"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">FROM_INVENTORY_CONTAINER_NAME</property>
+                                <expression name="expression" type="javascript">dataSetRow["FROM_INVENTORY_CONTAINER_NAME"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">TO_LOCATION_AREA_NAME</property>
+                                <expression name="expression" type="javascript">dataSetRow["TO_LOCATION_AREA_NAME"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">TO_INVENTORY_CONTAINER_NAME</property>
+                                <expression name="expression" type="javascript">dataSetRow["TO_INVENTORY_CONTAINER_NAME"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">LOCATION_DESCRIPTION</property>
+                                <expression name="expression" type="javascript">dataSetRow["LOCATION_DESCRIPTION"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                        </list-property>
+                        <column id="2003">
+                            <property name="width">20%</property>
+                        </column>
+                        <column id="2004">
+                            <property name="width">28%</property>
+                        </column>
+                        <column id="2005">
+                            <property name="width">4%</property>
+                        </column>
+                        <column id="2006">
+                            <property name="width">20%</property>
+                        </column>
+                        <column id="2007">
+                            <property name="width">28%</property>
+                        </column>
+                        <header>
+                            <row id="1961">
+                                <cell id="1962"/>
+                                <cell id="1963"/>
+                                <cell id="1964"/>
+                                <cell id="1965"/>
+                                <cell id="1966"/>
+                            </row>
+                        </header>
+                        <detail>
+                            <row id="1967">
+                                <cell id="1968">
+                                    <label id="2009">
+                                        <property name="style">criteriaLabel</property>
+                                        <text-property name="text" key="LOCATION">LOCATION</text-property>
+                                    </label>
+                                </cell>
+                                <cell id="1969">
+                                    <data id="2202">
+                                        <property name="style">reportCriteria</property>
+                                        <property name="resultSetColumn">LOCATION_DESCRIPTION</property>
+                                    </data>
+                                </cell>
+                                <cell id="1970"/>
+                                <cell id="1971">
+                                    <label id="2012">
+                                        <property name="style">criteriaLabel</property>
+                                        <text-property name="text" key="STATUS">STATUS</text-property>
+                                    </label>
+                                </cell>
+                                <cell id="1972">
+                                    <data id="2021">
+                                        <property name="style">reportCriteria</property>
+                                        <list-property name="mapRules">
+                                            <structure>
+                                                <expression name="testExpr">row["STATUS"]</expression>
+                                                <property name="operator">eq</property>
+                                                <simple-property-list name="value1">
+                                                    <value>'RAISED'</value>
+                                                </simple-property-list>
+                                                <text-property name="display" key="RAISED"></text-property>
+                                            </structure>
+                                            <structure>
+                                                <expression name="testExpr">row["STATUS"]</expression>
+                                                <property name="operator">eq</property>
+                                                <simple-property-list name="value1">
+                                                    <value>'ABORTED'</value>
+                                                </simple-property-list>
+                                                <text-property name="display" key="ABORTED"></text-property>
+                                            </structure>
+                                            <structure>
+                                                <expression name="testExpr">row["STATUS"]</expression>
+                                                <property name="operator">eq</property>
+                                                <simple-property-list name="value1">
+                                                    <value>'REJECTED'</value>
+                                                </simple-property-list>
+                                                <text-property name="display" key="REJECTED"></text-property>
+                                            </structure>
+                                            <structure>
+                                                <expression name="testExpr">row["STATUS"]</expression>
+                                                <property name="operator">eq</property>
+                                                <simple-property-list name="value1">
+                                                    <value>'APPROVED'</value>
+                                                </simple-property-list>
+                                                <text-property name="display" key="APPROVED"></text-property>
+                                            </structure>
+                                        </list-property>
+                                        <property name="resultSetColumn">STATUS</property>
+                                    </data>
+                                </cell>
+                            </row>
+                            <row id="1973">
+                                <cell id="1974"/>
+                                <cell id="1975">
+                                    <data id="2194">
+                                        <property name="style">reportCriteria</property>
+                                        <property name="resultSetColumn">STREET1</property>
+                                    </data>
+                                    <data id="2195">
+                                        <property name="style">reportCriteria</property>
+                                        <property name="resultSetColumn">STREET2</property>
+                                    </data>
+                                    <data id="2196">
+                                        <property name="style">reportCriteria</property>
+                                        <property name="resultSetColumn">STREET3</property>
+                                    </data>
+                                    <data id="2197">
+                                        <property name="style">reportCriteria</property>
+                                        <property name="resultSetColumn">TOWN</property>
+                                    </data>
+                                    <data id="2198">
+                                        <property name="style">reportCriteria</property>
+                                        <property name="resultSetColumn">COUNTY</property>
+                                    </data>
+                                    <data id="2199">
+                                        <property name="style">reportCriteria</property>
+                                        <property name="resultSetColumn">COUNTRY</property>
+                                    </data>
+                                    <data id="2200">
+                                        <property name="style">reportCriteria</property>
+                                        <property name="resultSetColumn">POST_CODE</property>
+                                    </data>
+                                </cell>
+                                <cell id="1976"/>
+                                <cell id="1977"/>
+                                <cell id="1978"/>
+                            </row>
+                            <row id="1985">
+                                <cell id="1986">
+                                    <label id="2203">
+                                        <property name="style">criteriaLabel</property>
+                                        <text-property name="text" key="AUTHORISING_USER_ID">AUTHORISING_USER_ID</text-property>
+                                    </label>
+                                </cell>
+                                <cell id="1987">
+                                    <data id="2025">
+                                        <property name="style">reportCriteria</property>
+                                        <property name="resultSetColumn">AUTH_USER_NAME</property>
+                                    </data>
+                                </cell>
+                                <cell id="1988"/>
+                                <cell id="1989">
+                                    <label id="2205">
+                                        <property name="style">criteriaLabel</property>
+                                        <text-property name="text" key="AUTHORISED_DATE">AUTHORISED_DATE</text-property>
+                                    </label>
+                                </cell>
+                                <cell id="1990">
+                                    <data id="2023">
+                                        <property name="style">reportCriteria</property>
+                                        <property name="resultSetColumn">FORMATTED_AUTHORISED_DATE</property>
+                                    </data>
+                                </cell>
+                            </row>
+                            <row id="2167">
+                                <cell id="2168">
+                                    <label id="2013">
+                                        <property name="style">criteriaLabel</property>
+                                        <text-property name="text" key="REASON_CODE">REASON_CODE</text-property>
+                                    </label>
+                                </cell>
+                                <cell id="2169">
+                                    <data id="2022">
+                                        <property name="style">reportCriteria</property>
+                                        <property name="resultSetColumn">REASON_DESCRIPTION</property>
+                                    </data>
+                                </cell>
+                                <cell id="2170"/>
+                                <cell id="2171">
+                                    <label id="2204">
+                                        <property name="style">criteriaLabel</property>
+                                        <text-property name="text" key="AUTHORISING_COMMENT">AUTHORISING_COMMENT</text-property>
+                                    </label>
+                                </cell>
+                                <cell id="2172">
+                                    <data id="2024">
+                                        <property name="style">reportCriteria</property>
+                                        <property name="resultSetColumn">AUTHORISED_COMMENTS</property>
+                                    </data>
+                                </cell>
+                            </row>
+                            <row id="1991">
+                                <cell id="1992">
+                                    <label id="2238">
+                                        <property name="style">criteriaLabel</property>
+                                        <text-property name="text" key="FROM_LOCATION_AREA_NAME">FROM_LOCATION_AREA_NAME</text-property>
+                                    </label>
+                                </cell>
+                                <cell id="1993">
+                                    <data id="2241">
+                                        <property name="style">reportCriteria</property>
+                                        <property name="resultSetColumn">FROM_LOCATION_AREA_NAME</property>
+                                    </data>
+                                </cell>
+                                <cell id="1994"/>
+                                <cell id="1995">
+                                    <label id="2244">
+                                        <property name="style">criteriaLabel</property>
+                                        <text-property name="text" key="TO_LOCATION_AREA_NAME">TO_LOCATION_AREA_NAME</text-property>
+                                    </label>
+                                </cell>
+                                <cell id="1996">
+                                    <data id="2246">
+                                        <property name="style">reportCriteria</property>
+                                        <property name="resultSetColumn">TO_LOCATION_AREA_NAME</property>
+                                    </data>
+                                </cell>
+                            </row>
+                            <row id="2226">
+                                <cell id="2227">
+                                    <label id="2239">
+                                        <property name="style">criteriaLabel</property>
+                                        <text-property name="text" key="FROM_INVENTORY_CONTAINER_NAME">FROM_INVENTORY_CONTAINER_NAME</text-property>
+                                    </label>
+                                </cell>
+                                <cell id="2228">
+                                    <data id="2243">
+                                        <property name="style">reportCriteria</property>
+                                        <property name="resultSetColumn">FROM_INVENTORY_CONTAINER_NAME</property>
+                                    </data>
+                                </cell>
+                                <cell id="2229"/>
+                                <cell id="2230">
+                                    <label id="2245">
+                                        <property name="style">criteriaLabel</property>
+                                        <text-property name="text" key="TO_INVENTORY_CONTAINER_NAME">TO_INVENTORY_CONTAINER_NAME</text-property>
+                                    </label>
+                                </cell>
+                                <cell id="2231">
+                                    <data id="2247">
+                                        <property name="style">reportCriteria</property>
+                                        <property name="resultSetColumn">TO_INVENTORY_CONTAINER_NAME</property>
+                                    </data>
+                                </cell>
+                            </row>
+                            <row id="2232">
+                                <cell id="2233">
+                                    <label id="2011">
+                                        <property name="style">criteriaLabel</property>
+                                        <text-property name="text" key="USER_ID">USER_ID</text-property>
+                                    </label>
+                                </cell>
+                                <cell id="2234">
+                                    <data id="2019">
+                                        <property name="style">reportCriteria</property>
+                                        <property name="resultSetColumn">USER_NAME</property>
+                                    </data>
+                                </cell>
+                                <cell id="2235"/>
+                                <cell id="2236">
+                                    <label id="2010">
+                                        <property name="style">criteriaLabel</property>
+                                        <text-property name="text" key="COMMENTS">COMMENTS</text-property>
+                                    </label>
+                                </cell>
+                                <cell id="2237">
+                                    <data id="2018">
+                                        <property name="style">reportCriteria</property>
+                                        <property name="resultSetColumn">COMMENTS</property>
+                                    </data>
+                                </cell>
+                            </row>
+                        </detail>
+                        <footer>
+                            <row id="1997">
+                                <cell id="1998"/>
+                                <cell id="1999"/>
+                                <cell id="2000"/>
+                                <cell id="2001"/>
+                                <cell id="2002">
+                                    <data id="2030">
+                                        <property name="style">reportCriteria</property>
+                                        <property name="fontStyle">italic</property>
+                                        <property name="resultSetColumn">SET_BASE_CURRENCY_ID</property>
+                                    </data>
+                                </cell>
+                            </row>
+                        </footer>
+                    </table>
+                </cell>
+            </row>
+            <row id="1693">
+                <cell id="1694"/>
+            </row>
+            <row id="425">
+                <cell id="426">
+                    <table id="2032">
+                        <property name="width">6.7in</property>
+                        <property name="dataSet">ItemQuery</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">PRODUCT_ID</property>
+                                <text-property name="displayName">PRODUCT_ID</text-property>
+                                <expression name="expression">dataSetRow["PRODUCT_ID"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">DESCRIPTION</property>
+                                <text-property name="displayName">DESCRIPTION</text-property>
+                                <expression name="expression">dataSetRow["DESCRIPTION"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">STYLE</property>
+                                <text-property name="displayName">STYLE</text-property>
+                                <expression name="expression">dataSetRow["STYLE"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">COLOUR</property>
+                                <text-property name="displayName">COLOUR</text-property>
+                                <expression name="expression">dataSetRow["COLOUR"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">SIZE</property>
+                                <text-property name="displayName">SIZE</text-property>
+                                <expression name="expression">dataSetRow["SIZE"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">RETAIL</property>
+                                <text-property name="displayName">RETAIL</text-property>
+                                <expression name="expression">dataSetRow["RETAIL"]</expression>
+                                <property name="dataType">decimal</property>
+                            </structure>
+                            <structure>
+                                <property name="name">COST</property>
+                                <text-property name="displayName">COST</text-property>
+                                <expression name="expression">dataSetRow["COST"]</expression>
+                                <property name="dataType">decimal</property>
+                            </structure>
+                            <structure>
+                                <property name="name">QTY</property>
+                                <text-property name="displayName">QTY</text-property>
+                                <expression name="expression">dataSetRow["QTY"]</expression>
+                                <property name="dataType">integer</property>
+                            </structure>
+                            <structure>
+                                <property name="name">TOTAL_RETAIL</property>
+                                <text-property name="displayName">TOTAL_RETAIL</text-property>
+                                <expression name="expression">dataSetRow["TOTAL_RETAIL"]</expression>
+                                <property name="dataType">float</property>
+                            </structure>
+                            <structure>
+                                <property name="name">TOTAL_COST</property>
+                                <text-property name="displayName">TOTAL_COST</text-property>
+                                <expression name="expression">dataSetRow["TOTAL_COST"]</expression>
+                                <property name="dataType">float</property>
+                            </structure>
+                            <structure>
+                                <property name="name">TOTAL_QTY</property>
+                                <text-property name="displayName">TOTAL_QTY</text-property>
+                                <expression name="expression">dataSetRow["TOTAL_QTY"]</expression>
+                                <property name="dataType">float</property>
+                            </structure>
+                            <structure>
+                                <property name="name">FORMATTED_RETAIL</property>
+                                <text-property name="displayName">FORMATTED_RETAIL</text-property>
+                                <expression name="expression">dataSetRow["FORMATTED_RETAIL"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">FORMATTED_COST</property>
+                                <text-property name="displayName">FORMATTED_COST</text-property>
+                                <expression name="expression">dataSetRow["FORMATTED_COST"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">FORMATTED_TOTAL_RETAIL</property>
+                                <text-property name="displayName">FORMATTED_TOTAL_RETAIL</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["FORMATTED_TOTAL_RETAIL"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">FORMATTED_TOTAL_COST</property>
+                                <text-property name="displayName">FORMATTED_TOTAL_COST</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["FORMATTED_TOTAL_COST"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">BLANK_STYLE</property>
+                                <text-property name="displayName">BLANK_STYLE</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["BLANK_STYLE"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">BLANK_COLOUR</property>
+                                <text-property name="displayName">BLANK_COLOUR</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["BLANK_COLOUR"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">BLANK_SIZE</property>
+                                <text-property name="displayName">BLANK_SIZE</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["BLANK_SIZE"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                        </list-property>
+                        <column id="2101">
+                            <property name="width">13%</property>
+                        </column>
+                        <column id="2102">
+                            <property name="width">18%</property>
+                        </column>
+                        <column id="2103">
+                            <property name="width">13%</property>
+                        </column>
+                        <column id="2104">
+                            <property name="width">13%</property>
+                        </column>
+                        <column id="2112">
+                            <property name="width">10%</property>
+                        </column>
+                        <column id="2113">
+                            <property name="width">10%</property>
+                        </column>
+                        <column id="2162">
+                            <property name="width">10%</property>
+                        </column>
+                        <header>
+                            <row id="2114">
+                                <cell id="2115"/>
+                                <cell id="2116"/>
+                                <cell id="2117"/>
+                                <cell id="2118"/>
+                                <cell id="2126"/>
+                                <cell id="2127"/>
+                                <cell id="2158"/>
+                            </row>
+                            <row id="2033">
+                                <cell id="2034">
+                                    <label id="2035">
+                                        <property name="style">columnHeader</property>
+                                        <text-property name="text" key="PRODUCT_ID">PRODUCT_ID</text-property>
+                                    </label>
+                                </cell>
+                                <cell id="2036">
+                                    <property name="colSpan">3</property>
+                                    <property name="rowSpan">1</property>
+                                    <label id="2037">
+                                        <property name="style">columnHeader</property>
+                                        <text-property name="text" key="DESCRIPTION">DESCRIPTION</text-property>
+                                    </label>
+                                </cell>
+                                <cell id="2056">
+                                    <label id="2057">
+                                        <property name="style">columnHeaderRight</property>
+                                        <text-property name="text" key="RETAIL">FORMATTED_RETAIL</text-property>
+                                    </label>
+                                </cell>
+                                <cell id="2058">
+                                    <label id="2059">
+                                        <property name="style">columnHeaderRight</property>
+                                        <text-property name="text" key="COST">FORMATTED_COST</text-property>
+                                    </label>
+                                </cell>
+                                <cell id="2159">
+                                    <label id="2049">
+                                        <property name="style">columnHeaderRight</property>
+                                        <text-property name="text" key="ADJUST_QUANTITY">QTY</text-property>
+                                    </label>
+                                </cell>
+                            </row>
+                        </header>
+                        <detail>
+                            <row id="2060">
+                                <cell id="2061">
+                                    <data id="2062">
+                                        <property name="style">reportColumn</property>
+                                        <property name="resultSetColumn">PRODUCT_ID</property>
+                                    </data>
+                                </cell>
+                                <cell id="2063">
+                                    <property name="colSpan">3</property>
+                                    <property name="rowSpan">1</property>
+                                    <data id="2064">
+                                        <property name="style">reportColumn</property>
+                                        <property name="resultSetColumn">DESCRIPTION</property>
+                                    </data>
+                                </cell>
+                                <cell id="2083">
+                                    <data id="2084">
+                                        <property name="style">reportColumnRight</property>
+                                        <property name="resultSetColumn">FORMATTED_RETAIL</property>
+                                    </data>
+                                </cell>
+                                <cell id="2085">
+                                    <data id="2086">
+                                        <property name="style">reportColumnRight</property>
+                                        <property name="resultSetColumn">FORMATTED_COST</property>
+                                    </data>
+                                </cell>
+                                <cell id="2160">
+                                    <data id="2076">
+                                        <property name="style">reportColumnRight</property>
+                                        <property name="resultSetColumn">QTY</property>
+                                    </data>
+                                </cell>
+                            </row>
+                            <row id="2176">
+                                <list-property name="visibility">
+                                    <structure>
+                                        <property name="format">all</property>
+                                        <expression name="valueExpr" type="javascript">row["BLANK_STYLE"] == null &amp;&amp; row["BLANK_COLOUR"] == null &amp;&amp; row["BLANK_SIZE"] == null</expression>
+                                    </structure>
+                                </list-property>
+                                <cell id="2177"/>
+                                <cell id="2178">
+                                    <data id="2186">
+                                        <property name="style">reportColumn</property>
+                                        <property name="resultSetColumn">BLANK_STYLE</property>
+                                    </data>
+                                </cell>
+                                <cell id="2179">
+                                    <data id="2188">
+                                        <property name="style">reportColumn</property>
+                                        <property name="resultSetColumn">BLANK_COLOUR</property>
+                                    </data>
+                                </cell>
+                                <cell id="2180">
+                                    <data id="2190">
+                                        <property name="style">reportColumn</property>
+                                        <property name="resultSetColumn">BLANK_SIZE</property>
+                                    </data>
+                                </cell>
+                                <cell id="2182"/>
+                                <cell id="2183"/>
+                                <cell id="2184"/>
+                            </row>
+                        </detail>
+                        <footer>
+                            <row id="2087">
+                                <cell id="2088"/>
+                                <cell id="2089"/>
+                                <cell id="2090"/>
+                                <cell id="2091">
+                                    <label id="2191">
+                                        <property name="style">reportColumnRight</property>
+                                        <property name="canShrink">false</property>
+                                        <text-property name="text" key="TOTAL">TOTAL</text-property>
+                                    </label>
+                                </cell>
+                                <cell id="2099">
+                                    <data id="2173">
+                                        <property name="style">reportColumnTotal</property>
+                                        <property name="resultSetColumn">FORMATTED_TOTAL_RETAIL</property>
+                                    </data>
+                                </cell>
+                                <cell id="2100">
+                                    <data id="2174">
+                                        <property name="style">reportColumnTotal</property>
+                                        <property name="resultSetColumn">FORMATTED_TOTAL_COST</property>
+                                    </data>
+                                </cell>
+                                <cell id="2161">
+                                    <data id="2175">
+                                        <property name="style">reportColumnTotal</property>
+                                        <property name="resultSetColumn">TOTAL_QTY</property>
+                                    </data>
+                                </cell>
+                            </row>
+                        </footer>
+                    </table>
+                </cell>
+            </row>
+        </grid>
+    </body>
+</report>

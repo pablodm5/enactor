@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<retail:posPromptPage xmlns:core="http://www.enactor.com/core" xmlns:retail="http://www.enactor.com/retail" xmlns:ns4="http://www.enactor.com/crm" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803" xmlns:ns6="http://www.apis-it.hr/fin/2012/types/f73" xmlns:ns7="http://www.w3.org/2000/09/xmldsig#" xmlns:ns8="http://www.enactor.com/retail/storedRetailTransaction/service" xmlns:ns9="http://www.fu.gov.si/" xmlns:ns10="http://www.enactor.com/addressLookup/service" xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:ns14="http://www.enactor.com/crm/customerLoyalty/service" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" allowResize="true" allowMove="true" allowClose="true" windowtype="view-panel" messageBase="Pos/Currency/CurrencyMessages" url="Pos/Currency/CurrencyConverter">
+    <core:elements>
+        <core:label messageId="CONVERT_PROMPT" id="Prompt"/>
+        <core:button messageId="BUTTON_CONVERT" id="Button1">
+            <core:text>OKPressed</core:text>
+        </core:button>
+        <core:button messageId="BUTTON_CANCEL" id="Button8">
+            <core:text>CancelPressed</core:text>
+        </core:button>
+        <core:panel fontSize="18" horizontalScrollBars="WhenNeeded" verticalScrollBars="WhenNeeded" id="DialogPanel">
+            <core:boundsConstraint/>
+            <core:elements>
+                <core:label messageId="CONVERT_FROM_CURRENCY" id="FromLabel">
+                    <core:boundsConstraint height="29" width="177" y="5" x="16"/>
+                </core:label>
+                <core:comboBox manualDropDownDisabled="false" lazyLoad="false" type="textField" focusOrder="3" id="FromField">
+                    <core:boundsConstraint height="29" width="240" y="5" x="208"/>
+                    <core:text>#{fromCurrency}</core:text>
+                    <core:listExpression>${currencyList}</core:listExpression>
+                </core:comboBox>
+                <core:label messageId="CONVERT_TO_CURRENCY" id="ToLabel">
+                    <core:boundsConstraint height="29" width="177" y="45" x="16"/>
+                </core:label>
+                <core:comboBox manualDropDownDisabled="false" lazyLoad="false" type="textField" focusOrder="1" id="ToField">
+                    <core:boundsConstraint height="29" width="240" y="45" x="208"/>
+                    <core:text>#{toCurrency}</core:text>
+                    <core:listExpression>${currencyList}</core:listExpression>
+                </core:comboBox>
+                <core:label messageId="CONVERT_AMOUNT" id="FromAmountLabel">
+                    <core:boundsConstraint height="29" width="177" y="85" x="16"/>
+                </core:label>
+                <core:inputText overwrite="true" type="textField" focusOrder="2" id="FromAmountField">
+                    <core:boundsConstraint height="29" width="240" y="85" x="208"/>
+                    <core:text>#{fromAmount}</core:text>
+                    <core:validationData>
+                        <core:currencyFieldValidationData>
+                            <core:type>CurrencyAmount</core:type>
+                            <core:inputMask></core:inputMask>
+                            <core:validationClassname></core:validationClassname>
+                            <core:maxValue>999999999</core:maxValue>
+                            <core:minValue>0</core:minValue>
+                            <core:currencyId>#{fromCurrency.currencyId}</core:currencyId>
+                        </core:currencyFieldValidationData>
+                    </core:validationData>
+                </core:inputText>
+                <core:errorLabel errorFieldId="FromAmountField" allowWrap="true" fontSize="12" colour="RED" id="FromAmountError">
+                    <core:boundsConstraint height="52" width="156" y="85" x="460"/>
+                </core:errorLabel>
+                <core:label messageId="EXCHANGE_RATE" id="ExchangeRateLabel">
+                    <core:boundsConstraint height="29" width="177" y="125" x="16"/>
+                </core:label>
+                <core:inputText editable="false" type="textField" visibility="#{exchangeRateValue != 0}" id="ExchangeRateField">
+                    <core:boundsConstraint height="29" width="240" y="125" x="208"/>
+                    <core:text>#{format:formatExchangeRate(exchangeRateValue)}</core:text>
+                </core:inputText>
+                <core:inputText editable="false" messageId="ERROR_NO_EXCHANGE_RATE" type="textField" visibility="#{exchangeRateValue == 0}" colour="RED" id="ExchangeRateError">
+                    <core:boundsConstraint height="29" width="240" y="125" x="208"/>
+                </core:inputText>
+                <core:label messageId="CONVERTED_AMOUNT" id="ToAmountLabel">
+                    <core:boundsConstraint height="29" width="177" y="165" x="16"/>
+                </core:label>
+                <core:inputText editable="false" type="textField" id="ToAmountField">
+                    <core:boundsConstraint height="29" width="240" y="165" x="208"/>
+                    <core:text>#{toAmount}</core:text>
+                    <core:validationData>
+                        <core:currencyFieldValidationData>
+                            <core:type>CurrencyAmount</core:type>
+                            <core:inputMask></core:inputMask>
+                            <core:validationClassname></core:validationClassname>
+                            <core:maxValue>999999999</core:maxValue>
+                            <core:minValue>0</core:minValue>
+                            <core:currencyId>#{toCurrency.currencyId}</core:currencyId>
+                        </core:currencyFieldValidationData>
+                    </core:validationData>
+                </core:inputText>
+                <core:errorLabel errorFieldId="ToAmountField" allowWrap="true" fontSize="12" colour="RED" id="ToAmountError">
+                    <core:boundsConstraint height="52" width="156" y="165" x="460"/>
+                </core:errorLabel>
+            </core:elements>
+        </core:panel>
+        <core:hidden id="InputBox"/>
+        <core:hidden id="Receipt"/>
+    </core:elements>
+    <core:templateURL>Pos/StandardPosFormTemplate</core:templateURL>
+    <core:events>
+        <core:event destination="enactor.Page" event="key.EnterPressed">tabNext</core:event>
+    </core:events>
+    <core:validationEvents>
+        <core:event>OKPressed</core:event>
+        <core:event>InputBoxEnterPressed</core:event>
+    </core:validationEvents>
+    <core:variables>
+        <core:variable required="true" name="enactor.mfc.exchangeRateValue">
+            <core:interfaceName>java.lang.Double</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="currencyList">
+            <core:interfaceName>java.util.List</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.pos.FromAmount">
+            <core:interfaceName>java.lang.Long</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.pos.ToAmount">
+            <core:interfaceName>java.lang.Long</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.pos.FromCurrency">
+            <core:interfaceName>com.enactor.mfc.currency.ICurrencyKey</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.pos.ToCurrency">
+            <core:interfaceName>com.enactor.mfc.currency.ICurrencyKey</core:interfaceName>
+        </core:variable>
+    </core:variables>
+</retail:posPromptPage>

@@ -1,0 +1,92 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.enactor.training.docker</groupId>
+	<artifactId>lin-base-compose</artifactId>
+	<packaging>pom</packaging>
+	<name>Training - Linux Base Compose Files</name>
+	<parent>
+		<groupId>com.enactor.training.docker</groupId>
+		<artifactId>lin-compose-parent-pom</artifactId>
+		<version>TRUNK-SNAPSHOT</version>
+		<relativePath>..</relativePath>
+	</parent>	
+	<properties>
+		<skip-copy-resources>false</skip-copy-resources>
+		<skip-create-zipped-config>false</skip-create-zipped-config>	
+		<db.port>3306</db.port>
+		<!-- DB Services -->
+		<db.estatemanager>mysql-em</db.estatemanager>
+		<db.customermanager>mysql-em</db.customermanager>
+		<db.ordermanager>mysql-em</db.ordermanager>
+		<db.storeserver>mysql-ss</db.storeserver>
+		<db.pdpserver>mysql-pdp</db.pdpserver>
+		<db.sso>mysql-sso</db.sso>
+		<!-- DB Schemas -->
+		<db.schema.em>enactorem</db.schema.em>
+		<db.schema.cm>enactorem</db.schema.cm>
+		<db.schema.om>enactorem</db.schema.om>
+		<db.schema.sso>enactorsso</db.schema.sso>
+		<db.schema.pdp1>enactorpdp</db.schema.pdp1>
+		<db.schema.ss1>enactorss</db.schema.ss1>		
+	</properties>
+	<profiles>
+		<profile>
+			<id>env-docker-compose</id>	
+			<build>
+				<plugins>
+					<plugin>
+						<artifactId>maven-antrun-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>Update env.env and run.ps1 tokens</id>
+								<phase>process-resources</phase>
+								<goals>
+									<goal>run</goal>
+								</goals>
+								<configuration>
+									<tasks>
+										<!-- Environment base - compose and .env  -->
+										<replace dir="${env.base}" includes="*.env"  token="REPLACE_DOCKER_REPO" value="${docker.repo.url}" />
+										<replace dir="${env.base}" includes="*.env"  token="REPLACE_DOCKER_BASE" value="${docker.baselocation}" />								
+										<replace dir="${env.base}" includes="*.env"  token="REPLACE_DOCKER_STANDARD_BASE" value="${docker.standardbaselocation}" />	
+										<replace dir="${env.base}" includes="*.env"  token="REPLACE_DOCKER_TAG" value="${docker.tag}"  />
+										<replace dir="${env.base}" includes="*.env"  token="REPLACE_SOLR_DOCKER_TAG" value="${solr.docker.tag}"  />
+										<replace dir="${env.base}" includes="*.env"  token="REPLACE_MONGO_DOCKER_TAG" value="${mongo.docker.tag}"  />
+										<replace dir="${env.base}" includes="*.env"  token="REPLACE_DB_PORT" value="${db.port}"  />
+										<replace dir="${env.base}" includes="*.env"  token="REPLACE_OS" value="${docker.os}"  />
+										<!-- Environment files for containers -->								
+										<replace dir="${env.dir}" includes="*.env"  token="REPLACE_DB_PORT" value="${db.port}"  />
+										<replace dir="${env.dir}" includes="*.env"  token="REPLACE_DB_IP_EM" value="${db.estatemanager}"  />
+										<replace dir="${env.dir}" includes="*.env"  token="REPLACE_DB_IP_OM" value="${db.ordermanager}"  />
+										<replace dir="${env.dir}" includes="*.env"  token="REPLACE_DB_IP_CM" value="${db.customermanager}"  />
+										<replace dir="${env.dir}" includes="*.env"  token="REPLACE_DB_IP_PDP" value="${db.pdpserver}"  />	
+										<replace dir="${env.dir}" includes="*.env"  token="REPLACE_DB_IP_SS" value="${db.storeserver}"  />															
+										<!-- Schemas -->
+										<replace dir="${env.dir}" includes="*.env"  token="REPLACE_DB_SCHEMA_EM" value="${db.schema.em}"  />
+										<replace dir="${env.dir}" includes="*.env"  token="REPLACE_DB_SCHEMA_PDP" value="${db.schema.pdp1}"  />						
+										<replace dir="${env.dir}" includes="*.env"  token="REPLACE_DB_SCHEMA_SS" value="${db.schema.ss1}"  />	
+										<replace dir="${env.dir}" includes="*.env"  token="REPLACE_DB_SCHEMA_SSO" value="${db.schema.sso}"  />
+										<replace dir="${env.dir}" includes="*.env"  token="REPLACE_DB_SCHEMA_CM" value="${db.schema.cm}"  />
+										<replace dir="${env.dir}" includes="*.env"  token="REPLACE_DB_SCHEMA_OM" value="${db.schema.om}"  />			
+										<copy todir="${project.build.directory}/config">
+											<fileset dir="${project.build.directory}">
+												<include name="*.yml"/>
+												<include name=".env"/>
+											</fileset>
+										</copy>
+										<copy todir="${project.build.directory}/config/env">
+											<fileset dir="${project.build.directory}/env">
+												<include name="*"/>
+											</fileset>
+										</copy>								
+									</tasks>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>								
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+</project>

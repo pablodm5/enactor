@@ -1,0 +1,1925 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.23" id="1">
+    <property name="comments">Copyright (c) 2016 Enactor</property>
+    <property name="createdBy">Eclipse BIRT Designer Version 4.6.0.v201606072122</property>
+    <text-property name="title">Cash Up Summary</text-property>
+    <simple-property-list name="includeResource">
+        <value>Messages/CashManagement/CashUpSummaryMessages</value>
+    </simple-property-list>
+    <property name="units">in</property>
+    <method name="initialize"><![CDATA[globalDataFormatter = Packages.com.enactor.coreUI.factories.DataFormatterFactory.getInstance().getFormatter(reportContext.getLocale());
+baseCurrencyId = globalDataFormatter.getBaseCurrencyId();
+
+if(params["locationId"].value == null){
+	params["locationId"].value = "";
+}
+
+if(params["terminalType"].value == null){
+	params["terminalType"].value = 0;
+}
+
+
+dateStr = "";
+ownerIdStr = "";
+typeIdStr = "";
+locationIdStr = "";
+
+locationParam = new Array(1); 
+locationParam[0] = params["locationId"];
+
+if(params["date"].value == null){
+	params["date"].value = Packages.com.enactor.core.utilities.DateUtils.getNow();
+}
+
+dateStr = Packages.com.enactor.core.utilities.DateUtils.formatShortDateTime(reportContext.getLocale(), params["date"].value);
+
+if (params["terminalType"].value == 0) {
+	terminalTypeStr = "-"
+}
+
+if (params["terminalType"].value == 1) {
+	terminalTypeStr = "Terminal"
+}
+
+if (params["terminalType"].value == 2) {
+	terminalTypeStr = "Cashier"
+}
+
+if (params["terminalType"].value == 4) {
+	terminalTypeStr = "Safe"
+}
+
+if (params["terminalType"].value == 5) {
+	terminalTypeStr = "Pay Point"
+}
+
+if (params["ownerId"].value != null) {
+
+	var ownerIds = Packages.com.enactor.core.utilities.StringUtils.splitString(params["ownerId"].value, ",");
+	var idCount = ownerIds.length;
+
+	if (idCount > 0) {
+	
+		ownerIdStr = "'";
+		typeIdStr = "'";
+		locationIdStr = "'";
+	
+		for (i=0; i < idCount; i++) {
+		
+			var currentId = Packages.com.enactor.core.utilities.StringUtils.splitString(ownerIds[i], ";");
+			var ownerId = Packages.com.enactor.core.utilities.StringUtils.splitString(currentId[0], "=")[1];
+			var typeId = Packages.com.enactor.core.utilities.StringUtils.splitString(currentId[1], "=")[1];
+			var locationId = Packages.com.enactor.core.utilities.StringUtils.splitString(currentId[2], "=")[1];
+			ownerIdStr = ownerIdStr + ownerId + "','";
+			typeIdStr = typeIdStr + typeId + "','";
+			locationIdStr = locationIdStr + locationId + "','";
+		}
+		
+		ownerIdStr = ownerIdStr.substring(0, ownerIdStr.length - 2);
+		typeIdStr = typeIdStr.substring(0, typeIdStr.length - 2);
+		locationIdStr = locationIdStr.substring(0, locationIdStr.length - 2);
+		
+		ownerIdStr = Packages.com.enactor.core.utilities.StringUtils.removeDuplicates(ownerIdStr);
+		typeIdStr = Packages.com.enactor.core.utilities.StringUtils.removeDuplicates(typeIdStr);
+		locationIdStr = Packages.com.enactor.core.utilities.StringUtils.removeDuplicates(locationIdStr);
+
+		vars["ownerIdStr"] = ownerIdStr;
+		vars["typeIdStr"] = typeIdStr;
+		vars["locationIdStr"] = locationIdStr;
+		
+		params["ownerId"].value = "1";
+		
+		if (params["terminalType"].value == 0) {
+			terminalTypeStr = "Various";
+		}
+	} else {
+		params["ownerId"].value = "";
+	}
+} else {
+	params["ownerId"].value = "";
+}
+
+params["dateIn"].value = params["date"].value;
+
+params["dateIn"].value = com.enactor.core.utilities.DateUtils.getDayStart(params["date"].value);
+params["dateOut"].value = com.enactor.core.utilities.DateUtils.getDayEnd(params["date"].value);
+
+]]></method>
+    <property name="theme">ReportLibrary.BasicReportTheme</property>
+    <text-property name="displayName">Terminal Discrepancies</text-property>
+    <property name="layoutPreference">auto layout</property>
+    <property name="imageDPI">96</property>
+    <list-property name="libraries">
+        <structure>
+            <property name="fileName">ReportLibrary.rptlibrary</property>
+            <property name="namespace">ReportLibrary</property>
+        </structure>
+    </list-property>
+    <parameters>
+        <scalar-parameter name="userName" id="462" extends="ReportLibrary.userName">
+            <text-property name="promptText">Displayable User Name</text-property>
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value></value>
+            </simple-property-list>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="odaJndiName" id="367">
+            <text-property name="promptText">ODA JNDI Name</text-property>
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value></value>
+            </simple-property-list>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="locationId" id="500">
+            <text-property name="promptText">Location Id</text-property>
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="terminalType" id="2062">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">integer</property>
+            <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="ownerId" id="2060">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="date" id="518">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">dateTime</property>
+            <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="concealValue">false</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="dateIn" id="2157">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">dateTime</property>
+            <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="concealValue">false</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="dateOut" id="2158">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">dateTime</property>
+            <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="concealValue">false</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+    </parameters>
+    <data-sources>
+        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="Data Source" id="51"
+ extends="ReportLibrary.Data Source"/>
+    </data-sources>
+    <data-sets>
+        <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="LocationDescription" id="999"
+ extends="ReportLibrary.LocationDescription"/>
+        <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="MultipleTerminalDescriptions" id="10011"
+ extends="ReportLibrary.MultipleTerminalDescriptions"/>
+        <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="MainQuery" id="266">
+            <property name="eventHandlerClass">com.enactor.coreReporting.reportEventHandlers.DataSourceQueryTranslatorEventHandler</property>
+            <list-property name="computedColumns">
+                <structure>
+                    <property name="name">FORMATTED_DISCREPANCY</property>
+                    <expression name="expression">expectedVal = row["DISCREPANCY"] != null ? row["DISCREPANCY"]  : 0;
+currencyId = row["CURRENCY_ID"];
+globalDataFormatter.formatCurrencyAmount(expectedVal, currencyId);</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">FORMATTED_OPENING_FLOAT</property>
+                    <expression name="expression">expectedVal = row["OPENING_FLOAT"] != null ? row["OPENING_FLOAT"]  : 0;
+currencyId = row["CURRENCY_ID"];
+globalDataFormatter.formatCurrencyAmount(expectedVal, currencyId);</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">FORMATTED_FLOAT_REQUEST</property>
+                    <expression name="expression">expectedVal = row["CHANGE_REQUEST"] != null ? row["CHANGE_REQUEST"]  : 0;
+currencyId = row["CURRENCY_ID"];
+globalDataFormatter.formatCurrencyAmount(expectedVal, currencyId);</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">FORMATTED_TAKINGS</property>
+                    <expression name="expression">expectedVal = row["TAKINGS"] != null ? row["TAKINGS"]  : 0;
+currencyId = row["CURRENCY_ID"];
+globalDataFormatter.formatCurrencyAmount(expectedVal, currencyId);</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">FORMATTED_PICK_UP</property>
+                    <expression name="expression">expectedVal = row["CASH_LIFT"] != null ? row["CASH_LIFT"]  : 0;
+currencyId = row["CURRENCY_ID"];
+globalDataFormatter.formatCurrencyAmount(expectedVal, currencyId);</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">FORMATTED_FLOAT</property>
+                    <expression name="expression">expectedVal = row["CASH_FLOAT"] != null ? row["CASH_FLOAT"]  : 0;
+currencyId = row["CURRENCY_ID"];
+globalDataFormatter.formatCurrencyAmount(expectedVal, currencyId);</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">FORMATTED_CLOSING_FLOAT</property>
+                    <expression name="expression">expectedVal = row["CLOSING_FLOAT"] != null ? row["CLOSING_FLOAT"]  : 0;
+currencyId = row["CURRENCY_ID"];
+globalDataFormatter.formatCurrencyAmount(expectedVal, currencyId);</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">FORMATTED_EXPECTED</property>
+                    <expression name="expression">expectedVal = row["EXPECTED"] != null ? row["EXPECTED"]  : 0;
+currencyId = row["CURRENCY_ID"];
+globalDataFormatter.formatCurrencyAmount(expectedVal, currencyId);</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">FORMATTED_DECLARED</property>
+                    <expression name="expression">expectedVal = row["DECLARED"] != null ? row["DECLARED"]  : 0;
+currencyId = row["CURRENCY_ID"];
+globalDataFormatter.formatCurrencyAmount(expectedVal, currencyId);</expression>
+                    <property name="dataType">string</property>
+                </structure>
+            </list-property>
+            <list-property name="parameters">
+                <structure>
+                    <property name="name">locationIdIn</property>
+                    <property name="paramName">locationId</property>
+                    <property name="dataType">string</property>
+                    <property name="position">1</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">locationIdIn2</property>
+                    <property name="paramName">locationId</property>
+                    <property name="dataType">string</property>
+                    <property name="position">2</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">dateIn</property>
+                    <property name="paramName">dateIn</property>
+                    <property name="dataType">dateTime</property>
+                    <property name="position">3</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">dateOut</property>
+                    <property name="paramName">dateOut</property>
+                    <property name="dataType">dateTime</property>
+                    <property name="position">4</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">ownerOwnerIdIn</property>
+                    <property name="paramName">ownerId</property>
+                    <property name="dataType">string</property>
+                    <property name="position">5</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">ownerTypeIdIn</property>
+                    <property name="paramName">ownerId</property>
+                    <property name="dataType">string</property>
+                    <property name="position">6</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">ownerLocationIdIn</property>
+                    <property name="paramName">ownerId</property>
+                    <property name="dataType">string</property>
+                    <property name="position">7</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">terminalTypeIn</property>
+                    <property name="paramName">terminalType</property>
+                    <property name="dataType">integer</property>
+                    <property name="position">8</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">terminalTypeOut</property>
+                    <property name="paramName">terminalType</property>
+                    <property name="dataType">integer</property>
+                    <property name="position">9</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+            </list-property>
+            <structure name="cachedMetaData"/>
+            <property name="dataSource">Data Source</property>
+            <xml-property name="queryText"><![CDATA[
+SELECT
+	Q1.OWNER_ID,
+	Q1.TENDER_ID,
+	Q1.OPENING_FLOAT,
+	Q1.CHANGE_REQUEST,
+	Q1.TAKINGS,
+	ABS(Q1.CASH_LIFT) AS CASH_LIFT,
+	Q1.CASH_FLOAT,
+	ABS(Q1.CLOSING_FLOAT) AS CLOSING_FLOAT,
+	ABS(Q1.DECLARED) AS DECLARED,
+	(SUM(Q1.OPENING_FLOAT) + SUM(Q1.CASH_FLOAT) + SUM(Q1.TAKINGS)) - (ABS(SUM(Q1.CASH_LIFT)) + ABS(SUM(Q1.CLOSING_FLOAT))) as EXPECTED,
+	ABS(Q1.DECLARED)- ((SUM(Q1.OPENING_FLOAT) + SUM(Q1.CASH_FLOAT) + SUM(Q1.TAKINGS)) - (ABS(SUM(Q1.CASH_LIFT)) + ABS(SUM(Q1.CLOSING_FLOAT)))) AS DISCREPANCY,
+	Q1.BASE_OPENING_FLOAT,
+	Q1.BASE_CHANGE_REQUEST,
+	Q1.BASE_TAKINGS,
+	ABS(Q1.BASE_CASH_LIFT) AS BASE_CASH_LIFT,
+	Q1.BASE_CASH_FLOAT,
+	ABS(Q1.BASE_CLOSING_FLOAT) AS BASE_CLOSING_FLOAT,
+	ABS(Q1.BASE_DECLARED) AS BASE_DECLARED,
+	(SUM(Q1.BASE_OPENING_FLOAT) + SUM(Q1.BASE_CASH_FLOAT) + SUM(Q1.BASE_TAKINGS)) - (ABS(SUM(Q1.BASE_CASH_LIFT)) + ABS(SUM(Q1.BASE_CLOSING_FLOAT))) as BASE_EXPECTED,
+	ABS(Q1.BASE_DECLARED) - ((SUM(Q1.BASE_OPENING_FLOAT) + SUM(Q1.BASE_CASH_FLOAT) + SUM(Q1.BASE_TAKINGS)) - (ABS(SUM(Q1.BASE_CASH_LIFT)) + ABS(SUM(Q1.BASE_CLOSING_FLOAT)))) AS BASE_DISCREPANCY,
+	Q1.CURRENCY_ID
+FROM (
+	SELECT
+		Q.OWNER_ID,
+		Q.TENDER_ID,
+		SUM(CASE WHEN (Q.TYPE = 'OPENING_FLOAT') THEN Q.VALUE ELSE 0 END) AS OPENING_FLOAT,
+		SUM(CASE WHEN (Q.TYPE = 'CHANGE_REQUEST') THEN Q.VALUE ELSE 0 END) AS CHANGE_REQUEST,
+		SUM(CASE WHEN (Q.TYPE = 'TAKINGS') THEN Q.VALUE ELSE 0 END) AS TAKINGS,
+		SUM(CASE WHEN (Q.TYPE = 'CASH_LIFT') THEN Q.VALUE ELSE 0 END) AS CASH_LIFT,
+		SUM(CASE WHEN (Q.TYPE = 'CASH_FLOAT') THEN Q.VALUE ELSE 0 END) AS CASH_FLOAT,
+		SUM(CASE WHEN (Q.TYPE = 'CLOSING_FLOAT') THEN Q.VALUE ELSE 0 END) AS CLOSING_FLOAT,
+		SUM(CASE WHEN (Q.TYPE = 'DECLARED') THEN Q.VALUE ELSE 0 END) AS DECLARED,
+		SUM(CASE WHEN (Q.TYPE = 'OPENING_FLOAT') THEN Q.BASE_VALUE ELSE 0 END) AS BASE_OPENING_FLOAT,
+		SUM(CASE WHEN (Q.TYPE = 'CHANGE_REQUEST') THEN Q.BASE_VALUE ELSE 0 END) AS BASE_CHANGE_REQUEST,
+		SUM(CASE WHEN (Q.TYPE = 'TAKINGS') THEN Q.BASE_VALUE ELSE 0 END) AS BASE_TAKINGS,
+		SUM(CASE WHEN (Q.TYPE = 'CASH_LIFT') THEN Q.BASE_VALUE ELSE 0 END) AS BASE_CASH_LIFT,
+		SUM(CASE WHEN (Q.TYPE = 'CASH_FLOAT') THEN Q.BASE_VALUE ELSE 0 END) AS BASE_CASH_FLOAT,
+		SUM(CASE WHEN (Q.TYPE = 'CLOSING_FLOAT') THEN Q.BASE_VALUE ELSE 0 END) AS BASE_CLOSING_FLOAT,
+		SUM(CASE WHEN (Q.TYPE = 'DECLARED') THEN Q.BASE_VALUE ELSE 0 END) AS BASE_DECLARED,
+		Q.CURRENCY_ID
+		FROM (
+			-- OPENING_FLOAT
+			SELECT DISTINCT 'OPENING_FLOAT' AS TYPE, CT.Owner_Id AS OWNER_ID, CTI.Tender_Id AS TENDER_ID, CTI.Currency_Id AS CURRENCY_ID, CTI.Value AS VALUE,
+			CTI.Base_Value AS BASE_VALUE, CT.Location_Id AS LOCATION_ID, CT.Owner_Type AS OWNER_TYPE, CS.Start_Date AS SESSION_START_DATE,
+			CS.End_Date AS SESSION_END_DATE, CS.Owner_Id AS SESSION_OWNER_ID, CS.Type AS SESSION_OWNER_TYPE, CS.Session_Number AS SESSION_NUMBER, '-' AS CASH_TRANSACTIONS_ID
+			FROM cashtransactions CT
+				INNER JOIN cashtransactionitems CTI ON CT.Id = CTI.Id
+				LEFT OUTER JOIN cashsessions CS ON CT.Session_Number = CS.Session_Number AND CT.Owner_Id = CS.Owner_Id AND CT.Location_Id = CS.Location_Id AND CT.Owner_Type = CS.Type
+				INNER JOIN tenders T ON CTI.Tender_Id = T.Tender_Id
+				WHERE (CT.Transaction_Type = 'TerminalOpeningFloat' OR (CT.Transaction_Type LIKE 'TerminalCashup%' AND CTI.Item_Type = 'TerminalOpen'))
+				AND T.Is_Cashup_Tender = 1 AND T.Is_Pickup_Tender = 1 AND T.Is_Auto_Picked_Up <> 1
+				AND CT.Is_Voided = '0'
+				AND CS.Status <> 1
+			UNION
+			-- CHANGE_REQUEST
+			SELECT DISTINCT 'CHANGE_REQUEST' AS TYPE, CT.Owner_Id AS OWNER_ID, CTI.Tender_Id AS TENDER_ID, CTI.Currency_Id AS CURRENCY_ID, CTI.Value AS VALUE,
+			CTI.Base_Value AS BASE_VALUE, CT.Location_Id AS LOCATION_ID, CT.Owner_Type AS OWNER_TYPE, CS.Start_Date AS SESSION_START_DATE,
+			CS.End_Date AS SESSION_END_DATE, CS.Owner_Id AS SESSION_OWNER_ID, CS.Type AS SESSION_OWNER_TYPE, CS.Session_Number AS SESSION_NUMBER, '-' AS CASH_TRANSACTIONS_ID
+			FROM cashtransactions CT
+				INNER JOIN cashtransactionitems CTI ON CT.Id = CTI.Id
+				LEFT OUTER JOIN cashsessions CS ON CT.Session_Number = CS.Session_Number AND CT.Owner_Id = CS.Owner_Id AND CT.Location_Id = CS.Location_Id AND CT.Owner_Type = CS.Type
+				INNER JOIN tenders T ON CTI.Tender_Id = T.Tender_Id
+				WHERE CT.Transaction_Type = 'TerminalFloatRequest'
+				AND T.Is_Cashup_Tender = 1 AND T.Is_Pickup_Tender = 1 AND T.Is_Auto_Picked_Up <> 1
+				AND CT.Is_Voided = '0'
+				AND CS.Status <> 1
+			UNION
+			-- CASH_LIFT
+			SELECT DISTINCT 'CASH_LIFT' AS TYPE, CT.Owner_Id AS OWNER_ID, CTI.Tender_Id AS TENDER_ID, CTI.Currency_Id AS CURRENCY_ID, CTI.Value AS VALUE,
+			CTI.Base_Value AS BASE_VALUE, CT.Location_Id AS LOCATION_ID, CT.Owner_Type AS OWNER_TYPE, CS.Start_Date AS SESSION_START_DATE,
+			CS.End_Date AS SESSION_END_DATE, CS.Owner_Id AS SESSION_OWNER_ID, CS.Type AS SESSION_OWNER_TYPE, CS.Session_Number AS SESSION_NUMBER, '-' AS CASH_TRANSACTIONS_ID
+			FROM cashtransactions CT
+				INNER JOIN cashtransactionitems CTI ON CT.Id = CTI.Id
+				LEFT OUTER JOIN cashsessions CS ON CT.Session_Number = CS.Session_Number AND CT.Owner_Id = CS.Owner_Id AND CT.Location_Id = CS.Location_Id AND CT.Owner_Type = CS.Type
+				INNER JOIN tenders T ON CTI.Tender_Id = T.Tender_Id
+				WHERE CT.Transaction_Type = 'TerminalPickup'
+				AND T.Is_Cashup_Tender = 1 AND T.Is_Pickup_Tender = 1 AND T.Is_Auto_Picked_Up <> 1
+				AND CT.Is_Voided = '0'
+			UNION
+			-- CASH_FLOAT
+			SELECT DISTINCT 'CASH_FLOAT' AS TYPE, CT.Owner_Id AS OWNER_ID, CTI.Tender_Id AS TENDER_ID, CTI.Currency_Id AS CURRENCY_ID, CTI.Value AS VALUE,
+			CTI.Base_Value AS BASE_VALUE, CT.Location_Id AS LOCATION_ID, CT.Owner_Type AS OWNER_TYPE, CS.Start_Date AS SESSION_START_DATE,
+			CS.End_Date AS SESSION_END_DATE, CS.Owner_Id AS SESSION_OWNER_ID, CS.Type AS SESSION_OWNER_TYPE, CS.Session_Number AS SESSION_NUMBER, '-' AS CASH_TRANSACTIONS_ID
+			FROM cashtransactions CT
+				INNER JOIN cashtransactionitems CTI ON CT.Id = CTI.Id
+				LEFT OUTER JOIN cashsessions CS ON CT.Session_Number = CS.Session_Number AND CT.Owner_Id = CS.Owner_Id AND CT.Location_Id = CS.Location_Id AND CT.Owner_Type = CS.Type
+				INNER JOIN tenders T ON CTI.Tender_Id = T.Tender_Id
+				WHERE CT.Transaction_Type = 'TerminalFloat'
+				AND T.Is_Cashup_Tender = 1 AND T.Is_Pickup_Tender = 1 AND T.Is_Auto_Picked_Up <> 1
+				AND CT.Is_Voided = '0'
+				AND CS.Status <> 1
+			UNION
+			-- CLOSING_FLOAT
+			SELECT DISTINCT 'CLOSING_FLOAT' AS TYPE, CT.Owner_Id AS OWNER_ID, CTI.Tender_Id AS TENDER_ID, CTI.Currency_Id AS CURRENCY_ID, CTI.Value AS VALUE,
+			CTI.Base_Value AS BASE_VALUE, CT.Location_Id AS LOCATION_ID, CT.Owner_Type AS OWNER_TYPE, CS.Start_Date AS SESSION_START_DATE,
+			CS.End_Date AS SESSION_END_DATE, CS.Owner_Id AS SESSION_OWNER_ID, CS.Type AS SESSION_OWNER_TYPE, CS.Session_Number AS SESSION_NUMBER, '-' AS CASH_TRANSACTIONS_ID
+			FROM cashtransactions CT
+				INNER JOIN cashtransactionitems CTI ON CT.Id = CTI.Id
+				LEFT OUTER JOIN cashsessions CS ON CT.Session_Number = CS.Session_Number AND CT.Owner_Id = CS.Owner_Id AND CT.Location_Id = CS.Location_Id AND CT.Owner_Type = CS.Type
+				INNER JOIN tenders T ON CTI.Tender_Id = T.Tender_Id
+				WHERE CT.Transaction_Type = 'TerminalClosingFloat'
+				AND T.Is_Cashup_Tender = 1 AND T.Is_Pickup_Tender = 1 AND T.Is_Auto_Picked_Up <> 1
+				AND CT.Is_Voided = '0'
+				AND CS.Status <> 1
+			UNION
+			-- DECLARED
+			SELECT DISTINCT 'DECLARED' AS TYPE, CT.Owner_Id AS OWNER_ID, CTI.Tender_Id AS TENDER_ID, CTI.Currency_Id AS CURRENCY_ID, CTI.Value AS VALUE,
+			CTI.Base_Value AS BASE_VALUE, CT.Location_Id AS LOCATION_ID, CT.Owner_Type AS OWNER_TYPE, CS.Start_Date AS SESSION_START_DATE,
+			CS.End_Date AS SESSION_END_DATE, CS.Owner_Id AS SESSION_OWNER_ID, CS.Type AS SESSION_OWNER_TYPE, CS.Session_Number AS SESSION_NUMBER, CT.ID AS CASH_TRANSACTIONS_ID
+			FROM cashtransactions CT
+				INNER JOIN cashtransactionitems CTI ON CT.Id = CTI.Id
+				LEFT OUTER JOIN cashsessions CS ON CT.Session_Number = CS.Session_Number AND CT.Owner_Id = CS.Owner_Id AND CT.Location_Id = CS.Location_Id AND CT.Owner_Type = CS.Type
+				INNER JOIN tenders T ON CTI.Tender_Id = T.Tender_Id
+				WHERE CT.Transaction_Type LIKE 'TerminalCashup%' AND CTI.Item_Type = 'Counted'
+				AND T.Is_Cashup_Tender = 1 AND T.Is_Pickup_Tender = 1 AND T.Is_Auto_Picked_Up <> 1
+				AND CT.Is_Voided = '0'
+				AND CS.Status <> 1
+			UNION
+			-- TAKINGS	
+			SELECT DISTINCT 'TAKINGS' AS TYPE, CT.Owner_Id AS OWNER_ID, CTI.Tender_Id AS TENDER_ID, CTI.Currency_Id AS CURRENCY_ID, CTI.Value AS VALUE,
+			CTI.Base_Value AS BASE_VALUE, CT.Location_Id AS LOCATION_ID, CT.Owner_Type AS OWNER_TYPE, CS.Start_Date AS SESSION_START_DATE,
+			CS.End_Date AS SESSION_END_DATE, CS.Owner_Id AS SESSION_OWNER_ID, CS.Type AS SESSION_OWNER_TYPE, CS.Session_Number AS SESSION_NUMBER, '-' AS CASH_TRANSACTIONS_ID
+			FROM cashtransactions CT
+				INNER JOIN cashtransactionitems CTI ON CT.Id = CTI.Id
+				LEFT OUTER JOIN cashsessions CS ON CT.Session_Number = CS.Session_Number AND CT.Owner_Id = CS.Owner_Id AND CT.Location_Id = CS.Location_Id AND CT.Owner_Type = CS.Type
+				INNER JOIN tenders T ON CTI.Tender_Id = T.Tender_Id
+				WHERE (CTI.Item_Type = 'Sale' AND CT.Transaction_Type != 'TerminalSpotCheck' AND CT.Transaction_Type != 'TerminalBlindSpotCheck')
+				AND T.Is_Cashup_Tender = 1 AND T.Is_Pickup_Tender = 1 AND T.Is_Auto_Picked_Up <> 1
+				AND CT.Is_Voided = '0'
+				AND CS.Status <> 1
+		) Q
+		WHERE
+		(? = !~''~! or Q.LOCATION_ID = ?)
+		AND (Q.SESSION_END_DATE >= ? AND Q.SESSION_END_DATE <= ?)
+		AND	(? = !~''~! or Q.SESSION_OWNER_ID in (!~LOAD_VARIABLE(ownerIdStr)~!))
+		AND	(? = !~''~! or CAST(Q.SESSION_OWNER_TYPE AS char) in (!~LOAD_VARIABLE(typeIdStr)~!))
+		AND	(? = !~''~! or Q.LOCATION_ID in (!~LOAD_VARIABLE(locationIdStr)~!))
+		AND	(? = 0 or Q.OWNER_TYPE = ?)
+		GROUP BY Q.OWNER_ID, Q.TENDER_ID, Q.CURRENCY_ID
+	) Q1
+	GROUP BY Q1.OWNER_ID, Q1.TENDER_ID, Q1.OPENING_FLOAT, Q1.CHANGE_REQUEST, Q1.TAKINGS, Q1.CASH_LIFT, Q1.CASH_FLOAT,
+	Q1.CLOSING_FLOAT, Q1.DECLARED, Q1.BASE_OPENING_FLOAT, Q1.BASE_CHANGE_REQUEST, Q1.BASE_TAKINGS, Q1.BASE_CASH_LIFT,
+	Q1.BASE_CASH_FLOAT,	Q1.BASE_CLOSING_FLOAT, Q1.BASE_DECLARED, Q1.CURRENCY_ID
+	]]></xml-property>
+        </oda-data-set>
+        <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="TotalQuery" id="182">
+            <property name="eventHandlerClass">com.enactor.coreReporting.reportEventHandlers.DataSourceQueryTranslatorEventHandler</property>
+            <list-property name="computedColumns">
+                <structure>
+                    <property name="name">FORMATTED_TOTAL_DISCREPANCIES</property>
+                    <expression name="expression">expectedVal = row["TOTAL_DISCREPANCIES"] != null ? row["TOTAL_DISCREPANCIES"] : 0;
+currencyId = row["CURRENCY_ID"];
+globalDataFormatter.formatCurrencyAmount(expectedVal, currencyId);</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">FORMATTED_TOTAL_EXPECTED</property>
+                    <expression name="expression">expectedVal = row["TOTAL_EXPECTED"] != null ? row["TOTAL_EXPECTED"] : 0;
+currencyId = row["CURRENCY_ID"];
+globalDataFormatter.formatCurrencyAmount(expectedVal, currencyId);</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">FORMATTED_TOTAL_DECLARED</property>
+                    <expression name="expression">expectedVal = row["TOTAL_DECLARED"] != null ? row["TOTAL_DECLARED"] : 0;
+currencyId = row["CURRENCY_ID"];
+globalDataFormatter.formatCurrencyAmount(expectedVal, currencyId);</expression>
+                    <property name="dataType">string</property>
+                </structure>
+            </list-property>
+            <list-property name="parameters">
+                <structure>
+                    <property name="name">locationIdIn</property>
+                    <property name="paramName">locationId</property>
+                    <property name="dataType">string</property>
+                    <property name="position">1</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">locationIdIn2</property>
+                    <property name="paramName">locationId</property>
+                    <property name="dataType">string</property>
+                    <property name="position">2</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">dateIn</property>
+                    <property name="paramName">dateIn</property>
+                    <property name="dataType">dateTime</property>
+                    <property name="position">3</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">dateOut</property>
+                    <property name="paramName">dateOut</property>
+                    <property name="dataType">dateTime</property>
+                    <property name="position">4</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">ownerOwnerIdIn</property>
+                    <property name="paramName">ownerId</property>
+                    <property name="dataType">string</property>
+                    <property name="position">5</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">ownerTypeIdIn</property>
+                    <property name="paramName">ownerId</property>
+                    <property name="dataType">string</property>
+                    <property name="position">6</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">ownerLocationIdIn</property>
+                    <property name="paramName">ownerId</property>
+                    <property name="dataType">string</property>
+                    <property name="position">7</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">terminalTypeIn</property>
+                    <property name="paramName">terminalType</property>
+                    <property name="dataType">integer</property>
+                    <property name="position">8</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">terminalTypeOut</property>
+                    <property name="paramName">terminalType</property>
+                    <property name="dataType">integer</property>
+                    <property name="position">9</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+            </list-property>
+            <structure name="cachedMetaData"/>
+            <property name="dataSource">Data Source</property>
+            <xml-property name="queryText"><![CDATA[
+SELECT
+	CONCAT('TOTAL ', Q2.TENDER_ID) AS TOTAL_TENDERS,
+	SUM(Q2.EXPECTED) AS TOTAL_EXPECTED,
+	SUM(Q2.DECLARED) AS TOTAL_DECLARED,
+	SUM(Q2.DISCREPANCY) AS TOTAL_DISCREPANCIES,
+	Q2.CURRENCY_ID AS CURRENCY_ID
+FROM (
+	SELECT
+		Q1.OWNER_ID,
+		Q1.TENDER_ID,
+		Q1.OPENING_FLOAT,
+		Q1.CHANGE_REQUEST,
+		Q1.TAKINGS,
+		ABS(Q1.CASH_LIFT) AS CASH_LIFT,
+		Q1.CASH_FLOAT,
+		ABS(Q1.CLOSING_FLOAT) AS CLOSING_FLOAT,
+		ABS(Q1.DECLARED) AS DECLARED,
+		(SUM(Q1.OPENING_FLOAT) + SUM(Q1.CASH_FLOAT) + SUM(Q1.TAKINGS)) - (ABS(SUM(Q1.CASH_LIFT)) + ABS(SUM(Q1.CLOSING_FLOAT))) as EXPECTED,
+		ABS(Q1.DECLARED)- ((SUM(Q1.OPENING_FLOAT) + SUM(Q1.CASH_FLOAT) + SUM(Q1.TAKINGS)) - (ABS(SUM(Q1.CASH_LIFT)) + ABS(SUM(Q1.CLOSING_FLOAT)))) AS DISCREPANCY,
+		Q1.BASE_OPENING_FLOAT,
+		Q1.BASE_CHANGE_REQUEST,
+		Q1.BASE_TAKINGS,
+		ABS(Q1.BASE_CASH_LIFT) AS BASE_CASH_LIFT,
+		Q1.BASE_CASH_FLOAT,
+		ABS(Q1.BASE_CLOSING_FLOAT) AS BASE_CLOSING_FLOAT,
+		ABS(Q1.BASE_DECLARED) AS BASE_DECLARED,
+		(SUM(Q1.BASE_OPENING_FLOAT) + SUM(Q1.BASE_CASH_FLOAT) + SUM(Q1.BASE_TAKINGS)) - (ABS(SUM(Q1.BASE_CASH_LIFT)) + ABS(SUM(Q1.BASE_CLOSING_FLOAT))) as BASE_EXPECTED,
+		ABS(Q1.BASE_DECLARED) - ((SUM(Q1.BASE_OPENING_FLOAT) + SUM(Q1.BASE_CASH_FLOAT) + SUM(Q1.BASE_TAKINGS)) - (ABS(SUM(Q1.BASE_CASH_LIFT)) + ABS(SUM(Q1.BASE_CLOSING_FLOAT)))) AS BASE_DISCREPANCY,
+		Q1.CURRENCY_ID
+	FROM (
+		SELECT
+			Q.OWNER_ID,
+			Q.TENDER_ID,
+			SUM(CASE WHEN (Q.TYPE = 'OPENING_FLOAT') THEN Q.VALUE ELSE 0 END) AS OPENING_FLOAT,
+			SUM(CASE WHEN (Q.TYPE = 'CHANGE_REQUEST') THEN Q.VALUE ELSE 0 END) AS CHANGE_REQUEST,
+			SUM(CASE WHEN (Q.TYPE = 'TAKINGS') THEN Q.VALUE ELSE 0 END) AS TAKINGS,
+			SUM(CASE WHEN (Q.TYPE = 'CASH_LIFT') THEN Q.VALUE ELSE 0 END) AS CASH_LIFT,
+			SUM(CASE WHEN (Q.TYPE = 'CASH_FLOAT') THEN Q.VALUE ELSE 0 END) AS CASH_FLOAT,
+			SUM(CASE WHEN (Q.TYPE = 'CLOSING_FLOAT') THEN Q.VALUE ELSE 0 END) AS CLOSING_FLOAT,
+			SUM(CASE WHEN (Q.TYPE = 'DECLARED') THEN Q.VALUE ELSE 0 END) AS DECLARED,
+			SUM(CASE WHEN (Q.TYPE = 'OPENING_FLOAT') THEN Q.BASE_VALUE ELSE 0 END) AS BASE_OPENING_FLOAT,
+			SUM(CASE WHEN (Q.TYPE = 'CHANGE_REQUEST') THEN Q.BASE_VALUE ELSE 0 END) AS BASE_CHANGE_REQUEST,
+			SUM(CASE WHEN (Q.TYPE = 'TAKINGS') THEN Q.BASE_VALUE ELSE 0 END) AS BASE_TAKINGS,
+			SUM(CASE WHEN (Q.TYPE = 'CASH_LIFT') THEN Q.BASE_VALUE ELSE 0 END) AS BASE_CASH_LIFT,
+			SUM(CASE WHEN (Q.TYPE = 'CASH_FLOAT') THEN Q.BASE_VALUE ELSE 0 END) AS BASE_CASH_FLOAT,
+			SUM(CASE WHEN (Q.TYPE = 'CLOSING_FLOAT') THEN Q.BASE_VALUE ELSE 0 END) AS BASE_CLOSING_FLOAT,
+			SUM(CASE WHEN (Q.TYPE = 'DECLARED') THEN Q.BASE_VALUE ELSE 0 END) AS BASE_DECLARED,
+			Q.CURRENCY_ID
+			FROM (
+				-- OPENING_FLOAT
+				SELECT DISTINCT 'OPENING_FLOAT' AS TYPE, CT.Owner_Id AS OWNER_ID, CTI.Tender_Id AS TENDER_ID, CTI.Currency_Id AS CURRENCY_ID, CTI.Value AS VALUE,
+				CTI.Base_Value AS BASE_VALUE, CT.Location_Id AS LOCATION_ID, CT.Owner_Type AS OWNER_TYPE, CS.Start_Date AS SESSION_START_DATE,
+				CS.End_Date AS SESSION_END_DATE, CS.Owner_Id AS SESSION_OWNER_ID, CS.Type AS SESSION_OWNER_TYPE, CS.Session_Number AS SESSION_NUMBER, '-' AS CASH_TRANSACTIONS_ID
+				FROM cashtransactions CT
+					INNER JOIN cashtransactionitems CTI ON CT.Id = CTI.Id
+					LEFT OUTER JOIN cashsessions CS ON CT.Session_Number = CS.Session_Number AND CT.Owner_Id = CS.Owner_Id AND CT.Location_Id = CS.Location_Id AND CT.Owner_Type = CS.Type
+					INNER JOIN tenders T ON CTI.Tender_Id = T.Tender_Id
+					WHERE (CT.Transaction_Type = 'TerminalOpeningFloat' OR (CT.Transaction_Type LIKE 'TerminalCashup%' AND CTI.Item_Type = 'TerminalOpen'))
+					AND T.Is_Cashup_Tender = 1 AND T.Is_Pickup_Tender = 1 AND T.Is_Auto_Picked_Up <> 1
+					AND CT.Is_Voided = '0'
+					AND CS.Status <> 1
+				UNION
+				-- CHANGE_REQUEST
+				SELECT DISTINCT 'CHANGE_REQUEST' AS TYPE, CT.Owner_Id AS OWNER_ID, CTI.Tender_Id AS TENDER_ID, CTI.Currency_Id AS CURRENCY_ID, CTI.Value AS VALUE,
+				CTI.Base_Value AS BASE_VALUE, CT.Location_Id AS LOCATION_ID, CT.Owner_Type AS OWNER_TYPE, CS.Start_Date AS SESSION_START_DATE,
+				CS.End_Date AS SESSION_END_DATE, CS.Owner_Id AS SESSION_OWNER_ID, CS.Type AS SESSION_OWNER_TYPE, CS.Session_Number AS SESSION_NUMBER, '-' AS CASH_TRANSACTIONS_ID
+				FROM cashtransactions CT
+					INNER JOIN cashtransactionitems CTI ON CT.Id = CTI.Id
+					LEFT OUTER JOIN cashsessions CS ON CT.Session_Number = CS.Session_Number AND CT.Owner_Id = CS.Owner_Id AND CT.Location_Id = CS.Location_Id AND CT.Owner_Type = CS.Type
+					INNER JOIN tenders T ON CTI.Tender_Id = T.Tender_Id
+					WHERE CT.Transaction_Type = 'TerminalFloatRequest'
+					AND T.Is_Cashup_Tender = 1 AND T.Is_Pickup_Tender = 1 AND T.Is_Auto_Picked_Up <> 1
+					AND CT.Is_Voided = '0'
+					AND CS.Status <> 1
+				UNION
+				-- CASH_LIFT
+				SELECT DISTINCT 'CASH_LIFT' AS TYPE, CT.Owner_Id AS OWNER_ID, CTI.Tender_Id AS TENDER_ID, CTI.Currency_Id AS CURRENCY_ID, CTI.Value AS VALUE,
+				CTI.Base_Value AS BASE_VALUE, CT.Location_Id AS LOCATION_ID, CT.Owner_Type AS OWNER_TYPE, CS.Start_Date AS SESSION_START_DATE,
+				CS.End_Date AS SESSION_END_DATE, CS.Owner_Id AS SESSION_OWNER_ID, CS.Type AS SESSION_OWNER_TYPE, CS.Session_Number AS SESSION_NUMBER, '-' AS CASH_TRANSACTIONS_ID
+				FROM cashtransactions CT
+					INNER JOIN cashtransactionitems CTI ON CT.Id = CTI.Id
+					LEFT OUTER JOIN cashsessions CS ON CT.Session_Number = CS.Session_Number AND CT.Owner_Id = CS.Owner_Id AND CT.Location_Id = CS.Location_Id AND CT.Owner_Type = CS.Type
+					INNER JOIN tenders T ON CTI.Tender_Id = T.Tender_Id
+					WHERE CT.Transaction_Type = 'TerminalPickup'
+					AND T.Is_Cashup_Tender = 1 AND T.Is_Pickup_Tender = 1 AND T.Is_Auto_Picked_Up <> 1
+					AND CT.Is_Voided = '0'
+				UNION
+				-- CASH_FLOAT
+				SELECT DISTINCT 'CASH_FLOAT' AS TYPE, CT.Owner_Id AS OWNER_ID, CTI.Tender_Id AS TENDER_ID, CTI.Currency_Id AS CURRENCY_ID, CTI.Value AS VALUE,
+				CTI.Base_Value AS BASE_VALUE, CT.Location_Id AS LOCATION_ID, CT.Owner_Type AS OWNER_TYPE, CS.Start_Date AS SESSION_START_DATE,
+				CS.End_Date AS SESSION_END_DATE, CS.Owner_Id AS SESSION_OWNER_ID, CS.Type AS SESSION_OWNER_TYPE, CS.Session_Number AS SESSION_NUMBER, '-' AS CASH_TRANSACTIONS_ID
+				FROM cashtransactions CT
+					INNER JOIN cashtransactionitems CTI ON CT.Id = CTI.Id
+					LEFT OUTER JOIN cashsessions CS ON CT.Session_Number = CS.Session_Number AND CT.Owner_Id = CS.Owner_Id AND CT.Location_Id = CS.Location_Id AND CT.Owner_Type = CS.Type
+					INNER JOIN tenders T ON CTI.Tender_Id = T.Tender_Id
+					WHERE CT.Transaction_Type = 'TerminalFloat'
+					AND T.Is_Cashup_Tender = 1 AND T.Is_Pickup_Tender = 1 AND T.Is_Auto_Picked_Up <> 1
+					AND CT.Is_Voided = '0'
+					AND CS.Status <> 1
+				UNION
+				-- CLOSING_FLOAT
+				SELECT DISTINCT 'CLOSING_FLOAT' AS TYPE, CT.Owner_Id AS OWNER_ID, CTI.Tender_Id AS TENDER_ID, CTI.Currency_Id AS CURRENCY_ID, CTI.Value AS VALUE,
+				CTI.Base_Value AS BASE_VALUE, CT.Location_Id AS LOCATION_ID, CT.Owner_Type AS OWNER_TYPE, CS.Start_Date AS SESSION_START_DATE,
+				CS.End_Date AS SESSION_END_DATE, CS.Owner_Id AS SESSION_OWNER_ID, CS.Type AS SESSION_OWNER_TYPE, CS.Session_Number AS SESSION_NUMBER, '-' AS CASH_TRANSACTIONS_ID
+				FROM cashtransactions CT
+					INNER JOIN cashtransactionitems CTI ON CT.Id = CTI.Id
+					LEFT OUTER JOIN cashsessions CS ON CT.Session_Number = CS.Session_Number AND CT.Owner_Id = CS.Owner_Id AND CT.Location_Id = CS.Location_Id AND CT.Owner_Type = CS.Type
+					INNER JOIN tenders T ON CTI.Tender_Id = T.Tender_Id
+					WHERE CT.Transaction_Type = 'TerminalClosingFloat'
+					AND T.Is_Cashup_Tender = 1 AND T.Is_Pickup_Tender = 1 AND T.Is_Auto_Picked_Up <> 1
+					AND CT.Is_Voided = '0'
+					AND CS.Status <> 1
+				UNION
+				-- DECLARED
+				SELECT DISTINCT 'DECLARED' AS TYPE, CT.Owner_Id AS OWNER_ID, CTI.Tender_Id AS TENDER_ID, CTI.Currency_Id AS CURRENCY_ID, CTI.Value AS VALUE,
+				CTI.Base_Value AS BASE_VALUE, CT.Location_Id AS LOCATION_ID, CT.Owner_Type AS OWNER_TYPE, CS.Start_Date AS SESSION_START_DATE,
+				CS.End_Date AS SESSION_END_DATE, CS.Owner_Id AS SESSION_OWNER_ID, CS.Type AS SESSION_OWNER_TYPE, CS.Session_Number AS SESSION_NUMBER, CT.ID AS CASH_TRANSACTIONS_ID
+				FROM cashtransactions CT
+					INNER JOIN cashtransactionitems CTI ON CT.Id = CTI.Id
+					LEFT OUTER JOIN cashsessions CS ON CT.Session_Number = CS.Session_Number AND CT.Owner_Id = CS.Owner_Id AND CT.Location_Id = CS.Location_Id AND CT.Owner_Type = CS.Type
+					INNER JOIN tenders T ON CTI.Tender_Id = T.Tender_Id
+					WHERE CT.Transaction_Type LIKE 'TerminalCashup%' AND CTI.Item_Type = 'Counted'
+					AND T.Is_Cashup_Tender = 1 AND T.Is_Pickup_Tender = 1 AND T.Is_Auto_Picked_Up <> 1
+					AND CT.Is_Voided = '0'
+					AND CS.Status <> 1
+				UNION
+				-- TAKINGS	
+				SELECT DISTINCT 'TAKINGS' AS TYPE, CT.Owner_Id AS OWNER_ID, CTI.Tender_Id AS TENDER_ID, CTI.Currency_Id AS CURRENCY_ID, CTI.Value AS VALUE,
+				CTI.Base_Value AS BASE_VALUE, CT.Location_Id AS LOCATION_ID, CT.Owner_Type AS OWNER_TYPE, CS.Start_Date AS SESSION_START_DATE,
+				CS.End_Date AS SESSION_END_DATE, CS.Owner_Id AS SESSION_OWNER_ID, CS.Type AS SESSION_OWNER_TYPE, CS.Session_Number AS SESSION_NUMBER, '-' AS CASH_TRANSACTIONS_ID
+				FROM cashtransactions CT
+					INNER JOIN cashtransactionitems CTI ON CT.Id = CTI.Id
+					LEFT OUTER JOIN cashsessions CS ON CT.Session_Number = CS.Session_Number AND CT.Owner_Id = CS.Owner_Id AND CT.Location_Id = CS.Location_Id AND CT.Owner_Type = CS.Type
+					INNER JOIN tenders T ON CTI.Tender_Id = T.Tender_Id
+					WHERE (CTI.Item_Type = 'Sale' AND CT.Transaction_Type != 'TerminalSpotCheck' AND CT.Transaction_Type != 'TerminalBlindSpotCheck')
+					AND T.Is_Cashup_Tender = 1 AND T.Is_Pickup_Tender = 1 AND T.Is_Auto_Picked_Up <> 1
+					AND CT.Is_Voided = '0'
+					AND CS.Status <> 1
+			) Q
+			WHERE
+			(? = !~''~! or Q.LOCATION_ID = ?)
+			AND (Q.SESSION_END_DATE >= ? AND Q.SESSION_END_DATE <= ?)
+			AND	(? = !~''~! or Q.SESSION_OWNER_ID in (!~LOAD_VARIABLE(ownerIdStr)~!))
+			AND	(? = !~''~! or CAST(Q.SESSION_OWNER_TYPE AS char) in (!~LOAD_VARIABLE(typeIdStr)~!))
+			AND	(? = !~''~! or Q.LOCATION_ID in (!~LOAD_VARIABLE(locationIdStr)~!))
+			AND	(? = 0 or Q.OWNER_TYPE = ?)
+			GROUP BY Q.OWNER_ID, Q.TENDER_ID, Q.CURRENCY_ID
+		) Q1
+		GROUP BY Q1.OWNER_ID, Q1.TENDER_ID, Q1.OPENING_FLOAT, Q1.CHANGE_REQUEST, Q1.TAKINGS, Q1.CASH_LIFT, Q1.CASH_FLOAT,
+		Q1.CLOSING_FLOAT, Q1.DECLARED, Q1.BASE_OPENING_FLOAT, Q1.BASE_CHANGE_REQUEST, Q1.BASE_TAKINGS, Q1.BASE_CASH_LIFT,
+		Q1.BASE_CASH_FLOAT,	Q1.BASE_CLOSING_FLOAT, Q1.BASE_DECLARED, Q1.CURRENCY_ID
+	) Q2
+	GROUP BY Q2.TENDER_ID, Q2.CURRENCY_ID
+]]></xml-property>
+        </oda-data-set>
+        <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="CashSessionOwnerDescription" id="1558"
+ extends="ReportLibrary.CashSessionOwnerDescription"/>
+        <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="TableTotalQuery" id="231">
+            <property name="eventHandlerClass">com.enactor.coreReporting.reportEventHandlers.DataSourceQueryTranslatorEventHandler</property>
+            <list-property name="parameters">
+                <structure>
+                    <property name="name">locationIdIn</property>
+                    <property name="paramName">locationId</property>
+                    <property name="dataType">string</property>
+                    <property name="position">1</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">locationIdIn2</property>
+                    <property name="paramName">locationId</property>
+                    <property name="dataType">string</property>
+                    <property name="position">2</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">dateIn</property>
+                    <property name="paramName">dateIn</property>
+                    <property name="dataType">dateTime</property>
+                    <property name="position">3</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">dateOut</property>
+                    <property name="paramName">dateOut</property>
+                    <property name="dataType">dateTime</property>
+                    <property name="position">4</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">ownerOwnerIdIn</property>
+                    <property name="paramName">ownerId</property>
+                    <property name="dataType">string</property>
+                    <property name="position">5</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">ownerTypeIdIn</property>
+                    <property name="paramName">ownerId</property>
+                    <property name="dataType">string</property>
+                    <property name="position">6</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">ownerLocationIdIn</property>
+                    <property name="paramName">ownerId</property>
+                    <property name="dataType">string</property>
+                    <property name="position">7</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">terminalTypeIn</property>
+                    <property name="paramName">terminalType</property>
+                    <property name="dataType">integer</property>
+                    <property name="position">8</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">terminalTypeOut</property>
+                    <property name="paramName">terminalType</property>
+                    <property name="dataType">integer</property>
+                    <property name="position">9</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+            </list-property>
+            <property name="dataSource">Data Source</property>
+            <xml-property name="queryText"><![CDATA[
+SELECT
+	SUM(Q2.BASE_OPENING_FLOAT) AS TOTAL_OPENING,
+	SUM(Q2.BASE_CHANGE_REQUEST) AS TOTAL_FLOAT_REQUEST,
+	SUM(Q2.BASE_TAKINGS) AS TOTAL_TAKINGS,
+	SUM(Q2.BASE_CASH_LIFT) AS TOTAL_PICKUP,
+	SUM(Q2.BASE_CASH_FLOAT) AS TOTAL_FLOAT,
+	SUM(Q2.BASE_CLOSING_FLOAT) AS TOTAL_CLOSING_FLOAT
+FROM (
+	SELECT
+		Q1.OWNER_ID,
+		Q1.TENDER_ID,
+		Q1.OPENING_FLOAT,
+		Q1.CHANGE_REQUEST,
+		Q1.TAKINGS,
+		ABS(Q1.CASH_LIFT) AS CASH_LIFT,
+		Q1.CASH_FLOAT,
+		ABS(Q1.CLOSING_FLOAT) AS CLOSING_FLOAT,
+		ABS(Q1.DECLARED) AS DECLARED,
+		(SUM(Q1.OPENING_FLOAT) + SUM(Q1.CASH_FLOAT) + SUM(Q1.TAKINGS)) - (ABS(SUM(Q1.CASH_LIFT)) + ABS(SUM(Q1.CLOSING_FLOAT))) as EXPECTED,
+		ABS(Q1.DECLARED)- ((SUM(Q1.OPENING_FLOAT) + SUM(Q1.CASH_FLOAT) + SUM(Q1.TAKINGS)) - (ABS(SUM(Q1.CASH_LIFT)) + ABS(SUM(Q1.CLOSING_FLOAT)))) AS DISCREPANCY,
+		Q1.BASE_OPENING_FLOAT,
+		Q1.BASE_CHANGE_REQUEST,
+		Q1.BASE_TAKINGS,
+		ABS(Q1.BASE_CASH_LIFT) AS BASE_CASH_LIFT,
+		Q1.BASE_CASH_FLOAT,
+		ABS(Q1.BASE_CLOSING_FLOAT) AS BASE_CLOSING_FLOAT,
+		ABS(Q1.BASE_DECLARED) AS BASE_DECLARED,
+		(SUM(Q1.BASE_OPENING_FLOAT) + SUM(Q1.BASE_CASH_FLOAT) + SUM(Q1.BASE_TAKINGS)) - (ABS(SUM(Q1.BASE_CASH_LIFT)) + ABS(SUM(Q1.BASE_CLOSING_FLOAT))) as BASE_EXPECTED,
+		ABS(Q1.BASE_DECLARED) - ((SUM(Q1.BASE_OPENING_FLOAT) + SUM(Q1.BASE_CASH_FLOAT) + SUM(Q1.BASE_TAKINGS)) - (ABS(SUM(Q1.BASE_CASH_LIFT)) + ABS(SUM(Q1.BASE_CLOSING_FLOAT)))) AS BASE_DISCREPANCY,
+		Q1.CURRENCY_ID
+	FROM (
+		SELECT
+			Q.OWNER_ID,
+			Q.TENDER_ID,
+			SUM(CASE WHEN (Q.TYPE = 'OPENING_FLOAT') THEN Q.VALUE ELSE 0 END) AS OPENING_FLOAT,
+			SUM(CASE WHEN (Q.TYPE = 'CHANGE_REQUEST') THEN Q.VALUE ELSE 0 END) AS CHANGE_REQUEST,
+			SUM(CASE WHEN (Q.TYPE = 'TAKINGS') THEN Q.VALUE ELSE 0 END) AS TAKINGS,
+			SUM(CASE WHEN (Q.TYPE = 'CASH_LIFT') THEN Q.VALUE ELSE 0 END) AS CASH_LIFT,
+			SUM(CASE WHEN (Q.TYPE = 'CASH_FLOAT') THEN Q.VALUE ELSE 0 END) AS CASH_FLOAT,
+			SUM(CASE WHEN (Q.TYPE = 'CLOSING_FLOAT') THEN Q.VALUE ELSE 0 END) AS CLOSING_FLOAT,
+			SUM(CASE WHEN (Q.TYPE = 'DECLARED') THEN Q.VALUE ELSE 0 END) AS DECLARED,
+			SUM(CASE WHEN (Q.TYPE = 'OPENING_FLOAT') THEN Q.BASE_VALUE ELSE 0 END) AS BASE_OPENING_FLOAT,
+			SUM(CASE WHEN (Q.TYPE = 'CHANGE_REQUEST') THEN Q.BASE_VALUE ELSE 0 END) AS BASE_CHANGE_REQUEST,
+			SUM(CASE WHEN (Q.TYPE = 'TAKINGS') THEN Q.BASE_VALUE ELSE 0 END) AS BASE_TAKINGS,
+			SUM(CASE WHEN (Q.TYPE = 'CASH_LIFT') THEN Q.BASE_VALUE ELSE 0 END) AS BASE_CASH_LIFT,
+			SUM(CASE WHEN (Q.TYPE = 'CASH_FLOAT') THEN Q.BASE_VALUE ELSE 0 END) AS BASE_CASH_FLOAT,
+			SUM(CASE WHEN (Q.TYPE = 'CLOSING_FLOAT') THEN Q.BASE_VALUE ELSE 0 END) AS BASE_CLOSING_FLOAT,
+			SUM(CASE WHEN (Q.TYPE = 'DECLARED') THEN Q.BASE_VALUE ELSE 0 END) AS BASE_DECLARED,
+			Q.CURRENCY_ID
+			FROM (
+				-- OPENING_FLOAT
+				SELECT DISTINCT 'OPENING_FLOAT' AS TYPE, CT.Owner_Id AS OWNER_ID, CTI.Tender_Id AS TENDER_ID, CTI.Currency_Id AS CURRENCY_ID, CTI.Value AS VALUE,
+				CTI.Base_Value AS BASE_VALUE, CT.Location_Id AS LOCATION_ID, CT.Owner_Type AS OWNER_TYPE, CS.Start_Date AS SESSION_START_DATE,
+				CS.End_Date AS SESSION_END_DATE, CS.Owner_Id AS SESSION_OWNER_ID, CS.Type AS SESSION_OWNER_TYPE, CS.Session_Number AS SESSION_NUMBER, '-' AS CASH_TRANSACTIONS_ID
+				FROM cashtransactions CT
+					INNER JOIN cashtransactionitems CTI ON CT.Id = CTI.Id
+					LEFT OUTER JOIN cashsessions CS ON CT.Session_Number = CS.Session_Number AND CT.Owner_Id = CS.Owner_Id AND CT.Location_Id = CS.Location_Id AND CT.Owner_Type = CS.Type
+					INNER JOIN tenders T ON CTI.Tender_Id = T.Tender_Id
+					WHERE (CT.Transaction_Type = 'TerminalOpeningFloat' OR (CT.Transaction_Type LIKE 'TerminalCashup%' AND CTI.Item_Type = 'TerminalOpen'))
+					AND T.Is_Cashup_Tender = 1 AND T.Is_Pickup_Tender = 1 AND T.Is_Auto_Picked_Up <> 1
+					AND CT.Is_Voided = '0'
+					AND CS.Status <> 1
+				UNION
+				-- CHANGE_REQUEST
+				SELECT DISTINCT 'CHANGE_REQUEST' AS TYPE, CT.Owner_Id AS OWNER_ID, CTI.Tender_Id AS TENDER_ID, CTI.Currency_Id AS CURRENCY_ID, CTI.Value AS VALUE,
+				CTI.Base_Value AS BASE_VALUE, CT.Location_Id AS LOCATION_ID, CT.Owner_Type AS OWNER_TYPE, CS.Start_Date AS SESSION_START_DATE,
+				CS.End_Date AS SESSION_END_DATE, CS.Owner_Id AS SESSION_OWNER_ID, CS.Type AS SESSION_OWNER_TYPE, CS.Session_Number AS SESSION_NUMBER, '-' AS CASH_TRANSACTIONS_ID
+				FROM cashtransactions CT
+					INNER JOIN cashtransactionitems CTI ON CT.Id = CTI.Id
+					LEFT OUTER JOIN cashsessions CS ON CT.Session_Number = CS.Session_Number AND CT.Owner_Id = CS.Owner_Id AND CT.Location_Id = CS.Location_Id AND CT.Owner_Type = CS.Type
+					INNER JOIN tenders T ON CTI.Tender_Id = T.Tender_Id
+					WHERE CT.Transaction_Type = 'TerminalFloatRequest'
+					AND T.Is_Cashup_Tender = 1 AND T.Is_Pickup_Tender = 1 AND T.Is_Auto_Picked_Up <> 1
+					AND CT.Is_Voided = '0'
+					AND CS.Status <> 1
+				UNION
+				-- CASH_LIFT
+				SELECT DISTINCT 'CASH_LIFT' AS TYPE, CT.Owner_Id AS OWNER_ID, CTI.Tender_Id AS TENDER_ID, CTI.Currency_Id AS CURRENCY_ID, CTI.Value AS VALUE,
+				CTI.Base_Value AS BASE_VALUE, CT.Location_Id AS LOCATION_ID, CT.Owner_Type AS OWNER_TYPE, CS.Start_Date AS SESSION_START_DATE,
+				CS.End_Date AS SESSION_END_DATE, CS.Owner_Id AS SESSION_OWNER_ID, CS.Type AS SESSION_OWNER_TYPE, CS.Session_Number AS SESSION_NUMBER, '-' AS CASH_TRANSACTIONS_ID
+				FROM cashtransactions CT
+					INNER JOIN cashtransactionitems CTI ON CT.Id = CTI.Id
+					LEFT OUTER JOIN cashsessions CS ON CT.Session_Number = CS.Session_Number AND CT.Owner_Id = CS.Owner_Id AND CT.Location_Id = CS.Location_Id AND CT.Owner_Type = CS.Type
+					INNER JOIN tenders T ON CTI.Tender_Id = T.Tender_Id
+					WHERE CT.Transaction_Type = 'TerminalPickup'
+					AND T.Is_Cashup_Tender = 1 AND T.Is_Pickup_Tender = 1 AND T.Is_Auto_Picked_Up <> 1
+					AND CT.Is_Voided = '0'
+				UNION
+				-- CASH_FLOAT
+				SELECT DISTINCT 'CASH_FLOAT' AS TYPE, CT.Owner_Id AS OWNER_ID, CTI.Tender_Id AS TENDER_ID, CTI.Currency_Id AS CURRENCY_ID, CTI.Value AS VALUE,
+				CTI.Base_Value AS BASE_VALUE, CT.Location_Id AS LOCATION_ID, CT.Owner_Type AS OWNER_TYPE, CS.Start_Date AS SESSION_START_DATE,
+				CS.End_Date AS SESSION_END_DATE, CS.Owner_Id AS SESSION_OWNER_ID, CS.Type AS SESSION_OWNER_TYPE, CS.Session_Number AS SESSION_NUMBER, '-' AS CASH_TRANSACTIONS_ID
+				FROM cashtransactions CT
+					INNER JOIN cashtransactionitems CTI ON CT.Id = CTI.Id
+					LEFT OUTER JOIN cashsessions CS ON CT.Session_Number = CS.Session_Number AND CT.Owner_Id = CS.Owner_Id AND CT.Location_Id = CS.Location_Id AND CT.Owner_Type = CS.Type
+					INNER JOIN tenders T ON CTI.Tender_Id = T.Tender_Id
+					WHERE CT.Transaction_Type = 'TerminalFloat'
+					AND T.Is_Cashup_Tender = 1 AND T.Is_Pickup_Tender = 1 AND T.Is_Auto_Picked_Up <> 1
+					AND CT.Is_Voided = '0'
+					AND CS.Status <> 1
+				UNION
+				-- CLOSING_FLOAT
+				SELECT DISTINCT 'CLOSING_FLOAT' AS TYPE, CT.Owner_Id AS OWNER_ID, CTI.Tender_Id AS TENDER_ID, CTI.Currency_Id AS CURRENCY_ID, CTI.Value AS VALUE,
+				CTI.Base_Value AS BASE_VALUE, CT.Location_Id AS LOCATION_ID, CT.Owner_Type AS OWNER_TYPE, CS.Start_Date AS SESSION_START_DATE,
+				CS.End_Date AS SESSION_END_DATE, CS.Owner_Id AS SESSION_OWNER_ID, CS.Type AS SESSION_OWNER_TYPE, CS.Session_Number AS SESSION_NUMBER, '-' AS CASH_TRANSACTIONS_ID
+				FROM cashtransactions CT
+					INNER JOIN cashtransactionitems CTI ON CT.Id = CTI.Id
+					LEFT OUTER JOIN cashsessions CS ON CT.Session_Number = CS.Session_Number AND CT.Owner_Id = CS.Owner_Id AND CT.Location_Id = CS.Location_Id AND CT.Owner_Type = CS.Type
+					INNER JOIN tenders T ON CTI.Tender_Id = T.Tender_Id
+					WHERE CT.Transaction_Type = 'TerminalClosingFloat'
+					AND T.Is_Cashup_Tender = 1 AND T.Is_Pickup_Tender = 1 AND T.Is_Auto_Picked_Up <> 1
+					AND CT.Is_Voided = '0'
+					AND CS.Status <> 1
+				UNION
+				-- DECLARED
+				SELECT DISTINCT 'DECLARED' AS TYPE, CT.Owner_Id AS OWNER_ID, CTI.Tender_Id AS TENDER_ID, CTI.Currency_Id AS CURRENCY_ID, CTI.Value AS VALUE,
+				CTI.Base_Value AS BASE_VALUE, CT.Location_Id AS LOCATION_ID, CT.Owner_Type AS OWNER_TYPE, CS.Start_Date AS SESSION_START_DATE,
+				CS.End_Date AS SESSION_END_DATE, CS.Owner_Id AS SESSION_OWNER_ID, CS.Type AS SESSION_OWNER_TYPE, CS.Session_Number AS SESSION_NUMBER, CT.ID AS CASH_TRANSACTIONS_ID
+				FROM cashtransactions CT
+					INNER JOIN cashtransactionitems CTI ON CT.Id = CTI.Id
+					LEFT OUTER JOIN cashsessions CS ON CT.Session_Number = CS.Session_Number AND CT.Owner_Id = CS.Owner_Id AND CT.Location_Id = CS.Location_Id AND CT.Owner_Type = CS.Type
+					INNER JOIN tenders T ON CTI.Tender_Id = T.Tender_Id
+					WHERE CT.Transaction_Type LIKE 'TerminalCashup%' AND CTI.Item_Type = 'Counted'
+					AND T.Is_Cashup_Tender = 1 AND T.Is_Pickup_Tender = 1 AND T.Is_Auto_Picked_Up <> 1
+					AND CT.Is_Voided = '0'
+					AND CS.Status <> 1
+				UNION
+				-- TAKINGS	
+				SELECT DISTINCT 'TAKINGS' AS TYPE, CT.Owner_Id AS OWNER_ID, CTI.Tender_Id AS TENDER_ID, CTI.Currency_Id AS CURRENCY_ID, CTI.Value AS VALUE,
+				CTI.Base_Value AS BASE_VALUE, CT.Location_Id AS LOCATION_ID, CT.Owner_Type AS OWNER_TYPE, CS.Start_Date AS SESSION_START_DATE,
+				CS.End_Date AS SESSION_END_DATE, CS.Owner_Id AS SESSION_OWNER_ID, CS.Type AS SESSION_OWNER_TYPE, CS.Session_Number AS SESSION_NUMBER, '-' AS CASH_TRANSACTIONS_ID
+				FROM cashtransactions CT
+					INNER JOIN cashtransactionitems CTI ON CT.Id = CTI.Id
+					LEFT OUTER JOIN cashsessions CS ON CT.Session_Number = CS.Session_Number AND CT.Owner_Id = CS.Owner_Id AND CT.Location_Id = CS.Location_Id AND CT.Owner_Type = CS.Type
+					INNER JOIN tenders T ON CTI.Tender_Id = T.Tender_Id
+					WHERE (CTI.Item_Type = 'Sale' AND CT.Transaction_Type != 'TerminalSpotCheck' AND CT.Transaction_Type != 'TerminalBlindSpotCheck')
+					AND T.Is_Cashup_Tender = 1 AND T.Is_Pickup_Tender = 1 AND T.Is_Auto_Picked_Up <> 1
+					AND CT.Is_Voided = '0'
+					AND CS.Status <> 1
+			) Q
+			WHERE
+			(? = !~''~! or Q.LOCATION_ID = ?)
+			AND (Q.SESSION_END_DATE >= ? AND Q.SESSION_END_DATE <= ?)
+			AND	(? = !~''~! or Q.SESSION_OWNER_ID in (!~LOAD_VARIABLE(ownerIdStr)~!))
+			AND	(? = !~''~! or CAST(Q.SESSION_OWNER_TYPE AS char) in (!~LOAD_VARIABLE(typeIdStr)~!))
+			AND	(? = !~''~! or Q.LOCATION_ID in (!~LOAD_VARIABLE(locationIdStr)~!))
+			AND	(? = 0 or Q.OWNER_TYPE = ?)
+			GROUP BY Q.OWNER_ID, Q.TENDER_ID, Q.CURRENCY_ID
+		) Q1
+		GROUP BY Q1.OWNER_ID, Q1.TENDER_ID, Q1.OPENING_FLOAT, Q1.CHANGE_REQUEST, Q1.TAKINGS, Q1.CASH_LIFT, Q1.CASH_FLOAT,
+		Q1.CLOSING_FLOAT, Q1.DECLARED, Q1.BASE_OPENING_FLOAT, Q1.BASE_CHANGE_REQUEST, Q1.BASE_TAKINGS, Q1.BASE_CASH_LIFT,
+		Q1.BASE_CASH_FLOAT,	Q1.BASE_CLOSING_FLOAT, Q1.BASE_DECLARED, Q1.CURRENCY_ID
+	) Q2
+	]]></xml-property>
+        </oda-data-set>
+    </data-sets>
+    <page-setup>
+        <simple-master-page name="Simple MasterPage" id="2">
+            <property name="type">a4</property>
+            <property name="orientation">landscape</property>
+            <property name="topMargin">0.75in</property>
+            <property name="leftMargin">0.75in</property>
+            <property name="bottomMargin">0.75in</property>
+            <property name="rightMargin">0.75in</property>
+            <page-header>
+                <grid name="ReportHeader" id="368" extends="ReportLibrary.ReportHeader"/>
+            </page-header>
+            <page-footer>
+                <grid id="3">
+                    <property name="width">100%</property>
+                    <column id="523">
+                        <property name="width">45%</property>
+                    </column>
+                    <column id="524">
+                        <property name="width">50%</property>
+                    </column>
+                    <column id="525">
+                        <property name="width">5%</property>
+                    </column>
+                    <row id="526">
+                        <cell id="527">
+                            <text name="GeneratedOnText" id="531" extends="ReportLibrary.GeneratedOnText">
+                                <property name="style">reportFooterLeft</property>
+                                <property name="contentType">html</property>
+                                <text-property name="content"><![CDATA[
+<value-of>l10nParams = new Array(1); l10nParams[0] = Packages.com.enactor.core.utilities.DateUtils.formatShortDateMediumTime(reportContext.getLocale(), new Date) ; reportContext.getMessage("GENERATED_ON", reportContext.getLocale(), l10nParams);</value-of>
+]]></text-property>
+                            </text>
+                        </cell>
+                        <cell id="528">
+                            <text name="GeneratedByText" id="530" extends="ReportLibrary.GeneratedByText">
+                                <property name="style">reportFooterLeft</property>
+                                <property name="contentType">html</property>
+                                <text-property name="content"><![CDATA[
+<value-of>l10nParams = new Array(1); l10nParams[0] = params["userName"] ; reportContext.getMessage("GENERATED_BY", reportContext.getLocale(), l10nParams);</value-of>
+]]></text-property>
+                            </text>
+                        </cell>
+                        <cell id="529">
+                            <grid id="532">
+                                <property name="width">100%</property>
+                                <column id="533"/>
+                                <column id="534"/>
+                                <column id="535"/>
+                                <row id="536">
+                                    <cell id="537">
+                                        <auto-text id="538">
+                                            <property name="style">reportFooterRight</property>
+                                            <property name="type">page-number</property>
+                                        </auto-text>
+                                    </cell>
+                                    <cell id="539">
+                                        <text id="540">
+                                            <property name="style">reportFooterCentre</property>
+                                            <property name="contentType">plain</property>
+                                            <text-property name="content"><![CDATA[/]]></text-property>
+                                        </text>
+                                    </cell>
+                                    <cell id="541">
+                                        <auto-text id="542">
+                                            <property name="style">reportFooterRight</property>
+                                            <property name="type">total-page</property>
+                                        </auto-text>
+                                    </cell>
+                                </row>
+                            </grid>
+                        </cell>
+                    </row>
+                </grid>
+            </page-footer>
+        </simple-master-page>
+    </page-setup>
+    <body>
+        <grid name="ReportTitleGrid" id="362">
+            <property name="width">100%</property>
+            <column id="363"/>
+            <row id="364">
+                <cell id="365">
+                    <property name="paddingTop">1pt</property>
+                    <label name="ReportTitleLabel" id="521">
+                        <property name="style">reportTitle</property>
+                        <property name="fontFamily">sans-serif</property>
+                        <property name="fontSize">larger</property>
+                        <property name="paddingTop">1pt</property>
+                        <property name="textAlign">center</property>
+                        <text-property name="text" key="TITLE"></text-property>
+                    </label>
+                </cell>
+            </row>
+        </grid>
+        <grid name="CriteriaGrid" id="1559">
+            <property name="marginTop">0pt</property>
+            <property name="width">100%</property>
+            <list-property name="visibility">
+                <structure>
+                    <property name="format">all</property>
+                    <expression name="valueExpr">if (pageNumber > 1) {
+ true;
+} else {
+ false;
+}</expression>
+                </structure>
+            </list-property>
+            <column id="377">
+                <property name="width">11%</property>
+            </column>
+            <column id="567">
+                <property name="width">39%</property>
+            </column>
+            <column id="993">
+                <property name="width">11%</property>
+            </column>
+            <column id="578">
+                <property name="width">39%</property>
+            </column>
+            <row id="992">
+                <cell id="991">
+                    <property name="colSpan">4</property>
+                    <property name="rowSpan">1</property>
+                    <property name="width">100%</property>
+                    <label id="990">
+                        <property name="style">subReportHeader</property>
+                        <property name="marginTop">0pt</property>
+                        <property name="paddingTop">1pt</property>
+                        <property name="textAlign">center</property>
+                        <text-property name="text" key="REPORT_CRITERIA">The Report Criteria</text-property>
+                    </label>
+                </cell>
+            </row>
+            <row id="989">
+                <cell id="988">
+                    <property name="paddingTop">1pt</property>
+                    <label id="568">
+                        <property name="style">criteriaLabel</property>
+                        <text-property name="text" key="CRITERIA_1"></text-property>
+                    </label>
+                </cell>
+                <cell id="562">
+                    <property name="paddingTop">1pt</property>
+                    <data id="1014">
+                        <property name="style">reportCriteria</property>
+                        <property name="fontWeight">normal</property>
+                        <list-property name="mapRules">
+                            <structure>
+                                <expression name="testExpr">row["LOCATION_DESCRIPTION"]</expression>
+                                <property name="operator">is-null</property>
+                                <text-property name="display" key="BLANK"></text-property>
+                            </structure>
+                        </list-property>
+                        <property name="dataSet">LocationDescription</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">LOCATION_DESCRIPTION</property>
+                                <expression name="expression">dataSetRow["LOCATION_DESCRIPTION"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                        </list-property>
+                        <property name="resultSetColumn">LOCATION_DESCRIPTION</property>
+                    </data>
+                </cell>
+                <cell id="985">
+                    <property name="paddingTop">1pt</property>
+                    <label id="437">
+                        <property name="style">criteriaLabel</property>
+                        <text-property name="text" key="CRITERIA_2"></text-property>
+                    </label>
+                </cell>
+                <cell id="573">
+                    <property name="paddingTop">1pt</property>
+                    <text-data id="1035">
+                        <property name="style">criteriaLabel</property>
+                        <expression name="valueExpr">dateStr;</expression>
+                        <property name="contentType">html</property>
+                    </text-data>
+                </cell>
+            </row>
+            <row id="984">
+                <cell id="983">
+                    <property name="paddingTop">1pt</property>
+                    <label id="2063">
+                        <property name="style">criteriaLabel</property>
+                        <text-property name="text" key="CRITERIA_3"></text-property>
+                    </label>
+                </cell>
+                <cell id="563">
+                    <property name="paddingTop">1pt</property>
+                    <text-data id="2100">
+                        <property name="style">criteriaLabel</property>
+                        <expression name="valueExpr">terminalTypeStr;</expression>
+                        <property name="contentType">html</property>
+                    </text-data>
+                </cell>
+                <cell id="982">
+                    <property name="paddingTop">1pt</property>
+                    <label id="2595">
+                        <property name="style">criteriaLabel</property>
+                        <text-property name="text" key="CRITERIA_4">Terminals:</text-property>
+                    </label>
+                </cell>
+                <cell id="574">
+                    <property name="paddingTop">1pt</property>
+                    <data id="10141">
+                        <property name="style">reportCriteria</property>
+                        <property name="fontWeight">normal</property>
+                        <list-property name="mapRules">
+                            <structure>
+                                <expression name="testExpr">row["TERMINAL_DESCRIPTIONS"]</expression>
+                                <property name="operator">is-null</property>
+                                <text-property name="display" key="BLANK"></text-property>
+                            </structure>
+                        </list-property>
+                        <property name="dataSet">MultipleTerminalDescriptions</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">TERMINAL_DESCRIPTIONS</property>
+                                <expression name="expression">dataSetRow["TERMINAL_DESCRIPTIONS"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                        </list-property>
+                        <property name="resultSetColumn">TERMINAL_DESCRIPTIONS</property>
+                    </data>
+                </cell>
+            </row>
+            <row id="981">
+                <cell id="980"/>
+                <cell id="564"/>
+                <cell id="979"/>
+                <cell id="575"/>
+            </row>
+            <row id="420">
+                <cell id="421"/>
+                <cell id="566"/>
+                <cell id="422"/>
+                <cell id="577"/>
+            </row>
+        </grid>
+        <grid name="ResultsGrid" id="998">
+            <property name="width">100%</property>
+            <column id="997"/>
+            <row id="996">
+                <cell id="995">
+                    <table id="102">
+                        <property name="dataSet">MainQuery</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">OWNER_ID</property>
+                                <text-property name="displayName">OWNER_ID</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["OWNER_ID"]</expression>
+                                <property name="dataType">string</property>
+                                <property name="allowExport">true</property>
+                            </structure>
+                            <structure>
+                                <property name="name">TENDER_ID</property>
+                                <text-property name="displayName">TENDER_ID</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["TENDER_ID"]</expression>
+                                <property name="dataType">string</property>
+                                <property name="allowExport">true</property>
+                            </structure>
+                            <structure>
+                                <property name="name">DISCREPANCY</property>
+                                <text-property name="displayName">DISCREPANCY</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["DISCREPANCY"]</expression>
+                                <property name="dataType">integer</property>
+                            </structure>
+                            <structure>
+                                <property name="name">FORMATTED_OPENING_FLOAT</property>
+                                <text-property name="displayName">FORMATTED_OPENING_FLOAT</text-property>
+                                <expression name="expression">dataSetRow["FORMATTED_OPENING_FLOAT"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">FORMATTED_FLOAT_REQUEST</property>
+                                <text-property name="displayName">FORMATTED_FLOAT_REQUEST</text-property>
+                                <expression name="expression">dataSetRow["FORMATTED_FLOAT_REQUEST"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">FORMATTED_TAKINGS</property>
+                                <text-property name="displayName">FORMATTED_TAKINGS</text-property>
+                                <expression name="expression">dataSetRow["FORMATTED_TAKINGS"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">FORMATTED_PICK_UP</property>
+                                <text-property name="displayName">FORMATTED_PICK_UP</text-property>
+                                <expression name="expression">dataSetRow["FORMATTED_PICK_UP"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">FORMATTED_FLOAT</property>
+                                <text-property name="displayName">FORMATTED_FLOAT</text-property>
+                                <expression name="expression">dataSetRow["FORMATTED_FLOAT"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">FORMATTED_CLOSING_FLOAT</property>
+                                <text-property name="displayName">FORMATTED_CLOSING_FLOAT</text-property>
+                                <expression name="expression">dataSetRow["FORMATTED_CLOSING_FLOAT"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">FORMATTED_EXPECTED</property>
+                                <text-property name="displayName">FORMATTED_EXPECTED</text-property>
+                                <expression name="expression">dataSetRow["FORMATTED_EXPECTED"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">FORMATTED_DECLARED</property>
+                                <text-property name="displayName">FORMATTED_DECLARED</text-property>
+                                <expression name="expression">dataSetRow["FORMATTED_DECLARED"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">FORMATTED_DISCREPANCY</property>
+                                <text-property name="displayName">FORMATTED_DISCREPANCY</text-property>
+                                <expression name="expression">dataSetRow["FORMATTED_DISCREPANCY"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">Aggregation</property>
+                                <property name="dataType">float</property>
+                                <property name="aggregateFunction">SUM</property>
+                                <list-property name="arguments">
+                                    <structure>
+                                        <property name="name">Expression</property>
+                                        <expression name="value" type="javascript">row["OPENING_FLOAT"]</expression>
+                                    </structure>
+                                </list-property>
+                                <property name="allowExport">true</property>
+                            </structure>
+                        </list-property>
+                        <list-property name="sort">
+                            <structure>
+                                <expression name="key" type="javascript">row["TENDER_ID"]</expression>
+                                <property name="direction">asc</property>
+                                <property name="strength">-1</property>
+                            </structure>
+                        </list-property>
+                        <column id="152">
+                            <property name="width">10%</property>
+                        </column>
+                        <column id="153">
+                            <property name="width">10%</property>
+                        </column>
+                        <column id="154">
+                            <property name="width">10%</property>
+                        </column>
+                        <column id="155">
+                            <property name="width">10%</property>
+                        </column>
+                        <column id="156">
+                            <property name="width">10%</property>
+                        </column>
+                        <column id="157">
+                            <property name="width">10%</property>
+                        </column>
+                        <column id="158">
+                            <property name="width">10%</property>
+                        </column>
+                        <column id="159">
+                            <property name="width">10%</property>
+                        </column>
+                        <column id="160">
+                            <property name="width">10%</property>
+                        </column>
+                        <column id="161">
+                            <property name="width">10%</property>
+                        </column>
+                        <header>
+                            <row id="103">
+                                <cell id="106"/>
+                                <cell id="108">
+                                    <label id="109">
+                                        <text-property name="text">Opening Float</text-property>
+                                    </label>
+                                </cell>
+                                <cell id="110">
+                                    <label id="111">
+                                        <text-property name="text">Float Requests</text-property>
+                                    </label>
+                                </cell>
+                                <cell id="121">
+                                    <label id="2070">
+                                        <text-property name="text">Takings</text-property>
+                                    </label>
+                                </cell>
+                                <cell id="112">
+                                    <label id="113">
+                                        <text-property name="text">Pick Up</text-property>
+                                    </label>
+                                </cell>
+                                <cell id="122">
+                                    <label id="2071">
+                                        <text-property name="text">Float</text-property>
+                                    </label>
+                                </cell>
+                                <cell id="114">
+                                    <label id="115">
+                                        <text-property name="text">Closing Float</text-property>
+                                    </label>
+                                </cell>
+                                <cell id="116">
+                                    <label id="117">
+                                        <text-property name="text">Expected</text-property>
+                                    </label>
+                                </cell>
+                                <cell id="118">
+                                    <label id="119">
+                                        <text-property name="text">Declared</text-property>
+                                    </label>
+                                </cell>
+                                <cell id="120">
+                                    <label id="2072">
+                                        <text-property name="text">Discrepancy</text-property>
+                                    </label>
+                                </cell>
+                            </row>
+                        </header>
+                        <group id="2073">
+                            <property name="groupName">NewTableGroup1</property>
+                            <expression name="keyExpr" type="javascript">row["OWNER_ID"]</expression>
+                            <structure name="toc">
+                                <expression name="expressionValue" type="javascript">row["OWNER_ID"]</expression>
+                            </structure>
+                            <property name="hideDetail">false</property>
+                            <header>
+                                <row id="2074">
+                                    <property name="backgroundColor">#BFBFBF</property>
+                                    <cell id="163">
+                                        <data id="181">
+                                            <property name="fontWeight">bold</property>
+                                            <property name="resultSetColumn">OWNER_ID</property>
+                                        </data>
+                                    </cell>
+                                    <cell id="164"/>
+                                    <cell id="165"/>
+                                    <cell id="166"/>
+                                    <cell id="167"/>
+                                    <cell id="168"/>
+                                    <cell id="169"/>
+                                    <cell id="170"/>
+                                    <cell id="171"/>
+                                    <cell id="172"/>
+                                </row>
+                            </header>
+                            <footer>
+                                <row id="2075">
+                                    <cell id="173"/>
+                                    <cell id="174"/>
+                                    <cell id="175"/>
+                                    <cell id="176"/>
+                                    <cell id="177"/>
+                                    <cell id="178"/>
+                                    <cell id="179"/>
+                                    <cell id="180"/>
+                                    <cell id="2076"/>
+                                    <cell id="2077"/>
+                                </row>
+                            </footer>
+                        </group>
+                        <detail>
+                            <row id="2078">
+                                <cell id="125">
+                                    <data id="126">
+                                        <property name="resultSetColumn">TENDER_ID</property>
+                                    </data>
+                                </cell>
+                                <cell id="127">
+                                    <data id="2586">
+                                        <property name="style">reportColumnRight</property>
+                                        <property name="fontStyle">italic</property>
+                                        <property name="resultSetColumn">FORMATTED_OPENING_FLOAT</property>
+                                        <text-property name="helpText" key="TOOLTIP_OPENING_FLOAT"></text-property>
+                                    </data>
+                                </cell>
+                                <cell id="129">
+                                    <data id="2587">
+                                        <property name="style">reportColumnRight</property>
+                                        <property name="fontStyle">italic</property>
+                                        <property name="resultSetColumn">FORMATTED_FLOAT_REQUEST</property>
+                                        <text-property name="helpText" key="TOOLTIP_CHANGE_REQUEST"></text-property>
+                                    </data>
+                                </cell>
+                                <cell id="140">
+                                    <data id="2588">
+                                        <property name="style">reportColumnRight</property>
+                                        <property name="fontStyle">italic</property>
+                                        <property name="resultSetColumn">FORMATTED_TAKINGS</property>
+                                        <text-property name="helpText" key="TOOLTIP_TAKINGS"></text-property>
+                                    </data>
+                                </cell>
+                                <cell id="131">
+                                    <data id="2589">
+                                        <property name="style">reportColumnRight</property>
+                                        <property name="fontStyle">italic</property>
+                                        <property name="resultSetColumn">FORMATTED_PICK_UP</property>
+                                        <text-property name="helpText" key="TOOLTIP_CASH_LIFT"></text-property>
+                                    </data>
+                                </cell>
+                                <cell id="141">
+                                    <data id="2590">
+                                        <property name="style">reportColumnRight</property>
+                                        <property name="fontStyle">italic</property>
+                                        <property name="resultSetColumn">FORMATTED_FLOAT</property>
+                                        <text-property name="helpText" key="TOOLTIP_CASH_FLOAT"></text-property>
+                                    </data>
+                                </cell>
+                                <cell id="133">
+                                    <data id="2591">
+                                        <property name="style">reportColumnRight</property>
+                                        <property name="fontStyle">italic</property>
+                                        <property name="resultSetColumn">FORMATTED_CLOSING_FLOAT</property>
+                                        <text-property name="helpText" key="TOOLTIP_CLOSING_FLOAT"></text-property>
+                                    </data>
+                                </cell>
+                                <cell id="135">
+                                    <data id="2592">
+                                        <property name="style">reportColumnRight</property>
+                                        <property name="fontStyle">italic</property>
+                                        <property name="resultSetColumn">FORMATTED_EXPECTED</property>
+                                        <text-property name="helpText" key="TOOLTIP_EXPECTED"></text-property>
+                                    </data>
+                                </cell>
+                                <cell id="137">
+                                    <data id="2593">
+                                        <property name="style">reportColumnRight</property>
+                                        <property name="fontStyle">italic</property>
+                                        <property name="resultSetColumn">FORMATTED_DECLARED</property>
+                                        <text-property name="helpText" key="TOOLTIP_DECLARED"></text-property>
+                                    </data>
+                                </cell>
+                                <cell id="139">
+                                    <data id="2594">
+                                        <property name="style">reportColumnRight</property>
+                                        <property name="fontStyle">italic</property>
+                                        <list-property name="highlightRules">
+                                            <structure>
+                                                <property name="operator">ne</property>
+                                                <property name="color">#FF0000</property>
+                                                <expression name="testExpr" type="javascript">row["DISCREPANCY"]</expression>
+                                                <simple-property-list name="value1">
+                                                    <value type="javascript">0</value>
+                                                </simple-property-list>
+                                            </structure>
+                                        </list-property>
+                                        <property name="resultSetColumn">FORMATTED_DISCREPANCY</property>
+                                        <text-property name="helpText" key="TOOLTIP_DISCREPANCY"></text-property>
+                                    </data>
+                                </cell>
+                            </row>
+                        </detail>
+                        <footer>
+                            <row id="2113">
+                                <cell id="2114"/>
+                                <cell id="2115"/>
+                                <cell id="2116"/>
+                                <cell id="2117"/>
+                                <cell id="2118"/>
+                                <cell id="2119"/>
+                                <cell id="2120"/>
+                                <cell id="2121"/>
+                                <cell id="2122"/>
+                                <cell id="2123"/>
+                            </row>
+                            <row id="2082">
+                                <cell id="143"/>
+                                <cell id="144"/>
+                                <cell id="145"/>
+                                <cell id="146"/>
+                                <cell id="147"/>
+                                <cell id="148"/>
+                                <cell id="149"/>
+                                <cell id="150"/>
+                                <cell id="151"/>
+                                <cell id="2083"/>
+                            </row>
+                        </footer>
+                    </table>
+                </cell>
+            </row>
+            <row id="425">
+                <cell id="426">
+                    <table id="232">
+                        <property name="dataSet">TableTotalQuery</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">TOTAL_OPENING</property>
+                                <text-property name="displayName">TOTAL_OPENING</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["TOTAL_OPENING"]</expression>
+                                <property name="dataType">float</property>
+                            </structure>
+                            <structure>
+                                <property name="name">TOTAL_FLOAT_REQUEST</property>
+                                <text-property name="displayName">TOTAL_FLOAT_REQUEST</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["TOTAL_FLOAT_REQUEST"]</expression>
+                                <property name="dataType">float</property>
+                            </structure>
+                            <structure>
+                                <property name="name">TOTAL_TAKINGS</property>
+                                <text-property name="displayName">TOTAL_TAKINGS</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["TOTAL_TAKINGS"]</expression>
+                                <property name="dataType">float</property>
+                            </structure>
+                            <structure>
+                                <property name="name">TOTAL_PICKUP</property>
+                                <text-property name="displayName">TOTAL_PICKUP</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["TOTAL_PICKUP"]</expression>
+                                <property name="dataType">float</property>
+                            </structure>
+                            <structure>
+                                <property name="name">TOTAL_FLOAT</property>
+                                <text-property name="displayName">TOTAL_FLOAT</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["TOTAL_FLOAT"]</expression>
+                                <property name="dataType">float</property>
+                            </structure>
+                            <structure>
+                                <property name="name">TOTAL_CLOSING_FLOAT</property>
+                                <text-property name="displayName">TOTAL_CLOSING_FLOAT</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["TOTAL_CLOSING_FLOAT"]</expression>
+                                <property name="dataType">float</property>
+                            </structure>
+                        </list-property>
+                        <column id="263">
+                            <property name="width">10%</property>
+                        </column>
+                        <column id="256">
+                            <property name="width">10%</property>
+                        </column>
+                        <column id="257">
+                            <property name="width">10%</property>
+                        </column>
+                        <column id="258">
+                            <property name="width">10%</property>
+                        </column>
+                        <column id="259">
+                            <property name="width">10%</property>
+                        </column>
+                        <column id="268">
+                            <property name="width">10%</property>
+                        </column>
+                        <column id="272">
+                            <property name="width">10%</property>
+                        </column>
+                        <column id="276">
+                            <property name="width">10%</property>
+                        </column>
+                        <column id="277">
+                            <property name="width">10%</property>
+                        </column>
+                        <column id="278">
+                            <property name="width">10%</property>
+                        </column>
+                        <detail>
+                            <row id="242">
+                                <property name="fontWeight">bold</property>
+                                <cell id="261">
+                                    <label id="264">
+                                        <text-property name="text">Totals</text-property>
+                                    </label>
+                                </cell>
+                                <cell id="243">
+                                    <text id="2065">
+                                        <property name="style">reportColumnRight</property>
+                                        <property name="fontStyle">italic</property>
+                                        <property name="paddingRight">5pt</property>
+                                        <property name="contentType">html</property>
+                                        <text-property name="content"><![CDATA[<div id="textcontrol" title="<value-of>reportContext.getMessage("TOOLTIP_OPENING_FLOAT", reportContext.getLocale());</value-of>"><value-of>longVal = row["TOTAL_OPENING"] != null ? row["TOTAL_OPENING"] : 0;
+											globalDataFormatter.formatCurrencyAmount(longVal, baseCurrencyId);</value-of></div>]]></text-property>
+                                    </text>
+                                </cell>
+                                <cell id="245">
+                                    <text id="2066">
+                                        <property name="style">reportColumnRight</property>
+                                        <property name="fontStyle">italic</property>
+                                        <property name="paddingRight">5pt</property>
+                                        <property name="contentType">html</property>
+                                        <text-property name="content"><![CDATA[<div id="textcontrol" title="<value-of>reportContext.getMessage("TOOLTIP_CHANGE_REQUEST", reportContext.getLocale());</value-of>"><value-of>longVal = row["TOTAL_FLOAT_REQUEST"] != null ? row["TOTAL_FLOAT_REQUEST"] : 0;
+											globalDataFormatter.formatCurrencyAmount(longVal, baseCurrencyId);</value-of></div>]]></text-property>
+                                    </text>
+                                </cell>
+                                <cell id="275">
+                                    <text id="2067">
+                                        <property name="style">reportColumnRight</property>
+                                        <property name="fontStyle">italic</property>
+                                        <property name="paddingRight">5pt</property>
+                                        <property name="contentType">html</property>
+                                        <text-property name="content"><![CDATA[<div id="textcontrol" title="<value-of>reportContext.getMessage("TOOLTIP_TAKINGS", reportContext.getLocale());</value-of>"><value-of>longVal = row["TOTAL_TAKINGS"] != null ? row["TOTAL_TAKINGS"] : 0;
+											globalDataFormatter.formatCurrencyAmount(longVal, baseCurrencyId);</value-of></div>]]></text-property>
+                                    </text>
+                                </cell>
+                                <cell id="247">
+                                    <text id="2084">
+                                        <property name="style">reportColumnRight</property>
+                                        <property name="fontStyle">italic</property>
+                                        <property name="paddingRight">5pt</property>
+                                        <property name="contentType">html</property>
+                                        <text-property name="content"><![CDATA[<div id="textcontrol" title="<value-of>reportContext.getMessage("TOOLTIP_CASH_LIFT", reportContext.getLocale());</value-of>"><value-of>longVal = row["TOTAL_PICKUP"] != null ? row["TOTAL_PICKUP"] : 0;
+											globalDataFormatter.formatCurrencyAmount(longVal, baseCurrencyId);</value-of></div>]]></text-property>
+                                    </text>
+                                </cell>
+                                <cell id="2085">
+                                    <text id="2086">
+                                        <property name="style">reportColumnRight</property>
+                                        <property name="fontStyle">italic</property>
+                                        <property name="paddingRight">5pt</property>
+                                        <property name="contentType">html</property>
+                                        <text-property name="content"><![CDATA[<div id="textcontrol" title="<value-of>reportContext.getMessage("TOOLTIP_FLOAT", reportContext.getLocale());</value-of>"><value-of>longVal = row["TOTAL_FLOAT"] != null ? row["TOTAL_FLOAT"] : 0;
+											globalDataFormatter.formatCurrencyAmount(longVal, baseCurrencyId);</value-of></div>]]></text-property>
+                                    </text>
+                                </cell>
+                                <cell id="249">
+                                    <text id="2068">
+                                        <property name="style">reportColumnRight</property>
+                                        <property name="fontStyle">italic</property>
+                                        <property name="paddingRight">5pt</property>
+                                        <property name="contentType">html</property>
+                                        <text-property name="content"><![CDATA[<div id="textcontrol" title="<value-of>reportContext.getMessage("TOOLTIP_CLOSING_FLOAT", reportContext.getLocale());</value-of>"><value-of>longVal = row["TOTAL_CLOSING_FLOAT"] != null ? row["TOTAL_CLOSING_FLOAT"] : 0;
+											globalDataFormatter.formatCurrencyAmount(longVal, baseCurrencyId);</value-of></div>]]></text-property>
+                                    </text>
+                                </cell>
+                                <cell id="2069"/>
+                                <cell id="270"/>
+                                <cell id="274"/>
+                            </row>
+                        </detail>
+                        <footer>
+                            <row id="251">
+                                <cell id="262"/>
+                                <cell id="252"/>
+                                <cell id="253"/>
+                                <cell id="254"/>
+                                <cell id="255"/>
+                                <cell id="267"/>
+                                <cell id="271"/>
+                                <cell id="2087"/>
+                                <cell id="2088"/>
+                                <cell id="2089"/>
+                            </row>
+                        </footer>
+                    </table>
+                </cell>
+            </row>
+            <row id="2144">
+                <cell id="2145">
+                    <table id="183">
+                        <property name="dataSet">TotalQuery</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">TOTAL_TENDERS</property>
+                                <text-property name="displayName">TOTAL_TENDERS</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["TOTAL_TENDERS"]</expression>
+                                <property name="dataType">string</property>
+                                <property name="allowExport">true</property>
+                            </structure>
+                            <structure>
+                                <property name="name">TOTAL_DISCREPANCIES</property>
+                                <text-property name="displayName">TOTAL_DISCREPANCIES</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["TOTAL_DISCREPANCIES"]</expression>
+                                <property name="dataType">integer</property>
+                                <property name="allowExport">false</property>
+                            </structure>
+                            <structure>
+                                <property name="name">FORMATTED_TOTAL_EXPECTED</property>
+                                <text-property name="displayName">FORMATTED_TOTAL_EXPECTED</text-property>
+                                <expression name="expression">dataSetRow["FORMATTED_TOTAL_EXPECTED"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">FORMATTED_TOTAL_DECLARED</property>
+                                <text-property name="displayName">FORMATTED_TOTAL_DECLARED</text-property>
+                                <expression name="expression">dataSetRow["FORMATTED_TOTAL_DECLARED"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">FORMATTED_TOTAL_DISCREPANCIES</property>
+                                <text-property name="displayName">FORMATTED_TOTAL_DISCREPANCIES</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["FORMATTED_TOTAL_DISCREPANCIES"]</expression>
+                                <property name="dataType">string</property>
+                                <property name="allowExport">true</property>
+                            </structure>
+                        </list-property>
+                        <list-property name="sort">
+                            <structure>
+                                <expression name="key" type="javascript">row["TOTAL_TENDERS"]</expression>
+                                <property name="direction">asc</property>
+                                <property name="strength">-1</property>
+                            </structure>
+                        </list-property>
+                        <column id="230">
+                            <property name="width">10%</property>
+                        </column>
+                        <column id="226">
+                            <property name="width">10%</property>
+                        </column>
+                        <column id="2135">
+                            <property name="width">10%</property>
+                        </column>
+                        <column id="2131">
+                            <property name="width">10%</property>
+                        </column>
+                        <column id="2127">
+                            <property name="width">10%</property>
+                        </column>
+                        <column id="214">
+                            <property name="width">10%</property>
+                        </column>
+                        <column id="207">
+                            <property name="width">10%</property>
+                        </column>
+                        <column id="208">
+                            <property name="width">10%</property>
+                        </column>
+                        <column id="209">
+                            <property name="width">10%</property>
+                        </column>
+                        <column id="210">
+                            <property name="width">10%</property>
+                        </column>
+                        <detail>
+                            <row id="2146">
+                                <cell id="2147"/>
+                                <cell id="2148"/>
+                                <cell id="2149"/>
+                                <cell id="2150"/>
+                                <cell id="2151"/>
+                                <cell id="2152"/>
+                                <cell id="2153"/>
+                                <cell id="2154"/>
+                                <cell id="2155"/>
+                                <cell id="2156"/>
+                            </row>
+                            <row id="193">
+                                <cell id="228"/>
+                                <cell id="224"/>
+                                <cell id="2133"/>
+                                <cell id="2129"/>
+                                <cell id="2125"/>
+                                <cell id="212"/>
+                                <cell id="194">
+                                    <data id="195">
+                                        <property name="resultSetColumn">TOTAL_TENDERS</property>
+                                    </data>
+                                </cell>
+                                <cell id="196">
+                                    <data id="10142">
+                                        <property name="style">reportColumnRight</property>
+                                        <property name="fontStyle">italic</property>
+                                        <property name="resultSetColumn">FORMATTED_TOTAL_EXPECTED</property>
+                                        <text-property name="helpText" key="TOOLTIP_TOTAL_EXPECTED"></text-property>
+                                    </data>
+                                </cell>
+                                <cell id="198">
+                                    <data id="10143">
+                                        <property name="style">reportColumnRight</property>
+                                        <property name="fontStyle">italic</property>
+                                        <property name="resultSetColumn">FORMATTED_TOTAL_DECLARED</property>
+                                        <text-property name="helpText" key="TOOLTIP_TOTAL_DECLARED"></text-property>
+                                    </data>
+                                </cell>
+                                <cell id="200">
+                                    <data id="201">
+                                        <property name="style">reportColumnRight</property>
+                                        <property name="fontStyle">italic</property>
+                                        <list-property name="highlightRules">
+                                            <structure>
+                                                <property name="operator">ne</property>
+                                                <property name="color">#FF0000</property>
+                                                <expression name="testExpr" type="javascript">row["TOTAL_DISCREPANCIES"]</expression>
+                                                <simple-property-list name="value1">
+                                                    <value type="javascript">0</value>
+                                                </simple-property-list>
+                                            </structure>
+                                        </list-property>
+                                        <property name="resultSetColumn">FORMATTED_TOTAL_DISCREPANCIES</property>
+                                        <text-property name="helpText" key="TOOLTIP_TOTAL_DISCREPANCIES"></text-property>
+                                    </data>
+                                </cell>
+                            </row>
+                        </detail>
+                        <footer>
+                            <row id="202">
+                                <cell id="229"/>
+                                <cell id="225"/>
+                                <cell id="2134"/>
+                                <cell id="2130"/>
+                                <cell id="2126"/>
+                                <cell id="213"/>
+                                <cell id="203"/>
+                                <cell id="204"/>
+                                <cell id="205"/>
+                                <cell id="206"/>
+                            </row>
+                        </footer>
+                    </table>
+                </cell>
+            </row>
+        </grid>
+    </body>
+    <property name="pageVariables">
+        <variable-element name="ownerIdStr">
+            <property name="type">report</property>
+        </variable-element>
+        <variable-element name="typeIdStr">
+            <property name="type">report</property>
+        </variable-element>
+        <variable-element name="locationIdStr">
+            <property name="type">report</property>
+        </variable-element>
+    </property>
+</report>

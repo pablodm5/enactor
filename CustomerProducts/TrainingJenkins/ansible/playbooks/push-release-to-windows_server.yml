@@ -1,0 +1,37 @@
+- 
+ name: 'Add windows host(remote) details'
+ hosts: localhost
+ tasks:
+  - name: 'Add host'
+    add_host: 
+     hostname: '{{hostName}}'
+     groupname: '{{groupName}}'
+     ansible_user: '{{usrName}}'
+     ansible_password: '{{pwd}}'
+     ansible_connection: winrm
+     ansible_winrm_server_cert_validation: ignore
+
+- name: 'Push new release'
+  hosts: '{{groupName}}'
+  tasks:
+    - name: 'Stop containers'
+      win_command: docker-compose down
+      args:
+       chdir: "{{ remoteDir }}"
+       creates: "{{ remoteDir }}"
+
+    - name: 'Delete existing directory'
+      win_file:
+       path: "{{ remoteDir }}"
+       state: absent
+       
+    - name: 'Copy Config files'
+      win_copy:
+       src: "{{ localDir }}"
+       dest: "{{ remoteDir }}"
+
+    - name: 'Start containers'
+      win_command: docker-compose up -d
+      args:
+       chdir: "{{ remoteDir }}"
+       creates: "{{ remoteDir }}"

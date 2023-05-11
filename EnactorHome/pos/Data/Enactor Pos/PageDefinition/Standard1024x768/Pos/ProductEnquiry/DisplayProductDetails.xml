@@ -1,0 +1,463 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<retail:posPromptPage xmlns:core="http://www.enactor.com/core" xmlns:retail="http://www.enactor.com/retail" xmlns:ns4="http://www.enactor.com/crm" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803" xmlns:ns6="http://www.apis-it.hr/fin/2012/types/f73" xmlns:ns7="http://www.w3.org/2000/09/xmldsig#" xmlns:ns8="http://www.enactor.com/retail/storedRetailTransaction/service" xmlns:ns9="http://www.fu.gov.si/" xmlns:ns10="http://www.enactor.com/addressLookup/service" xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:ns14="http://www.enactor.com/crm/customerLoyalty/service" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" allowResize="true" allowMove="true" allowClose="true" windowtype="view-panel" height="0" width="0" updateMode="UPDATE_ELEMENTS" messageBase="Pos/Product/ProductMessages" url="Standard1024x768/Pos/ProductEnquiry/DisplayProductDetails">
+    <core:elements>
+        <core:button messageBase="#{notEmpty(confirmMessageBase) ? confirmMessageBase : ''}" messageId="#{notEmpty(confirmMessageIdOK) ? confirmMessageIdOK : notEmpty(confirmMessageIdSell) ? confirmMessageIdSell : 'BUTTON_OK'}" visible="true" id="Button1">
+            <core:text>#{notEmpty(confirmMessageIdOK) &amp;&amp; !strings:compareStrings(confirmMessageIdOK, 'BUTTON_SELL') ? 'OKPressed' : 'SellPressed'}</core:text>
+        </core:button>
+        <core:button messageId="BUTTON_BACK" id="Button8">
+            <core:text>BackPressed</core:text>
+        </core:button>
+        <core:button messageId="#{(notEmpty(displayOrderButton) &amp;&amp; displayOrderButton) ? 'BUTTON_ORDER' : 'BUTTON_QTY_SELL'}" id="Button2">
+            <core:boundsConstraint height="81" width="161" y="100" x="853"/>
+            <core:text>#{(notEmpty(displayOrderButton) &amp;&amp; displayOrderButton) ? 'OrderPressed' : 'QtySellPressed'}</core:text>
+        </core:button>
+        <core:button messageId="CLEAR_SIZE_SELECTION" visibility="#{notEmpty(selectedSize)}" id="Button4">
+            <core:text>ClearSizeSelection</core:text>
+        </core:button>
+        <core:panel horizontalScrollBars="WhenNeeded" verticalScrollBars="WhenNeeded" enabled="false" id="DialogPanel">
+            <core:elements>
+                <core:panel vAlign="CENTRE" hAlign="LEFT" backgroundImageURL="#{productEnquiryBean:resolveImgURL(largeImageURL)}" style="ImageStyle=ScaledMaintainAspect" id="LargerImage">
+                    <core:boundsConstraint height="292" width="272" y="16" x="14"/>
+                    <core:elements/>
+                </core:panel>
+                <core:panel styleClass="lookUpItemTitlePanel" id="INVENTORY_DETAILS_TITLE_PANEL">
+                    <core:boundsConstraint height="44" width="225" y="360" x="14"/>
+                    <core:elements>
+                        <core:label messageId="INVENTORY_DETAILS" styleClass="lookUpItemLabelBold" id="INVENTORY_DETAILS_TITLE">
+                            <core:boundsConstraint height="22" width="195" y="11" x="16"/>
+                        </core:label>
+                    </core:elements>
+                </core:panel>
+                <core:panel styleClass="lookUpItemPanel" id="COLOUR_QUANTITY_PANEL">
+                    <core:boundsConstraint height="224" width="225" y="403" x="14"/>
+                    <core:elements>
+                        <core:text messageId="QUANTITY" styleClass="lookUpItemLabel" id="Quantitylabel">
+                            <core:boundsConstraint height="29" width="144" y="114" x="11"/>
+                        </core:text>
+                        <core:comboBox manualDropDownDisabled="false" lazyLoad="false" allowBlank="#{true}" editable="true" enable="#{notEmpty(colourList)}" id="ColourCombo">
+                            <core:boundsConstraint height="36" width="200" y="45" x="11"/>
+                            <core:text>#{selectedColour}</core:text>
+                            <core:textElementEvents valueChangedEvent="ColourSelected"/>
+                            <core:listExpression>#{productEnquiryBean:getCoulorKeysAndLocalisedDescriptionList(colourList, dynamicColourKeysMap, userLocale)}</core:listExpression>
+                            <core:listingElementEvents>
+<core:selectionEvent>ColourSelected</core:selectionEvent>
+                            </core:listingElementEvents>
+                        </core:comboBox>
+                        <core:text messageId="COLOUR" styleClass="lookUpItemLabel" id="Colourlabel">
+                            <core:boundsConstraint height="29" width="144" y="16" x="11"/>
+                        </core:text>
+                        <core:comboBox manualDropDownDisabled="false" lazyLoad="false" allowBlank="#{true}" editable="true" enable="#{(notEmpty(sizeList) &amp;&amp;  notEmpty(selectedSize) &amp;&amp;  notEmpty(getValue((!viewAlternativeStock ? localInventorySkuMap : alternativeLocationInventorySkuMap), selectedSize.productId).value) &amp;&amp;  getValue((!viewAlternativeStock ? localInventorySkuMap : alternativeLocationInventorySkuMap), selectedSize.productId).value &gt; 0)  || (notEmpty(localInventoryLevel) &amp;&amp; notEmpty(localInventoryLevel.value) &amp;&amp; localInventoryLevel.value &gt; 0)}" id="QuantityCombo">
+                            <core:boundsConstraint height="36" width="200" y="142" x="11"/>
+                            <core:text>#{selectedQuantity}</core:text>
+                            <core:listExpression>#{notEmpty(selectedSize) &amp;&amp; notEmpty(getValue((!viewAlternativeStock ? localInventorySkuMap : alternativeLocationInventorySkuMap), selectedSize.productId).value) ? productEnquiryBean:stockLevelToList(getValue((!viewAlternativeStock ? localInventorySkuMap : alternativeLocationInventorySkuMap), selectedSize.productId).value, false) : 
+productEnquiryBean:stockLevelToList(localInventoryLevel.value, false)}</core:listExpression>
+                            <core:listingElementEvents>
+<core:selectionEvent>QuantitySelected</core:selectionEvent>
+                            </core:listingElementEvents>
+                        </core:comboBox>
+                    </core:elements>
+                </core:panel>
+                <core:panel styleClass="lookUpItemTitlePanel" id="LOCAL_STOCK_TITLE_PANEL">
+                    <core:boundsConstraint height="44" width="259" y="360" x="257"/>
+                    <core:elements>
+                        <core:label messageId="SELECT_SIZE" styleClass="lookUpItemLabelBold" id="SELECT_SIZE">
+                            <core:boundsConstraint height="22" width="137" y="11" x="16"/>
+                        </core:label>
+                        <core:label styleClass="lookUpItemLabel" id="LOCAL_STOCK_VALUE">
+                            <core:boundsConstraint height="22" width="85" y="11" x="164"/>
+                            <core:alignment>RIGHT</core:alignment>
+                            <core:text>#{notEmpty(selectedSize) &amp;&amp; 
+notEmpty(getValue(localInventorySkuMap, selectedSize.productId).value) ? 
+getValue(localInventorySkuMap, selectedSize.productId).value : 
+localInventoryLevel.value}</core:text>
+                        </core:label>
+                    </core:elements>
+                </core:panel>
+                <core:panel styleClass="lookUpItemPanel" id="SELECT_SIZE_PANEL">
+                    <core:boundsConstraint height="224" width="259" y="403" x="257"/>
+                    <core:elements>
+                        <core:panel verticalScrollBars="WhenNeeded" visibility="#{notEmpty(sizeList)}" id="SizePanel">
+                            <core:boundsConstraint height="165" width="233" y="51" x="16"/>
+                            <core:elements>
+<core:dataTable maxRepeatCount="4" repeatColumns="true" rowIndexVar="rowSizeIndex" rowSelection="false" var="rowSize" data="#{sizeList}" visibility="#{notEmpty(sizeList) &amp;&amp; size(sizeList) &gt; 1}" id="SizeDataTable">
+    <core:flowConstraint width="233"/>
+    <core:cell id="TABLE_CELL_1">
+        <core:elements>
+            <core:panel vAlign="CENTRE" hAlign="CENTRE" id="PANEL_4">
+                <core:flowConstraint width="50" height="50"/>
+                <core:elements>
+                    <core:button adjustImagesToSize="false" allowWrap="false" styleClass="#{notEmpty(selectedSize) &amp;&amp; rowSize.productId == selectedSize.productId ? 'lookUpItemButtonSelected' : 'lookUpItemButton'}" id="SizeButton">
+                        <core:flowConstraint width="40" height="40"/>
+                        <core:text>SizeSelected</core:text>
+                        <core:labelText>#{productEnquiryBean:getSizeLocalisedDescription(rowSize.sizeKey.sizeId, rowSize.sizeKey.sizeRangeId , dynamicColourKeysMap, userLocale)}</core:labelText>
+                        <core:data>
+                            <core:expression value="#{rowSize}" javaInterfaceName="java.lang.Object" name="enactor.pos.SelectedSize"/>
+                        </core:data>
+                    </core:button>
+                </core:elements>
+            </core:panel>
+        </core:elements>
+    </core:cell>
+</core:dataTable>
+                            </core:elements>
+                        </core:panel>
+                        <core:label messageId="SELECT_SIZE" visibility="#{notEmpty(sizeList) &amp;&amp; size(sizeList) == 1}" id="SELECT_SINGLE_SIZE">
+                            <core:boundsConstraint height="23" width="234" y="51" x="16"/>
+                            <core:text>#{productEnquiryBean:getSizeLocalisedDescription(selectedSize.sizeKey.sizeId, selectedSize.sizeKey.sizeRangeId , dynamicColourKeysMap, userLocale)}</core:text>
+                        </core:label>
+                        <core:button messageId="BUTTON_LOCAL_STOCK" styleClass="#{!viewAlternativeStock ? 'lookUpItemButtonSelected' : 'lookUpItemButton'}" visibility="#{notEmpty(sizeList) &amp;&amp; loadProductInventoryDetailsSuccess}" id="BUTTON_LOCAL_STOCK">
+                            <core:boundsConstraint height="35" width="75" y="8" x="96"/>
+                            <core:text>ViewLocalStock</core:text>
+                        </core:button>
+                        <core:button messageId="BUTTON_ALTERNATE" styleClass="#{viewAlternativeStock ? 'lookUpItemButtonSelected' : 'lookUpItemButton'}" visibility="#{notEmpty(sizeList) &amp;&amp; loadProductInventoryDetailsSuccess}" id="BUTTON_ALTERNATE">
+                            <core:boundsConstraint height="35" width="76" y="8" x="173"/>
+                            <core:text>ViewAlternativeLocationStock</core:text>
+                        </core:button>
+                        <core:text messageBase="Pos/Product/ProductMessages" messageId="#{loadProductInventoryDetailsFail ? 'FAILED_TO_LOAD_INVENTORY_DETAILS' : loadProductInventoryDetailsCancel ? 'NO_INVENTORY_DETAILS_HAVE_BEEN_LOADED' : 'LOADING_INVENTORY_DETAILS'}" styleClass="lookUpItemLabel" visibility="#{!loadProductInventoryDetailsSuccess}" id="LoadingMessage">
+                            <core:boundsConstraint height="42" width="242" y="10" x="8"/>
+                        </core:text>
+                    </core:elements>
+                </core:panel>
+                <core:panel styleClass="lookUpItemTitlePanel" id="Copy Of LOCAL_STOCK_TITLE_PANEL">
+                    <core:boundsConstraint height="44" width="275" y="360" x="530"/>
+                    <core:elements>
+                        <core:label messageId="STOCK_IN_BUSINESS" styleClass="lookUpItemLabelBold" id="STOCK_IN_BUSINESS_TITLE">
+                            <core:boundsConstraint height="22" width="249" y="11" x="16"/>
+                        </core:label>
+                    </core:elements>
+                </core:panel>
+                <core:panel styleClass="lookUpItemPanel" id="STOCK_SIZE_PANEL">
+                    <core:boundsConstraint height="224" width="276" y="403" x="530"/>
+                    <core:elements>
+                        <core:panel borderStyle="Line" visibility="#{notEmpty(alternateSizeList) || notEmpty(alternativeLocationInventoryLevel)}" id="StockPanel">
+                            <core:boundsConstraint height="121" width="264" y="82" x="11"/>
+                            <core:elements>
+<core:panel adjustImagesToSize="true" id="HeaderPanel">
+    <core:flowConstraint width="264"/>
+    <core:elements>
+        <core:tableElement vAlign="CENTRE" borderStyle="None" id="HeaderTable">
+            <core:flowConstraint width="264"/>
+            <core:row id="TABLE_ROW_1">
+                <core:cell vAlign="CENTRE" id="TABLE_CELL_1">
+                    <core:flowConstraint width="50%"/>
+                    <core:elements>
+                        <core:label styleClass="lookUpItemDataTableLabel" id="StoreHeaderLabel">
+                            <core:flowConstraint/>
+                        </core:label>
+                    </core:elements>
+                </core:cell>
+                <core:cell vAlign="CENTRE" id="TABLE_CELL_4">
+                    <core:flowConstraint width="25%"/>
+                    <core:elements>
+                        <core:label messageId="PRODUCT_SEARCH_SIZE" styleClass="lookUpItemDataTableLabel" id="SizeHeaderLabel">
+                            <core:flowConstraint/>
+                        </core:label>
+                    </core:elements>
+                </core:cell>
+                <core:cell vAlign="CENTRE" id="TABLE_CELL_5">
+                    <core:flowConstraint width="25%"/>
+                    <core:elements>
+                        <core:label messageId="QTY" styleClass="lookUpItemDataTableLabel" id="QuantityHeaderLabel">
+                            <core:flowConstraint/>
+                        </core:label>
+                    </core:elements>
+                </core:cell>
+            </core:row>
+        </core:tableElement>
+    </core:elements>
+</core:panel>
+<core:panel verticalScrollBars="WhenNeeded" borderStyle="None" id="PANEL_6">
+    <core:flowConstraint width="264" height="100"/>
+    <core:elements>
+        <core:dataTable rowSelection="false" var="rowStock" data="#{notEmpty(alternateSizeList) ? alternateSizeList : alternativeLocationInventoryLevel}" vAlign="CENTRE" borderStyle="None" id="DATA_TABLE_2">
+            <core:flowConstraint width="270"/>
+            <core:cell vAlign="CENTRE" id="StoreCell">
+                <core:flowConstraint width="50%" height="15"/>
+                <core:elements>
+                    <core:label styleClass="lookUpItemDataTableLabel" id="StoreLabel">
+                        <core:flowConstraint/>
+                        <core:text>#{rowStock.locationName}</core:text>
+                    </core:label>
+                </core:elements>
+            </core:cell>
+            <core:cell vAlign="CENTRE" id="SizeCell">
+                <core:flowConstraint width="25%"/>
+                <core:elements>
+                    <core:label styleClass="lookUpItemDataTableLabel" id="SizeLabel">
+                        <core:flowConstraint/>
+                        <core:text>#{instanceOf(rowStock, 'com.enactor.inventoryManagement.itemInventoryLevel.ISKUProductLocationInventoryLevel') &amp;&amp; notEmpty(rowStock.sizeId) ? productEnquiryBean:getSizeLocalisedDescription(rowStock.sizeId, styleSizeProduct.sizeRangeKey.sizeRangeId, dynamicColourKeysMap, userLocale) : ''}</core:text>
+                    </core:label>
+                </core:elements>
+            </core:cell>
+            <core:cell vAlign="CENTRE" id="QuantityCell">
+                <core:flowConstraint width="25%"/>
+                <core:elements>
+                    <core:label styleClass="lookUpItemDataTableLabel" id="QuantityLabel">
+                        <core:flowConstraint/>
+                        <core:text>#{rowStock.value}</core:text>
+                    </core:label>
+                </core:elements>
+            </core:cell>
+        </core:dataTable>
+    </core:elements>
+</core:panel>
+                            </core:elements>
+                        </core:panel>
+                        <core:label messageId="WAREHOUSE_STOCK_TITLE" styleClass="lookUpItemLabel" id="WAREHOUSE_STOCK_TITLE">
+                            <core:boundsConstraint height="24" width="100" y="14" x="11"/>
+                        </core:label>
+                        <core:label messageId="EXPECTED_TITLE" styleClass="lookUpItemLabel" id="EXPECTED_TITLE">
+                            <core:boundsConstraint height="24" width="100" y="45" x="11"/>
+                        </core:label>
+                        <core:label styleClass="lookUpItemLabel" id="EXPECTED_VALUE">
+                            <core:boundsConstraint height="24" width="69" y="45" x="112"/>
+                            <core:text>#{notEmpty(expectedInventoryLevel) ? expectedInventoryLevel.value : '-'}</core:text>
+                        </core:label>
+                        <core:label styleClass="lookUpItemLabel" id="EXPECTED_DATE">
+                            <core:boundsConstraint height="24" width="95" y="45" x="180"/>
+                        </core:label>
+                        <core:label styleClass="lookUpItemLabel" id="WAREHOUSE_STOCK_VALUE">
+                            <core:boundsConstraint height="24" width="164" y="14" x="111"/>
+                            <core:text>#{notEmpty(warehouseInventoryLevel) ? warehouseInventoryLevel.value : '-'}</core:text>
+                        </core:label>
+                    </core:elements>
+                </core:panel>
+                <core:listBox lazyLoad="false" listSelectionMethod="DEFAULT" documentTemplateUrl="Pos/ProductEnquiry/ProductPromotionDescriptionTemplate" verticalScrollBars="WhenNeeded" styleClass="lookUpItemListBox" visible="true" id="ProductPromotionDescriptionList">
+                    <core:boundsConstraint height="52" width="361" y="292" x="444"/>
+                    <core:elements/>
+                    <core:listExpression>#{productDetail.productPromotions.promotions}</core:listExpression>
+                    <core:selectableExpression>#{false}</core:selectableExpression>
+                </core:listBox>
+                <core:label messageId="PROMOTIONS" styleClass="lookUpItemLabel" id="PROMOTIONS_TITLE">
+                    <core:boundsConstraint height="22" width="121" y="290" x="316"/>
+                </core:label>
+                <core:text allowWrap="true" styleClass="lookUpItemLabel" enabled="true" id="ProductLongDescriptionField">
+                    <core:boundsConstraint height="61" width="490" y="221" x="314"/>
+                    <core:verticalAlignment>TOP</core:verticalAlignment>
+                    <core:text>#{longDescription}</core:text>
+                </core:text>
+                <core:listBox lazyLoad="false" listSelectionMethod="DEFAULT" documentTemplateUrl="Pos/ProductEnquiry/ProductPriceHistoryDescriptionTemplate" verticalScrollBars="WhenNeeded" styleClass="lookUpItemListBox" visible="true" id="PriceHistoryDescriptionList">
+                    <core:boundsConstraint height="39" width="329" y="176" x="476"/>
+                    <core:elements/>
+                    <core:listExpression>#{productDetail.productPriceHistory.history}</core:listExpression>
+                    <core:selectableExpression>#{false}</core:selectableExpression>
+                </core:listBox>
+                <core:label styleClass="lookUpItemLabel" id="CURRENT_PRICE">
+                    <core:boundsConstraint height="22" width="80" y="142" x="476"/>
+                    <core:text>#{notEmpty(currentPriceHistory) &amp;&amp; currentPriceHistory.currentPrice &gt; 0 ? format:formatCurrency(currentPriceHistory.currentPrice) : productDetail.productPriceHistory.currentPrice &gt; 0 ? format:formatCurrency(productDetail.productPriceHistory.currentPrice) : '-'}</core:text>
+                </core:label>
+                <core:label styleClass="lookUpItemLabel" id="CURRENT_PRICE_DATE">
+                    <core:boundsConstraint height="22" width="118" y="142" x="562"/>
+                    <core:text>#{format:formatDate(productDetail.productPriceHistory.currentPriceStartDate)}</core:text>
+                </core:label>
+                <core:label styleClass="lookUpItemLabel" id="Size">
+                    <core:boundsConstraint height="22" width="329" y="112" x="476"/>
+                    <core:text>#{instanceOf(productDetail, 'com.enactor.productCatalogueSearchMessages.productCatalogueSearch.IStyleColourSizeProductDetail') ? 
+productEnquiryBean:getSizeLocalisedDescription(product.sizeKey.sizeId, product.sizeKey.sizeRangeId, dynamicColourKeysMap, userLocale) : 
+notEmpty(selectedSize) ? productEnquiryBean:getSizeLocalisedDescription(selectedSize.sizeKey.sizeId, selectedSize.sizeKey.sizeRangeId, dynamicColourKeysMap, userLocale) : '-'}</core:text>
+                </core:label>
+                <core:label styleClass="lookUpItemLabel" id="Colour">
+                    <core:boundsConstraint height="22" width="329" y="82" x="476"/>
+                    <core:text>#{instanceOf(productDetail, 'com.enactor.productCatalogueSearchMessages.productCatalogueSearch.IStyleColourSizeProductDetail') &amp;&amp; instanceOf(product, 'com.enactor.mfc.product.ISKUProduct')  ? 
+productEnquiryBean:getColourLocalisedDescription(product.colourKey, dynamicColourKeysMap, userLocale) : 
+notEmpty(selectedColour) ? productEnquiryBean:getColourLocalisedDescription(selectedColour, dynamicColourKeysMap, userLocale) : '-'}</core:text>
+                </core:label>
+                <core:label styleClass="lookUpItemLabelBold" enabled="true" id="DescriptionField">
+                    <core:boundsConstraint height="33" width="491" y="7" x="314"/>
+                    <core:alignment>LEFT</core:alignment>
+                    <core:text>#{productDetail.description}</core:text>
+                </core:label>
+                <core:label messageId="PD_COLOUR" styleClass="lookUpItemLabel" id="ColourLabel">
+                    <core:boundsConstraint height="22" width="121" y="82" x="314"/>
+                </core:label>
+                <core:label messageId="PD_SIZE" styleClass="lookUpItemLabel" id="SizeLabel">
+                    <core:boundsConstraint height="22" width="121" y="112" x="314"/>
+                </core:label>
+                <core:label messageId="CURRENT_PRICE" styleClass="lookUpItemLabel" id="CURRENT_PRICE_TITLE">
+                    <core:boundsConstraint height="22" width="121" y="142" x="314"/>
+                </core:label>
+                <core:label messageId="HISTORY" styleClass="lookUpItemLabel" id="HISTORY_TITLE">
+                    <core:boundsConstraint height="22" width="121" y="176" x="314"/>
+                </core:label>
+                <core:text messageId="PD_PRODUCT_ID" styleClass="lookUpItemLabel" id="ProductId">
+                    <core:boundsConstraint height="25" width="121" y="47" x="314"/>
+                </core:text>
+                <core:label styleClass="lookUpItemLabel" id="ProductIdValue">
+                    <core:boundsConstraint height="25" width="329" y="47" x="476"/>
+                    <core:text>#{productId}</core:text>
+                </core:label>
+            </core:elements>
+        </core:panel>
+        <core:hidden id="SelectionList"/>
+        <core:hidden id="NumericPad"/>
+        <core:hidden id="Receipt"/>
+        <core:hidden id="ShiftAlphaKeyboard"/>
+        <core:hidden id="ClearButton"/>
+        <core:hidden id="InputBoxPanel"/>
+        <core:hidden id="TotalLabel"/>
+        <core:hidden id="AlphaKeyboard"/>
+        <core:hidden id="InputBox"/>
+        <core:hidden id="EnterButton"/>
+        <core:hidden id="ToggleAlphaKeyboard"/>
+        <core:hidden id="Prompt"/>
+        <core:button adjustImagesToSize="false" borderSize="0" styleClass="bagButton" id="BUTTON_2">
+            <core:boundsConstraint height="48" width="48" y="16" x="786"/>
+            <core:alignment>CENTRE</core:alignment>
+            <core:verticalAlignment>CENTRE</core:verticalAlignment>
+            <core:text>CancelPressed</core:text>
+        </core:button>
+    </core:elements>
+    <core:templateURL>Standard1024x768/Pos/ProductEnquiryFullScreenStandardPosTemplate</core:templateURL>
+    <core:events>
+        <core:event destination="enactor.Prompt" event="key.EnterPressed">OKPressed</core:event>
+    </core:events>
+    <core:variables>
+        <core:variable required="true" name="enactor.coreUI.CurrentEvent">
+            <core:interfaceName>com.enactor.core.events.IEvent</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="promptMessageId">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:variable>
+        <core:variable required="false" name="enactor.coreUI.ProductUpsaleMap">
+            <core:interfaceName>java.util.Map</core:interfaceName>
+        </core:variable>
+        <core:variable required="false" name="enactor.mfc.ColourList">
+            <core:interfaceName>java.util.List</core:interfaceName>
+        </core:variable>
+        <core:variable required="false" name="enactor.mfc.Product">
+            <core:interfaceName>com.enactor.mfc.product.IProduct</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.pos.CurrentPriceHistory">
+            <core:interfaceName>com.enactor.productCatalogueSearchMessages.productCatalogueSearch.IProductPriceHistory</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.inventoryManager.SKUProductLocationLevels">
+            <core:interfaceName>java.util.List</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.pos.AlternativeLocationInventorySkuList">
+            <core:interfaceName>java.util.List</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.pos.LocalInventorySkuList">
+            <core:interfaceName>java.util.List</core:interfaceName>
+        </core:variable>
+        <core:variable required="false" name="enactor.dynamicMap.DynamicColourKeysMap">
+            <core:interfaceName>com.enactor.core.utilities.DynamicMap</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.inventoryManager.WarehouseInventoryLevel">
+            <core:interfaceName>com.enactor.inventoryManagement.itemInventoryLevel.ILocationInventoryLevel</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.pos.LocalInventorySkuMap">
+            <core:interfaceName>java.util.Map</core:interfaceName>
+        </core:variable>
+        <core:variable required="false" name="enactor.pos.SizeList">
+            <core:interfaceName>java.util.List</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.pos.LoadProductInventoryDetailsSuccess">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.pos.TotalStockInBusiness">
+            <core:interfaceName>java.lang.Integer</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.pos.SelectedMediaItemMapKey">
+            <core:interfaceName>com.enactor.productCatalogueSearchMessages.productCatalogueSearch.IProductMediaSetItem</core:interfaceName>
+        </core:variable>
+        <core:variable required="false" name="ConfirmMessageIdOK">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.mfc.InformationText">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:variable>
+        <core:variable required="false" name="enactor.coreUI.ReceintViewedMap">
+            <core:interfaceName>java.util.Map</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.mfc.StyleSizeProduct">
+            <core:interfaceName>com.enactor.mfc.product.IStyleSizeProduct</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="ConfirmMessageIdSell">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.pos.LoadProductInventoryDetailsFail">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.mfc.LongDescription">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:variable>
+        <core:variable required="false" name="ConfirmMessageBase">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.pos.AlternativeLocationInventorySkuMap">
+            <core:interfaceName>java.util.Map</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.pos.SelectedColour">
+            <core:interfaceName>com.enactor.mfc.product.colour.IColourKey</core:interfaceName>
+        </core:variable>
+        <core:variable required="false" name="enactor.pos.SelectedSize">
+            <core:interfaceName>java.lang.Object</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.pos.LoadProductInventoryDetailsCancel">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.pos.SKUProducts">
+            <core:interfaceName>java.util.List</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.inventoryManager.ExpectedInventoryLevel">
+            <core:interfaceName>com.enactor.inventoryManagement.itemInventoryLevel.ILocationInventoryLevel</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.pos.LargeImageURL">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.pos.SelectedQuantity">
+            <core:interfaceName>java.lang.Integer</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.inventoryManager.AlternativeLocationInventoryLevel">
+            <core:interfaceName>java.util.List</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.pos.SelectedMediaItem">
+            <core:interfaceName>com.enactor.productCatalogueSearchMessages.productCatalogueSearch.IProductMediaSetItem</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.pos.DisplayProductDetails">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:variable>
+        <core:variable required="false" name="enactor.pos.ColourSizeMap">
+            <core:interfaceName>java.util.Map</core:interfaceName>
+        </core:variable>
+        <core:variable required="false" name="enactor.pos.ProductMediaMap">
+            <core:interfaceName>java.util.Map</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.coreUI.ProcessHandle">
+            <core:interfaceName>com.enactor.coreUI.processes.ProcessHandle</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.pos.AlternateSizeList">
+            <core:interfaceName>java.util.List</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.pos.ViewAlternativeStock">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.productCatalogue.ProductDetail">
+            <core:interfaceName>com.enactor.productCatalogueSearchMessages.productCatalogueSearch.IProductSearchDetail</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.inventoryManager.LocalInventoryLevel">
+            <core:interfaceName>com.enactor.inventoryManagement.itemInventoryLevel.ILocationInventoryLevel</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.pos.AlternativeLocationColourSizeMap">
+            <core:interfaceName>java.util.Map</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.mfc.ProductId">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.mfc.TransactionHandler">
+            <core:interfaceName>com.enactor.mfc.retail.transaction.IRetailTransactionHandler</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.pos.DisplayOrderButton">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.coreUI.UserLocale">
+            <core:interfaceName>com.enactor.core.localisation.ILocale</core:interfaceName>
+        </core:variable>
+    </core:variables>
+    <core:functionLibraries>
+        <core:functionLibrary name="productEnquiryBean" path="com.enactor.pos.productEnquiry.ProductEnquiryBean">
+            <core:type>CLASS</core:type>
+        </core:functionLibrary>
+    </core:functionLibraries>
+    <core:scannerEnabled>true</core:scannerEnabled>
+</retail:posPromptPage>

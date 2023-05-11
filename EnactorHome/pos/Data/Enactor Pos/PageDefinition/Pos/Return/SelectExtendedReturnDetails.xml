@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<retail:posPromptPage xmlns:core="http://www.enactor.com/core" xmlns:retail="http://www.enactor.com/retail" xmlns:ns4="http://www.enactor.com/crm" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803" xmlns:ns6="http://www.apis-it.hr/fin/2012/types/f73" xmlns:ns7="http://www.w3.org/2000/09/xmldsig#" xmlns:ns8="http://www.enactor.com/retail/storedRetailTransaction/service" xmlns:ns9="http://www.fu.gov.si/" xmlns:ns10="http://www.enactor.com/addressLookup/service" xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:ns14="http://www.enactor.com/crm/customerLoyalty/service" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" allowResize="true" allowMove="true" hasBorders="FALSE" allowClose="true" windowtype="view-panel" updateMode="UPDATE_ELEMENTS" messageBase="Pos/Product/ReturnItemMessages" title="Select Extended Return Details" url="Pos/Return/SelectExtendedReturnDetails">
+    <core:elements>
+        <core:text lineHeight="0" messageId="PLEASE_SELECT_RETURN_ITEMS" id="Prompt"/>
+        <core:hidden id="InputBox"/>
+        <core:hidden id="Receipt"/>
+        <core:listBox lazyLoad="false" listSelectionMethod="DEFAULT" documentTemplateUrl="#{notEmpty(listTemplateUrl) ? listTemplateUrl : 'Pos/Print/StandardDisplayTemplate'}" styleClass="selectReturnItemsList" id="SelectionList">
+            <core:elements/>
+            <core:listExpression>#{list}</core:listExpression>
+            <core:listingElementEvents>
+                <core:selectionEvent>page.SelectionList.changed</core:selectionEvent>
+            </core:listingElementEvents>
+            <core:selectableExpression>#{basket:hasExtendedReturnItemDetails(extendedReturnItemInformation, selectedItem) ? basket:getExtendedReturnItemDetails(extendedReturnItemInformation, selectedItem.lineNumber).selectable : false}</core:selectableExpression>
+            <core:startWithFirstItemExpression>#{true}</core:startWithFirstItemExpression>
+        </core:listBox>
+        <core:button lineHeight="0" messageId="#{(basket:hasExtendedReturnItemDetails(extendedReturnItemInformation, page['SelectionList'].selectedItem) &amp;&amp; basket:getExtendedReturnItemDetails(extendedReturnItemInformation, page['SelectionList'].selectedItem.lineNumber).selected) ? 'BUTTON_RETURN_UNSELECT' : 'BUTTON_RETURN_SELECT'}" visibility="#{notEmpty(page['SelectionList'].selectedItem)}" id="Button1">
+            <core:updateTriggers>
+                <core:element>SelectionList</core:element>
+            </core:updateTriggers>
+            <core:text>OKPressed</core:text>
+        </core:button>
+        <core:button lineHeight="0" messageBase="Pos/General/PosMessages" messageId="BUTTON_UP" styleClass="navigation-up" visibility="#{page['SelectionList'].visible &amp;&amp; page['SelectionList'].moveUp}" id="Button2">
+            <core:updateTriggers>
+                <core:element>SelectionList</core:element>
+            </core:updateTriggers>
+            <core:text>page.SelectionList.up</core:text>
+        </core:button>
+        <core:button messageBase="Pos/Product/ReturnItemMessages" messageId="CHANGE_RETURN_QUANTITY" visibility="#{basket:hasExtendedReturnItemDetails(extendedReturnItemInformation, page['SelectionList'].selectedItem) &amp;&amp; basket:getExtendedReturnItemDetails(extendedReturnItemInformation, page['SelectionList'].selectedItem.lineNumber).returnQuantity &gt; 0}" id="Button3">
+            <core:text>ChangeReturnQuantity</core:text>
+        </core:button>
+        <core:button lineHeight="0" messageBase="Pos/Product/ReturnItemMessages" messageId="RETURN_HISTORY" visibility="#{displayReturnHistoryButton}" id="Button5">
+            <core:text>ReturnHistory</core:text>
+        </core:button>
+        <core:button lineHeight="0" messageBase="Pos/General/PosMessages" messageId="BUTTON_DOWN" styleClass="navigation-down" visibility="#{page['SelectionList'].visible &amp;&amp; page['SelectionList'].moveDown}" id="Button6">
+            <core:updateTriggers>
+                <core:element>SelectionList</core:element>
+            </core:updateTriggers>
+            <core:text>page.SelectionList.down</core:text>
+        </core:button>
+        <core:button lineHeight="0" messageBase="Pos/Product/ReturnItemMessages" messageId="BUTTON_FINISH" id="Button7">
+            <core:text>FinishPressed</core:text>
+        </core:button>
+        <core:button lineHeight="0" messageBase="Pos/General/PosMessages" messageId="BUTTON_CANCEL" id="Button8">
+            <core:text>CancelPressed</core:text>
+        </core:button>
+        <core:button lineHeight="0" messageBase="Pos/Product/ReturnItemMessages" messageId="#{(externalReturn == 'true') ? 'RETURN_COMPLETE_ORDER' : 'RETURN_COMPLETE_RECEIPT'}" visibility="#{isEmpty(hideCompleteReceipt) || !hideCompleteReceipt}" id="Button4">
+            <core:text>ReturnCompleteReceipt</core:text>
+        </core:button>
+    </core:elements>
+    <core:templateURL>Pos/FullScreenTraditionalPosTemplate</core:templateURL>
+    <core:events>
+        <core:event destination="enactor.Prompt" event="key.EnterPressed">OKPressed</core:event>
+        <core:event destination="SelectionList" event="key.UpPressed">up</core:event>
+        <core:event destination="SelectionList" event="key.DownPressed">down</core:event>
+    </core:events>
+    <core:variables>
+        <core:variable required="true" name="enactor.coreUI.List">
+            <core:interfaceName>java.util.List</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.pos.ExtendedReturnItemInformation">
+            <core:interfaceName>java.util.Map</core:interfaceName>
+        </core:variable>
+        <core:variable name="displayReturnHistoryButton">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:variable>
+        <core:variable name="displayOrderReturnButton">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:variable>
+        <core:variable name="hideCompleteReceipt">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.coreUI.SelectedItem">
+            <core:interfaceName>com.enactor.mfc.basket.items.ISalesItem</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.pos.ListTemplateUrl">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.mfc.ArchiveRetailSaleTransaction">
+            <core:interfaceName>com.enactor.mfc.retail.transaction.IRetailSaleTransaction</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.pos.ExternalReturn">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.coreUI.ListHeader">
+            <core:interfaceName>java.lang.Object</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.coreUI.ListFooter">
+            <core:interfaceName>java.lang.Object</core:interfaceName>
+        </core:variable>
+    </core:variables>
+    <core:scannerEnabled>true</core:scannerEnabled>
+    <core:scannerDataName>enactor.pos.ProductCodeScanned</core:scannerDataName>
+</retail:posPromptPage>

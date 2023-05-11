@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<retail:posPromptPage xmlns:core="http://www.enactor.com/core" xmlns:retail="http://www.enactor.com/retail" xmlns:ns4="http://www.enactor.com/crm" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803" xmlns:ns6="http://www.apis-it.hr/fin/2012/types/f73" xmlns:ns7="http://www.w3.org/2000/09/xmldsig#" xmlns:ns8="http://www.enactor.com/retail/storedRetailTransaction/service" xmlns:ns9="http://www.fu.gov.si/" xmlns:ns10="http://www.enactor.com/addressLookup/service" xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:ns14="http://www.enactor.com/crm/customerLoyalty/service" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" allowResize="true" allowMove="true" hasBorders="FALSE" allowClose="true" height="800" width="480" managementBeanClassname="com.enactor.pos.menu.LoadMenuBean" managementBeanName="loadMenu" transparentBackground="false" messageBase="Pos/Tender/TenderMessages" titleId="INSERT_CARD_TITLE" url="NextGen480x800/CardPayment/InsertCard">
+    <core:elements>
+        <retail:menuPageElement menuExpression="#{loadMenu.footerMenu}" id="FooterMenu">
+            <retail:menu menuCatagory="RETAIL" menuType="TREE">
+                <retail:menuSetId></retail:menuSetId>
+                <retail:roleId>
+                    <retail:roleId></retail:roleId>
+                    <retail:regionId groupTypeId="region"/>
+                </retail:roleId>
+                <retail:menuGroupId groupTypeId="menuGroup"/>
+                <retail:menuDefaultGroupId groupTypeId="menuGroup"/>
+                <retail:localeId/>
+            </retail:menu>
+            <retail:renderElement>FOOTER_BUTTONS_PAGE_REFERENCE.FooterRefPanel.Button1</retail:renderElement>
+            <retail:renderElement>FOOTER_BUTTONS_PAGE_REFERENCE.FooterRefPanel.Button2</retail:renderElement>
+            <retail:renderElement>FOOTER_BUTTONS_PAGE_REFERENCE.FooterRefPanel.Button3</retail:renderElement>
+            <retail:renderElement>FOOTER_BUTTONS_PAGE_REFERENCE.FooterRefPanel.Button4</retail:renderElement>
+        </retail:menuPageElement>
+        <core:hidden id="ReceiptPanel"/>
+        <core:hidden id="NumericInputPanel"/>
+        <core:label messageBase="NextGen/PosMessages" messageId="CARD_PAYMENT" id="TitleLabel"/>
+        <core:button adjustImagesToSize="false" visible="true" id="BackButton">
+            <core:text>CancelPressed</core:text>
+        </core:button>
+        <core:panel id="DialogPanel">
+            <core:boundsConstraint height="637" width="480" y="76" x="0"/>
+            <core:elements>
+                <core:label messageId="BALANCE_DUE" id="TotalLabel">
+                    <core:boundsConstraint height="40" width="177" y="27" x="24"/>
+                </core:label>
+                <core:label messageBase="NextGen/PosMessages" messageId="TOTAL_VALUE" styleClass="totalValueLabel" id="TotalValueLabel">
+                    <core:boundsConstraint height="40" width="167" y="27" x="296"/>
+                </core:label>
+                <core:text allowWrap="true" styleClass="insertPaymentCardText" id="InsertCardText">
+                    <core:boundsConstraint height="100" width="410" y="88" x="24"/>
+                    <core:uiMessage messageId="INSERT_CARD_SEE_PHONE" applicability="#{contactlessEnabled &amp;&amp; notEmpty(iCCReaderStatus) &amp;&amp; enumEquals(iCCReaderStatus.status, 'SEE_PHONE')}"/>
+                    <core:uiMessage messageId="INSERT_CARD_CTLS_COLLISION" applicability="#{contactlessEnabled &amp;&amp; notEmpty(iCCReaderStatus) &amp;&amp; enumEquals(iCCReaderStatus.status, 'CTLS_COLLISION')}"/>
+                    <core:uiMessage messageId="INSERT_CARD_CTLS_UNSUPPORTED" applicability="#{contactlessEnabled &amp;&amp; notEmpty(iCCReaderStatus) &amp;&amp; enumEquals(iCCReaderStatus.status, 'CTLS_UNSUPPORTED')}"/>
+                    <core:uiMessage messageId="INSERT_CARD_CTLS_READ_ERROR" applicability="#{contactlessEnabled &amp;&amp; notEmpty(iCCReaderStatus) &amp;&amp; enumEquals(iCCReaderStatus.status, 'CTLS_READ_ERROR')}"/>
+                    <core:uiMessage messageId="ICC_PIN_ENTRY_IN_PROGRESS" applicability="#{notEmpty(iCCReaderStatus) &amp;&amp; enumEquals(iCCReaderStatus.status, 'PIN_ENTRY')}"/>
+                    <core:uiMessage messageId="ICC_PIN_ENTRY_RETRY_IN_PROGRESS" applicability="#{notEmpty(iCCReaderStatus) &amp;&amp; enumEquals(iCCReaderStatus.status, 'PIN_ENTRY_RETRY')}"/>
+                    <core:uiMessage messageId="ICC_PIN_ENTRY_LAST_TRY_IN_PROGRESS" applicability="#{notEmpty(iCCReaderStatus) &amp;&amp; enumEquals(iCCReaderStatus.status, 'PIN_ENTRY_LAST_TRY')}"/>
+                    <core:uiMessage messageId="INSERT_CARD_FALL_FORWARD_CONTACT_ONLY" applicability="#{notEmpty(contactOnly) &amp;&amp; contactOnly &amp;&amp; fallForward}"/>
+                    <core:uiMessage messageId="INSERT_CARD_CONTACT_ONLY" applicability="#{notEmpty(contactOnly) &amp;&amp; contactOnly}"/>
+                    <core:uiMessage messageId="INSERT_CARD_CONTACT_OR_MSR_ONLY" applicability="#{!contactlessEnabled &amp;&amp; iCCReaderConfiguration.enableContactless}"/>
+                    <core:uiMessage messageId="INSERT_CARD_WITH_CONTACTLESS" applicability="#{contactlessEnabled}"/>
+                    <core:uiMessage messageId="INSERT_CARD_RETRY" applicability="#{!empty(iCCRetryCount) &amp;&amp; iCCRetryCount &gt; 0}"/>
+                    <core:uiMessage messageId="INSERT_CARD"/>
+                </core:text>
+                <core:button messageId="BUTTON_CONTACTLESS" styleClass="bottomSpanButton" visibility="#{(notEmpty(iCCReaderConfiguration) &amp;&amp; iCCReaderConfiguration.enableContactless) &amp;&amp; !contactlessEnabled &amp;&amp; !contactOnly &amp;&amp; !fallForward}" id="Button2">
+                    <core:boundsConstraint height="71" width="480" y="343" x="0"/>
+                    <core:text>EnableContactless</core:text>
+                </core:button>
+                <core:button messageId="BUTTON_KEY_CARD" styleClass="bottomSpanButton" visibility="#{notEmpty(manualInput) || (notEmpty(iCCReaderConfiguration) &amp;&amp; (iCCReaderConfiguration.enableP2PE == iCCReaderConfiguration.enableKeyedCardInput) &amp;&amp; (isEmpty(contactlessEnabled) || !contactlessEnabled) &amp;&amp; !contactOnly)}" id="Button3">
+                    <core:boundsConstraint height="71" width="480" y="419" x="0"/>
+                    <core:text>KeyCardPressed</core:text>
+                </core:button>
+                <core:button messageId="BUTTON_CANCEL_CONTACTLESS" styleClass="bottomSpanButton" visibility="#{notEmpty(contactlessEnabled) &amp;&amp; contactlessEnabled}" id="Button7">
+                    <core:boundsConstraint height="71" width="480" y="490" x="0"/>
+                    <core:text>CancelContactless</core:text>
+                </core:button>
+                <core:button messageId="BUTTON_CANCEL" styleClass="bottomSpanButton" id="CancelButton">
+                    <core:boundsConstraint height="71" width="480" y="566" x="0"/>
+                    <core:text>CancelPressed</core:text>
+                </core:button>
+            </core:elements>
+        </core:panel>
+        <core:panel namingContainer="false" id="FooterPanel">
+            <core:elements>
+                <core:pageElementRef pageDefinitionURL="Pos/FooterButtons" elementIdRef="FooterRefPanel" transparentBackground="true" id="FOOTER_BUTTONS_PAGE_REFERENCE">
+                    <core:boundsConstraint height="87" width="480" y="0" x="0"/>
+                    <core:elements/>
+                    <core:parameter value="BAG" name="enactor.pos.DisplayHint">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                    </core:parameter>
+                </core:pageElementRef>
+            </core:elements>
+        </core:panel>
+    </core:elements>
+    <core:templateURL>NextGen480x800/Pos/FullScreenTraditionalPosTemplate</core:templateURL>
+    <core:scannerEnabled>false</core:scannerEnabled>
+    <core:scannerDataName></core:scannerDataName>
+    <core:mSREnabled>true</core:mSREnabled>
+    <core:mSRDataName>enactor.pos.CardTrack2</core:mSRDataName>
+</retail:posPromptPage>

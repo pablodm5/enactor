@@ -1,0 +1,2365 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.21" id="1">
+    <property name="author">Rob Harot</property>
+    <property name="comments">Copyright (c) 2009 Enactor Ltd.</property>
+    <property name="createdBy">Eclipse BIRT Designer Version 2.5.2.v20100208 Build &lt;2.5.2.v20100210-0630></property>
+    <text-property name="title">Card Transactions</text-property>
+    <html-property name="description">Card Transactions Report</html-property>
+    <simple-property-list name="includeResource">
+        <value>Messages/Tender/CardTransactionsMessages</value>
+    </simple-property-list>
+    <property name="units">in</property>
+    <method name="initialize"><![CDATA[globalDataFormatter = Packages.com.enactor.coreUI.factories.DataFormatterFactory.getInstance().getFormatter(reportContext.getLocale());
+try {    
+	globalDataDecryptor = Packages.com.enactor.coreReporting.cryptography.ReportEntityEncryptorManager.getInstance();
+}
+catch(err) {
+	globalDataDecryptor = null;
+}
+baseCurrencyId = globalDataFormatter.getBaseCurrencyId();
+
+if(params["viewFullPan"].value == null){
+	params["viewFullPan"].value = "false";
+}
+
+if(params["regionGroupId"].value == null){
+	params["regionGroupId"].value = "";
+}
+
+if(params["regionGroupHierarchyId"].value == null){
+	params["regionGroupHierarchyId"].value = "";
+}
+
+if(params["locationId"].value == null){
+	params["locationId"].value = "";
+}
+
+if(params["deviceId"].value == null){
+	params["deviceId"].value = "";
+}
+
+if(params["acquirerId"].value == null){
+	params["acquirerId"].value = "";
+}
+
+if(params["acquirerGroupId"].value == null){
+	params["acquirerGroupId"].value = "";
+}
+
+if(params["acquirerGroupHierarchyId"].value == null){
+	params["acquirerGroupHierarchyId"].value = "";
+}
+
+if(params["userId"].value == null){
+	params["userId"].value = "";
+}
+
+if(params["cardEntryMethodId"].value == null){
+	params["cardEntryMethodId"].value = "";
+}
+
+if(params["customerId"].value == null){
+	params["customerId"].value = "";
+}
+
+if(params["cardNumber"].value == null){
+	params["cardNumber"].value = "";
+}
+
+if( params["cardNumber"].value == "" ) {
+	params["cardNumberHashed"].value = "";
+}
+else {
+	params["cardNumberHashed"].value = Packages.com.enactor.core.cryptography.CryptographyUtils.createPANDigest( params["cardNumber"].value );
+}
+
+if(params["minCardUsage"].value == null){
+	params["minCardUsage"].value = 0;
+}
+
+if(params["minValue"].value == null){
+	params["minValue"].value = 0;
+}
+
+if(params["maxValue"].value == null){
+	params["maxValue"].value = 0;
+}
+
+if(params["minTransNum"].value == null){
+	params["minTransNum"].value = 0;
+}
+
+if(params["maxTransNum"].value == null){
+	params["maxTransNum"].value = 0;
+}
+
+if(params["salesReturns"].value == null){
+	//no filtering
+	params["salesReturnsInt"].value = 0;
+}
+else if(params["salesReturns"].value == 'sales'){
+	params["salesReturnsInt"].value = 1;
+}
+else if(params["salesReturns"].value == 'returns'){
+	params["salesReturnsInt"].value = 2;
+}
+else {
+	//no filtering
+	params["salesReturnsInt"].value = 0;
+}
+
+startDateStr = "";
+
+if(params["startDate"].value != null){
+	startDateStr = globalDataFormatter.formatDate(params["startDate"].value);
+}
+else {
+	params["startDate"].value = Packages.com.enactor.core.utilities.DateUtils.beginningOfTime();
+	startDateStr = reportContext.getMessage("BLANK", reportContext.getLocale());
+}
+
+endDateStr = "";
+
+if(params["endDate"].value != null){
+	endDateStr = globalDataFormatter.formatDate(params["endDate"].value);
+}
+else {
+	params["endDate"].value = Packages.com.enactor.core.utilities.DateUtils.endOfTime();
+	endDateStr = reportContext.getMessage("BLANK", reportContext.getLocale());
+}]]></method>
+    <property name="theme">ReportLibrary.BasicReportTheme</property>
+    <text-property name="displayName">Card Transactions</text-property>
+    <property name="layoutPreference">auto layout</property>
+    <property name="imageDPI">96</property>
+    <list-property name="libraries">
+        <structure>
+            <property name="fileName">ReportLibrary.rptlibrary</property>
+            <property name="namespace">ReportLibrary</property>
+        </structure>
+    </list-property>
+    <parameters>
+        <scalar-parameter name="userName" id="462" extends="ReportLibrary.userName">
+            <text-property name="promptText">Displayable User Name</text-property>
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant"></value>
+            </simple-property-list>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="odaJndiName" id="367">
+            <text-property name="promptText">ODA JNDI Name</text-property>
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant"></value>
+            </simple-property-list>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="viewFullPan" id="1042">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant">true</value>
+            </simple-property-list>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="regionGroupId" id="1084">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="regionGroupHierarchyId" id="1085">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="locationId" id="1086">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="deviceId" id="1087">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="acquirerId" id="1090">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="acquirerGroupId" id="1091">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="acquirerGroupHierarchyId" id="1092">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="userId" id="1088">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="customerId" id="1089">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="cardEntryMethodId" id="1120">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+        	</structure>
+        </scalar-parameter>
+        <scalar-parameter name="cardNumber" id="1044">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="cardNumberHashed" id="1045">
+            <property name="hidden">true</property>
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="minCardUsage" id="1098">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">decimal</property>
+            <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="minValue" id="1097">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">decimal</property>
+            <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="maxValue" id="1108">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">decimal</property>
+            <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="minTransNum" id="1100">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">integer</property>
+            <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="maxTransNum" id="1101">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">integer</property>
+            <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="salesReturns" id="1099">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="salesReturnsInt" id="1574">
+            <property name="hidden">true</property>
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">integer</property>
+            <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="startDate" id="1094">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">dateTime</property>
+            <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="endDate" id="1095">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">dateTime</property>
+            <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+    </parameters>
+    <data-sources>
+        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="Data Source" id="374"
+ extends="ReportLibrary.Data Source"/>
+    </data-sources>
+    <data-sets>
+        <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="LocationDescription" id="999"
+ extends="ReportLibrary.LocationDescription">
+            <structure name="cachedMetaData">
+                <list-property name="resultSet">
+                    <structure>
+                        <property name="position">1</property>
+                        <property name="name">LOCATION_DESCRIPTION</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">2</property>
+                        <property name="name">LOCATION_DESCRIPTION</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                </list-property>
+            </structure>
+            <list-property name="resultSet">
+                <structure>
+                    <property name="position">1</property>
+                    <property name="name">LOCATION_DESCRIPTION</property>
+                    <property name="nativeName">LOCATION_DESCRIPTION</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">1</property>
+                    <property name="name">LOCATION_DESCRIPTION</property>
+                    <property name="nativeName">LOCATION_DESCRIPTION</property>
+                    <property name="dataType">string</property>
+                </structure>
+            </list-property>
+        </oda-data-set>
+        <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="MainQuery" id="444">
+            <property name="eventHandlerClass">com.enactor.coreReporting.reportEventHandlers.DataSourceQueryTranslatorEventHandler</property>
+            <property name="newHandlerOnEachEvent">true</property>
+            <list-property name="computedColumns">
+                <structure>
+                    <property name="name">SET_BASE_CURRENCY_ID</property>
+                    <expression name="expression">baseCurrencyId = row["BASE_CURRENCY_ID"];
+'';</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">FORMATTED_BASE_VALUE</property>
+                    <expression name="expression">longVal = row["BASE_VALUE"] != null ? row["BASE_VALUE"]  : 0;
+globalDataFormatter.formatCurrencyAmount(longVal, baseCurrencyId);</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">FORMATTED_FOREIGN_VALUE</property>
+                    <expression name="expression">longVal = row["FOREIGN_VALUE"] != null ? row["FOREIGN_VALUE"]  : 0;
+currencyId = row["FOREIGN_CURRENCY_ID"];
+globalDataFormatter.formatCurrencyAmount(longVal, currencyId);</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">FORMATTED_COMPLETED_DATE_TIME</property>
+                    <expression name="expression">var date = row["COMPLETED_DATE_TIME"];
+Packages.com.enactor.core.utilities.DateUtils.formatShortDateTime( reportContext.getLocale(), date );</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">FORMATTED_CARD_NUMBER</property>
+                    <expression name="expression">pan = row["CARD_NUMBER"] != null ? row["CARD_NUMBER"] : '';
+if( pan == '' || pan == '-' ) {
+	keyId = row["KEY_ID"];
+	encryptedData = row["ENCRYPTED_DATA"];
+	if( keyId != null &amp;&amp; encryptedData != null &amp;&amp; globalDataDecryptor != null) {
+		try {
+			if( globalDataDecryptor.decodeAndDecryptConcatenatedData(keyId, encryptedData) != null ) {
+				pan = globalDataDecryptor.decodeAndDecryptConcatenatedData(keyId, encryptedData)[1];
+			}
+			else {
+				pan = '?';
+			}
+		}
+		catch (err) {
+			pan = err.name + ': ' + err.message;
+		}
+	}
+}
+if( pan != '' &amp;&amp; pan != '-' ) {
+	if( params["viewFullPan"] == 'false' ) {
+		pan = Packages.com.enactor.core.utilities.StringUtils.manglePANLess( pan );
+	}
+}
+pan;</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">ACQUIRER_GROUP_KEY</property>
+                    <expression name="expression">acquirerId = row["ACQUIRER_ID"] != null ? row["ACQUIRER_ID"] : '';
+acquirerGroupId = row["ACQUIRER_GROUP_ID"] != null ? row["ACQUIRER_GROUP_ID"] : '';
+acquirerGroupHierarchyId = row["ACQUIRER_GROUP_HIERARCHY_ID"] != null ? row["ACQUIRER_GROUP_HIERARCHY_ID"] : '';
+acquirerId + '|' + acquirerGroupId + '|' + acquirerGroupHierarchyId;</expression>
+                    <property name="dataType">string</property>
+                </structure>
+            </list-property>
+            <list-property name="parameters">
+                <structure>
+                    <property name="name">regionGroupIdIn</property>
+                    <property name="paramName">regionGroupId</property>
+                    <property name="dataType">string</property>
+                    <property name="position">1</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">regionGroupIdIn2</property>
+                    <property name="paramName">regionGroupId</property>
+                    <property name="dataType">string</property>
+                    <property name="position">2</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">regionGroupHierarchyIdIn</property>
+                    <property name="paramName">regionGroupHierarchyId</property>
+                    <property name="dataType">string</property>
+                    <property name="position">3</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">regionGroupHierarchyIdIn2</property>
+                    <property name="paramName">regionGroupHierarchyId</property>
+                    <property name="dataType">string</property>
+                    <property name="position">4</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">locationIdIn</property>
+                    <property name="paramName">locationId</property>
+                    <property name="dataType">string</property>
+                    <property name="position">5</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">locationIdIn2</property>
+                    <property name="paramName">locationId</property>
+                    <property name="dataType">string</property>
+                    <property name="position">6</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">deviceIdIn</property>
+                    <property name="paramName">deviceId</property>
+                    <property name="dataType">string</property>
+                    <property name="position">7</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">deviceIdIn2</property>
+                    <property name="paramName">deviceId</property>
+                    <property name="dataType">string</property>
+                    <property name="position">8</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">acquirerIdIn</property>
+                    <property name="paramName">acquirerId</property>
+                    <property name="dataType">string</property>
+                    <property name="position">9</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">acquirerIdIn2</property>
+                    <property name="paramName">acquirerId</property>
+                    <property name="dataType">string</property>
+                    <property name="position">10</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">acquirerGroupIdIn</property>
+                    <property name="paramName">acquirerGroupId</property>
+                    <property name="dataType">string</property>
+                    <property name="position">11</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">acquirerGroupIdIn2</property>
+                    <property name="paramName">acquirerGroupId</property>
+                    <property name="dataType">string</property>
+                    <property name="position">12</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">acquirerGroupHierarchyIdIn</property>
+                    <property name="paramName">acquirerGroupHierarchyId</property>
+                    <property name="dataType">string</property>
+                    <property name="position">13</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">acquirerGroupHierarchyIdIn2</property>
+                    <property name="paramName">acquirerGroupHierarchyId</property>
+                    <property name="dataType">string</property>
+                    <property name="position">14</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">userIdIn</property>
+                    <property name="paramName">userId</property>
+                    <property name="dataType">string</property>
+                    <property name="position">15</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">userIdIn2</property>
+                    <property name="paramName">userId</property>
+                    <property name="dataType">string</property>
+                    <property name="position">16</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">customerIdIn</property>
+                    <property name="paramName">customerId</property>
+                    <property name="dataType">string</property>
+                    <property name="position">17</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">customerIdIn2</property>
+                    <property name="paramName">customerId</property>
+                    <property name="dataType">string</property>
+                    <property name="position">18</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                 <structure>
+                    <property name="name">cardEntryMethodIdIn</property>
+                    <property name="paramName">cardEntryMethodId</property>
+                    <property name="dataType">string</property>
+                    <property name="position">19</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">cardEntryMethodIdIn2</property>
+                    <property name="paramName">cardEntryMethodId</property>
+                    <property name="dataType">string</property>
+                    <property name="position">20</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">cardNumberIn</property>
+                    <property name="paramName">cardNumber</property>
+                    <property name="dataType">string</property>
+                    <property name="position">21</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">cardNumberIn2</property>
+                    <property name="paramName">cardNumber</property>
+                    <property name="dataType">string</property>
+                    <property name="position">22</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">cardNumberHashedIn</property>
+                    <property name="paramName">cardNumberHashed</property>
+                    <property name="dataType">string</property>
+                    <property name="position">23</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">cardNumberHashedIn2</property>
+                    <property name="paramName">cardNumberHashed</property>
+                    <property name="dataType">string</property>
+                    <property name="position">24</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">minValueIn</property>
+                    <property name="paramName">minValue</property>
+                    <property name="dataType">integer</property>
+                    <property name="position">25</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">minValueIn2</property>
+                    <property name="paramName">minValue</property>
+                    <property name="dataType">integer</property>
+                    <property name="position">26</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">maxValueIn</property>
+                    <property name="paramName">maxValue</property>
+                    <property name="dataType">integer</property>
+                    <property name="position">27</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">maxValueIn2</property>
+                    <property name="paramName">maxValue</property>
+                    <property name="dataType">integer</property>
+                    <property name="position">28</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">minTransNumIn</property>
+                    <property name="paramName">minTransNum</property>
+                    <property name="dataType">integer</property>
+                    <property name="position">29</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">minTransNumIn2</property>
+                    <property name="paramName">minTransNum</property>
+                    <property name="dataType">integer</property>
+                    <property name="position">30</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">maxTransNumIn</property>
+                    <property name="paramName">maxTransNum</property>
+                    <property name="dataType">integer</property>
+                    <property name="position">31</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">maxTransNumIn2</property>
+                    <property name="paramName">maxTransNum</property>
+                    <property name="dataType">integer</property>
+                    <property name="position">32</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">salesReturnsIn</property>
+                    <property name="paramName">salesReturnsInt</property>
+                    <property name="dataType">integer</property>
+                    <property name="position">33</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">salesReturnsIn2</property>
+                    <property name="paramName">salesReturnsInt</property>
+                    <property name="dataType">integer</property>
+                    <property name="position">34</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">salesReturnsIn3</property>
+                    <property name="paramName">salesReturnsInt</property>
+                    <property name="dataType">integer</property>
+                    <property name="position">35</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">startDateIn</property>
+                    <property name="paramName">startDate</property>
+                    <property name="dataType">dateTime</property>
+                    <property name="position">36</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">endDateIn</property>
+                    <property name="paramName">endDate</property>
+                    <property name="dataType">dateTime</property>
+                    <property name="position">37</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">regionGroupIdOut</property>
+                    <property name="paramName">regionGroupId</property>
+                    <property name="dataType">string</property>
+                    <property name="position">38</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">regionGroupIdOut2</property>
+                    <property name="paramName">regionGroupId</property>
+                    <property name="dataType">string</property>
+                    <property name="position">39</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">regionGroupHierarchyIdOut</property>
+                    <property name="paramName">regionGroupHierarchyId</property>
+                    <property name="dataType">string</property>
+                    <property name="position">40</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">regionGroupHierarchyIdOut2</property>
+                    <property name="paramName">regionGroupHierarchyId</property>
+                    <property name="dataType">string</property>
+                    <property name="position">41</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">locationIdOut</property>
+                    <property name="paramName">locationId</property>
+                    <property name="dataType">string</property>
+                    <property name="position">42</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">locationIdOut2</property>
+                    <property name="paramName">locationId</property>
+                    <property name="dataType">string</property>
+                    <property name="position">43</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">deviceIdOut</property>
+                    <property name="paramName">deviceId</property>
+                    <property name="dataType">string</property>
+                    <property name="position">44</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">deviceIdOut2</property>
+                    <property name="paramName">deviceId</property>
+                    <property name="dataType">string</property>
+                    <property name="position">45</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">acquirerIdOut</property>
+                    <property name="paramName">acquirerId</property>
+                    <property name="dataType">string</property>
+                    <property name="position">46</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">acquirerIdOut2</property>
+                    <property name="paramName">acquirerId</property>
+                    <property name="dataType">string</property>
+                    <property name="position">47</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">acquirerGroupIdOut</property>
+                    <property name="paramName">acquirerGroupId</property>
+                    <property name="dataType">string</property>
+                    <property name="position">48</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">acquirerGroupIdOut2</property>
+                    <property name="paramName">acquirerGroupId</property>
+                    <property name="dataType">string</property>
+                    <property name="position">49</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">acquirerGroupHierarchyIdOut</property>
+                    <property name="paramName">acquirerGroupHierarchyId</property>
+                    <property name="dataType">string</property>
+                    <property name="position">50</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">acquirerGroupHierarchyIdOut2</property>
+                    <property name="paramName">acquirerGroupHierarchyId</property>
+                    <property name="dataType">string</property>
+                    <property name="position">51</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">userIdOut</property>
+                    <property name="paramName">userId</property>
+                    <property name="dataType">string</property>
+                    <property name="position">52</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">userIdOut2</property>
+                    <property name="paramName">userId</property>
+                    <property name="dataType">string</property>
+                    <property name="position">53</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">customerIdOut</property>
+                    <property name="paramName">customerId</property>
+                    <property name="dataType">string</property>
+                    <property name="position">54</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">customerIdOut2</property>
+                    <property name="paramName">customerId</property>
+                    <property name="dataType">string</property>
+                    <property name="position">55</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">cardEntryMethodIdOut</property>
+                    <property name="paramName">cardEntryMethodId</property>
+                    <property name="dataType">string</property>
+                    <property name="position">56</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">cardEntryMethodIdOut2</property>
+                    <property name="paramName">cardEntryMethodId</property>
+                    <property name="dataType">string</property>
+                    <property name="position">57</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">cardNumberOut</property>
+                    <property name="paramName">cardNumber</property>
+                    <property name="dataType">string</property>
+                    <property name="position">58</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">cardNumberOut2</property>
+                    <property name="paramName">cardNumber</property>
+                    <property name="dataType">string</property>
+                    <property name="position">59</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">cardNumberHashedOut</property>
+                    <property name="paramName">cardNumberHashed</property>
+                    <property name="dataType">string</property>
+                    <property name="position">60</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">cardNumberHashedOut2</property>
+                    <property name="paramName">cardNumberHashed</property>
+                    <property name="dataType">string</property>
+                    <property name="position">61</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">minCardUsageOut</property>
+                    <property name="paramName">minCardUsage</property>
+                    <property name="dataType">integer</property>
+                    <property name="position">62</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">minCardUsageOut2</property>
+                    <property name="paramName">minCardUsage</property>
+                    <property name="dataType">integer</property>
+                    <property name="position">63</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">minValueOut</property>
+                    <property name="paramName">minValue</property>
+                    <property name="dataType">integer</property>
+                    <property name="position">64</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">minValueOut2</property>
+                    <property name="paramName">minValue</property>
+                    <property name="dataType">integer</property>
+                    <property name="position">65</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">maxValueOut</property>
+                    <property name="paramName">maxValue</property>
+                    <property name="dataType">integer</property>
+                    <property name="position">66</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">maxValueOut2</property>
+                    <property name="paramName">maxValue</property>
+                    <property name="dataType">integer</property>
+                    <property name="position">67</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">minTransNumOut</property>
+                    <property name="paramName">minTransNum</property>
+                    <property name="dataType">integer</property>
+                    <property name="position">68</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">minTransNumOut2</property>
+                    <property name="paramName">minTransNum</property>
+                    <property name="dataType">integer</property>
+                    <property name="position">69</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">maxTransNumOut</property>
+                    <property name="paramName">maxTransNum</property>
+                    <property name="dataType">integer</property>
+                    <property name="position">70</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">maxTransNumOut2</property>
+                    <property name="paramName">maxTransNum</property>
+                    <property name="dataType">integer</property>
+                    <property name="position">71</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">salesReturnsOut</property>
+                    <property name="paramName">salesReturnsInt</property>
+                    <property name="dataType">integer</property>
+                    <property name="position">72</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">salesReturnsOut2</property>
+                    <property name="paramName">salesReturnsInt</property>
+                    <property name="dataType">integer</property>
+                    <property name="position">73</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">salesReturnsOut3</property>
+                    <property name="paramName">salesReturnsInt</property>
+                    <property name="dataType">integer</property>
+                    <property name="position">74</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">startDateOut</property>
+                    <property name="paramName">startDate</property>
+                    <property name="dataType">dateTime</property>
+                    <property name="position">75</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">endDateOut</property>
+                    <property name="paramName">endDate</property>
+                    <property name="dataType">dateTime</property>
+                    <property name="position">76</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+            </list-property>
+            <structure name="cachedMetaData"/>
+            <property name="dataSource">Data Source</property>
+            <xml-property name="queryText"><![CDATA[select 		RTI.Base_Currency_Id as BASE_CURRENCY_ID,
+			RTI.Location_Id as LOCATION_ID,
+			TT.Acquirer_Id as ACQUIRER_ID,
+			TT.Acquirer_Group_Id as ACQUIRER_GROUP_ID,
+			TT.Acquirer_Group_Hierarchy_Id as ACQUIRER_GROUP_HIERARCHY_ID,
+			A.Description as ACQUIRER_DESCRIPTION,
+			RTI.Terminal_Number as TERMINAL_NUMBER,
+			RTI.Transaction_Number as TRANSACTION_NUMBER,
+			RTI.Completed_Date_Time as COMPLETED_DATE_TIME,
+			TT.Customer_Id as CUSTOMER_ID,
+			TT.Customer_Surname as CUSTOMER_SURNAME,
+			TT.Card_Entry_Method as CARD_ENTRY_METHOD,
+			-TT.Base_Value as BASE_VALUE,
+			TT.Currency_Id as FOREIGN_CURRENCY_ID,
+			-TT.Value as FOREIGN_VALUE,
+			TT.Card_Number as CARD_NUMBER, 
+			TT.Card_Number_Hashed as CARD_NUMBER_HASHED, 
+			TT.Card_Number_Mangled as CARD_NUMBER_MANGLED, 
+			TT.Encrypted_Data as ENCRYPTED_DATA, 
+			TT.Key_Id as KEY_ID, 
+			CT.Description as CARD_TYPE_DESCRIPTION,
+			TT.Merchant_Id as MERCHANT_ID
+from TenderTransactions TT
+inner join RetailTransactionIds RTI on TT.Transaction_Key = RTI.Transaction_Key
+inner join 
+(
+	select COUNT(*) as CARD_COUNT,
+	TTIn.Card_Number as CARD_NUMBER,
+	TTIn.Card_Number_Hashed as CARD_NUMBER_HASHED
+	from TenderTransactions TTIn
+	inner join RetailTransactionIds RTIIn on TTIn.Transaction_Key = RTIIn.Transaction_Key
+	where (? = !~''~! or RTIIn.Region_Group_Id = ?) 
+	and (? = !~''~! or RTIIn.Region_Group_Hierarchy_Id = ?) 
+	and (? = !~''~! or RTIIn.Location_Id = ?) 
+	and (? = !~''~! or RTIIn.Device_Id = ?) 
+	and (? = !~''~! or TTIn.Acquirer_Id = ?) 
+	and (? = !~''~! or TTIn.Acquirer_Group_Id = ?) 
+	and (? = !~''~! or TTIn.Acquirer_Group_Hierarchy_Id = ?) 
+	and (? = !~''~! or TTIn.User_Id = ?) 
+	and (? = !~''~! or TTIn.Customer_Id = ?)
+	and (? = !~''~! or TTIn.Card_Entry_Method = ?)
+	and ((TTIn.Card_Number != !~''~! and TTIn.Card_Number != '-') or (TTIn.Card_Number_Hashed != !~''~! and TTIn.Card_Number_Hashed != '-') or (TTIn.Card_Number_Mangled != !~''~! and TTIn.Card_Number_Mangled != '-'))
+	and ((? = !~''~! or TTIn.Card_Number = ?) or (? = !~''~! or TTIn.Card_Number_Hashed = ?)) 
+	and (? = 0 or ABS(TTIn.Base_Value) >= ?)
+	and (? = 0 or ABS(TTIn.Base_Value) <= ?)
+	and (? = 0 or RTIIn.Transaction_Number >= ?)
+	and (? = 0 or RTIIn.Transaction_Number <= ?)
+	and (? = 0 or (? = 1 and TTIn.Base_Value < 0) or (? = 2 and TTIn.Base_Value > 0))
+	and (RTIIn.Completed_Date_Time >= ?)
+	and (RTIIn.Completed_Date_Time <= ?)
+	group by TTIn.Card_Number, TTIn.Card_Number_Hashed
+) CC on TT.Card_Number = CC.CARD_NUMBER and TT.Card_Number_Hashed = CC.CARD_NUMBER_HASHED
+left outer join CardTypes CT on TT.Card_Type_Id = CT.Card_Type_Id and TT.Card_Type_Group_Id = CT.Group_Id and TT.Card_Type_Group_Hierarchy_Id = CT.Group_Hierarchy_Id
+left outer join Acquirers A on TT.Acquirer_Id = A.Acquirer_Id and TT.Acquirer_Group_Id = A.Group_Id and TT.Acquirer_Group_Hierarchy_Id = A.Group_Hierarchy_Id
+where (? = !~''~! or RTI.Region_Group_Id = ?) 
+and (? = !~''~! or RTI.Region_Group_Hierarchy_Id = ?) 
+and (? = !~''~! or RTI.Location_Id = ?) 
+and (? = !~''~! or RTI.Device_Id = ?) 
+and (? = !~''~! or TT.Acquirer_Id = ?) 
+and (? = !~''~! or TT.Acquirer_Group_Id = ?) 
+and (? = !~''~! or TT.Acquirer_Group_Hierarchy_Id = ?) 
+and (? = !~''~! or TT.User_Id = ?) 
+and (? = !~''~! or TT.Customer_Id = ?) 
+and (? = !~''~! or TT.Card_Entry_Method = ?)
+and ((TT.Card_Number != !~''~! and TT.Card_Number != '-') or (TT.Card_Number_Hashed != !~''~! and TT.Card_Number_Hashed != '-') or (TT.Card_Number_Mangled != !~''~! and TT.Card_Number_Mangled != '-'))
+and ((? = !~''~! or TT.Card_Number = ?) or (? = !~''~! or TT.Card_Number_Hashed = ?)) 
+and (? = 0 or CC.CARD_COUNT >= ?)
+and (? = 0 or ABS(TT.Base_Value) >= ?)
+and (? = 0 or ABS(TT.Base_Value) <= ?)
+and (? = 0 or RTI.Transaction_Number >= ?)
+and (? = 0 or RTI.Transaction_Number <= ?)
+and (? = 0 or (? = 1 and TT.Base_Value < 0) or (? = 2 and TT.Base_Value > 0))
+and (RTI.Completed_Date_Time >= ?)
+and (RTI.Completed_Date_Time <= ?)
+order by RTI.Completed_Date_Time, RTI.Transaction_Number
+
+
+
+
+]]></xml-property>
+        </oda-data-set>
+        <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="TerminalDescription" id="1001"
+ extends="ReportLibrary.TerminalDescription"/>
+        <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="UserDescription" id="1005"
+ extends="ReportLibrary.UserDescription"/>
+        <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="CustomerDescription" id="1007"
+ extends="ReportLibrary.CustomerDescription"/>
+        <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="RegionDescription" id="1013"
+ extends="ReportLibrary.RegionDescription">
+            <list-property name="resultSet">
+                <structure>
+                    <property name="position">1</property>
+                    <property name="name">REGION_DESCRIPTION</property>
+                    <property name="nativeName">REGION_DESCRIPTION</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">1</property>
+                    <property name="name">REGION_DESCRIPTION</property>
+                    <property name="nativeName">REGION_DESCRIPTION</property>
+                    <property name="dataType">string</property>
+                </structure>
+            </list-property>
+        </oda-data-set>
+        <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="AcquirerDescription" id="1083"
+ extends="ReportLibrary.AcquirerDescription"/>
+    </data-sets>
+    <page-setup>
+        <simple-master-page name="Simple MasterPage" id="2">
+            <property name="type">a4</property>
+            <property name="orientation">landscape</property>
+            <property name="topMargin">0.75in</property>
+            <property name="leftMargin">0.75in</property>
+            <property name="bottomMargin">0.75in</property>
+            <property name="rightMargin">0.75in</property>
+            <page-header>
+                <grid name="ReportHeader" id="396" extends="ReportLibrary.ReportHeader">
+                    <overridden-values>
+                        <ref-entry baseId="316" id="316"/>
+                        <ref-entry baseId="317" id="317"/>
+                        <ref-entry baseId="318" id="318"/>
+                        <ref-entry baseId="319" id="319"/>
+                        <ref-entry baseId="327" name="CompanyLogoWide" id="327"/>
+                        <ref-entry baseId="380" name="NewImage" id="380"/>
+                        <ref-entry baseId="320" id="320"/>
+                        <ref-entry baseId="481" name="PoweredBy" id="481"/>
+                        <ref-entry baseId="328" name="CompanyTitle" id="328"/>
+                    </overridden-values>
+                </grid>
+            </page-header>
+            <page-footer>
+                <grid id="522">
+                    <property name="width">100%</property>
+                    <column id="523">
+                        <property name="width">45%</property>
+                    </column>
+                    <column id="524">
+                        <property name="width">4.3020833333in</property>
+                    </column>
+                    <column id="525">
+                        <property name="width">5%</property>
+                    </column>
+                    <row id="526">
+                        <cell id="527">
+                            <text name="GeneratedOnText" id="531" extends="ReportLibrary.GeneratedOnText">
+                                <property name="style">reportFooterLeft</property>
+                                                            <property name="contentType">html</property>
+                                <text-property name="content"><![CDATA[
+<value-of>l10nParams = new Array(1); l10nParams[0] = Packages.com.enactor.core.utilities.DateUtils.formatShortDateMediumTime(reportContext.getLocale(), new Date) ; reportContext.getMessage("GENERATED_ON", reportContext.getLocale(), l10nParams);</value-of>
+]]></text-property>
+                            </text>
+                        </cell>
+                        <cell id="528">
+                            <text name="GeneratedByText" id="530" extends="ReportLibrary.GeneratedByText">
+                                <property name="style">reportFooterLeft</property>
+                                                            <property name="contentType">html</property>
+                                <text-property name="content"><![CDATA[
+<value-of>l10nParams = new Array(1); l10nParams[0] = params["userName"] ; reportContext.getMessage("GENERATED_BY", reportContext.getLocale(), l10nParams);</value-of>
+]]></text-property>
+                            </text>
+                        </cell>
+                        <cell id="529">
+                            <grid id="532">
+                                <property name="width">100%</property>
+                                <column id="533"/>
+                                <column id="534"/>
+                                <column id="535"/>
+                                <row id="536">
+                                    <cell id="537">
+                                        <auto-text id="538">
+                                            <property name="style">reportFooterRight</property>
+                                            <property name="type">page-number</property>
+                                        </auto-text>
+                                    </cell>
+                                    <cell id="539">
+                                        <text id="540">
+                                            <property name="style">reportFooterCentre</property>
+                                            <property name="contentType">plain</property>
+                                            <text-property name="content"><![CDATA[/]]></text-property>
+                                        </text>
+                                    </cell>
+                                    <cell id="541">
+                                        <auto-text id="542">
+                                            <property name="style">reportFooterRight</property>
+                                            <property name="type">total-page</property>
+                                        </auto-text>
+                                    </cell>
+                                </row>
+                            </grid>
+                        </cell>
+                    </row>
+                </grid>
+            </page-footer>
+        </simple-master-page>
+    </page-setup>
+    <body>
+        <grid name="ReportTitleGrid" id="362">
+            <property name="width">100%</property>
+            <column id="363"/>
+            <row id="364">
+                <cell id="365">
+                    <property name="paddingTop">1pt</property>
+                    <label name="ReportTitleLabel" id="521">
+                        <property name="style">reportTitle</property>
+                        <property name="fontFamily">sans-serif</property>
+                        <property name="fontSize">larger</property>
+                        <property name="paddingTop">1pt</property>
+                        <property name="textAlign">center</property>
+                        <text-property name="text" key="TITLE"></text-property>
+                    </label>
+                </cell>
+            </row>
+        </grid>
+        <grid name="CriteriaGrid" id="376">
+            <property name="marginTop">0pt</property>
+            <property name="width">100%</property>
+            <list-property name="visibility">
+                <structure>
+                    <property name="format">all</property>
+                    <expression name="valueExpr">if (pageNumber > 1) {
+ true;
+} else {
+ false;
+}</expression>
+                </structure>
+            </list-property>
+            <column id="377">
+                <property name="width">11%</property>
+            </column>
+            <column id="567">
+                <property name="width">39%</property>
+            </column>
+            <column id="393">
+                <property name="width">11%</property>
+            </column>
+            <column id="578">
+                <property name="width">39%</property>
+            </column>
+            <row id="382">
+                <cell id="383">
+                    <property name="colSpan">4</property>
+                    <property name="rowSpan">1</property>
+                    <label id="394">
+                        <property name="style">subReportHeader</property>
+                        <property name="marginTop">0pt</property>
+                        <property name="paddingTop">1pt</property>
+                        <property name="textAlign">center</property>
+                        <text-property name="text" key="REPORT_CRITERIA">The Report Criteria</text-property>
+                    </label>
+                </cell>
+            </row>
+            <row id="389">
+                <cell id="390">
+                    <property name="paddingTop">1pt</property>
+                    <label id="568">
+                        <property name="style">criteriaLabel</property>
+                        <text-property name="text" key="CRITERIA_1"></text-property>
+                    </label>
+                </cell>
+                <cell id="562">
+                    <property name="paddingTop">1pt</property>
+                    <data id="1078">
+                        <property name="style">criteriaLabel</property>
+                        <list-property name="mapRules">
+                            <structure>
+                                <expression name="testExpr">row["REGION_DESCRIPTION"]</expression>
+                                <property name="operator">is-null</property>
+                                <text-property name="display" key="BLANK"></text-property>
+                            </structure>
+                        </list-property>
+                        <property name="dataSet">RegionDescription</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">REGION_DESCRIPTION</property>
+                                <expression name="expression">dataSetRow["REGION_DESCRIPTION"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                        </list-property>
+                        <property name="resultSetColumn">REGION_DESCRIPTION</property>
+                    </data>
+                </cell>
+                <cell id="392">
+                    <label id="437">
+                        <property name="style">criteriaLabel</property>
+                        <text-property name="text" key="CRITERIA_2"></text-property>
+                    </label>
+                </cell>
+                <cell id="573">
+                    <data id="1079">
+                        <property name="style">criteriaLabel</property>
+                        <list-property name="mapRules">
+                            <structure>
+                                <expression name="testExpr">row["LOCATION_DESCRIPTION"]</expression>
+                                <property name="operator">is-null</property>
+                                <text-property name="display" key="BLANK"></text-property>
+                            </structure>
+                        </list-property>
+                        <property name="dataSet">LocationDescription</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">LOCATION_DESCRIPTION</property>
+                                <expression name="expression">dataSetRow["LOCATION_DESCRIPTION"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                        </list-property>
+                        <property name="resultSetColumn">LOCATION_DESCRIPTION</property>
+                    </data>
+                </cell>
+            </row>
+            <row id="400">
+                <cell id="401">
+                    <label id="1056">
+                        <property name="style">criteriaLabel</property>
+                        <text-property name="text" key="CRITERIA_3"></text-property>
+                    </label>
+                </cell>
+                <cell id="563">
+                    <data id="1080">
+                        <property name="style">criteriaLabel</property>
+                        <list-property name="mapRules">
+                            <structure>
+                                <expression name="testExpr">row["TERMINAL_DESCRIPTION"]</expression>
+                                <property name="operator">is-null</property>
+                                <text-property name="display" key="BLANK"></text-property>
+                            </structure>
+                        </list-property>
+                        <property name="dataSet">TerminalDescription</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">TERMINAL_DESCRIPTION</property>
+                                <expression name="expression">dataSetRow["TERMINAL_DESCRIPTION"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                        </list-property>
+                        <property name="resultSetColumn">TERMINAL_DESCRIPTION</property>
+                    </data>
+                </cell>
+                <cell id="402">
+                    <label id="1059">
+                        <property name="style">criteriaLabel</property>
+                        <text-property name="text" key="CRITERIA_4"></text-property>
+                    </label>
+                </cell>
+                <cell id="574">
+                    <data id="1093">
+                        <property name="style">criteriaLabel</property>
+                        <list-property name="mapRules">
+                            <structure>
+                                <expression name="testExpr">row["ACQUIRER_DESCRIPTION"]</expression>
+                                <property name="operator">is-null</property>
+                                <text-property name="display" key="BLANK"></text-property>
+                            </structure>
+                        </list-property>
+                        <property name="dataSet">AcquirerDescription</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">ACQUIRER_DESCRIPTION</property>
+                                <expression name="expression">dataSetRow["ACQUIRER_DESCRIPTION"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                        </list-property>
+                        <property name="resultSetColumn">ACQUIRER_DESCRIPTION</property>
+                    </data>
+                </cell>
+            </row>
+            <row id="403">
+                <cell id="404">
+                    <label id="1057">
+                        <property name="style">criteriaLabel</property>
+                        <text-property name="text" key="CRITERIA_5"></text-property>
+                    </label>
+                </cell>
+                <cell id="564">
+                    <data id="1081">
+                        <property name="style">criteriaLabel</property>
+                        <list-property name="mapRules">
+                            <structure>
+                                <expression name="testExpr">row["USER_FULL_NAME"]</expression>
+                                <property name="operator">is-null</property>
+                                <text-property name="display" key="BLANK"></text-property>
+                            </structure>
+                        </list-property>
+                        <property name="dataSet">UserDescription</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">USER_FULL_NAME</property>
+                                <expression name="expression">dataSetRow["USER_FULL_NAME"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                        </list-property>
+                        <property name="resultSetColumn">USER_FULL_NAME</property>
+                    </data>
+                </cell>
+                <cell id="405">
+                    <label id="1063">
+                        <property name="style">criteriaLabel</property>
+                        <text-property name="text" key="CRITERIA_6"></text-property>
+                    </label>
+                </cell>
+                <cell id="575">
+                    <data id="1082">
+                        <property name="style">criteriaLabel</property>
+                        <list-property name="mapRules">
+                            <structure>
+                                <expression name="testExpr">row["CUSTOMER_FULL_NAME"]</expression>
+                                <property name="operator">is-null</property>
+                                <text-property name="display" key="BLANK"></text-property>
+                            </structure>
+                        </list-property>
+                        <property name="dataSet">CustomerDescription</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">CUSTOMER_FULL_NAME</property>
+                                <expression name="expression">dataSetRow["CUSTOMER_FULL_NAME"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                        </list-property>
+                        <property name="resultSetColumn">CUSTOMER_FULL_NAME</property>
+                    </data>
+                </cell>
+            </row>
+            <row id="406">
+                <list-property name="visibility">
+                    <structure>
+                        <property name="format">all</property>
+                        <expression name="valueExpr" type="javascript">true</expression>
+                    </structure>
+                </list-property>
+                <cell id="407">
+                    <label id="1058">
+                        <property name="style">criteriaLabel</property>
+                        <text-property name="text" key="CRITERIA_7"></text-property>
+                    </label>
+                </cell>
+                <cell id="565">
+                    <text-data id="1114">
+                        <property name="style">criteriaLabel</property>
+                        <expression name="valueExpr">params["cardNumber"] != "" 
+? params["cardNumber"]
+: reportContext.getMessage("BLANK", reportContext.getLocale());</expression>
+                        <property name="contentType">html</property>
+                    </text-data>
+                </cell>
+                <cell id="408">
+                    <label id="1064">
+                        <property name="style">criteriaLabel</property>
+                        <text-property name="text" key="CRITERIA_8"></text-property>
+                    </label>
+                </cell>
+                <cell id="576">
+                    <text-data id="1113">
+                        <property name="style">criteriaLabel</property>
+                        <expression name="valueExpr">params["minCardUsage"] != 0 
+? params["minCardUsage"]
+: reportContext.getMessage("BLANK", reportContext.getLocale());</expression>
+                        <property name="contentType">html</property>
+                    </text-data>
+                </cell>
+            </row>
+            <row id="420">
+                <cell id="421">
+                    <label id="1062">
+                        <property name="style">criteriaLabel</property>
+                        <text-property name="text" key="CRITERIA_9"></text-property>
+                    </label>
+                </cell>
+                <cell id="566">
+                    <text-data id="1018">
+                        <property name="style">criteriaLabel</property>
+                        <expression name="valueExpr">params["minValue"] != 0 
+? globalDataFormatter.formatCurrencyAmount(params["minValue"]) 
+: reportContext.getMessage("BLANK", reportContext.getLocale());</expression>
+                        <property name="contentType">html</property>
+                    </text-data>
+                </cell>
+                <cell id="422">
+                    <label id="1107">
+                        <property name="style">criteriaLabel</property>
+                        <text-property name="text" key="CRITERIA_10"></text-property>
+                    </label>
+                </cell>
+                <cell id="577">
+                    <text-data id="1109">
+                        <property name="style">criteriaLabel</property>
+                        <expression name="valueExpr">params["maxValue"] != 0 
+? globalDataFormatter.formatCurrencyAmount(params["maxValue"]) 
+: reportContext.getMessage("BLANK", reportContext.getLocale());</expression>
+                        <property name="contentType">html</property>
+                    </text-data>
+                </cell>
+            </row>
+            <row id="1046">
+                <cell id="1047">
+                    <label id="1060">
+                        <property name="style">criteriaLabel</property>
+                        <text-property name="text" key="CRITERIA_11"></text-property>
+                    </label>
+                </cell>
+                <cell id="1048">
+                    <text-data id="1110">
+                        <property name="style">criteriaLabel</property>
+                        <expression name="valueExpr">params["minTransNum"] != 0 
+? params["minTransNum"]
+: reportContext.getMessage("BLANK", reportContext.getLocale());</expression>
+                        <property name="contentType">html</property>
+                    </text-data>
+                </cell>
+                <cell id="1049">
+                    <label id="1066">
+                        <property name="style">criteriaLabel</property>
+                        <text-property name="text" key="CRITERIA_12"></text-property>
+                    </label>
+                </cell>
+                <cell id="1050">
+                    <text-data id="1111">
+                        <property name="style">criteriaLabel</property>
+                        <expression name="valueExpr">params["maxTransNum"] != 0 
+? params["maxTransNum"]
+: reportContext.getMessage("BLANK", reportContext.getLocale());</expression>
+                        <property name="contentType">html</property>
+                    </text-data>
+                </cell>
+            </row>
+            <row id="1051">
+                <cell id="1052">
+                    <label id="1065">
+                        <property name="style">criteriaLabel</property>
+                        <text-property name="text" key="CRITERIA_13"></text-property>
+                    </label>
+                </cell>
+                <cell id="1053">
+                    <text-data id="1577">
+                        <property name="style">criteriaLabel</property>
+                        <expression name="valueExpr">messageId = "BLANK";
+if( params["salesReturnsInt"] == 1 ) {
+	messageId = "sales";
+}
+else if( params["salesReturnsInt"] == 2 ) {
+	messageId = "returns";
+}
+reportContext.getMessage(messageId, reportContext.getLocale());</expression>
+                        <property name="contentType">html</property>
+                    </text-data>
+                </cell>
+                <cell id="1054">
+                    <label id="1578">
+                        <property name="style">criteriaLabel</property>
+                        <list-property name="visibility">
+                            <structure>
+                                <property name="format">all</property>
+                                <expression name="valueExpr" type="javascript">true</expression>
+                            </structure>
+                        </list-property>
+                        <text-property name="text" key="CRITERIA_14"></text-property>
+                    </label>
+                </cell>
+                <cell id="1055">
+                    <text-data id="1579">
+                        <property name="style">criteriaLabel</property>
+                        <list-property name="visibility">
+                            <structure>
+                                <property name="format">all</property>
+                                <expression name="valueExpr" type="javascript">true</expression>
+                            </structure>
+                        </list-property>
+                        <expression name="valueExpr">messageId = "false";
+if( params["viewFullPan"] == "true" ) {
+	messageId = "true";
+}
+reportContext.getMessage(messageId, reportContext.getLocale());</expression>
+                        <property name="contentType">html</property>
+                    </text-data>
+                </cell>
+            </row>
+            <row id="1102">
+                <cell id="1103">
+                    <label id="1061">
+                        <property name="style">criteriaLabel</property>
+                        <text-property name="text" key="CRITERIA_15"></text-property>
+                    </label>
+                </cell>
+                <cell id="1104">
+                    <text-data id="1016">
+                        <property name="style">criteriaLabel</property>
+                        <expression name="valueExpr">startDateStr;</expression>
+                        <property name="contentType">html</property>
+                    </text-data>
+                </cell>
+                <cell id="1105">
+                    <label id="1067">
+                        <property name="style">criteriaLabel</property>
+                        <text-property name="text" key="CRITERIA_16"></text-property>
+                    </label>
+                </cell>
+                <cell id="1106">
+                    <text-data id="1096">
+                        <property name="style">criteriaLabel</property>
+                        <expression name="valueExpr">endDateStr;</expression>
+                        <property name="contentType">html</property>
+                    </text-data>
+                </cell>
+            </row>
+        </grid>
+        <grid name="ResultsGrid" id="384">
+            <property name="width">100%</property>
+            <column id="385"/>
+            <row id="386">
+                <cell id="387"/>
+            </row>
+            <row id="425">
+                <cell id="426">
+                    <table id="1333">
+                        <property name="width">100%</property>
+                        <property name="dataSet">MainQuery</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">LOCATION_ID</property>
+                                <expression name="expression">dataSetRow["LOCATION_ID"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">ACQUIRER_DESCRIPTION</property>
+                                <expression name="expression">dataSetRow["ACQUIRER_DESCRIPTION"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">TERMINAL_NUMBER</property>
+                                <expression name="expression">dataSetRow["TERMINAL_NUMBER"]</expression>
+                                <property name="dataType">decimal</property>
+                            </structure>
+                            <structure>
+                                <property name="name">TRANSACTION_NUMBER</property>
+                                <expression name="expression">dataSetRow["TRANSACTION_NUMBER"]</expression>
+                                <property name="dataType">decimal</property>
+                            </structure>
+                            <structure>
+                                <property name="name">COMPLETED_DATE_TIME</property>
+                                <expression name="expression">dataSetRow["COMPLETED_DATE_TIME"]</expression>
+                                <property name="dataType">date-time</property>
+                            </structure>
+                            <structure>
+                                <property name="name">CUSTOMER_ID</property>
+                                <expression name="expression">dataSetRow["CUSTOMER_ID"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">CUSTOMER_SURNAME</property>
+                                <expression name="expression">dataSetRow["CUSTOMER_SURNAME"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">BASE_VALUE</property>
+                                <expression name="expression">dataSetRow["BASE_VALUE"]</expression>
+                                <property name="dataType">decimal</property>
+                            </structure>
+                            <structure>
+                                <property name="name">FOREIGN_CURRENCY_ID</property>
+                                <expression name="expression">dataSetRow["FOREIGN_CURRENCY_ID"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">FOREIGN_VALUE</property>
+                                <expression name="expression">dataSetRow["FOREIGN_VALUE"]</expression>
+                                <property name="dataType">decimal</property>
+                            </structure>
+                            <structure>
+                                <property name="name">CARD_NUMBER</property>
+                                <expression name="expression">dataSetRow["CARD_NUMBER"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">CARD_NUMBER_HASHED</property>
+                                <expression name="expression">dataSetRow["CARD_NUMBER_HASHED"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">ENCRYPTED_DATA</property>
+                                <expression name="expression">dataSetRow["ENCRYPTED_DATA"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">KEY_ID</property>
+                                <expression name="expression">dataSetRow["KEY_ID"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">CARD_TYPE_DESCRIPTION</property>
+                                <expression name="expression">dataSetRow["CARD_TYPE_DESCRIPTION"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">MERCHANT_ID</property>
+                                <expression name="expression">dataSetRow["MERCHANT_ID"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">FORMATTED_BASE_VALUE</property>
+                                <expression name="expression">dataSetRow["FORMATTED_BASE_VALUE"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">FORMATTED_FOREIGN_VALUE</property>
+                                <expression name="expression">dataSetRow["FORMATTED_FOREIGN_VALUE"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">FORMATTED_COMPLETED_DATE_TIME</property>
+                                <expression name="expression">dataSetRow["FORMATTED_COMPLETED_DATE_TIME"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">FORMATTED_CARD_NUMBER</property>
+                                <text-property name="displayName">FORMATTED_CARD_NUMBER</text-property>
+                                <expression name="expression">dataSetRow["FORMATTED_CARD_NUMBER"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">ACQUIRER_GROUP_KEY</property>
+                                <text-property name="displayName">ACQUIRER_GROUP_KEY</text-property>
+                                <expression name="expression">dataSetRow["ACQUIRER_GROUP_KEY"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">CardNumberMangled</property>
+                                <expression name="expression" type="javascript">dataSetRow["CARD_NUMBER_MANGLED"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">CARD_ENTRY_METHOD</property>
+                                <expression name="expression" type="javascript">dataSetRow["CARD_ENTRY_METHOD"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                        </list-property>
+                        <property name="pageBreakInterval">50</property>
+                        <column id="1432"/>
+                        <column id="1433"/>
+                        <column id="1455"/>
+                        <column id="1604"/>
+                        <column id="1435"/>
+                        <column id="1436"/>
+                        <column id="1437"/>
+                        <column id="1438"/>
+                        <column id="1439"/>
+                        <column id="1441"/>
+                        <column id="1573"/>
+                        <column id="1442">
+                            <list-property name="visibility">
+                                <structure>
+                                    <property name="format">all</property>
+                                    <expression name="valueExpr" type="javascript">true</expression>
+                                </structure>
+                            </list-property>
+                        </column>
+                        <column id="1443">
+                            <list-property name="visibility">
+                                <structure>
+                                    <property name="format">all</property>
+                                    <expression name="valueExpr">true</expression>
+                                </structure>
+                            </list-property>
+                        </column>
+                        <column id="1589"/>
+                        <column id="1444">
+                            <list-property name="visibility">
+                                <structure>
+                                    <property name="format">all</property>
+                                    <expression name="valueExpr">true</expression>
+                                </structure>
+                            </list-property>
+                        </column>
+                        <column id="1445">
+                            <list-property name="visibility">
+                                <structure>
+                                    <property name="format">all</property>
+                                    <expression name="valueExpr">true</expression>
+                                </structure>
+                            </list-property>
+                        </column>
+                        <column id="1446"/>
+                        <column id="1447"/>
+                        <header>
+                            <row id="1334">
+                                <cell id="1335">
+                                    <label id="1336">
+                                        <property name="style">columnHeader</property>
+                                        <text-property name="text" key="LOCATION">LOCATION_ID</text-property>
+                                        <text-property name="helpText" key="TOOLTIP_LOCATION"></text-property>
+                                    </label>
+                                </cell>
+                                <cell id="1337">
+                                    <label id="1340">
+                                        <property name="style">columnHeader</property>
+                                        <text-property name="text" key="TERMINAL">TERMINAL_NUMBER</text-property>
+                                        <text-property name="helpText" key="TOOLTIP_TERMINAL"></text-property>
+                                    </label>
+                                </cell>
+                                <cell id="1452">
+                                    <label id="1338">
+                                        <property name="style">columnHeader</property>
+                                        <text-property name="text" key="ACQUIRER">ACQUIRER_DESCRIPTION</text-property>
+                                        <text-property name="helpText" key="TOOLTIP_ACQUIRER"></text-property>
+                                    </label>
+                                </cell>
+                                <cell id="1595">
+                                    <label id="1605">
+                                     	<property name="style">columnHeader</property>
+                                        <text-property name="text" key="CARD_ENTRY_METHOD">CARD_ENTRY_METHOD</text-property>
+                                        <text-property name="helpText" key="TOOLTIP_CARD_ENTRY_METHOD"></text-property>
+                                    </label>
+                                </cell>
+                                <cell id="1341">
+                                    <label id="1342">
+                                        <property name="style">columnHeaderRight</property>
+                                        <text-property name="text" key="TRANSACTION_NUMBER">TRANSACTION_NUMBER</text-property>
+                                        <text-property name="helpText" key="TOOLTIP_TRANSACTION_NUMBER"></text-property>
+                                    </label>
+                                </cell>
+                                <cell id="1343">
+                                    <label id="1372">
+                                        <property name="style">columnHeader</property>
+                                        <text-property name="text" key="DATE_TIME">FORMATTED_COMPLETED_DATE_TIME</text-property>
+                                        <text-property name="helpText" key="TOOLTIP_DATE_TIME"></text-property>
+                                    </label>
+                                </cell>
+                                <cell id="1345">
+                                    <label id="1346">
+                                        <property name="style">columnHeader</property>
+                                        <text-property name="text" key="CUSTOMER_ID">CUSTOMER_ID</text-property>
+                                        <text-property name="helpText" key="TOOLTIP_CUSTOMER_ID"></text-property>
+                                    </label>
+                                </cell>
+                                <cell id="1347">
+                                    <label id="1348">
+                                        <property name="style">columnHeader</property>
+                                        <text-property name="text" key="CUSTOMER_SURNAME">CUSTOMER_SURNAME</text-property>
+                                        <text-property name="helpText" key="TOOLTIP_CUSTOMER_SURNAME"></text-property>
+                                    </label>
+                                </cell>
+                                <cell id="1349">
+                                    <label id="1368">
+                                        <property name="style">columnHeaderRight</property>
+                                        <text-property name="text" key="VALUE">FORMATTED_BASE_VALUE</text-property>
+                                        <text-property name="helpText" key="TOOLTIP_BASE_VALUE"></text-property>
+                                    </label>
+                                </cell>
+                                <cell id="1353">
+                                    <label id="1370">
+                                        <property name="style">columnHeaderRight</property>
+                                        <text-property name="text" key="FOREIGN_VALUE">FORMATTED_FOREIGN_VALUE</text-property>
+                                        <text-property name="helpText" key="TOOLTIP_FOREIGN_VALUE"></text-property>
+                                    </label>
+                                </cell>
+                                <cell id="1564">
+                                    <label id="1352">
+                                        <property name="style">columnHeader</property>
+                                        <text-property name="text" key="CURRENCY">FOREIGN_CURRENCY_ID</text-property>
+                                        <text-property name="helpText" key="TOOLTIP_CURRENCY"></text-property>
+                                    </label>
+                                </cell>
+                                <cell id="1355">
+                                    <label id="1356">
+                                        <property name="style">columnHeader</property>
+                                        <text-property name="text" key="CARD_NUMBER">FORMATTED_CARD_NUMBER</text-property>
+                                        <text-property name="helpText" key="TOOLTIP_CARD_NUMBER"></text-property>
+                                    </label>
+                                </cell>
+                                <cell id="1357">
+                                    <label id="1358">
+                                        <property name="style">columnHeader</property>
+                                        <text-property name="text">CARD_NUMBER_HASHED</text-property>
+                                    </label>
+                                </cell>
+                                <cell id="1580">
+                                    <label id="1590">
+                                        <property name="style">columnHeader</property>
+                                        <text-property name="text" key="CARD_NUMBER_MANGLED">CARD_NUMBER_HASHED</text-property>
+                                    </label>
+                                </cell>
+                                <cell id="1359">
+                                    <label id="1360">
+                                        <property name="style">columnHeader</property>
+                                        <text-property name="text">ENCRYPTED_DATA</text-property>
+                                    </label>
+                                </cell>
+                                <cell id="1361">
+                                    <label id="1362">
+                                        <property name="style">columnHeader</property>
+                                        <text-property name="text">KEY_ID</text-property>
+                                    </label>
+                                </cell>
+                                <cell id="1363">
+                                    <label id="1364">
+                                        <property name="style">columnHeader</property>
+                                        <text-property name="text" key="CARD_TYPE">CARD_TYPE_DESCRIPTION</text-property>
+                                        <text-property name="helpText" key="TOOLTIP_CARD_TYPE"></text-property>
+                                    </label>
+                                </cell>
+                                <cell id="1365">
+                                    <label id="1366">
+                                        <property name="style">columnHeader</property>
+                                        <text-property name="text" key="MERCHANT_ID">MERCHANT_ID</text-property>
+                                        <text-property name="helpText" key="TOOLTIP_MERCHANT_ID"></text-property>
+                                    </label>
+                                </cell>
+                            </row>
+                        </header>
+                        <group id="1456">
+                            <property name="groupName">locationGroup</property>
+                            <property name="interval">none</property>
+                            <property name="sortDirection">asc</property>
+                            <expression name="keyExpr">row["LOCATION_ID"]</expression>
+                            <structure name="toc">
+                                <expression name="expressionValue">row["LOCATION_ID"]</expression>
+                            </structure>
+                            <property name="repeatHeader">true</property>
+                            <property name="hideDetail">false</property>
+                            <property name="pageBreakAfter">auto</property>
+                            <property name="pageBreakBefore">auto</property>
+                            <property name="pageBreakInside">auto</property>
+                            <header>
+                                <row id="1457">
+                                    <cell id="1458">
+                                        <data id="1491">
+                                            <property name="style">sectionHeader</property>
+                                            <property name="resultSetColumn">LOCATION_ID</property>
+                                            <text-property name="helpText" key="TOOLTIP_LOCATION"></text-property>
+                                        </data>
+                                    </cell>
+                                    <cell id="1459"/>
+                                    <cell id="1460"/>
+                                    <cell id="1596"/>
+                                    <cell id="1461"/>
+                                    <cell id="1462"/>
+                                    <cell id="1463"/>
+                                    <cell id="1464"/>
+                                    <cell id="1465"/>
+                                    <cell id="1467"/>
+                                    <cell id="1565"/>
+                                    <cell id="1468"/>
+                                    <cell id="1469"/>
+                                    <cell id="1581"/>
+                                    <cell id="1470"/>
+                                    <cell id="1471"/>
+                                    <cell id="1472"/>
+                                    <cell id="1473"/>
+                                </row>
+                            </header>
+                            <footer>
+                                <row id="1474">
+                                    <cell id="1475"/>
+                                    <cell id="1476"/>
+                                    <cell id="1477"/>
+                                    <cell id="1602"/>
+                                    <cell id="1478"/>
+                                    <cell id="1479"/>
+                                    <cell id="1480"/>
+                                    <cell id="1481"/>
+                                    <cell id="1482"/>
+                                    <cell id="1484"/>
+                                    <cell id="1571"/>
+                                    <cell id="1485"/>
+                                    <cell id="1486"/>
+                                    <cell id="1587"/>
+                                    <cell id="1487"/>
+                                    <cell id="1488"/>
+                                    <cell id="1489"/>
+                                    <cell id="1490"/>
+                                </row>
+                            </footer>
+                        </group>
+                        <group id="1492">
+                            <property name="groupName">terminalGroup</property>
+                            <property name="interval">none</property>
+                            <property name="sortDirection">asc</property>
+                            <expression name="keyExpr">row["TERMINAL_NUMBER"]</expression>
+                            <structure name="toc">
+                                <expression name="expressionValue">row["TERMINAL_NUMBER"]</expression>
+                            </structure>
+                            <property name="repeatHeader">true</property>
+                            <property name="hideDetail">false</property>
+                            <property name="pageBreakAfter">auto</property>
+                            <property name="pageBreakBefore">auto</property>
+                            <property name="pageBreakInside">auto</property>
+                            <header>
+                                <row id="1493">
+                                    <cell id="1494"/>
+                                    <cell id="1495">
+                                        <data id="1527">
+                                            <property name="style">sectionHeader</property>
+                                            <property name="resultSetColumn">TERMINAL_NUMBER</property>
+                                            <text-property name="helpText" key="TOOLTIP_TERMINAL"></text-property>
+                                        </data>
+                                    </cell>
+                                    <cell id="1496"/>
+                                    <cell id="1597"/>
+                                    <cell id="1497"/>
+                                    <cell id="1498"/>
+                                    <cell id="1499"/>
+                                    <cell id="1500"/>
+                                    <cell id="1501"/>
+                                    <cell id="1503"/>
+                                    <cell id="1566"/>
+                                    <cell id="1504"/>
+                                    <cell id="1505"/>
+                                    <cell id="1582"/>
+                                    <cell id="1506"/>
+                                    <cell id="1507"/>
+                                    <cell id="1508"/>
+                                    <cell id="1509"/>
+                                </row>
+                            </header>
+                            <footer>
+                                <row id="1510">
+                                    <cell id="1511"/>
+                                    <cell id="1512"/>
+                                    <cell id="1513"/>
+                                    <cell id="1601"/>
+                                    <cell id="1514"/>
+                                    <cell id="1515"/>
+                                    <cell id="1516"/>
+                                    <cell id="1517"/>
+                                    <cell id="1518"/>
+                                    <cell id="1520"/>
+                                    <cell id="1570"/>
+                                    <cell id="1521"/>
+                                    <cell id="1522"/>
+                                    <cell id="1586"/>
+                                    <cell id="1523"/>
+                                    <cell id="1524"/>
+                                    <cell id="1525"/>
+                                    <cell id="1526"/>
+                                </row>
+                            </footer>
+                        </group>
+                        <group id="1528">
+                            <property name="groupName">acquirerGroup</property>
+                            <property name="interval">none</property>
+                            <property name="sortDirection">asc</property>
+                            <expression name="keyExpr">row["ACQUIRER_GROUP_KEY"]</expression>
+                            <structure name="toc">
+                                <expression name="expressionValue">row["ACQUIRER_GROUP_KEY"]</expression>
+                            </structure>
+                            <property name="repeatHeader">true</property>
+                            <property name="hideDetail">false</property>
+                            <property name="pageBreakAfter">auto</property>
+                            <property name="pageBreakBefore">auto</property>
+                            <property name="pageBreakInside">auto</property>
+                            <header>
+                                <row id="1529">
+                                    <cell id="1530"/>
+                                    <cell id="1531"/>
+                                    <cell id="1532">
+                                        <data id="1377">
+                                            <property name="style">sectionHeader</property>
+                                            <property name="resultSetColumn">ACQUIRER_DESCRIPTION</property>
+                                            <text-property name="helpText" key="TOOLTIP_ACQUIRER"></text-property>
+                                        </data>
+                                    </cell>
+                                    <cell id="1598"/>
+                                    <cell id="1533"/>
+                                    <cell id="1534"/>
+                                    <cell id="1535"/>
+                                    <cell id="1536"/>
+                                    <cell id="1537"/>
+                                    <cell id="1539"/>
+                                    <cell id="1567"/>
+                                    <cell id="1540"/>
+                                    <cell id="1541"/>
+                                    <cell id="1583"/>
+                                    <cell id="1542"/>
+                                    <cell id="1543"/>
+                                    <cell id="1544"/>
+                                    <cell id="1545"/>
+                                </row>
+                            </header>
+                            <footer>
+                                <row id="1546">
+                                    <cell id="1547"/>
+                                    <cell id="1548"/>
+                                    <cell id="1549"/>
+                                    <cell id="1600"/>
+                                    <cell id="1550"/>
+                                    <cell id="1551"/>
+                                    <cell id="1552"/>
+                                    <cell id="1553"/>
+                                    <cell id="1554"/>
+                                    <cell id="1556"/>
+                                    <cell id="1569"/>
+                                    <cell id="1557"/>
+                                    <cell id="1558"/>
+                                    <cell id="1585"/>
+                                    <cell id="1559"/>
+                                    <cell id="1560"/>
+                                    <cell id="1561"/>
+                                    <cell id="1562"/>
+                                </row>
+                            </footer>
+                        </group>
+                        <detail>
+                            <row id="1373">
+                                <cell id="1374"/>
+                                <cell id="1376"/>
+                                <cell id="1453"/>
+                                <cell id="1599">
+                                    <data id="1606">
+                                        <property name="resultSetColumn">CARD_ENTRY_METHOD</property>
+                                    </data>
+                                </cell>
+                                <cell id="1380">
+                                    <data id="1381">
+                                        <property name="style">reportColumnRight</property>
+                                        <property name="resultSetColumn">TRANSACTION_NUMBER</property>
+                                        <text-property name="helpText" key="TOOLTIP_TRANSACTION_NUMBER"></text-property>
+                                    </data>
+                                </cell>
+                                <cell id="1382">
+                                    <data id="1411">
+                                        <property name="style">reportColumn</property>
+                                        <property name="resultSetColumn">FORMATTED_COMPLETED_DATE_TIME</property>
+                                        <text-property name="helpText" key="TOOLTIP_DATE_TIME"></text-property>
+                                    </data>
+                                </cell>
+                                <cell id="1384">
+                                    <data id="1385">
+                                        <property name="style">reportColumn</property>
+                                        <property name="resultSetColumn">CUSTOMER_ID</property>
+                                        <text-property name="helpText" key="TOOLTIP_CUSTOMER_ID"></text-property>
+                                    </data>
+                                </cell>
+                                <cell id="1386">
+                                    <data id="1387">
+                                        <property name="style">reportColumn</property>
+                                        <property name="resultSetColumn">CUSTOMER_SURNAME</property>
+                                        <text-property name="helpText" key="TOOLTIP_CUSTOMER_SURNAME"></text-property>
+                                    </data>
+                                </cell>
+                                <cell id="1388">
+                                    <data id="1407">
+                                        <property name="style">reportColumnRight</property>
+                                        <property name="resultSetColumn">FORMATTED_BASE_VALUE</property>
+                                        <text-property name="helpText" key="TOOLTIP_BASE_VALUE"></text-property>
+                                    </data>
+                                </cell>
+                                <cell id="1392">
+                                    <data id="1409">
+                                        <property name="style">reportColumnRight</property>
+                                        <property name="fontStyle">italic</property>
+                                        <property name="resultSetColumn">FORMATTED_FOREIGN_VALUE</property>
+                                        <text-property name="helpText" key="TOOLTIP_FOREIGN_VALUE"></text-property>
+                                    </data>
+                                </cell>
+                                <cell id="1568">
+                                    <data id="1391">
+                                        <property name="style">reportColumn</property>
+                                        <property name="resultSetColumn">FOREIGN_CURRENCY_ID</property>
+                                        <text-property name="helpText" key="TOOLTIP_CURRENCY"></text-property>
+                                    </data>
+                                </cell>
+                                <cell id="1394">
+                                    <data id="1451">
+                                        <property name="style">reportColumn</property>
+                                        <property name="resultSetColumn">FORMATTED_CARD_NUMBER</property>
+                                        <text-property name="helpText" key="TOOLTIP_CARD_NUMBER"></text-property>
+                                    </data>
+                                </cell>
+                                <cell id="1396">
+                                    <data id="1397">
+                                        <property name="style">reportColumn</property>
+                                        <property name="resultSetColumn">CARD_NUMBER_HASHED</property>
+                                    </data>
+                                </cell>
+                                <cell id="1584">
+                                    <data id="1591">
+                                        <property name="style">reportColumn</property>
+                                        <property name="resultSetColumn">CardNumberMangled</property>
+                                    </data>
+                                </cell>
+                                <cell id="1398">
+                                    <data id="1399">
+                                        <property name="style">reportColumn</property>
+                                        <property name="resultSetColumn">ENCRYPTED_DATA</property>
+                                    </data>
+                                </cell>
+                                <cell id="1400">
+                                    <data id="1401">
+                                        <property name="style">reportColumn</property>
+                                        <property name="resultSetColumn">KEY_ID</property>
+                                    </data>
+                                </cell>
+                                <cell id="1402">
+                                    <data id="1403">
+                                        <property name="style">reportColumn</property>
+                                        <property name="resultSetColumn">CARD_TYPE_DESCRIPTION</property>
+                                        <text-property name="helpText" key="TOOLTIP_CARD_TYPE"></text-property>
+                                    </data>
+                                </cell>
+                                <cell id="1404">
+                                    <data id="1405">
+                                        <property name="style">reportColumn</property>
+                                        <property name="resultSetColumn">MERCHANT_ID</property>
+                                        <text-property name="helpText" key="TOOLTIP_MERCHANT_ID"></text-property>
+                                    </data>
+                                </cell>
+                            </row>
+                        </detail>
+                        <footer>
+                            <row id="1412">
+                                <cell id="1413"/>
+                                <cell id="1414"/>
+                                <cell id="1454"/>
+                                <cell id="1603"/>
+                                <cell id="1416"/>
+                                <cell id="1417"/>
+                                <cell id="1418"/>
+                                <cell id="1419"/>
+                                <cell id="1420"/>
+                                <cell id="1422"/>
+                                <cell id="1572"/>
+                                <cell id="1423"/>
+                                <cell id="1424"/>
+                                <cell id="1588"/>
+                                <cell id="1425"/>
+                                <cell id="1426"/>
+                                <cell id="1427"/>
+                                <cell id="1428"/>
+                            </row>
+                        </footer>
+                    </table>
+                </cell>
+            </row>
+        </grid>
+    </body>
+</report>

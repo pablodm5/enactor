@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<retail:posPromptPage xmlns:core="http://www.enactor.com/core" xmlns:retail="http://www.enactor.com/retail" xmlns:ns4="http://www.enactor.com/crm" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803" xmlns:ns6="http://www.apis-it.hr/fin/2012/types/f73" xmlns:ns7="http://www.w3.org/2000/09/xmldsig#" xmlns:ns8="http://www.enactor.com/retail/storedRetailTransaction/service" xmlns:ns9="http://www.fu.gov.si/" xmlns:ns10="http://www.enactor.com/addressLookup/service" xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:ns14="http://www.enactor.com/crm/customerLoyalty/service" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" allowResize="true" allowMove="true" allowClose="true" windowtype="view-panel" height="1136" width="640" messageBase="Pos/GiftCard/GiftCardMessages" url="NextGen640x1136/Pos/GiftCard/GiftCardEnquiryDetails">
+    <core:elements>
+        <core:text messageId="DISPLAY_PROMPT" id="Prompt"/>
+        <core:button messageId="BUTTON_OK" id="Button1">
+            <core:text>OKPressed</core:text>
+        </core:button>
+        <core:button messageId="BUTTON_PRINT" id="Button2">
+            <core:text>PrintPressed</core:text>
+        </core:button>
+        <core:button messageId="BUTTON_HISTORY" visibility="#{priv:checkPrivilege('enactor.pos.GiftCardHistoryAllowed')}" id="Button3">
+            <core:text>HistoryPressed</core:text>
+        </core:button>
+        <core:button messageId="BUTTON_TOPUP" visibility="#{priv:checkPrivilege('enactor.pos.TopUpGiftCardAllowed')}" id="Button4">
+            <core:text>TopUpPressed</core:text>
+        </core:button>
+        <core:panel verticalScrollBars="WhenNeeded" id="DialogPanel">
+            <core:boundsConstraint height="274" width="641" y="41" x="10"/>
+            <core:elements>
+                <core:label messageId="ENQ_DISP_CUSTOMER" styleClass="inputLabel" id="CustomerLabel">
+                    <core:boundsConstraint height="45" width="151" y="5" x="16"/>
+                </core:label>
+                <core:inputText editable="false" type="textField" styleClass="inputText" id="ForenameField">
+                    <core:boundsConstraint height="45" width="217" y="5" x="176"/>
+                    <core:text>#{enactor:empty(customerName) ? '' : customerName.forename}</core:text>
+                </core:inputText>
+                <core:inputText editable="false" type="textField" styleClass="inputText" id="SurnameField">
+                    <core:boundsConstraint height="45" width="209" y="5" x="405"/>
+                    <core:text>#{enactor:empty(customerName) ? '' : customerName.surname}</core:text>
+                </core:inputText>
+                <core:label messageId="ENQ_DISP_ADDRESS" styleClass="inputLabel" id="AddressLabel">
+                    <core:boundsConstraint height="45" width="151" y="76" x="16"/>
+                </core:label>
+                <core:inputText editable="false" type="textField" styleClass="inputText" id="AddressLine1Field">
+                    <core:boundsConstraint height="45" width="438" y="76" x="176"/>
+                    <core:text>#{enactor:empty(customerAddress) ? '' : customerAddress.street1}</core:text>
+                </core:inputText>
+                <core:inputText editable="false" type="textField" styleClass="inputText" id="AddressLine2Field">
+                    <core:boundsConstraint height="45" width="438" y="136" x="176"/>
+                    <core:text>#{enactor:empty(customerAddress) ? '' : customerAddress.street2}</core:text>
+                </core:inputText>
+                <core:inputText editable="false" type="textField" styleClass="inputText" id="TownField">
+                    <core:boundsConstraint height="45" width="226" y="200" x="176"/>
+                    <core:text>#{enactor:empty(customerAddress) ? '' : customerAddress.town}</core:text>
+                </core:inputText>
+                <core:inputText editable="false" type="textField" styleClass="inputText" visibility="#{notEmpty(customerAddress.province)}" id="ProvinceField">
+                    <core:boundsConstraint height="45" width="209" y="200" x="405"/>
+                    <core:text>#{enactor:empty(customerAddress) ? '' : customerAddress.province}</core:text>
+                </core:inputText>
+                <core:inputText editable="false" type="textField" styleClass="inputText" id="PostCodeField">
+                    <core:boundsConstraint height="45" width="226" y="261" x="176"/>
+                    <core:text>#{enactor:empty(customerAddress) ? '' : customerAddress.postCode}</core:text>
+                </core:inputText>
+                <core:inputText editable="false" type="textField" styleClass="inputText" visibility="#{notEmpty(customerAddress.country)}" id="CountryField">
+                    <core:boundsConstraint height="45" width="209" y="261" x="405"/>
+                    <core:text>#{enactor:empty(customerAddress) ? '' : customerAddress.country}</core:text>
+                </core:inputText>
+                <core:label messageId="ENQ_DISP_CARD_DESCRIPTION" styleClass="inputLabel" id="CardDescLabel">
+                    <core:boundsConstraint height="45" width="151" y="333" x="16"/>
+                </core:label>
+                <core:inputText editable="false" type="textField" styleClass="inputText" id="CardDescField">
+                    <core:boundsConstraint height="45" width="226" y="333" x="176"/>
+                    <core:text>#{giftCardType.description}</core:text>
+                </core:inputText>
+                <core:label messageId="ENQ_DISP_CARD_STATUS" styleClass="inputLabel" id="StatusLabel">
+                    <core:boundsConstraint height="45" width="151" y="394" x="16"/>
+                </core:label>
+                <core:inputText editable="false" messageId="#{(empty(giftCardBalanceResponse) || empty(giftCardBalanceResponse.status)) ? 'GIFT_CARD_STATUS_UNKNOWN' : giftCardBalanceResponse.status == 'ACTIVE' ? 'GIFT_CARD_STATUS_ACTIVE' : giftCardBalanceResponse.status == 'AVAILABLE' ? 'GIFT_CARD_STATUS_AVAILABLE' : giftCardBalanceResponse.status == 'CLOSED' ? 'GIFT_CARD_STATUS_CLOSED' : 'GIFT_CARD_STATUS_UNKNOWN'}" type="textField" styleClass="inputText" id="StatusField">
+                    <core:boundsConstraint height="45" width="125" y="396" x="176"/>
+                </core:inputText>
+                <core:label messageId="ENQ_DISP_CARD_NUMBER" styleClass="inputLabel" id="CardNoLabel">
+                    <core:boundsConstraint height="45" width="151" y="455" x="16"/>
+                </core:label>
+                <core:inputText editable="false" type="textField" styleClass="inputText" id="CardNoField">
+                    <core:boundsConstraint height="45" width="226" y="456" x="176"/>
+                    <core:text>#{giftCardDetails.accountId}</core:text>
+                </core:inputText>
+                <core:label messageId="ENQ_DISP_DATE_ISSUED" styleClass="inputLabel" id="IssuedDateLabel">
+                    <core:boundsConstraint height="45" width="151" y="516" x="16"/>
+                </core:label>
+                <core:inputText editable="false" type="textField" styleClass="inputText" visibility="#{notEmpty(giftCardBalanceResponse.dateActivated)}" id="IssuedDateField">
+                    <core:boundsConstraint height="45" width="169" y="516" x="176"/>
+                    <core:text>#{giftCardBalanceResponse.dateActivated}</core:text>
+                    <core:validationData>
+                        <core:dateFieldValidationData>
+                            <core:type>Date</core:type>
+                            <core:inputMask></core:inputMask>
+                            <core:validationClassname></core:validationClassname>
+                        </core:dateFieldValidationData>
+                    </core:validationData>
+                </core:inputText>
+                <core:label messageId="ENQ_DISP_EXPIRY_DATE" styleClass="inputLabel" visibility="#{notEmpty(giftCardBalanceResponse.expiryDate)}" id="ExpiryDateLabel">
+                    <core:boundsConstraint height="45" width="151" y="577" x="16"/>
+                </core:label>
+                <core:inputText editable="false" type="textField" styleClass="inputText" visibility="#{notEmpty(giftCardBalanceResponse.expiryDate)}" id="ExpiryDateField">
+                    <core:boundsConstraint height="45" width="169" y="577" x="176"/>
+                    <core:text>#{giftCardBalanceResponse.expiryDate}</core:text>
+                    <core:validationData>
+                        <core:dateFieldValidationData>
+                            <core:type>Date</core:type>
+                            <core:inputMask></core:inputMask>
+                            <core:validationClassname></core:validationClassname>
+                        </core:dateFieldValidationData>
+                    </core:validationData>
+                </core:inputText>
+                <core:label messageId="ENQ_DISP_BALANCE" styleClass="inputLabel" id="BalanceLabel">
+                    <core:boundsConstraint height="45" width="151" y="639" x="16"/>
+                </core:label>
+                <core:inputText editable="false" type="textField" styleClass="inputText" id="BalanceField">
+                    <core:boundsConstraint height="45" width="230" y="639" x="176"/>
+                    <core:text>#{giftCardDetails.newBalance}</core:text>
+                    <core:validationData>
+                        <core:currencyFieldValidationData>
+                            <core:type>CurrencyAmount</core:type>
+                            <core:allowNulls>true</core:allowNulls>
+                            <core:inputMask></core:inputMask>
+                            <core:validationClassname></core:validationClassname>
+                            <core:currencyId>#{giftCardDetails.currencyId}</core:currencyId>
+                        </core:currencyFieldValidationData>
+                    </core:validationData>
+                </core:inputText>
+            </core:elements>
+        </core:panel>
+        <core:hidden id="InputBox"/>
+        <core:hidden id="Receipt"/>
+    </core:elements>
+    <core:templateURL>NextGen640x1136/Pos/FullScreenTraditionalPosTemplate</core:templateURL>
+    <core:events>
+        <core:event destination="enactor.Prompt" event="key.EnterPressed">OKPressed</core:event>
+    </core:events>
+    <core:variables>
+        <core:variable required="true" name="enactor.mfc.GiftCardDetails">
+            <core:interfaceName>com.enactor.mfc.basket.items.IGiftCardDetails</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.mfc.GiftCardType">
+            <core:interfaceName>com.enactor.mfc.giftCardType.IGiftCardType</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.mfc.CustomerName">
+            <core:interfaceName>com.enactor.mfc.name.IName</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.mfc.CustomerAddress">
+            <core:interfaceName>com.enactor.mfc.address.IAddress</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.cardAuthorisation.messages.GiftCardBalanceResponse">
+            <core:interfaceName>com.enactor.cardAuthorisation.messages.giftCard.IGiftCardBalanceResponse</core:interfaceName>
+        </core:variable>
+    </core:variables>
+</retail:posPromptPage>

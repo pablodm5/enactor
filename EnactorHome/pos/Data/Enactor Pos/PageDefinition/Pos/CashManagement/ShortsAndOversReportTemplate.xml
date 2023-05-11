@@ -1,0 +1,570 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<core:documentTemplate xmlns:core="http://www.enactor.com/core" xmlns:retail="http://www.enactor.com/retail" xmlns:ns4="http://www.enactor.com/crm" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803" xmlns:ns6="http://www.apis-it.hr/fin/2012/types/f73" xmlns:ns7="http://www.w3.org/2000/09/xmldsig#" xmlns:ns8="http://www.enactor.com/retail/storedRetailTransaction/service" xmlns:ns9="http://www.fu.gov.si/" xmlns:ns10="http://www.enactor.com/addressLookup/service" xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:ns14="http://www.enactor.com/crm/customerLoyalty/service" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" paginated="false" width="48" messageBase="Pos/Report/ShortsAndOversReportMessages" title="Cash Management Receipt" url="Pos/CashManagement/ShortsAndOversReportTemplate">
+    <core:elements>
+        <core:formatElement formatId="header"/>
+        <core:formatElement formatId="receiptHeader"/>
+        <core:formatElement formatId="shorts"/>
+        <core:formatElement formatId="overs"/>
+        <core:formatElement formatId="summary"/>
+        <core:formatElement formatId="footer"/>
+        <core:page number="0"/>
+    </core:elements>
+    <core:variables>
+        <core:variable required="true" name="enactor.coreUI.UserLocale">
+            <core:interfaceName>com.enactor.core.localisation.ILocale</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.coreUI.List">
+            <core:interfaceName>java.util.List</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.coreUI.UserLocale">
+            <core:interfaceName>com.enactor.core.localisation.ILocale</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.mfc.Location">
+            <core:interfaceName>com.enactor.mfc.location.ILocation</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.cashManagement.CMTransaction">
+            <core:interfaceName>com.enactor.cashManagement.entities.ICMTransaction</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="element">
+            <core:interfaceName>com.enactor.cashManagement.entities.cashSessionTotals.ICashSessionTotals</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="tenderElement">
+            <core:interfaceName>com.enactor.cashManagement.entities.cashSessionTotals.ICashTenderTotal</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.travelex.mfc.FinancialInstrumentMap">
+            <core:interfaceName>java.util.Map</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.travelex.cashManagement.ProductTypeMap">
+            <core:interfaceName>java.util.Map</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.pos.RunForThisTerminal">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.cashManagement.ShortsSummary">
+            <core:interfaceName>java.lang.Long</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.cashManagement.OversSummary">
+            <core:interfaceName>java.lang.Long</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.cashManagement.TrainingMode">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:variable>
+    </core:variables>
+    <core:columnDefs>
+        <core:columnDef id="FullWidth" startPos="0" endPos="48"/>
+        <core:columnDef id="Left" startPos="0" endPos="48" align="LEFT"/>
+        <core:columnDef id="Right" startPos="0" endPos="48" align="RIGHT"/>
+        <core:columnDef id="HeaderLeft" end="0" startPos="0" endPos="28"/>
+    </core:columnDefs>
+    <core:includedTemplateUrl>Travelex/Pos/Print/ReceiptFormatEntries</core:includedTemplateUrl>
+    <core:formatEntry id="overs">
+        <core:elements>
+            <core:row>
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="FullWidth">
+                            <core:elements>
+<core:text messageId="OVERS_SUBTITLE" style="INVERSE"/>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+            <core:row>
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="FullWidth">
+                            <core:elements>
+<core:text messageId="OVERS_SUBTITLE_UNDERLINE" style="INVERSE"/>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+            <core:row>
+                <core:rowLine>
+                    <core:elements/>
+                </core:rowLine>
+            </core:row>
+            <core:row>
+                <core:rowLine>
+                    <core:elements>
+                        <core:tableTemplate listVariableName="element" list="#{list}" id="SessionTotal">
+                            <core:formatElement formatId="oversListElement"/>
+                        </core:tableTemplate>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+            <core:row>
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="FullWidth">
+                            <core:elements>
+<core:text messageId="END_OF_OVERS_SUBTITLE" style="INVERSE"/>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+            <core:row>
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="FullWidth">
+                            <core:elements>
+<core:text messageId="END_OF_OVERS_SUBTITLE_UNDERLINE" style="INVERSE"/>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+            <core:formatElement formatId="blankSeparator"/>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="oversListElement">
+        <core:elements>
+            <core:row visibility="#{size(element.tenderTotalsList) &gt; 0}">
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="Left">
+                            <core:elements>
+<core:text messageId="TILL_ID"/>
+<core:text>
+    <core:text>#{element.ownerKey.ownerId}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="Right">
+                            <core:elements>
+<core:text>
+    <core:text>#{dates:formatDateForString(dates:getNow(), 'yyyy/MM/dd HH:mm:ss')}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+            <core:row visibility="#{size(element.tenderTotalsList) &gt; 0}">
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="Left">
+                            <core:elements>
+<core:text messageId="USER_ID"/>
+<core:text>
+    <core:text>#{user.userId}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="Right">
+                            <core:elements>
+<core:text>
+    <core:text>#{user.displayName}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+            <core:row>
+                <core:rowLine>
+                    <core:elements>
+                        <core:tableTemplate listVariableName="tenderElement" list="#{element.tenderTotalsList}" id="SessionTotal">
+                            <core:formatElement formatId="oversTenderListElement"/>
+                        </core:tableTemplate>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="oversTenderListElement">
+        <core:elements>
+            <core:row visibility="#{tenderElement.countedValue &gt; tenderElement.expectedValue}">
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="Left">
+                            <core:elements>
+<core:text>
+    <core:uiMessage value="#{item.localisedDescriptions}"/>
+    <core:formatters>
+        <core:formatLocaleString localeValue="#{userLocale}"/>
+    </core:formatters>
+    <core:text>#{financialInstrumentMap[tenderElement.tenderId]}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="Right">
+                            <core:elements>
+<core:text messageId="PPC_CASHOUT_LABEL" visibility="#{productTypeMap[tenderElement.tenderId] == 'prePaidCardCashoutProduct'}"/>
+<core:text messageId="CURRENCY_LABEL" visibility="#{productTypeMap[tenderElement.tenderId] != 'prePaidCardCashoutProduct'}"/>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+            <core:row visibility="#{tenderElement.countedValue &gt; tenderElement.expectedValue}">
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="Left">
+                            <core:elements>
+<core:text messageId="F_LABEL" style="INVERSE"/>
+<core:text style="INVERSE">
+    <core:formatters>
+        <core:formatCurrencyAmount currencyId="#{tenderElement.currencyKey.currencyId}"/>
+    </core:formatters>
+    <core:text>#{tenderElement.countedValue - tenderElement.expectedValue}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+            <core:row visibility="#{tenderElement.countedValue &gt; tenderElement.expectedValue}">
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="Left">
+                            <core:elements>
+<core:text messageId="L_LABEL" style="INVERSE"/>
+<core:text style="INVERSE">
+    <core:formatters>
+        <core:formatCurrencyAmount currencyId="#{location.baseCurrencyKey.currencyId}"/>
+    </core:formatters>
+    <core:text>#{tenderElement.baseCountedValue - tenderElement.baseExpectedValue}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="shorts">
+        <core:elements>
+            <core:row>
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="FullWidth">
+                            <core:elements>
+<core:text messageId="SHORTS_SUBTITLE" style="INVERSE"/>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+            <core:row>
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="FullWidth">
+                            <core:elements>
+<core:text messageId="SHORTS_SUBTITLE_UNDERLINE" style="INVERSE"/>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+            <core:formatElement formatId="blankSeparator"/>
+            <core:row>
+                <core:rowLine>
+                    <core:elements>
+                        <core:tableTemplate listVariableName="element" list="#{list}" id="SessionTotal">
+                            <core:formatElement formatId="shortsListElement"/>
+                        </core:tableTemplate>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+            <core:row>
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="FullWidth">
+                            <core:elements>
+<core:text messageId="END_OF_SHORTS_SUBTITLE" style="INVERSE"/>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+            <core:row>
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="FullWidth">
+                            <core:elements>
+<core:text messageId="END_OF_SHORTS_SUBTITLE_UNDERLINE" style="INVERSE"/>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+            <core:formatElement formatId="blankSeparator"/>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="shortsListElement">
+        <core:elements>
+            <core:row visibility="#{size(element.tenderTotalsList) &gt; 0}">
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="Left">
+                            <core:elements>
+<core:text messageId="TILL_ID"/>
+<core:text>
+    <core:text>#{element.ownerKey.ownerId}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="Right">
+                            <core:elements>
+<core:text>
+    <core:text>#{dates:formatDateForString(dates:getNow(), 'yyyy/MM/dd HH:mm:ss')}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+            <core:row visibility="#{size(element.tenderTotalsList) &gt; 0}">
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="Left">
+                            <core:elements>
+<core:text messageId="USER_ID"/>
+<core:text>
+    <core:text>#{user.userId}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="Right">
+                            <core:elements>
+<core:text>
+    <core:text>#{user.displayName}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+            <core:row>
+                <core:rowLine>
+                    <core:elements>
+                        <core:tableTemplate listVariableName="tenderElement" list="#{element.tenderTotalsList}" id="SessionTotal">
+                            <core:formatElement formatId="shortsTenderListElement"/>
+                        </core:tableTemplate>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="shortsTenderListElement">
+        <core:elements>
+            <core:row visibility="#{tenderElement.expectedValue &gt; tenderElement.countedValue}">
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="Left">
+                            <core:elements>
+<core:text>
+    <core:uiMessage value="#{item.localisedDescriptions}"/>
+    <core:formatters>
+        <core:formatLocaleString localeValue="#{userLocale}"/>
+    </core:formatters>
+    <core:text>#{financialInstrumentMap[tenderElement.tenderId]}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="Right">
+                            <core:elements>
+<core:text messageId="PPC_CASHOUT_LABEL" visibility="#{productTypeMap[tenderElement.tenderId] == 'prePaidCardCashoutProduct'}"/>
+<core:text messageId="CURRENCY_LABEL" visibility="#{productTypeMap[tenderElement.tenderId] != 'prePaidCardCashoutProduct'}"/>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+            <core:row visibility="#{tenderElement.expectedValue &gt; tenderElement.countedValue}">
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="Left">
+                            <core:elements>
+<core:text messageId="F_LABEL" style="INVERSE"/>
+<core:text style="INVERSE">
+    <core:formatters>
+        <core:formatCurrencyAmount currencyId="#{tenderElement.currencyKey.currencyId}"/>
+    </core:formatters>
+    <core:text>#{tenderElement.expectedValue - tenderElement.countedValue}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+            <core:row visibility="#{tenderElement.expectedValue &gt; tenderElement.countedValue}">
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="Left">
+                            <core:elements>
+<core:text messageId="L_LABEL" style="INVERSE"/>
+<core:text style="INVERSE">
+    <core:formatters>
+        <core:formatCurrencyAmount currencyId="#{location.baseCurrencyKey.currencyId}"/>
+    </core:formatters>
+    <core:text>#{tenderElement.baseExpectedValue - tenderElement.baseCountedValue}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="separator">
+        <core:elements>
+            <core:row>
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="FullWidth">
+                            <core:elements>
+<core:text messageBase="Travelex/Pos/Print/TravelexReceiptMessages" messageId="SEPARATOR"/>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="blankSeparator">
+        <core:elements>
+            <core:row>
+                <core:rowLine>
+                    <core:elements/>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="summary">
+        <core:elements>
+            <core:row visibility="#{!runForThisTerminal}">
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="FullWidth">
+                            <core:elements>
+<core:text messageId="SUMMARY_DETAILS" style="INVERSE"/>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+            <core:row visibility="#{!runForThisTerminal}">
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="FullWidth">
+                            <core:elements>
+<core:text messageId="SUMMARY_DETAILS_UNDERLINE" style="INVERSE"/>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+            <core:formatElement formatId="blankSeparator"/>
+            <core:row visibility="#{!runForThisTerminal}">
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="Left">
+                            <core:elements>
+<core:text messageId="S_LABEL" style="INVERSE"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="Right">
+                            <core:elements>
+<core:text style="INVERSE">
+    <core:formatters>
+        <core:formatCurrencyAmount currencyId="#{location.baseCurrencyKey.currencyId}"/>
+    </core:formatters>
+    <core:text>#{shortsSummary}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+            <core:row visibility="#{!runForThisTerminal}">
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="Left">
+                            <core:elements>
+<core:text messageId="O_LABEL" style="INVERSE"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="Right">
+                            <core:elements>
+<core:text style="INVERSE">
+    <core:formatters>
+        <core:formatCurrencyAmount currencyId="#{location.baseCurrencyKey.currencyId}"/>
+    </core:formatters>
+    <core:text>#{oversSummary}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+            <core:row visibility="#{!runForThisTerminal}">
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="Left">
+                            <core:elements>
+<core:text messageId="T_LABEL" style="INVERSE"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="Right">
+                            <core:elements>
+<core:text style="INVERSE">
+    <core:formatters>
+        <core:formatCurrencyAmount currencyId="#{location.baseCurrencyKey.currencyId}"/>
+    </core:formatters>
+    <core:text>#{shortsSummary - oversSummary}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+            <core:formatElement formatId="blankSeparator"/>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="header">
+        <core:elements>
+            <core:line visibility="#{trainingMode}">
+                <core:elements>
+                    <core:column maxLines="0" align="CENTRE" columnDefId="FullWidth">
+                        <core:elements>
+                            <core:text messageBase="Pos/Report/ShortsAndOversReportMessages" messageId="TRAINING_MODE_HEADING"/>
+                        </core:elements>
+                    </core:column>
+                </core:elements>
+            </core:line>
+            <core:formatElement applicability="#{trainingMode}" formatId="separator"/>
+            <core:row>
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="FullWidth">
+                            <core:elements>
+<core:text messageId="HEADER_TEXT" visibility="#{runForThisTerminal}" style="INVERSE"/>
+<core:text messageId="CONSOLIDATED_HEADER_TEXT" visibility="#{!runForThisTerminal}" style="INVERSE"/>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="footer">
+        <core:elements>
+            <core:row>
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="FullWidth">
+                            <core:elements>
+<core:text messageId="FOOTER_TEXT" style="INVERSE"/>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+</core:documentTemplate>

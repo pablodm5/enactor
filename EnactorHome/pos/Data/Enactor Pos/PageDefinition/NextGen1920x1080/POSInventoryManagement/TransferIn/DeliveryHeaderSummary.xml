@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<retail:posPromptPage xmlns:core="http://www.enactor.com/core" xmlns:retail="http://www.enactor.com/retail" xmlns:ns4="http://www.enactor.com/crm" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803" xmlns:ns6="http://www.apis-it.hr/fin/2012/types/f73" xmlns:ns7="http://www.w3.org/2000/09/xmldsig#" xmlns:ns8="http://www.enactor.com/retail/storedRetailTransaction/service" xmlns:ns9="http://www.fu.gov.si/" xmlns:ns10="http://www.enactor.com/addressLookup/service" xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:ns14="http://www.enactor.com/crm/customerLoyalty/service" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" allowResize="true" allowMove="true" allowClose="true" windowtype="view-panel" height="1080" width="1920" updateMode="REDRAW_PAGE" messageBase="POSInventoryManagement/TransferIn/TransferInMessages" url="NextGen1920x1080/POSInventoryManagement/TransferIn/DeliveryHeaderSummary">
+    <core:elements>
+        <core:hidden id="TotalLabel"/>
+        <core:button lineHeight="0" messageId="#{historyMode == true ? 'SUMMARY_REPRINT_BUTTON_LABEL' : 'SUMMARY_CONTINUE_BUTTON_LABEL'}" enabled="true" id="Button1">
+            <core:text>ConfirmPressed</core:text>
+        </core:button>
+        <core:button lineHeight="0" messageId="SUMMARY_ITEMS_BUTTON_LABEL" visibility="#{historyMode == false &amp;&amp; priv:checkPrivilege('enactor.inventoryManagement.pos.TransferIn.AllowEditItems')}" id="Button2">
+            <core:text>ItemsPressed</core:text>
+            <core:textElementEvents/>
+        </core:button>
+        <core:button lineHeight="0" messageId="SUMMARY_CONTAINERS_BUTTON_LABEL" visible="false" enable="#{deliveryReceiptHeader.totalContainers&gt;0}" enabled="true" id="Button3">
+            <core:text>ContainersPressed</core:text>
+            <core:textElementEvents/>
+        </core:button>
+        <core:button lineHeight="0" messageBase="POSInventoryManagement/TransferIn/TransferInMessages" messageId="REMOVE_BUTTON_LABEL" id="Button8">
+            <core:text>CancelPressed</core:text>
+        </core:button>
+        <core:text lineHeight="0" messageId="#{instanceOf(deliveryReceiptHeader, 'com.enactor.storeInventoryManagement.local.transferIn.ITransferInHeader') ? 'SUMMARY_TRANSFER_MESSAGE_LABEL' : 'SUMMARY_SUPPLIER_MESSAGE_LABEL'}" transparentBackground="true" id="Prompt">
+            <core:boundsConstraint height="97" width="321" y="378" x="13"/>
+        </core:text>
+        <core:panel transparentBackground="true" id="DialogPanel">
+            <core:elements>
+                <core:label lineHeight="0" messageId="SUMMARY_DELIVERY_HEADER_TITLE" styleClass="posPageHeading" id="DELIVERY_HEADER_SUMMARY_TITLE">
+                    <core:boundsConstraint height="30" width="300" y="8" x="5"/>
+                </core:label>
+                <core:label lineHeight="0" messageId="SUMMARY_DISPATCH_ID_LABEL" styleClass="formFieldLabel" id="DISPATCH_ID_LABEL">
+                    <core:boundsConstraint height="28" width="200" y="51" x="7"/>
+                </core:label>
+                <core:inputText editable="false" lineHeight="0" styleClass="formFieldInputText" id="DISPATCH_ID">
+                    <core:boundsConstraint height="32" width="180" y="51" x="191"/>
+                    <core:text>#{notEmpty(deliveryReceiptHeader.deliveryId) ? deliveryReceiptHeader.deliveryId : instanceOf(deliveryReceiptHeader, 'com.enactor.storeInventoryManagement.local.transferIn.ITransferInHeader') ? deliveryReceiptHeader.transferInHeaderId : deliveryReceiptHeader.supplierDeliveryReceiptHeaderId}</core:text>
+                </core:inputText>
+                <core:label lineHeight="0" styleClass="formFieldLabel" id="ORDER_ID_LABEL">
+                    <core:boundsConstraint height="28" width="200" y="97" x="7"/>
+                    <core:uiMessage messageId="SUMMARY_DELIVERY_ID_LABEL" applicability="instanceOf(deliveryReceiptHeader, 'com.enactor.storeInventoryManagement.local.transferIn.ITransferInHeader')"/>
+                    <core:uiMessage messageId="SUMMARY_PURCHASE_ORDER_ID_LABEL" applicability="!instanceOf(deliveryReceiptHeader, 'com.enactor.storeInventoryManagement.local.transferIn.ITransferInHeader')"/>
+                </core:label>
+                <core:label allowWrap="true" lineHeight="0" messageId="SUMMARY_NAME_LABEL" styleClass="formFieldLabel" visibility="#{notEmpty(transferInAddress)}" id="CUSTOMER_CONTACT_NAME_LABEL">
+                    <core:boundsConstraint height="28" width="180" y="479" x="7"/>
+                </core:label>
+                <core:label lineHeight="0" visibility="#{notEmpty(transferInAddress)}" id="CUSTOMER_CONTACT_NAME">
+                    <core:boundsConstraint height="28" width="239" y="479" x="191"/>
+                    <core:text>#{concat(concat(transferInAddress.name.forename, ' '), transferInAddress.name.surname)}</core:text>
+                </core:label>
+                <core:tableElement id="DATA_TABLE">
+                    <core:boundsConstraint height="60" width="461" y="177" x="7"/>
+                    <core:row id="HEADER_ROW_">
+                        <core:cell id="CONTAINER_CELL">
+                            <core:flowConstraint width="100%" height="100%"/>
+                            <core:elements>
+<core:label messageId="SUMMARY_CONTAINERS_HEADER_LABEL" styleClass="formFieldTitle" id="CONTAINERS_HEADER">
+    <core:flowConstraint/>
+</core:label>
+                            </core:elements>
+                        </core:cell>
+                        <core:cell id="LINES_CELL_">
+                            <core:flowConstraint width="100%" height="100%"/>
+                            <core:elements>
+<core:label messageId="SUMMARY_LINES_HEADER_LABEL" styleClass="formFieldTitle" id="LINES_HEADER">
+    <core:flowConstraint/>
+</core:label>
+                            </core:elements>
+                        </core:cell>
+                        <core:cell id="ITEMS_CELL">
+                            <core:flowConstraint width="100%" height="100%"/>
+                            <core:elements>
+<core:label messageId="SUMMARY_ITEMS_HEADER_LABEL" styleClass="formFieldTitle" id="ITEMS_HEADER">
+    <core:flowConstraint/>
+</core:label>
+                            </core:elements>
+                        </core:cell>
+                    </core:row>
+                    <core:row id="DATA_ROW">
+                        <core:cell backgroundColour="WHITE" id="CONTAINER_CELL">
+                            <core:flowConstraint width="100%" height="100%"/>
+                            <core:elements>
+<core:label styleClass="formFieldTitle" id="NUMBER_OF_CONTAINERS">
+    <core:text>#{totalContainers}</core:text>
+</core:label>
+                            </core:elements>
+                        </core:cell>
+                        <core:cell backgroundColour="WHITE" id="LINES_CELL">
+                            <core:flowConstraint width="100%" height="100%"/>
+                            <core:elements>
+<core:label styleClass="formFieldTitle" id="NUMBER_OF_LINES">
+    <core:text>#{totalLines}</core:text>
+</core:label>
+                            </core:elements>
+                        </core:cell>
+                        <core:cell backgroundColour="WHITE" id="ITEMS_CELL">
+                            <core:flowConstraint width="100%" height="100%"/>
+                            <core:elements>
+<core:label styleClass="formFieldTitle" id="NUMBER_OF_ITEMS">
+    <core:flowConstraint/>
+    <core:text>#{totalItems}</core:text>
+</core:label>
+                            </core:elements>
+                        </core:cell>
+                    </core:row>
+                </core:tableElement>
+                <core:label lineHeight="0" messageId="SUMMARY_TRANSFER_CREATED_LABEL" styleClass="formFieldLabel" id="DATE_ORDERED_LABEL">
+                    <core:boundsConstraint height="28" width="180" y="177" x="492"/>
+                </core:label>
+                <core:inputText editable="false" lineHeight="0" styleClass="formFieldInputText" id="TRANSFER_CREATED">
+                    <core:boundsConstraint height="32" width="180" y="177" x="676"/>
+                    <core:text>#{dates:formatShortDate(locale, deliveryReceiptHeader.dateTimeCreated.localDateTime)}</core:text>
+                </core:inputText>
+                <core:label lineHeight="0" messageId="SUMMARY_DATE_DISPATCHED_LABEL" styleClass="formFieldLabel" visibility="#{notEmpty(deliveryReceiptHeader.dateTimeDispatched.localDateTime)}" id="DATE_DISPATCHED_LABEL">
+                    <core:boundsConstraint height="28" width="180" y="223" x="492"/>
+                </core:label>
+                <core:inputText editable="false" lineHeight="0" styleClass="formFieldInputText" visibility="#{notEmpty(deliveryReceiptHeader.dateTimeDispatched.localDateTime)}" id="DATE_DISPATCHED">
+                    <core:boundsConstraint height="32" width="180" y="223" x="676"/>
+                    <core:text>#{dates:formatShortDate(locale, deliveryReceiptHeader.dateTimeDispatched.localDateTime)}</core:text>
+                </core:inputText>
+                <core:label lineHeight="0" messageId="SUMMARY_DELIVERY_TYPE_LABEL" styleClass="formFieldLabel" id="DELIVERY_TYPE_LABEL">
+                    <core:boundsConstraint height="28" width="200" y="51" x="492"/>
+                </core:label>
+                <core:inputText editable="false" lineHeight="0" messageId="#{instanceOf(deliveryReceiptHeader, 'com.enactor.storeInventoryManagement.local.transferIn.ITransferInHeader') ? (instanceOf(deliveryReceiptHeader,'com.enactor.storeInventoryManagement.local.transferIn.ICustomerTransferInHeader') ?(instanceOf(reason,'com.enactor.mfc.reason.IInterStoreTransferLimitedReason')  ? concat(reason.effectOnInventory,'_REQUEST_TYPE_LABEL') : 'TRANSFER_DELIVERY_TYPE_LABEL'):'SUMMARY_TRANSFER_DELIVERY_TYPE_LABEL') : 'SUMMARY_SUPPLIER_DELIVERY_TYPE_LABEL'}" styleClass="formFieldInputText" id="DELIVERY_TYPE">
+                    <core:boundsConstraint height="32" width="180" y="51" x="676"/>
+                </core:inputText>
+                <core:inputText edit="#{historyMode != true &amp;&amp; deliveryReceiptHeader.adHoc}" lineHeight="0" styleClass="formFieldInputText" id="ORDER_ID">
+                    <core:boundsConstraint height="32" width="180" y="97" x="191"/>
+                    <core:text>#{instanceOf(deliveryReceiptHeader, 'com.enactor.storeInventoryManagement.local.transferIn.ITransferInHeader') ? deliveryReceiptHeader.distributionOrderId : deliveryReceiptHeader.purchaseOrderId}</core:text>
+                </core:inputText>
+                <core:inputText edit="#{historyMode != true &amp;&amp; deliveryReceiptHeader.adHoc}" lineHeight="0" styleClass="formFieldInputText" id="SUPPLIER_NAME">
+                    <core:boundsConstraint height="32" width="180" y="97" x="676"/>
+                    <core:text>#{instanceOf(deliveryReceiptHeader, 'com.enactor.storeInventoryManagement.local.transferIn.ITransferInHeader') ? locationsDynamicMap[deliveryReceiptHeader.sourceLocationKey.locationId].description : suppliersDynamicMap[deliveryReceiptHeader.supplierKey.supplierId].name}</core:text>
+                </core:inputText>
+                <core:errorLabel errorFieldId="SUPPLIER" allowWrap="true" styleClass="formErrorLabel" visibility="#{formErrors != null &amp;&amp; formErrors['SUPPLIER'] != null ? true : false }" id="SUPPLIER_ERROR">
+                    <core:boundsConstraint height="32" width="190" y="97" x="860"/>
+                    <core:text>#{formErrors != null ? formErrors['SUPPLIER'] : null}</core:text>
+                </core:errorLabel>
+                <core:button lineHeight="0" messageId="#{instanceOf(deliveryReceiptHeader, 'com.enactor.storeInventoryManagement.local.transferIn.ITransferInHeader')?'SELECT_LOCATION':'SELECT_SUPPLIER'}" styleClass="buttonLight" skipPageValidation="true" visibility="#{historyMode != true &amp;&amp; deliveryReceiptHeader.adHoc}" id="SELECT_LOCATION_SUPPLIER">
+                    <core:boundsConstraint height="26" width="161" y="132" x="676"/>
+                    <core:text>#{instanceOf(deliveryReceiptHeader, 'com.enactor.storeInventoryManagement.local.transferIn.ITransferInHeader')?'SelectLocationPressed':'SelectSupplierPressed'}</core:text>
+                </core:button>
+                <core:label allowWrap="true" lineHeight="0" messageId="#{instanceOf(deliveryReceiptHeader, 'com.enactor.storeInventoryManagement.local.transferIn.ITransferInHeader') ? 'SUMMARY_SOURCE_LABEL':'SUMMARY_SUPPLIER_LABEL'}" styleClass="formFieldLabel" id="SOURCE_SUPPLIER_LABEL">
+                    <core:boundsConstraint height="28" width="200" y="97" x="492"/>
+                </core:label>
+                <core:label allowWrap="true" lineHeight="0" messageId="SUMMARY_ADDRESS_LABEL" styleClass="formFieldLabel" visibility="#{notEmpty(transferInAddress)}" id="CUSTOMER_CONTACT_ADDRESS_LABEL">
+                    <core:boundsConstraint height="28" width="180" y="377" x="492"/>
+                </core:label>
+                <core:label lineHeight="0" visibility="#{notEmpty(transferInAddress)}" id="CUSTOMER_CONTACT_STREET1">
+                    <core:boundsConstraint height="28" width="454" y="377" x="676"/>
+                    <core:text>#{concat(concat(transferInAddress.address.street1, ' '), transferInAddress.address.street2)}</core:text>
+                </core:label>
+                <core:label allowWrap="true" lineHeight="0" messageId="SUMMARY_PHONE_LABEL" styleClass="formFieldLabel" visibility="#{notEmpty(transferInAddress)}" id="CUSTOMER_CONTACT_PHONE_LABEL">
+                    <core:boundsConstraint height="28" width="180" y="525" x="7"/>
+                </core:label>
+                <core:label lineHeight="0" visibility="#{notEmpty(transferInAddress)}" id="CUSTOMER_CONTACT_PHONE">
+                    <core:boundsConstraint height="28" width="239" y="525" x="191"/>
+                    <core:text>#{transferInAddress.address.phone1}</core:text>
+                </core:label>
+                <core:label allowWrap="true" lineHeight="0" messageId="SUMMARY_EMAIL_LABEL" styleClass="formFieldLabel" visibility="#{notEmpty(transferInAddress)}" id="CUSTOMER_CONTACT_EMAIL_LABEL">
+                    <core:boundsConstraint height="28" width="180" y="571" x="7"/>
+                </core:label>
+                <core:label lineHeight="0" visibility="#{notEmpty(transferInAddress)}" id="CUSTOMER_CONTACT_EMAIL">
+                    <core:boundsConstraint height="28" width="289" y="571" x="191"/>
+                    <core:text>#{transferInAddress.address.email}</core:text>
+                </core:label>
+                <core:label lineHeight="0" visibility="#{notEmpty(transferInAddress)}" id="CUSTOMER_CONTACT_TOWN">
+                    <core:boundsConstraint height="28" width="180" y="525" x="676"/>
+                    <core:text>#{transferInAddress.address.town}</core:text>
+                </core:label>
+                <core:label lineHeight="0" visibility="#{notEmpty(transferInAddress)}" id="CUSTOMER_CONTACT_COUNTY">
+                    <core:boundsConstraint height="28" width="180" y="479" x="676"/>
+                    <core:text>#{transferInAddress.address.county}</core:text>
+                </core:label>
+                <core:label lineHeight="0" visibility="#{notEmpty(transferInAddress)}" id="CUSTOMER_CONTACT_POST_CODE">
+                    <core:boundsConstraint height="28" width="180" y="433" x="676"/>
+                    <core:text>#{transferInAddress.address.postCode}</core:text>
+                </core:label>
+                <core:label allowWrap="true" lineHeight="0" messageId="SUMMARY_ORDER_ID_LABEL" styleClass="formFieldLabel" visibility="#{instanceOf(deliveryReceiptHeader,'com.enactor.storeInventoryManagement.local.transferIn.ICustomerTransferInHeader')}" id="CUSTOMER_ORDER_ID_LABEL">
+                    <core:boundsConstraint height="28" width="180" y="387" x="7"/>
+                </core:label>
+                <core:label lineHeight="0" visibility="#{instanceOf(deliveryReceiptHeader,'com.enactor.storeInventoryManagement.local.transferIn.ICustomerTransferInHeader')}" id="CUSTOMER_ORDER_ID">
+                    <core:boundsConstraint height="28" width="191" y="387" x="191"/>
+                    <core:text>#{deliveryReceiptHeader.customerOrderId}</core:text>
+                </core:label>
+                <core:label allowWrap="true" lineHeight="0" messageId="SUMMARY_CUSTOMER_NUMBER_LABEL" styleClass="formFieldLabel" visibility="#{instanceOf(deliveryReceiptHeader,'com.enactor.storeInventoryManagement.local.transferIn.ICustomerTransferInHeader')}" id="CUSTOMER_NUMBER_LABEL">
+                    <core:boundsConstraint height="28" width="210" y="433" x="7"/>
+                </core:label>
+                <core:label lineHeight="0" visibility="#{instanceOf(deliveryReceiptHeader,'com.enactor.storeInventoryManagement.local.transferIn.ICustomerTransferInHeader')}" id="CUSTOMER_NUMBER">
+                    <core:boundsConstraint height="28" width="191" y="433" x="191"/>
+                    <core:text>#{deliveryReceiptHeader.customerNumber}</core:text>
+                </core:label>
+                <core:label lineHeight="0" messageId="CUSTOMER_DETAILS" styleClass="posPageHeading" visibility="#{instanceOf(deliveryReceiptHeader,'com.enactor.storeInventoryManagement.local.transferIn.ICustomerTransferInHeader')}" id="CUSTOMER_DETAILS">
+                    <core:boundsConstraint height="28" width="273" y="341" x="7"/>
+                </core:label>
+                <core:button lineHeight="0" id="ToggleAlphaKeyboard"/>
+            </core:elements>
+        </core:panel>
+        <core:hidden transparentBackground="true" id="Receipt"/>
+        <core:hidden transparentBackground="true" id="InputBox"/>
+        <core:button lineHeight="0" messageBase="POSInventoryManagement/Common/GeneralMessages" messageId="BACK_BUTTON_LABEL" id="Button7">
+            <core:text>BackPressed</core:text>
+        </core:button>
+        <core:button lineHeight="0" messageBase="POSInventoryManagement/Common/GeneralMessages" messageId="SUSPEND_BUTTON_LABEL" visibility="#{priv:checkPrivilege('enactor.inventoryManagement.pos.TransferIn.AllowTransferInSuspend')}" id="Button4">
+            <core:text>SuspendPressed</core:text>
+        </core:button>
+    </core:elements>
+    <core:templateURL>NextGen1920x1080/Pos/FullScreenTraditionalPosTemplate</core:templateURL>
+    <core:events>
+        <core:event destination="Button1" event="key.EnterPressed">press</core:event>
+        <core:event destination="Button8" event="key.KeyCode27Pressed">press</core:event>
+        <core:event destination="Button2" event="key.UpPressed">press</core:event>
+        <core:event destination="Button3" event="key.DownPressed">press</core:event>
+    </core:events>
+    <core:preferredConstraintType>BOUNDS</core:preferredConstraintType>
+    <core:variables>
+        <core:variable name="enactor.inventoryManagement.local.DeliveryReceiptHeadersPagedList">
+            <core:interfaceName>com.enactor.core.database.list.IPagedList</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.mfc.Reason">
+            <core:interfaceName>com.enactor.mfc.reason.IReason</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.inventoryManagement.local.transferIn.TransferInAddress">
+            <core:interfaceName>com.enactor.storeInventoryManagement.local.transferIn.transferInAddress.ITransferInAddress</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.inventoryManagement.local.DeliveryReceiptHeader">
+            <core:interfaceName>com.enactor.storeInventoryManagement.local.deliveryReceipt.IDeliveryReceiptHeader</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.mfc.Device">
+            <core:interfaceName>com.enactor.mfc.device.IDevice</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.coreUI.User">
+            <core:interfaceName>com.enactor.core.signOn.ISignedOnUser</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.dynamicMap.LocationsDynamicMap">
+            <core:interfaceName>com.enactor.core.utilities.DynamicMap</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.inventoryManagement.HistoryMode">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.inventoryManagement.TotalContainers">
+            <core:interfaceName>java.lang.Integer</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.inventoryManagement.TotalItems">
+            <core:interfaceName>java.lang.Integer</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.inventoryManagement.TotalLines">
+            <core:interfaceName>java.lang.Integer</core:interfaceName>
+        </core:variable>
+        <core:variable name="FormErrors">
+            <core:interfaceName>com.enactor.coreUI.processes.IFormErrors</core:interfaceName>
+        </core:variable>
+    </core:variables>
+    <core:scannerEnabled>false</core:scannerEnabled>
+    <core:scannerDataName></core:scannerDataName>
+</retail:posPromptPage>

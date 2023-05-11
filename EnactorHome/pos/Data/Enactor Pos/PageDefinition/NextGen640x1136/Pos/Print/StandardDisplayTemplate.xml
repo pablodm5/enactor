@@ -1,0 +1,1533 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<core:documentTemplate xmlns:core="http://www.enactor.com/core" xmlns:retail="http://www.enactor.com/retail" xmlns:ns4="http://www.enactor.com/crm" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803" xmlns:ns6="http://www.apis-it.hr/fin/2012/types/f73" xmlns:ns7="http://www.w3.org/2000/09/xmldsig#" xmlns:ns8="http://www.enactor.com/retail/storedRetailTransaction/service" xmlns:ns9="http://www.fu.gov.si/" xmlns:ns10="http://www.enactor.com/addressLookup/service" xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:ns14="http://www.enactor.com/crm/customerLoyalty/service" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" paginated="false" messageBase="Pos/Print/ReceiptMessages" title="Standard Operator Display" url="NextGen640x1136/Pos/Print/StandardDisplayTemplate">
+    <core:elements>
+        <core:tableTemplate list="#{basket.itemIterator}" id="ReceiptList">
+            <core:formatElement applicableClassName="com.enactor.coreUI.views.ListHeader"/>
+            <core:formatElement applicableClassName="com.enactor.coreUI.views.ListFooter"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.print.BasketHeaderItem" formatId="basketHeaderItem"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.print.BasketFooterItem" formatId="basketFooterItem"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IMerchandiseItem" applicability="#{abs(item.quantity) == 1 &amp;&amp; (item.unitType == null || enumEquals(item.unitType, 'UNIT')) &amp;&amp; !item.voided}" formatId="merchandiseItem"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IMerchandiseItem" applicability="#{abs(item.quantity) == 1 &amp;&amp; (item.unitType == null || enumEquals(item.unitType, 'UNIT')) &amp;&amp; item.voided}" formatId="merchandiseItemVoided"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IMerchandiseItem" applicability="#{!item.voided}"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IFeeItem"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IProductWastageItem"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IGiftCardItem"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IProductRewardVoucherItem"/>
+            <core:formatElement applicableEntityName="cardTenderItem" applicability="#{!item.voided}" formatId="cardTenderItem"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.ICashTenderItem" applicability="#{item.issuedAsCashback &amp;&amp; !item.voided}" formatId="cashbackTenderItem"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.ITenderItem" applicability="#{!item.isChange &amp;&amp; !item.voided}" formatId="tenderItem"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.ITenderItem" applicability="#{item.isChange &amp;&amp; !item.voided &amp;&amp; !item.isRefund}" formatId="changeTenderItem"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.ITenderItem" applicability="#{item.isChange &amp;&amp; !item.voided &amp;&amp; item.isRefund}" formatId="customerToPayTenderItem"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IVoucherRedemptionItem"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.ITransactionVoidItem"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IVoidItem"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IStorageItem"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IAccountBalanceUpdateItem"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IServiceItem"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IRecallItem"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IMergeItem"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.INoSaleItem"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IDiscountItem"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IEmployeeSaleTransactionDiscountItem"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.ITransactionDiscountItem"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IRecordRepairItem"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IRecordActualRepairCostItem"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IRecallRepairItem"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IPriceOverrideItem"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IHonourPromotionItem"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IIssueLoyaltyCardItem"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.ILoyaltyOfferDeclinedItem"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.ICollectDetailsItem"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IDispatchDetailsItem"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IOrderDetailsItem"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IBundleDetailsItem"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IDeliveryChargeItem"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IAdminChargeItem"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.ISurchargeItem"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.ICustomDeliveryPackageItem"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IDeliveryPackageItem"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IPostVoidItem"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.ITaxSchemeOverrideItem"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IProductPreparationOptionItem"/>
+            <core:formatElement applicableEntityName="quantityModifierItem"/>
+            <core:formatElement applicableEntityName="dummyItem"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IAlterationServiceDetailItem"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IVoucherSaleItem"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.ILoyaltyPointsAdjustmentItem"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IPromotionControlItem"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IFlightDetailsItem"/>
+            <core:formatElement applicableClassName="com.enactor.customerOrders.retail.basket.items.ICustomerOrderDepositBasketItem"/>
+            <core:formatElement applicableClassName="com.enactor.customerOrders.retail.basket.items.ICustomerOrderCollectionBasketItem"/>
+            <core:formatElement applicableClassName="com.enactor.customerOrders.retail.basket.items.ICustomerOrderCollectionHeaderBasketItem"/>
+            <core:formatElement applicableClassName="com.enactor.customerOrders.retail.basket.items.ICustomerOrderReturnDetailsItem"/>
+            <core:formatElement applicableClassName="com.enactor.customerOrders.retail.basket.items.ICustomerOrderPaymentBasketItem"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IOrderDetailsItem"/>
+            <core:formatElement applicability="#{!item.voided}" formatId="basketItem"/>
+            <core:formatElement applicability="#{item.voided}" formatId="basketItemVoided"/>
+        </core:tableTemplate>
+    </core:elements>
+    <core:includedTemplateUrl>NextGen640x1136/Pos/Print/StandardReceiptColumnDefinitions</core:includedTemplateUrl>
+    <core:formatEntry id="listHeader">
+        <core:elements>
+            <core:row styleClass="listHeader" style="BOLD">
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0">
+                            <core:elements>
+<core:imageElement>
+    <core:flowConstraint height="8"/>
+</core:imageElement>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="headerSeparator">
+        <core:elements>
+            <core:row>
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0">
+                            <core:elements>
+<core:imageElement>
+    <core:flowConstraint height="3"/>
+</core:imageElement>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="basketHeaderItem">
+        <core:elements>
+            <core:assign to="flightDetailsItem" value="#{null}"/>
+            <core:formatElement applicability="#{instanceOf(item.transaction, 'com.enactor.mfc.retail.transaction.IAirportSaleTransaction')}" formatId="getFlightDetailsItemList"/>
+            <core:row styleClass="basketHeader" backgroundColour="LIGHT_BLUE" colour="WHITE" style="DOUBLE_HIGH;DOUBLE_WIDE;SOLID_BACKGROUND;BOLD">
+                <core:rowLine visibility="#{item.transaction.trainingDetails.trainingMode || instanceOf(item.transaction, 'com.enactor.mfc.retail.transaction.IRetailSaleTransaction') &amp;&amp; item.transaction.isTransactionReversed || instanceOf(item.transaction, 'com.enactor.mfc.retail.transaction.IRetailSaleTransaction') &amp;&amp; item.transaction.isTransactionReversal || instanceOf(item.transaction, 'com.enactor.mfc.retail.transaction.IEmployeeRetailSaleTransaction') || instanceOf(item.transaction, 'com.enactor.mfc.retail.transaction.IAirportSaleTransaction') || instanceOf(item.transaction, 'com.enactor.mfc.retail.transaction.ITaxRefundRequestTransaction') || instanceOf(item.transaction, 'com.enactor.mfc.retail.transaction.IRetailQuoteTransaction') || item.basket.total &lt; 0}">
+                    <core:elements>
+                        <core:column maxLines="0">
+                            <core:elements>
+<core:imageElement>
+    <core:flowConstraint height="8"/>
+</core:imageElement>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine visibility="#{item.transaction.trainingDetails.trainingMode}">
+                    <core:elements>
+                        <core:column maxLines="0" align="CENTRE" columnDefId="0" id="0">
+                            <core:elements>
+<core:lineElement messageId="TRAINING_MODE_HEADER"/>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine visibility="#{instanceOf(item.transaction, 'com.enactor.mfc.retail.transaction.IRetailSaleTransaction') &amp;&amp; item.transaction.isTransactionReversed}">
+                    <core:elements>
+                        <core:column maxLines="0" align="CENTRE" columnDefId="0" id="0">
+                            <core:elements>
+<core:lineElement messageId="REVERSED_TRANSACTION"/>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine visibility="#{instanceOf(item.transaction, 'com.enactor.mfc.retail.transaction.IRetailSaleTransaction') &amp;&amp; item.transaction.isTransactionReversal}">
+                    <core:elements>
+                        <core:column maxLines="0" align="CENTRE" columnDefId="0" id="0">
+                            <core:elements>
+<core:lineElement messageId="REVERSAL_TRANSACTION"/>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine visibility="#{instanceOf(item.transaction, 'com.enactor.mfc.retail.transaction.IEmployeeRetailSaleTransaction')}">
+                    <core:elements>
+                        <core:column maxLines="0" align="CENTRE" columnDefId="0" id="0">
+                            <core:elements>
+<core:lineElement messageId="EMPLOYEE_TRANSACTION"/>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine visibility="#{instanceOf(item.transaction, 'com.enactor.mfc.retail.transaction.IAirportSaleTransaction')}">
+                    <core:elements>
+                        <core:column maxLines="0" align="CENTRE" columnDefId="0" id="0">
+                            <core:elements>
+<core:lineElement messageId="AIRPORT_TRANSACTION"/>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine visibility="#{instanceOf(item.transaction, 'com.enactor.mfc.retail.transaction.ITaxRefundRequestTransaction')}">
+                    <core:elements>
+                        <core:column maxLines="0" align="CENTRE" columnDefId="0" id="0">
+                            <core:elements>
+<core:lineElement messageId="TAX_REFUND_REQUEST_TRANSACTION"/>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine visibility="#{instanceOf(item.transaction, 'com.enactor.mfc.retail.transaction.IRetailQuoteTransaction')}">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="0" id="0">
+                            <core:elements>
+<core:lineElement messageId="RETAIL_QUOTE_TRANSACTION"/>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine visibility="#{item.basket.total &lt; 0}">
+                    <core:elements>
+                        <core:column maxLines="0" align="CENTRE" columnDefId="0" id="0">
+                            <core:elements>
+<core:text visibility="#{item.basket.total &gt;= 0}">
+    <core:text>Sale Transaction</core:text>
+</core:text>
+<core:text visibility="#{item.basket.total &lt; 0}">
+    <core:text>Refund</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine visibility="#{item.transaction.trainingDetails.trainingMode || instanceOf(item.transaction, 'com.enactor.mfc.retail.transaction.IRetailSaleTransaction') &amp;&amp; item.transaction.isTransactionReversed || instanceOf(item.transaction, 'com.enactor.mfc.retail.transaction.IRetailSaleTransaction') &amp;&amp; item.transaction.isTransactionReversal || instanceOf(item.transaction, 'com.enactor.mfc.retail.transaction.IEmployeeRetailSaleTransaction') || instanceOf(item.transaction, 'com.enactor.mfc.retail.transaction.IAirportSaleTransaction') || instanceOf(item.transaction, 'com.enactor.mfc.retail.transaction.ITaxRefundRequestTransaction') || instanceOf(item.transaction, 'com.enactor.mfc.retail.transaction.IRetailQuoteTransaction') || item.basket.total &lt; 0}">
+                    <core:elements>
+                        <core:column maxLines="0">
+                            <core:elements>
+<core:imageElement>
+    <core:flowConstraint height="8"/>
+</core:imageElement>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+            <core:formatElement applicability="#{instanceOf(item.transaction, 'com.enactor.mfc.retail.transaction.IEmployeeRetailSaleTransaction')}" formatId="employeeDetails"/>
+            <core:row>
+                <core:rowLine visibility="#{!enactor:empty (item.transaction.loyaltyPointsDetails) &amp;&amp; (!enactor:empty (item.transaction.loyaltyPointsDetails.loyaltyAccountId) || !enactor:empty (item.transaction.loyaltyPointsDetails.loyaltyCardNumber))}">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="0" id="0">
+                            <core:elements>
+<core:text messageId="LOYALTY_ACCOUNT_ID_HDR"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="9" id="9">
+                            <core:elements>
+<core:text>
+    <core:text>#{enactor:empty (item.transaction.loyaltyPointsDetails.loyaltyAccountId) ? item.transaction.loyaltyPointsDetails.loyaltyCardNumber : item.transaction.loyaltyPointsDetails.loyaltyAccountId}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine visibility="#{!enactor:empty(item.transaction.loyaltyPointsDetails) &amp;&amp; !enactor:empty(item.transaction.loyaltyPointsDetails.loyaltyAccountId) &amp;&amp; !item.transaction.loyaltyPointsDetails.loyaltyAccountOffline}">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="0" id="0">
+                            <core:elements>
+<core:text messageId="LOYALTY_POINTS_BALANCE"/>
+<core:text>
+    <core:text> </core:text>
+</core:text>
+<core:text>
+    <core:text>#{item.transaction.loyaltyPointsDetails.loyaltyPointsBalance}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine visibility="#{instanceOf(item.transaction, 'com.enactor.mfc.retail.transaction.IAirportSaleTransaction') &amp;&amp; !empty(flightDetailsItem) &amp;&amp; !empty(flightDetailsItem.flightCode)}">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="0" id="0">
+                            <core:elements>
+<core:text messageId="FLIGHT_CODE"/>
+<core:text>
+    <core:text> #{flightDetailsItem.flightCode} </core:text>
+</core:text>
+<core:text messageId="FLIGHT_TO" visibility="#{!empty(flightDetailsItem.destinationAirportDescription)}"/>
+<core:text visibility="#{!empty(flightDetailsItem.destinationAirportDescription)}">
+    <core:text> #{flightDetailsItem.destinationAirportDescription}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine visibility="#{instanceOf(item.transaction, 'com.enactor.mfc.retail.transaction.IAirportSaleTransaction') &amp;&amp; !empty(flightDetailsItem) &amp;&amp; !empty(flightDetailsItem.flightCode)}">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="0" id="0">
+                            <core:elements>
+<core:text messageId="DESTINATION_ZONE"/>
+<core:text>
+    <core:text> #{!empty(flightDetailsItem.destinationZoneDescription) ? flightDetailsItem.destinationZoneDescription : flightDetailsItem.destinationZoneKey.zoneId}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine visibility="#{instanceOf(item.transaction, 'com.enactor.mfc.retail.transaction.IRetailQuoteTransaction') &amp;&amp; notEmpty(item.transaction.orderReference)}">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="8" id="RetailQuoteOrderRefLabel">
+                            <core:elements>
+<core:text messageId="RETAIL_QUOTE_ORDER_REFERENCE"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="9" id="RetailQuoteOrderRefText">
+                            <core:elements>
+<core:text>
+    <core:text>#{item.transaction.orderReference}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine visibility="#{instanceOf(item.transaction, 'com.enactor.mfc.retail.transaction.IRetailQuoteTransaction') &amp;&amp; notEmpty(item.transaction.quoteReference)}">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="8" id="RetailQuoteRefLabel">
+                            <core:elements>
+<core:text messageId="RETAIL_QUOTE_REFERENCE"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="9" id="RetailQuoteRefText">
+                            <core:elements>
+<core:text>
+    <core:text>#{item.transaction.quoteReference}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+            <core:row styleClass="basketHeader" colour="blue">
+                <core:rowLine visibility="#{instanceOf(item.transaction, 'com.enactor.mfc.retail.transaction.IRetailSaleTransaction') &amp;&amp; notEmpty(item.transaction.overrideTaxSchemeKey)}">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="0" id="0">
+                            <core:elements>
+<core:text messageId="TAX_SCHEME_OVERRIDDEN"/>
+<core:text>
+    <core:text>   </core:text>
+</core:text>
+<core:text>
+    <core:formatters>
+        <core:formatLocaleString/>
+    </core:formatters>
+    <core:text>#{overrideTaxScheme.description}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+            <core:formatElement applicability="#{!(basket:testModelBasketEmpty() || (((basket:getModelBasket()).saleItemQuantity &lt;= 0) &amp;&amp; ((basket:getModelBasket()).returnItemQuantity &lt;= 0)))}" formatId="listHeader"/>
+            <core:formatElement applicability="#{!(basket:testModelBasketEmpty() || (((basket:getModelBasket()).saleItemQuantity &lt;= 0) &amp;&amp; ((basket:getModelBasket()).returnItemQuantity &lt;= 0)))}" formatId="headerSeparator"/>
+            <core:formatElement applicability="#{!enactor:empty(item.sale.customerRetailDetails) &amp;&amp; (!enactor:empty(item.sale.customerRetailDetails.customerName) || !enactor:empty(item.sale.customerRetailDetails.customerAddress))}" formatId="customerNameAndAddress"/>
+            <core:formatElement applicability="#{instanceOf(item.transaction, 'com.enactor.mfc.retail.model.IRetailSaleData') &amp;&amp; item.transaction.receiptDetails.taxRefundFormRequested}" formatId="taxRefundFormRequested"/>
+            <core:formatElement applicability="#{instanceOf(item.transaction, 'com.enactor.mfc.retail.transaction.IRetailSaleTransaction') &amp;&amp; item.transaction.giftReceiptRequested}" formatId="giftReceiptRequested"/>
+        </core:elements>
+        <core:entityReferences>
+            <core:entityReference name="overrideTaxScheme" keyValue="#{item.transaction.overrideTaxSchemeKey}"/>
+        </core:entityReferences>
+    </core:formatEntry>
+    <core:formatEntry id="customerName">
+        <core:elements>
+            <core:row colour="dark_grey">
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="8" id="8">
+                            <core:elements>
+<core:text messageId="CUSTOMER_NAME"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="9" id="9">
+                            <core:elements>
+<core:text visibility="#{notEmpty(item.sale.customerRetailDetails.customerName.title) &amp;&amp; item.sale.customerRetailDetails.customerName.title != '-'}">
+    <core:text>#{item.sale.customerRetailDetails.customerName.title} </core:text>
+</core:text>
+<core:text visibility="#{!empty(item.sale.customerRetailDetails.customerName.forename)}">
+    <core:text>#{item.sale.customerRetailDetails.customerName.forename} </core:text>
+</core:text>
+<core:text>
+    <core:text>#{item.sale.customerRetailDetails.customerName.surname}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="customerAddress">
+        <core:elements>
+            <core:row colour="dark_grey">
+                <core:rowLine visibility="#{notEmpty(item.sale.customerRetailDetails.customerAddress.street1) || notEmpty(item.sale.customerRetailDetails.customerAddress.street2)}">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="8" id="8">
+                            <core:elements>
+<core:text messageId="CUSTOMER_ADDRESS"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="9" id="9">
+                            <core:elements>
+<core:text>
+    <core:text>#{item.sale.customerRetailDetails.customerAddress.street1}</core:text>
+</core:text>
+<core:text visibility="#{notEmpty(item.sale.customerRetailDetails.customerAddress.street2)}">
+    <core:text>, #{item.sale.customerRetailDetails.customerAddress.street2}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine visibility="#{notEmpty(item.sale.customerRetailDetails.customerAddress.street3)}">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="9" id="9">
+                            <core:elements>
+<core:text>
+    <core:text>#{item.sale.customerRetailDetails.customerAddress.street3}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine visibility="#{notEmpty(item.sale.customerRetailDetails.customerAddress.town) || notEmpty(item.sale.customerRetailDetails.customerAddress.postCode)}">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="9" id="9">
+                            <core:elements>
+<core:text visibility="#{notEmpty(item.sale.customerRetailDetails.customerAddress.town)}">
+    <core:text>#{item.sale.customerRetailDetails.customerAddress.town} </core:text>
+</core:text>
+<core:text visibility="#{notEmpty(item.sale.customerRetailDetails.customerAddress.postCode)}">
+    <core:text>#{item.sale.customerRetailDetails.customerAddress.postCode}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine visibility="#{notEmpty(item.sale.customerRetailDetails.customerAddress.phone1) || notEmpty(item.sale.customerRetailDetails.customerAddress.phone2)} || notEmpty(item.sale.customerRetailDetails.customerAddress.mobilePhone)}">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="8" id="8">
+                            <core:elements>
+<core:text messageId="CUSTOMER_PHONE"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="9" id="9">
+                            <core:elements>
+<core:text visibility="#{notEmpty(item.sale.customerRetailDetails.customerAddress.phone1)}">
+    <core:text>#{item.sale.customerRetailDetails.customerAddress.phone1}</core:text>
+</core:text>
+<core:text visibility="#{notEmpty(item.sale.customerRetailDetails.customerAddress.phone1) &amp;&amp; notEmpty(item.sale.customerRetailDetails.customerAddress.phone2)}">
+    <core:text>, </core:text>
+</core:text>
+<core:text visibility="#{notEmpty(item.sale.customerRetailDetails.customerAddress.phone2)}">
+    <core:text>#{item.sale.customerRetailDetails.customerAddress.phone2}</core:text>
+</core:text>
+<core:text visibility="#{(notEmpty(item.sale.customerRetailDetails.customerAddress.phone1) || notEmpty(item.sale.customerRetailDetails.customerAddress.phone2)) &amp;&amp; notEmpty(item.sale.customerRetailDetails.customerAddress.mobilePhone)}">
+    <core:text>, </core:text>
+</core:text>
+<core:text visibility="#{notEmpty(item.sale.customerRetailDetails.customerAddress.mobilePhone)}">
+    <core:text>#{item.sale.customerRetailDetails.customerAddress.mobilePhone}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="customerNameAndAddress">
+        <core:elements>
+            <core:formatElement applicability="#{!enactor:empty(item.sale.customerRetailDetails.customerName)}" formatId="customerName"/>
+            <core:formatElement applicability="#{!enactor:empty(item.sale.customerRetailDetails.customerAddress)}" formatId="customerAddress"/>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="loyaltyPoints">
+        <core:elements>
+            <core:row colour="#00CC99" style="BOLD;ITALIC">
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="2" id="2">
+                            <core:elements>
+<core:text messageId="EARNED_LOYALTY_POINTS"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="3" id="3">
+                            <core:elements>
+<core:text>
+    <core:formatters>
+        <core:formatNumber/>
+    </core:formatters>
+    <core:text>#{item.transaction.loyaltyPointsDetails.loyaltyPointsEarned}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine visibility="#{item.transaction.loyaltyPointsDetails.spendToNextTier != 0}">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="2" id="2">
+                            <core:elements>
+<core:text messageId="DISPLAY_SPEND_TO_NEXT_TIER"/>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="itemText">
+        <core:elements>
+            <core:column maxLines="0" wrap="true" align="LEFT" columnDefId="InfoDesc" visibility="#{notEmpty(item.text)}" id="InfoDesc">
+                <core:elements>
+                    <core:text>
+                        <core:text>#{item.text}</core:text>
+                    </core:text>
+                </core:elements>
+            </core:column>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="merchandiseItem">
+        <core:elements>
+            <core:formatElement formatId="separator"/>
+            <core:row>
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="1" wrap="true" columnDefId="6" id="2">
+                            <core:elements>
+<core:text fontSize="13" colour="#383E47">
+    <core:text>#{instanceOf(item, 'com.enactor.mfc.basket.items.IUnknownItem') ? (empty(item.MMGroupDescription) ? (empty(item.MMGroupId) ? concat((empty(item.productID) ? '' : concat(item.productID, ' ')), item.description) : item.MMGroupId) : item.MMGroupDescription) : item.description}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="3" id="3">
+                            <core:elements>
+<core:formatElement formatId="itemValue" visibility="#{strings:compareObjects(item.value, item.effectiveNetValue)}"/>
+<core:text fontSize="13" visibility="#{!strings:compareObjects(item.value, item.effectiveNetValue)}" style="BOLD;STRIKEOUT">
+    <core:formatters>
+        <core:formatCurrencyAmount/>
+    </core:formatters>
+    <core:text>#{item.value}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="6" id="2">
+                            <core:elements>
+<core:text fontSize="12" messageBase="NextGen/PosMessages" messageId="PRODUCT_NO_LABEL_SHORT" colour="#697584"/>
+<core:text fontSize="12" colour="#697584">
+    <core:text>#{item.productID}</core:text>
+</core:text>
+<core:text fontSize="12" visibility="#{instanceOf(item, 'com.enactor.mfc.basket.items.IStyleSizeItem')}" colour="#697584">
+    <core:text> | </core:text>
+</core:text>
+<core:text fontSize="12" visibility="#{instanceOf(item, 'com.enactor.mfc.basket.items.IStyleSizeItem')}" colour="#BABF26">
+    <core:text> #{empty(item.sizeDescription) ? (item.sizeKey != null ?
+										item.sizeKey.sizeId : '') : item.sizeDescription}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="3" id="3">
+                            <core:elements>
+<core:text fontSize="13" visibility="#{!strings:compareObjects(item.value, item.effectiveNetValue)}" style="BOLD">
+    <core:formatters>
+        <core:formatCurrencyAmount/>
+    </core:formatters>
+    <core:text>#{item.effectiveNetValue}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="2">
+                            <core:elements>
+<core:text>
+    <core:text> </core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine visibility="#{notEmpty(item.text)}">
+                    <core:elements>
+                        <core:formatElement formatId="itemText"/>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+            <core:formatElement formatId="itemModifiers"/>
+            <core:formatElement formatId="separator"/>
+            <core:formatElement formatId="lineSeparator"/>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="merchandiseItemVoided">
+        <core:elements>
+            <core:formatElement formatId="separator"/>
+            <core:row selectable="false">
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="2" wrap="true" columnDefId="6" id="2">
+                            <core:elements>
+<core:text fontSize="13" colour="#3DB7E4">
+    <core:text>#{instanceOf(item, 'com.enactor.mfc.basket.items.IUnknownItem') ? (empty(item.MMGroupDescription) ? (empty(item.MMGroupId) ? concat((empty(item.productID) ? '' : concat(item.productID, ' ')), item.description) : item.MMGroupId) : item.MMGroupDescription) : item.description}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="3" id="3">
+                            <core:elements>
+<core:formatElement formatId="itemValue"/>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="6" id="2">
+                            <core:elements>
+<core:text messageBase="NextGen/PosMessages" messageId="PRODUCT_NO_LABEL_SHORT"/>
+<core:text>
+    <core:text>#{item.productID}</core:text>
+</core:text>
+<core:text visibility="#{instanceOf(item, 'com.enactor.mfc.basket.items.IStyleSizeItem')}">
+    <core:text> | </core:text>
+</core:text>
+<core:text visibility="#{instanceOf(item, 'com.enactor.mfc.basket.items.IStyleSizeItem')}">
+    <core:text> #{empty(item.sizeDescription) ? (item.sizeKey != null ? item.sizeKey.sizeId : '') : item.sizeDescription}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:overlay backgroundColour="#ce3232cc">
+                    <core:elements>
+                        <core:imageElement imageURL="Pos/ItemVoidedOverlay.png">
+                            <core:flowConstraint width="100%" height="65"/>
+                        </core:imageElement>
+                    </core:elements>
+                </core:overlay>
+            </core:row>
+            <core:formatElement formatId="separator"/>
+            <core:formatElement formatId="lineSeparator"/>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="cardTenderItem">
+        <core:elements>
+            <core:formatElement formatId="separator"/>
+            <core:row styleClass="tender" backgroundColour="#FFFFFF" style="SOLID_BACKGROUND">
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="1" id="1">
+                            <core:elements>
+<core:imageElement originalFilename="VisaLogo.bmp" visibility="#{item.cardDetails.cardScheme == 'VISA' || item.cardDetails.cardScheme == 'VISA_DEBIT'}">
+    <core:flowConstraint height="32"/>
+</core:imageElement>
+<core:imageElement originalFilename="MastercardLogo.bmp" visibility="#{item.cardDetails.cardScheme == 'MASTERCARD' || item.cardDetails.cardScheme == 'MASTERCARD_DEBIT'}">
+    <core:flowConstraint height="49"/>
+</core:imageElement>
+<core:imageElement originalFilename="MaestroLogo.bmp" visibility="#{item.cardDetails.cardScheme == 'MAESTRO' || item.cardDetails.cardScheme == 'MAESTRO_UK'}">
+    <core:flowConstraint height="49"/>
+</core:imageElement>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="2" id="2">
+                            <core:elements>
+<core:text messageId="TENDER_REFUND" visibility="#{item.isRefund}"/>
+<core:text visibility="#{item.isRefund}">
+    <core:text> </core:text>
+</core:text>
+<core:text>
+    <core:text>#{item.description}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="3" visibility="#{item.foreignAmount == 0}" id="3">
+                            <core:elements>
+<core:text>
+    <core:text>#{format:formatCurrency(item.value)}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine visibility="#{item.foreignAmount != 0}">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="2" id="2">
+                            <core:elements>
+<core:text>
+    <core:text>    </core:text>
+</core:text>
+<core:text visibility="#{!instanceOf(item, 'com.enactor.mfc.basket.items.ILoyaltyAccountTenderItem')}">
+    <core:formatters>
+        <core:formatCurrencyAmount currencyId="#{item.currencyId}"/>
+    </core:formatters>
+    <core:text>#{item.foreignAmount}</core:text>
+</core:text>
+<core:text visibility="#{!instanceOf(item, 'com.enactor.mfc.basket.items.ILoyaltyAccountTenderItem')}">
+    <core:text> @ </core:text>
+</core:text>
+<core:text visibility="#{!instanceOf(item, 'com.enactor.mfc.basket.items.ILoyaltyAccountTenderItem')}">
+    <core:formatters>
+        <core:formatExchangeRate currencyId="#{item.currencyId}"/>
+    </core:formatters>
+    <core:text>#{item.exchangeRate}</core:text>
+</core:text>
+<core:text visibility="#{instanceOf(item, 'com.enactor.mfc.basket.items.ILoyaltyAccountTenderItem')}">
+    <core:text>#{item.foreignAmount}</core:text>
+</core:text>
+<core:text visibility="#{instanceOf(item, 'com.enactor.mfc.basket.items.ILoyaltyAccountTenderItem')}">
+    <core:text> </core:text>
+</core:text>
+<core:text messageId="LOYALTY_POINTS" visibility="#{instanceOf(item, 'com.enactor.mfc.basket.items.ILoyaltyAccountTenderItem')}"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="3" id="3">
+                            <core:elements>
+<core:formatElement formatId="itemValue"/>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine visibility="#{item.overPaymentAmount != 0 &amp;&amp; item.foreignAmount == 0}">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="6" id="6">
+                            <core:elements>
+<core:text messageId="OVERPAYMENT"/>
+<core:text>
+    <core:text> </core:text>
+</core:text>
+<core:text>
+    <core:formatters>
+        <core:formatCurrencyAmount/>
+    </core:formatters>
+    <core:text>#{item.overPaymentAmount}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine visibility="#{item.overPaymentAmount != 0 &amp;&amp; item.foreignAmount != 0}">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="6" id="6">
+                            <core:elements>
+<core:text messageId="OVERPAYMENT"/>
+<core:text>
+    <core:text> </core:text>
+</core:text>
+<core:text>
+    <core:formatters>
+        <core:formatCurrencyAmount currencyId="#{item.currencyId}"/>
+    </core:formatters>
+    <core:text>#{item.overPaymentForeignAmount}</core:text>
+</core:text>
+<core:text>
+    <core:text> (</core:text>
+</core:text>
+<core:text>
+    <core:formatters>
+        <core:formatCurrencyAmount/>
+    </core:formatters>
+    <core:text>#{item.overPaymentAmount}</core:text>
+</core:text>
+<core:text>
+    <core:text>)</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+            <core:formatElement formatId="separator"/>
+            <core:formatElement formatId="lineSeparator"/>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="cashbackTenderItem">
+        <core:elements>
+            <core:formatElement formatId="separator"/>
+            <core:row styleClass="" colour="#0d0f2e" style="#{item.voided ? 'STRIKEOUT' : ''};DOUBLE_HIGH;DOUBLE_WIDE">
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="2" id="2">
+                            <core:elements>
+<core:text messageId="CASHBACK"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="3" visibility="#{item.foreignAmount == 0}" id="3">
+                            <core:elements>
+<core:text>
+    <core:formatters>
+        <core:formatCurrencyAmount absValue="true"/>
+    </core:formatters>
+    <core:text>#{item.value}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine visibility="#{item.foreignAmount != 0}">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="2" id="2">
+                            <core:elements>
+<core:text>
+    <core:text>    </core:text>
+</core:text>
+<core:text visibility="#{!instanceOf(item, 'com.enactor.mfc.basket.items.ILoyaltyAccountTenderItem')}">
+    <core:formatters>
+        <core:formatCurrencyAmount absValue="true" currencyId="#{item.currencyId}"/>
+    </core:formatters>
+    <core:text>#{item.foreignAmount}</core:text>
+</core:text>
+<core:text visibility="#{!instanceOf(item, 'com.enactor.mfc.basket.items.ILoyaltyAccountTenderItem')}">
+    <core:text> @ </core:text>
+</core:text>
+<core:text visibility="#{!instanceOf(item, 'com.enactor.mfc.basket.items.ILoyaltyAccountTenderItem')}">
+    <core:formatters>
+        <core:formatExchangeRate currencyId="#{item.currencyId}"/>
+    </core:formatters>
+    <core:text>#{item.exchangeRate}</core:text>
+</core:text>
+<core:text visibility="#{instanceOf(item, 'com.enactor.mfc.basket.items.ILoyaltyAccountTenderItem')}">
+    <core:text>#{item.foreignAmount}</core:text>
+</core:text>
+<core:text visibility="#{instanceOf(item, 'com.enactor.mfc.basket.items.ILoyaltyAccountTenderItem')}">
+    <core:text> </core:text>
+</core:text>
+<core:text messageId="LOYALTY_POINTS" visibility="#{instanceOf(item, 'com.enactor.mfc.basket.items.ILoyaltyAccountTenderItem')}"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="3" id="3">
+                            <core:elements>
+<core:text>
+    <core:formatters>
+        <core:formatCurrencyAmount absValue="true"/>
+    </core:formatters>
+    <core:text>#{item.value}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+            <core:formatElement formatId="separator"/>
+            <core:formatElement formatId="lineSeparator"/>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="tenderItem">
+        <core:elements>
+            <core:formatElement formatId="separator"/>
+            <core:row styleClass="tender">
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="1" id="1">
+                            <core:elements>
+<core:text messageId="TENDER_VOID_FLAG" visibility="#{item.voided}"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="2" id="2">
+                            <core:elements>
+<core:text messageId="TENDER_REFUND" visibility="#{item.isRefund}"/>
+<core:text visibility="#{item.isRefund}">
+    <core:text> </core:text>
+</core:text>
+<core:text visibility="#{item.entityQName.localPart != 'cardTenderItem'}">
+    <core:text>#{item.description}</core:text>
+</core:text>
+<core:text visibility="#{item.entityQName.localPart == 'cardTenderItem'}">
+    <core:text>#{item.cardDetails.cardDescription}</core:text>
+</core:text>
+<core:text visibility="#{abs(item.tenderAmount) != abs(item.value)}">
+    <core:text> (</core:text>
+</core:text>
+<core:text visibility="#{abs(item.tenderAmount) != abs(item.value)}">
+    <core:formatters>
+        <core:formatCurrencyAmount currencyId="#{item.currencyId}"/>
+    </core:formatters>
+    <core:text>#{item.tenderAmount}</core:text>
+</core:text>
+<core:text visibility="#{abs(item.tenderAmount) != abs(item.value)}">
+    <core:text>)</core:text>
+</core:text>
+<core:text visibility="#{item.voided}">
+    <core:text> </core:text>
+</core:text>
+<core:text messageId="TENDER_VOID" visibility="#{item.voided}"/>
+<core:text visibility="#{item.voided}">
+    <core:text> </core:text>
+</core:text>
+<core:text visibility="#{item.voided}">
+    <core:formatters>
+        <core:formatCurrencyAmount/>
+    </core:formatters>
+    <core:text>#{item.value}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="3" visibility="#{item.foreignAmount == 0 &amp;&amp; !item.voided}" id="3">
+                            <core:elements>
+<core:text>
+    <core:formatters>
+        <core:formatCurrencyAmount/>
+    </core:formatters>
+    <core:text>#{item.value}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine visibility="#{item.foreignAmount != 0}">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="2" id="2">
+                            <core:elements>
+<core:text>
+    <core:text>  </core:text>
+</core:text>
+<core:text visibility="#{!instanceOf(item, 'com.enactor.mfc.basket.items.ILoyaltyAccountTenderItem')}">
+    <core:formatters>
+        <core:formatCurrencyAmount currencyId="#{item.currencyId}"/>
+    </core:formatters>
+    <core:text>#{item.foreignAmount}</core:text>
+</core:text>
+<core:text visibility="#{!instanceOf(item, 'com.enactor.mfc.basket.items.ILoyaltyAccountTenderItem')}">
+    <core:text> @ </core:text>
+</core:text>
+<core:text visibility="#{!instanceOf(item, 'com.enactor.mfc.basket.items.ILoyaltyAccountTenderItem')}">
+    <core:formatters>
+        <core:formatExchangeRate currencyId="#{item.currencyId}"/>
+    </core:formatters>
+    <core:text>#{item.exchangeRate}</core:text>
+</core:text>
+<core:text visibility="#{instanceOf(item, 'com.enactor.mfc.basket.items.ILoyaltyAccountTenderItem')}">
+    <core:text>#{item.foreignAmount}</core:text>
+</core:text>
+<core:text visibility="#{instanceOf(item, 'com.enactor.mfc.basket.items.ILoyaltyAccountTenderItem')}">
+    <core:text> </core:text>
+</core:text>
+<core:text messageId="LOYALTY_POINTS" visibility="#{instanceOf(item, 'com.enactor.mfc.basket.items.ILoyaltyAccountTenderItem')}"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="3" visibility="#{!item.voided}" id="3">
+                            <core:elements>
+<core:text>
+    <core:formatters>
+        <core:formatCurrencyAmount/>
+    </core:formatters>
+    <core:text>#{item.value}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine visibility="#{!item.voided &amp;&amp; instanceOf(item, 'com.enactor.mfc.basket.items.IVoucherTenderItem') &amp;&amp; !empty(item.serialNumber)}">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="2" id="2">
+                            <core:elements>
+<core:text messageId="SERIAL_NUMBER"/>
+<core:text>
+    <core:text>#{item.serialNumber}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine visibility="#{item.overPaymentAmount != 0 &amp;&amp; item.foreignAmount == 0}">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="6" id="6">
+                            <core:elements>
+<core:text messageId="OVERPAYMENT"/>
+<core:text>
+    <core:text> </core:text>
+</core:text>
+<core:text>
+    <core:formatters>
+        <core:formatCurrencyAmount/>
+    </core:formatters>
+    <core:text>#{item.overPaymentAmount}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine visibility="#{item.overPaymentAmount != 0 &amp;&amp; item.foreignAmount != 0}">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="6" id="6">
+                            <core:elements>
+<core:text messageId="OVERPAYMENT"/>
+<core:text>
+    <core:text> </core:text>
+</core:text>
+<core:text>
+    <core:formatters>
+        <core:formatCurrencyAmount currencyId="#{item.currencyId}"/>
+    </core:formatters>
+    <core:text>#{item.overPaymentForeignAmount}</core:text>
+</core:text>
+<core:text>
+    <core:text> (</core:text>
+</core:text>
+<core:text>
+    <core:formatters>
+        <core:formatCurrencyAmount/>
+    </core:formatters>
+    <core:text>#{item.overPaymentAmount}</core:text>
+</core:text>
+<core:text>
+    <core:text>)</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine visibility="#{instanceOf(item, 'com.enactor.mfc.basket.items.IChequeTenderItem') &amp;&amp; notEmpty(item.guaranteeCardDetails.mangledPAN)}">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="6" id="6">
+                            <core:elements>
+<core:text>
+    <core:text>#{item.guaranteeCardDetails.mangledPAN}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine visibility="#{ !item.voided &amp;&amp; instanceOf(item, 'com.enactor.mfc.basket.items.IPayPalTenderItem') &amp;&amp; notEmpty(item.authorisationCode)}">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="InfoDesc">
+                            <core:elements>
+<core:text messageId="PAYPAL_AUTHORISATION_CODE"/>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine visibility="#{ !item.voided &amp;&amp; instanceOf(item, 'com.enactor.mfc.basket.items.IPayPalTenderItem') &amp;&amp; notEmpty(item.transactionId)}">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="InfoDesc">
+                            <core:elements>
+<core:text messageId="PAYPAL_TRANSACTION_ID"/>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine visibility="#{ !item.voided &amp;&amp; instanceOf(item, 'com.enactor.mfc.basket.items.IPayPalTenderItem') &amp;&amp; notEmpty(item.originalTransactionId)}">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="InfoDesc">
+                            <core:elements>
+<core:text messageId="PAYPAL_ORIGINAL_TRANSACTION_ID"/>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine visibility="#{instanceOf(item, 'com.enactor.mfc.basket.items.IGiftCardTenderItem') &amp;&amp; notEmpty(item.giftCardDetails.accountId)}">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="6" id="6">
+                            <core:elements>
+<core:text>
+    <core:text>#{item.giftCardDetails.accountId}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine visibility="#{!item.voided &amp;&amp; !item.isRefund &amp;&amp; !item.isChange &amp;&amp; instanceOf(item, 'com.enactor.mfc.basket.items.IGiftCardTenderItem') &amp;&amp; notEmpty(item.giftCardDetails.accountId) &amp;&amp; item.giftCardDetails.authorisedOnline}">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="6" id="6">
+                            <core:elements>
+<core:text messageId="GIFT_CARD_BALANCE_REMAINING"/>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine visibility="#{notEmpty(item.referenceNumber) &amp;&amp; item.printReferenceNumber}">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="6" id="6">
+                            <core:elements>
+<core:text messageId="REFERENCE"/>
+<core:text>
+    <core:text>#{item.referenceNumber}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+            <core:formatElement applicability="#{instanceOf(item, 'com.enactor.mfc.basket.items.IPayPalTenderItem')}" formatId="payPalItemErrors" visibility="#{instanceOf(item, 'com.enactor.mfc.basket.items.IPayPalTenderItem')}"/>
+            <core:formatElement formatId="separator"/>
+            <core:formatElement formatId="lineSeparator"/>
+        </core:elements>
+        <core:entityReferences>
+            <core:entityReference name="tender" keyValue="#{item.tenderKey}"/>
+            <core:entityReference name="tenderChangeTender" keyValue="#{tender.changeTenderKey}"/>
+        </core:entityReferences>
+    </core:formatEntry>
+    <core:formatEntry id="payPalItemErrors">
+        <core:elements>
+            <core:tableTemplate listVariableName="errorData" list="#{item.errors}" id="PayPalErrors">
+                <core:formatElement formatId="payPalItemError"/>
+            </core:tableTemplate>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="payPalItemError">
+        <core:elements>
+            <core:row>
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="InfoDesc">
+                            <core:elements>
+<core:text messageId="PAYPAL_ERROR_DATA"/>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="changeTenderItem">
+        <core:elements>
+            <core:formatElement formatId="separator"/>
+            <core:row styleClass="tender change" colour="#0d0f2e" style="#{item.voided ? 'STRIKEOUT' : ''};DOUBLE_HIGH;DOUBLE_WIDE">
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="2" id="2">
+                            <core:elements>
+<core:text messageId="CHANGE"/>
+<core:text>
+    <core:text> (#{item.description})</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="3" visibility="#{item.foreignAmount == 0}" id="3">
+                            <core:elements>
+<core:text>
+    <core:formatters>
+        <core:formatCurrencyAmount/>
+    </core:formatters>
+    <core:text>#{item.value}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine visibility="#{item.foreignAmount != 0}">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="2" id="2">
+                            <core:elements>
+<core:text>
+    <core:text>    </core:text>
+</core:text>
+<core:text visibility="#{!instanceOf(item, 'com.enactor.mfc.basket.items.ILoyaltyAccountTenderItem')}">
+    <core:formatters>
+        <core:formatCurrencyAmount currencyId="#{item.currencyId}"/>
+    </core:formatters>
+    <core:text>#{item.foreignAmount}</core:text>
+</core:text>
+<core:text visibility="#{!instanceOf(item, 'com.enactor.mfc.basket.items.ILoyaltyAccountTenderItem')}">
+    <core:text> @ </core:text>
+</core:text>
+<core:text visibility="#{!instanceOf(item, 'com.enactor.mfc.basket.items.ILoyaltyAccountTenderItem')}">
+    <core:formatters>
+        <core:formatExchangeRate currencyId="#{item.currencyId}"/>
+    </core:formatters>
+    <core:text>#{item.exchangeRate}</core:text>
+</core:text>
+<core:text visibility="#{instanceOf(item, 'com.enactor.mfc.basket.items.ILoyaltyAccountTenderItem')}">
+    <core:text>#{item.foreignAmount}</core:text>
+</core:text>
+<core:text visibility="#{instanceOf(item, 'com.enactor.mfc.basket.items.ILoyaltyAccountTenderItem')}">
+    <core:text> </core:text>
+</core:text>
+<core:text messageId="LOYALTY_POINTS" visibility="#{instanceOf(item, 'com.enactor.mfc.basket.items.ILoyaltyAccountTenderItem')}"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="3" id="3">
+                            <core:elements>
+<core:text>
+    <core:formatters>
+        <core:formatCurrencyAmount/>
+    </core:formatters>
+    <core:text>#{item.value}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+            <core:formatElement formatId="separator"/>
+            <core:formatElement formatId="lineSeparator"/>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="customerToPayTenderItem">
+        <core:elements>
+            <core:formatElement formatId="separator"/>
+            <core:row styleClass="tender change" colour="#0d0f2e" style="#{item.voided ? 'STRIKEOUT' : ''};DOUBLE_HIGH;DOUBLE_WIDE">
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="2" id="2">
+                            <core:elements>
+<core:text messageId="CUSTOMER_TO_PAY"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="3" visibility="#{item.foreignAmount == 0}" id="3">
+                            <core:elements>
+<core:text>
+    <core:formatters>
+        <core:formatCurrencyAmount absValue="true"/>
+    </core:formatters>
+    <core:text>#{item.value}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine visibility="#{item.foreignAmount != 0}">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="2" id="2">
+                            <core:elements>
+<core:text>
+    <core:text>    </core:text>
+</core:text>
+<core:text visibility="#{!instanceOf(item, 'com.enactor.mfc.basket.items.ILoyaltyAccountTenderItem')}">
+    <core:formatters>
+        <core:formatCurrencyAmount absValue="true" currencyId="#{item.currencyId}"/>
+    </core:formatters>
+    <core:text>#{item.foreignAmount}</core:text>
+</core:text>
+<core:text visibility="#{!instanceOf(item, 'com.enactor.mfc.basket.items.ILoyaltyAccountTenderItem')}">
+    <core:text> @ </core:text>
+</core:text>
+<core:text visibility="#{!instanceOf(item, 'com.enactor.mfc.basket.items.ILoyaltyAccountTenderItem')}">
+    <core:formatters>
+        <core:formatExchangeRate currencyId="#{item.currencyId}"/>
+    </core:formatters>
+    <core:text>#{item.exchangeRate}</core:text>
+</core:text>
+<core:text visibility="#{instanceOf(item, 'com.enactor.mfc.basket.items.ILoyaltyAccountTenderItem')}">
+    <core:text>#{item.foreignAmount}</core:text>
+</core:text>
+<core:text visibility="#{instanceOf(item, 'com.enactor.mfc.basket.items.ILoyaltyAccountTenderItem')}">
+    <core:text> </core:text>
+</core:text>
+<core:text messageId="LOYALTY_POINTS" visibility="#{instanceOf(item, 'com.enactor.mfc.basket.items.ILoyaltyAccountTenderItem')}"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="3" id="3">
+                            <core:elements>
+<core:text>
+    <core:formatters>
+        <core:formatCurrencyAmount absValue="true"/>
+    </core:formatters>
+    <core:text>#{item.value}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+            <core:formatElement formatId="separator"/>
+            <core:formatElement formatId="lineSeparator"/>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="basketItem">
+        <core:elements>
+            <core:formatElement formatId="separator"/>
+            <core:row>
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="2" id="2">
+                            <core:elements>
+<core:text fontStyle="STRIKEOUT_COLOUR ITALIC" fontSize="13">
+    <core:text>#{item.description}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="3" id="3">
+                            <core:elements>
+<core:formatElement formatId="itemValue"/>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+            <core:formatElement formatId="separator"/>
+            <core:formatElement formatId="lineSeparator"/>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="basketItemVoided">
+        <core:elements>
+            <core:formatElement formatId="separator"/>
+            <core:row selectable="false" styleClass="voided" backgroundColour="#{item.voided ? '#ce3232cc' : '#FFFFFF'}" style="STRIKEOUT;SOLID_BACKGROUND">
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="2" id="2">
+                            <core:elements>
+<core:text>
+    <core:text>#{item.description}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="3" id="3">
+                            <core:elements>
+<core:formatElement formatId="itemValue"/>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+            <core:formatElement formatId="separator"/>
+            <core:formatElement formatId="lineSeparator"/>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="basketFooterItem">
+        <core:elements>
+            <core:row selectable="false" backgroundColour="#EBEBEB" visibility="#{notEmpty(item.basket.promotionCalculation.totalSaving)}" style="SOLID_BACKGROUND">
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="1">
+                            <core:elements>
+<core:imageElement>
+    <core:flowConstraint height="12"/>
+</core:imageElement>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="6" id="6">
+                            <core:elements>
+<core:text fontSize="13" messageId="PROMOTION_SAVING_MESSAGE" colour="#3DB7E4"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="3" id="3">
+                            <core:elements>
+<core:text fontSize="13" colour="#3DB7E4" style="BOLD">
+    <core:formatters>
+        <core:formatCurrencyAmount/>
+    </core:formatters>
+    <core:text>#{item.basket.promotionCalculation.totalSaving}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="1">
+                            <core:elements>
+<core:imageElement>
+    <core:flowConstraint height="15"/>
+</core:imageElement>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+            <core:formatElement applicability="#{!empty (item.transaction.loyaltyPointsDetails) &amp;&amp; !item.transaction.loyaltyPointsDetails.externalProvider &amp;&amp; (!empty (item.transaction.loyaltyPointsDetails.loyaltyCardNumber) || !empty (item.transaction.loyaltyPointsDetails.loyaltyAccountId))}" formatId="loyaltyPoints"/>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="itemModifiers">
+        <core:elements>
+            <core:tableTemplate listVariableName="modifier" list="#{item.modifiers}" id="Modifiers">
+                <core:formatElement applicability="#{modifier.voided}"/>
+                <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IEmployeeDiscountModifier" formatId="employeeDiscountModifier"/>
+                <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IDiscountModifier" applicability="#{enumEquals(modifier.discountType, 'ITEM')}" formatId="discountModifier"/>
+                <core:formatElement applicableClassName="com.enactor.mfc.promotion.calculation.DistributedPromotionSavingItem" formatId="DistributedPromotionSavingItem"/>
+                <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IPriceOverrideModifier" formatId="priceOverrideModifier"/>
+                <core:formatElement/>
+            </core:tableTemplate>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="employeeDiscountModifier">
+        <core:elements>
+            <core:row style="ITALIC;ITALIC">
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="6" visibility="#{!empty modifier.modifierItem}" id="6">
+                            <core:elements>
+<core:text fontSize="12" colour="#3DB7E4">
+    <core:text>#{modifier.modifierItem.reasonDescription}</core:text>
+</core:text>
+<core:text fontSize="12" colour="#3DB7E4">
+    <core:text> (</core:text>
+</core:text>
+<core:text fontSize="12" colour="#3DB7E4">
+    <core:formatters>
+        <core:formatCurrencyAmount/>
+    </core:formatters>
+    <core:text>#{modifier.originalItemValue}</core:text>
+</core:text>
+<core:text fontSize="12" messageId="VALUE_AT_PERCENTAGE" colour="#3DB7E4"/>
+<core:text fontSize="12" colour="#3DB7E4">
+    <core:formatters>
+        <core:formatPercentage/>
+    </core:formatters>
+    <core:text>#{modifier.displayPercentage}</core:text>
+</core:text>
+<core:text fontSize="12" colour="#3DB7E4">
+    <core:text>)</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="3" id="3">
+                            <core:elements>
+<core:text>
+    <core:formatters>
+        <core:formatCurrencyAmount negate="true" absValue="true"/>
+    </core:formatters>
+    <core:text>#{modifier.value}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="discountModifier">
+        <core:elements>
+            <core:row style="ITALIC;ITALIC">
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="6" visibility="#{!empty modifier.modifierItem}" id="6">
+                            <core:elements>
+<core:text fontSize="12" colour="#3DB7E4">
+    <core:text>#{empty(modifier.modifierItem.reasonDescription) ? modifier.modifierItem.description : modifier.modifierItem.reasonDescription}</core:text>
+</core:text>
+<core:text fontSize="12" visibility="#{enumEquals(modifier.modifierItem.type, 'PERCENTAGE')}" colour="#3DB7E4">
+    <core:text> </core:text>
+</core:text>
+<core:text fontSize="12" visibility="#{enumEquals(modifier.modifierItem.type, 'PERCENTAGE')}" colour="#3DB7E4">
+    <core:formatters>
+        <core:formatPercentage/>
+    </core:formatters>
+    <core:text>#{modifier.modifierItem.percentage}</core:text>
+</core:text>
+<core:text fontSize="12" colour="#3DB7E4">
+    <core:text> (</core:text>
+</core:text>
+<core:text fontSize="12" colour="#3DB7E4">
+    <core:formatters>
+        <core:formatCurrencyAmount/>
+    </core:formatters>
+    <core:text>#{modifier.modifierItem.value}</core:text>
+</core:text>
+<core:text fontSize="12" colour="#3DB7E4">
+    <core:text>)</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="priceOverrideModifier">
+        <core:elements>
+            <core:row style="ITALIC;ITALIC">
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="6" visibility="#{!empty modifier.modifierItem}" id="6">
+                            <core:elements>
+<core:text fontSize="12" colour="#3DB7E4">
+    <core:text>#{empty(modifier.modifierItem.reasonDescription) ? modifier.modifierItem.description : modifier.modifierItem.reasonDescription}</core:text>
+</core:text>
+<core:text fontSize="12" colour="#3DB7E4">
+    <core:text> (</core:text>
+</core:text>
+<core:text fontSize="12" colour="#3DB7E4">
+    <core:formatters>
+        <core:formatCurrencyAmount/>
+    </core:formatters>
+    <core:text>#{modifier.originalPrice}</core:text>
+</core:text>
+<core:text fontSize="12" colour="#3DB7E4">
+    <core:text> to </core:text>
+</core:text>
+<core:text fontSize="12" colour="#3DB7E4">
+    <core:formatters>
+        <core:formatCurrencyAmount/>
+    </core:formatters>
+    <core:text>#{modifier.newPrice}</core:text>
+</core:text>
+<core:text fontSize="12" colour="#3DB7E4">
+    <core:text>)</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="DistributedPromotionSavingItem">
+        <core:elements>
+            <core:row>
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="6" id="6">
+                            <core:elements>
+<core:text fontSize="12" colour="#3DB7E4">
+    <core:text>#{modifier.promotionItem.promotionDescription}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="3" id="3">
+                            <core:elements>
+<core:text fontSize="12" colour="#3DB7E4">
+    <core:formatters>
+        <core:formatCurrencyAmount/>
+    </core:formatters>
+    <core:text>#{-modifier.distributedSaving}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="separator">
+        <core:elements>
+            <core:row selectable="false" backgroundColour="#{item.voided ? '#ce3232cc' : '#FFFFFF'}" style="SOLID_BACKGROUND">
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="1">
+                            <core:elements>
+<core:imageElement>
+    <core:flowConstraint height="10"/>
+</core:imageElement>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="lineSeparator">
+        <core:elements>
+            <core:row selectable="false" backgroundColour="#EBEBEB" style="SOLID_BACKGROUND">
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="1">
+                            <core:elements>
+<core:imageElement>
+    <core:flowConstraint height="3"/>
+</core:imageElement>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="itemValue">
+        <core:elements>
+            <core:text fontSize="13" style="BOLD">
+                <core:formatters>
+                    <core:formatCurrencyAmount/>
+                </core:formatters>
+                <core:text>#{item.value}</core:text>
+            </core:text>
+        </core:elements>
+    </core:formatEntry>
+</core:documentTemplate>

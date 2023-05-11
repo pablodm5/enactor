@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<retail:posPromptPage xmlns:core="http://www.enactor.com/core" xmlns:retail="http://www.enactor.com/retail" xmlns:ns4="http://www.enactor.com/crm" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803" xmlns:ns6="http://www.apis-it.hr/fin/2012/types/f73" xmlns:ns7="http://www.w3.org/2000/09/xmldsig#" xmlns:ns8="http://www.enactor.com/retail/storedRetailTransaction/service" xmlns:ns9="http://www.fu.gov.si/" xmlns:ns10="http://www.enactor.com/addressLookup/service" xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:ns14="http://www.enactor.com/crm/customerLoyalty/service" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" messageBase="POSInventoryManagement/SORReturn/SORReturnMessages" url="POSInventoryManagement/SORReturn/SORReturnDataCapture">
+    <core:elements>
+        <core:hidden id="Receipt"/>
+        <core:hidden id="SelectionList"/>
+        <core:hidden id="InputBox"/>
+        <core:hidden id="TotalLabel"/>
+        <core:panel borderColour="BLUE" id="DialogPanel">
+            <core:elements>
+                <core:label messageId="DISPATCH_ID_LABEL" styleClass="formFieldLabel" id="DISPATCH_ID_LABEL">
+                    <core:boundsConstraint height="28" width="200" y="40" x="22"/>
+                </core:label>
+                <core:inputText editable="false" styleClass="formInputText" transparentBackground="false" enabled="true" id="DISPATCH_ID">
+                    <core:boundsConstraint height="28" width="224" y="40" x="232"/>
+                    <core:text>#{sORReturnHeader.SORReturnHeaderId}</core:text>
+                </core:inputText>
+                <core:errorLabel errorFieldId="DISPATCH_ID" styleClass="formErrorLabel" visible="false" id="DISPATCH_ERROR">
+                    <core:boundsConstraint height="28" width="224" y="40" x="464"/>
+                </core:errorLabel>
+                <core:label messageId="SUPPLIER_LABEL" styleClass="formFieldLabel" id="SUPPLIER_LABEL">
+                    <core:boundsConstraint height="28" width="200" y="80" x="22"/>
+                </core:label>
+                <core:inputText editable="false" allowWrap="true" styleClass="formInputText" transparentBackground="false" enabled="true" id="SUPPLIER">
+                    <core:boundsConstraint height="28" width="224" y="80" x="232"/>
+                    <core:text>#{retailSupplier.name}</core:text>
+                </core:inputText>
+                <core:errorLabel errorFieldId="SUPPLIER" allowWrap="true" styleClass="formErrorLabel" visibility="#{formErrors != null &amp;&amp; formErrors['SUPPLIER'] != null ? true : false }" colour="RED" id="SUPPLIER_ERROR">
+                    <core:boundsConstraint height="28" width="82" y="80" x="606"/>
+                    <core:text>#{formErrors != null ? formErrors['SUPPLIER'] : null}</core:text>
+                </core:errorLabel>
+                <core:button messageId="SELECT_SUPPLIER_BUTTON_LABEL" styleClass="buttonLight" id="SELECT_SUPPLIER_BUTTON">
+                    <core:boundsConstraint height="31" width="131" y="80" x="464"/>
+                    <core:text>SupplierPressed</core:text>
+                </core:button>
+                <core:label messageId="REASON_LABEL" styleClass="formFieldLabel" id="REASON_LABEL">
+                    <core:boundsConstraint height="28" width="200" y="120" x="22"/>
+                </core:label>
+                <core:inputText editable="false" styleClass="formInputText" transparentBackground="false" enabled="true" id="REASON">
+                    <core:boundsConstraint height="28" width="224" y="120" x="232"/>
+                    <core:text>#{getLocalisedString(reason.description, userLocale)}</core:text>
+                </core:inputText>
+                <core:errorLabel errorFieldId="REASON" styleClass="formErrorLabel" visibility="#{formErrors != null &amp;&amp; formErrors['REASON'] != null ? true : false }" colour="RED" id="REASON_ERROR">
+                    <core:boundsConstraint height="28" width="82" y="120" x="606"/>
+                    <core:text>#{formErrors != null ? formErrors['REASON'] : null}</core:text>
+                </core:errorLabel>
+                <core:button messageId="SELECT_REASON_BUTTON_LABEL" styleClass="buttonLight" visibility="#{displaySelectReasonButton}" id="SELECT_REASON_BUTTON">
+                    <core:boundsConstraint height="31" width="131" y="120" x="464"/>
+                    <core:text>ReasonPressed</core:text>
+                </core:button>
+                <core:label messageId="CARRIER_LABEL" styleClass="formFieldLabel" id="CARRIER_LABEL">
+                    <core:boundsConstraint height="28" width="200" y="160" x="22"/>
+                </core:label>
+                <core:comboBox manualDropDownDisabled="false" lazyLoad="false" editable="true" styleClass="formCombo" transparentBackground="false" id="CARRIER_TYPE">
+                    <core:boundsConstraint height="28" width="224" y="160" x="232"/>
+                    <core:text>#{selectedCarrierTypeKey}</core:text>
+                    <core:textElementEvents/>
+                    <core:listExpression>#{carrierTypeList}</core:listExpression>
+                    <core:listingElementEvents>
+                        <core:selectionEvent>CarrierTypeChanged</core:selectionEvent>
+                    </core:listingElementEvents>
+                </core:comboBox>
+                <core:errorLabel errorFieldId="CARRIER_TYPE" styleClass="formErrorLabel" visibility="#{formErrors != null &amp;&amp; formErrors['CARRIER_TYPE'] != null ? true : false }" colour="RED" id="CARRIER_TYPE_ERROR">
+                    <core:boundsConstraint height="28" width="224" y="160" x="464"/>
+                    <core:text>#{formErrors != null ? formErrors['CARRIER_TYPE'] : null}</core:text>
+                </core:errorLabel>
+                <core:comboBox manualDropDownDisabled="false" lazyLoad="false" styleClass="formCombo" transparentBackground="true" id="CARRIER_ID">
+                    <core:boundsConstraint height="28" width="224" y="200" x="232"/>
+                    <core:text>#{selectedCarrierKey}</core:text>
+                    <core:listExpression>#{carrierList}</core:listExpression>
+                    <core:listingElementEvents>
+                        <core:selectionEvent>CarrierChanged</core:selectionEvent>
+                    </core:listingElementEvents>
+                </core:comboBox>
+                <core:errorLabel errorFieldId="CARRIER_ID" styleClass="formErrorLabel" visibility="#{formErrors != null &amp;&amp; formErrors['CARRIER_ID'] != null ? true : false }" colour="RED" id="CARRIER_ID_ERROR">
+                    <core:boundsConstraint height="28" width="224" y="200" x="464"/>
+                    <core:text>#{formErrors != null ? formErrors['CARRIER_ID'] : null}</core:text>
+                </core:errorLabel>
+                <core:label messageId="PARCEL_REF_LABEL" styleClass="formFieldLabel" id="PARCEL_REF_LABEL">
+                    <core:boundsConstraint height="28" width="200" y="240" x="22"/>
+                </core:label>
+                <core:inputText styleClass="formInputText" transparentBackground="false" id="PARCEL_REF">
+                    <core:boundsConstraint height="28" width="224" y="240" x="232"/>
+                    <core:text>#{sORReturnHeader.carrierReference}</core:text>
+                </core:inputText>
+                <core:errorLabel errorFieldId="PARCEL_REF" styleClass="formErrorLabel" visible="false" id="PARCEL_REF_ERROR">
+                    <core:boundsConstraint height="28" width="224" y="240" x="464"/>
+                </core:errorLabel>
+            </core:elements>
+        </core:panel>
+        <core:button messageBase="POSInventoryManagement/Common/GeneralMessages" messageId="CONFIRM_BUTTON_LABEL" id="Button1">
+            <core:text>ConfirmPressed</core:text>
+        </core:button>
+        <core:button messageBase="POSInventoryManagement/Common/GeneralMessages" messageId="EDIT_ITEMS_BUTTON_LABEL" id="Button2">
+            <core:text>EditItemsPressed</core:text>
+        </core:button>
+        <core:button messageBase="POSInventoryManagement/Common/GeneralMessages" messageId="CANCEL_BUTTON_LABEL" id="Button8">
+            <core:text>CancelPressed</core:text>
+        </core:button>
+        <core:button messageBase="POSInventoryManagement/Common/GeneralMessages" messageId="SUSPEND_BUTTON_LABEL" id="Button4">
+            <core:text>SuspendPressed</core:text>
+        </core:button>
+        <core:text messageId="ENTER_DETAILS" id="Prompt"/>
+    </core:elements>
+    <core:templateURL>Pos/FullScreenTraditionalPosTemplate</core:templateURL>
+    <core:events>
+        <core:event destination="Button1" event="key.EnterPressed">press</core:event>
+        <core:event destination="Button2" event="key.UpPressed">press</core:event>
+        <core:event destination="Button3" event="key.DownPressed">press</core:event>
+        <core:event destination="Button8" event="key.KeyCode27Pressed">press</core:event>
+    </core:events>
+    <core:variables>
+        <core:variable required="true" name="enactor.mfc.SORReturnHeader">
+            <core:interfaceName>com.enactor.storeInventoryManagement.local.sorReturn.SORReturnHeader</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.mfc.SelectedCarrierTypeKey">
+            <core:interfaceName>com.enactor.storeInventoryManagement.local.carrier.ICarrierTypeKey</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.coreUI.CarrierTypeList">
+            <core:interfaceName>java.util.List</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.coreUI.CarrierList">
+            <core:interfaceName>java.util.List</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.mfc.SelectedCarrierKey">
+            <core:interfaceName>com.enactor.storeInventoryManagement.local.carrier.ICarrierKey</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.mfc.Reason">
+            <core:interfaceName>com.enactor.mfc.reason.Reason</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.coreUI.UserLocale">
+            <core:interfaceName>com.enactor.core.localisation.ILocale</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.mfc.RetailSupplier">
+            <core:interfaceName>com.enactor.mfc.supplier.RetailSupplier</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="FormErrors">
+            <core:interfaceName>com.enactor.coreUI.processes.IFormErrors</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.inventoryManagement.DisplaySelectReasonButton">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:variable>
+    </core:variables>
+</retail:posPromptPage>

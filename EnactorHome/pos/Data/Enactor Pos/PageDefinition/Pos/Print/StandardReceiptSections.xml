@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<core:documentTemplate xmlns:core="http://www.enactor.com/core" xmlns:retail="http://www.enactor.com/retail" xmlns:ns4="http://www.enactor.com/crm" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803" xmlns:ns6="http://www.apis-it.hr/fin/2012/types/f73" xmlns:ns7="http://www.w3.org/2000/09/xmldsig#" xmlns:ns8="http://www.enactor.com/retail/storedRetailTransaction/service" xmlns:ns9="http://www.fu.gov.si/" xmlns:ns10="http://www.enactor.com/addressLookup/service" xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:ns14="http://www.enactor.com/crm/customerLoyalty/service" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" paginated="false" messageBase="Pos/Print/ReceiptMessages" title="Standard Receipt Sections" url="Pos/Print/StandardReceiptSections">
+    <core:elements/>
+    <core:formatEntry id="receiptHeader">
+        <core:elements>
+            <core:formatElement formatId="headerLogo"/>
+            <core:formatElement formatId="storeAddress"/>
+            <core:formatElement formatId="headerLine" visible="false"/>
+            <core:formatElement formatId="headerStoreLine" visible="false"/>
+            <core:formatElement formatId="headerLines"/>
+            <core:formatElement applicability="#{transaction.trainingDetails.trainingMode}" formatId="trainingModeHeader"/>
+            <core:formatElement applicability="#{instanceOf(transaction, 'com.enactor.mfc.retail.transaction.IRetailTransaction') &amp;&amp; transaction.isTransactionReversed}" formatId="reversedTransactionHeader"/>
+            <core:formatElement applicability="#{instanceOf(transaction, 'com.enactor.mfc.retail.transaction.IRetailTransaction') &amp;&amp; transaction.isTransactionReversal}" formatId="reversalTransactionHeader"/>
+            <core:formatElement applicability="#{basket.total &gt;= 0 &amp;&amp; !instanceOf(transaction, 'com.enactor.mfc.retail.transaction.IRetailQuoteTransaction')}" formatId="saleHeader"/>
+            <core:formatElement applicability="#{basket.total &lt; 0 &amp;&amp; !instanceOf(transaction, 'com.enactor.mfc.retail.transaction.IRetailQuoteTransaction')}" formatId="refundHeader"/>
+            <core:formatElement applicability="#{instanceOf(transaction, 'com.enactor.mfc.retail.transaction.IRetailQuoteTransaction')}" formatId="retailQuoteHeader"/>
+            <core:formatElement applicability="#{notEmpty(receiptCopyNumber) &amp;&amp; receiptCopyNumber != 0}" formatId="copyHeader"/>
+            <core:formatElement applicability="#{reprintReceipt}" formatId="reprintReceiptHeader"/>
+            <core:formatElement applicability="#{instanceOf(transaction, 'com.enactor.mfc.retail.transaction.IRestaurantSaleTransaction') &amp;&amp; !empty (transaction.tableId)}" formatId="restaurantHeader"/>
+            <core:formatElement applicability="#{instanceOf(transaction, 'com.enactor.mfc.retail.transaction.IAirportSaleTransaction') &amp;&amp; !empty (flightDetailsItem)}" formatId="flightDetailsHeader"/>
+            <core:formatElement formatId="separator"/>
+            <core:formatElement applicability="#{instanceOf(transaction, 'com.enactor.mfc.retail.transaction.IRetailQuoteTransaction') &amp;&amp; notEmpty(transaction.orderReference)}" formatId="retailQuoteOrderReference"/>
+            <core:formatElement applicability="#{instanceOf(transaction, 'com.enactor.mfc.retail.transaction.IRetailQuoteTransaction') &amp;&amp; notEmpty(transaction.quoteReference)}" formatId="retailQuoteReference"/>
+            <core:formatElement formatId="headerTaxSchemeOverride"/>
+            <core:formatElement applicability="#{instanceOf(transaction, 'com.enactor.mfc.retail.transaction.ITaxRefundRequestTransaction') &amp;&amp; transaction.isTransactionReversal}" formatId="reversalTaxRefundTransactionHeaderDetails"/>
+            <core:formatElement applicability="#{instanceOf(transaction, 'com.enactor.mfc.retail.transaction.IRetailTransaction') &amp;&amp; transaction.isTransactionReversal &amp;&amp; !instanceOf(transaction, 'com.enactor.mfc.retail.transaction.ITaxRefundRequestTransaction')}" formatId="reversalTransactionHeaderDetails"/>
+            <core:formatElement formatId="collectionReceiptHeader"/>
+            <core:assign to="customerName" type="com.enactor.mfc.name.Name" value="sale.customerRetailDetails.customerName"/>
+            <core:assign to="customerAddress" type="com.enactor.mfc.address.Address" value="sale.customerRetailDetails.customerAddress"/>
+            <core:formatElement applicability="#{!empty(sale.customerRetailDetails) &amp;&amp; (!empty(sale.customerRetailDetails.customerName) || !empty(sale.customerRetailDetails.customerAddress)) &amp;&amp; !hasCollectionDetails}" formatId="customerNameAndAddress"/>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="receiptBody">
+        <core:elements>
+            <core:assign to="hasCardRegistrationItem" type="java.lang.Boolean" value="#{hasCardRegistrationItem}"/>
+            <core:assign to="merchItemsQuantity" type="int" value="0" id="MerchItemsQuantityAssign"/>
+            <core:assign to="merchItemsValue" type="long" value="0" id="MerchItemsValueAssign"/>
+            <core:assign to="salespersonId" type="java.lang.String" value="" id="SalespersonIdAssign"/>
+            <core:assign to="repairItems" type="int" value="0" id="RepairItemsAssign"/>
+            <core:formatElement formatId="initialiseSupplementaryBasketTotals"/>
+            <core:formatElement formatId="basketDispatchList" visibility="#{isDispatch}"/>
+            <core:formatElement applicability="#{!multipleCollections}" formatId="collectionReceiptBody"/>
+            <core:formatElement formatId="basketItemsList"/>
+            <core:formatElement formatId="basketOrderList"/>
+            <core:formatElement formatId="basketTransactionVoidItemsList" visible="false"/>
+            <core:formatElement formatId="transactionDiscountItemsList"/>
+            <core:formatElement formatId="basketTransactionItemsList" visible="false"/>
+            <core:formatElement applicability="#{notEmpty(basket.promotionCalculation)}" formatId="promotionCalculation"/>
+            <core:formatElement applicability="#{(basket.total != 0 || repairItems == 0) &amp;&amp; !hasCardRegistrationItem}" formatId="total"/>
+            <core:formatElement formatId="splitOrStandardTenderItemsList"/>
+            <core:formatElement applicability="#{basket.taxBreakdown != null}" formatId="taxBreakdownConditional"/>
+            <core:formatElement formatId="employeeBalance"/>
+            <core:formatElement applicability="#{!empty(transaction.loyaltyPointsDetails)}" formatId="loyaltyPoints"/>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="receiptBarcode">
+        <core:elements>
+            <core:formatElement formatId="separator"/>
+            <core:formatElement formatId="barcode"/>
+            <core:formatElement applicability="#{instanceOf(transaction, 'com.enactor.mfc.retail.transaction.IRetailQuoteTransaction')}" formatId="retailQuoteTrailer"/>
+            <core:lineElement id="EmptyLine"/>
+            <core:formatElement applicability="#{!(instanceOf(transaction, 'com.enactor.mfc.retail.transaction.IRetailTransaction') &amp;&amp; (transaction.isTransactionReversal || transaction.isTransactionReversed))}" formatId="trailerLines"/>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="receiptTrailer">
+        <core:elements>
+            <core:formatElement applicability="#{transaction.trainingDetails.trainingMode}" formatId="trainingModeTrailer"/>
+            <core:formatElement applicability="#{instanceOf(transaction, 'com.enactor.mfc.retail.transaction.IRetailTransaction') &amp;&amp; transaction.isTransactionReversed}" formatId="reversedTransactionTrailer"/>
+            <core:formatElement applicability="#{instanceOf(transaction, 'com.enactor.mfc.retail.transaction.IRetailTransaction') &amp;&amp; transaction.isTransactionReversal}" formatId="reversalTransactionTrailer"/>
+            <core:formatElement formatId="trailerLine"/>
+            <core:formatElement formatId="trailerStoreLine" visible="false"/>
+            <core:formatElement formatId="trailerLogo"/>
+            <core:formatElement applicability="#{notEmpty(isEmailReceipt) &amp;&amp; isEmailReceipt}" formatId="blankLineRow"/>
+            <core:formatElement applicability="#{notEmpty(isEmailReceipt) &amp;&amp; isEmailReceipt}" formatId="emailReceiptTrailer"/>
+            <core:formatElement applicability="#{notEmpty(qrData)}" formatId="qrcode"/>
+            <core:page number="0" id="PageBreakPage"/>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="lineSeparator">
+        <core:elements/>
+    </core:formatEntry>
+</core:documentTemplate>

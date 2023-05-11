@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<core:documentTemplate xmlns:core="http://www.enactor.com/core" xmlns:retail="http://www.enactor.com/retail" xmlns:ns4="http://www.enactor.com/crm" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803" xmlns:ns6="http://www.apis-it.hr/fin/2012/types/f73" xmlns:ns7="http://www.w3.org/2000/09/xmldsig#" xmlns:ns8="http://www.enactor.com/retail/storedRetailTransaction/service" xmlns:ns9="http://www.fu.gov.si/" xmlns:ns10="http://www.enactor.com/addressLookup/service" xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:ns14="http://www.enactor.com/crm/customerLoyalty/service" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" paginated="false" width="320" messageBase="Pos/Print/ReceiptMessages" title="ICC Reader General Format Entries" url="Pos/Print/ICCReaderGeneralFormatEntries">
+    <core:elements>
+        <core:assign to="startingIndex" type="int" value="0"/>
+    </core:elements>
+    <core:includedTemplateUrl>Pos/Print/ICCReaderItemFormatEntries</core:includedTemplateUrl>
+    <core:formatEntry id="countBasketItems">
+        <core:elements>
+            <core:assign to="count" type="int" value="0"/>
+            <core:tableTemplate list="#{basket:getItemIteratorForClass(basket, 'com.enactor.mfc.basket.items.IVoidableItem')}" id="receiptListTable">
+                <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IBaseBasketOptionValue"/>
+                <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IMerchandiseItem" formatId="incrementCount"/>
+                <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IGiftCardItem" formatId="incrementCount"/>
+                <core:formatElement applicableClassName="com.enactor.mfc.basket.items.ITenderItem" applicability="#{!item.isChange}" formatId="incrementCount"/>
+                <core:formatElement/>
+            </core:tableTemplate>
+            <core:assign to="startingIndex" value="#{max(count - maximumDisplayItems, 0)}"/>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="incrementCount">
+        <core:elements>
+            <core:assign to="count" value="#{count + 1}"/>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="receiptList">
+        <core:elements>
+            <core:assign to="currentIndex" type="int" value="0"/>
+            <core:tableTemplate list="#{basket:getItemIteratorForClass(basket, 'com.enactor.mfc.basket.items.IVoidableItem')}" id="receiptListTable">
+                <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IBaseBasketOptionValue"/>
+                <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IMerchandiseItem" applicability="#{currentIndex &gt;= startingIndex}" formatId="merchandiseItem"/>
+                <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IGiftCardItem" applicability="#{currentIndex &gt;= startingIndex}" formatId="giftCardItem"/>
+                <core:formatElement applicableClassName="com.enactor.mfc.basket.items.ITenderItem" applicability="#{currentIndex &gt;= startingIndex &amp;&amp; !item.isChange}" formatId="tenderItem"/>
+                <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IMerchandiseItem" applicability="#{currentIndex &lt; startingIndex}" formatId="incrementIndex"/>
+                <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IGiftCardItem" applicability="#{currentIndex &lt; startingIndex}" formatId="incrementIndex"/>
+                <core:formatElement applicableClassName="com.enactor.mfc.basket.items.ITenderItem" applicability="#{currentIndex &lt; startingIndex &amp;&amp; !item.isChange}" formatId="incrementIndex"/>
+                <core:formatElement/>
+            </core:tableTemplate>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="incrementIndex">
+        <core:elements>
+            <core:assign to="currentIndex" value="#{currentIndex + 1}"/>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="seperator">
+        <core:elements>
+            <core:row styleClass="line-wrapper seperator">
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" styleClass="seperator">
+                            <core:elements/>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="total">
+        <core:elements>
+            <core:assign to="changeValue" value="0"/>
+            <core:assign to="totalTransactionSavingsValue" value="0"/>
+            <core:tableTemplate list="#{basket.promotionCalculation.items}" id="Promotions">
+                <core:formatElement applicableClassName="com.enactor.mfc.promotion.calculation.IPromotionSavingItem" formatId="promotionSaving"/>
+                <core:formatElement applicableClassName="com.enactor.mfc.promotion.calculation.IPromotionPointsItem"/>
+                <core:formatElement applicableClassName="com.enactor.mfc.promotion.calculation.IPromotionFreeProductItem"/>
+                <core:formatElement applicableClassName="com.enactor.mfc.promotion.calculation.IPromotionNearMissItem"/>
+                <core:formatElement applicableClassName="com.enactor.mfc.promotion.calculation.IPromotionCalculationItem"/>
+            </core:tableTemplate>
+            <core:tableTemplate listVariableName="transactionDisountItem" list="#{basket.nonTenderItemIterator}" id="getTransactionDiscountItemItr">
+                <core:formatElement applicableClassName="com.enactor.mfc.basket.items.ITransactionDiscountItem" formatId="transactionDiscountItem"/>
+                <core:formatElement/>
+            </core:tableTemplate>
+            <core:tableTemplate list="#{basket.tenderItemIterator}" id="Tenders">
+                <core:formatElement applicableClassName="com.enactor.mfc.basket.items.ITenderItem" applicability="#{item.isChange &amp;&amp; !item.voided &amp;&amp; !item.isRefund}" formatId="changeTenderItem"/>
+                <core:formatElement/>
+            </core:tableTemplate>
+            <core:row styleClass="line-wrapper" visibility="#{totalTransactionSavingsValue != 0}">
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" styleClass="transaction-saving-name-col" id="0">
+                            <core:elements>
+<core:text messageId="TRANSACTION_SAVING" styleClass="transaction-saving-name"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" styleClass="transaction-saving-price-col" id="0">
+                            <core:elements>
+<core:text styleClass="transaction-saving-price">
+    <core:formatters>
+        <core:formatCurrencyAmount/>
+    </core:formatters>
+    <core:text>#{-totalTransactionSavingsValue}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+            <core:row styleClass="line-wrapper" visibility="#{changeValue == 0}">
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" styleClass="balance-name-col" visibility="#{!tendering}" id="0">
+                            <core:elements>
+<core:text messageId="#{notEmpty(basket) &amp;&amp; (basket.total &gt;= 0) ? 'TOTAL' : 'CREDIT_DUE'}" styleClass="balance-name"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" styleClass="balance-name-col" visibility="#{tendering}" id="0">
+                            <core:elements>
+<core:text messageId="#{notEmpty(basket) &amp;&amp; (basket.total &gt;= 0) ? 'TOTAL_DUE' : 'CREDIT_DUE'}" styleClass="balance-name"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" styleClass="balance-price-col" id="2">
+                            <core:elements>
+<core:text styleClass="balance-price">
+    <core:formatters>
+        <core:formatCurrencyAmount/>
+    </core:formatters>
+    <core:text>#{basket.balance}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+            <core:row styleClass="line-wrapper" visibility="#{changeValue != 0}">
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" styleClass="balance-name-col" id="0">
+                            <core:elements>
+<core:text messageId="CHANGE_DUE" styleClass="balance-name"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" styleClass="balance-price-col" id="2">
+                            <core:elements>
+<core:text styleClass="balance-price">
+    <core:formatters>
+        <core:formatCurrencyAmount/>
+    </core:formatters>
+    <core:text>#{changeValue}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="changeTenderItem">
+        <core:elements>
+            <core:assign to="changeValue" value="#{changeValue + item.value}"/>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="promotionSaving">
+        <core:elements>
+            <core:assign to="totalTransactionSavingsValue" value="#{totalTransactionSavingsValue + item.saving}"/>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="transactionDiscountItem">
+        <core:elements>
+            <core:assign to="totalTransactionSavingsValue" value="#{totalTransactionSavingsValue + (-transactionDisountItem.value)}"/>
+        </core:elements>
+    </core:formatEntry>
+</core:documentTemplate>

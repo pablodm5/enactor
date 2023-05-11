@@ -1,0 +1,359 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<core:simpleActivityFlowBusinessProcess xmlns:core="http://www.enactor.com/core" xmlns:ns6="tools" xmlns:ns7="http://maven.apache.org/POM/4.0.0" xmlns:retail="http://www.enactor.com/retail" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:tools="http://www.enactor.com/tools">
+    <core:processId>InventoryManagement/BulkPurchaseOrders</core:processId>
+    <core:name>Bulk Purchase Orders</core:name>
+    <core:businessProcessTypeId>InventoryManagement/BulkPurchaseOrdersType</core:businessProcessTypeId>
+    <core:startPrivilege>enactor.inventoryManagement.BulkPurchaseOrders.Run</core:startPrivilege>
+    <core:participatePrivilege>enactor.inventoryManagement.BulkPurchaseOrders.Run</core:participatePrivilege>
+    <core:administerPrivilege>enactor.inventoryManagement.BulkPurchaseOrders.Admin</core:administerPrivilege>
+    <core:deprecated>false</core:deprecated>
+    <core:uiSettings xsi:type="tools:BusinessProcessSettings" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <core:constraint xsi:type="core:UIPositionConstraint">
+            <core:x>11</core:x>
+            <core:y>91</core:y>
+        </core:constraint>
+        <tools:notes xsi:type="core:WrappedNull"/>
+    </core:uiSettings>
+    <core:activities xsi:type="core:WrappedList" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <core:listElement>
+            <core:value xsi:type="core:HTActivity">
+                <core:activityId>EnterOrderItems</core:activityId>
+                <core:name>Enter Order Items</core:name>
+                <core:activityTypeId>InventoryManagement/BulkPurchaseOrderEntryActivityType</core:activityTypeId>
+                <core:activityOutcome name="Success">
+                    <core:toActivity>GeneratePurchaseOrders</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:activityOutcome name="Cancel">
+                    <core:toActivity>PurchaseOrdersCancelled</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:activityOutcome name="Fail">
+                    <core:toActivity>ApplicationFailed</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:suspendActivityOutcome name="Suspend">
+                    <core:toActivity>EnterOrderItems</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:suspendActivityOutcome>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>538</core:x>
+                        <core:y>149</core:y>
+                    </core:constraint>
+                </core:uiSettings>
+                <core:metaData>
+                    <core:inputs/>
+                    <core:outputs>
+                        <core:output required="true" name="enactor.core.WorkingCopySessionId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:output>
+                        <core:output required="true" name="enactor.core.WorkingCopyTableName">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:output>
+                        <core:output required="true" name="enactor.inventoryManagement.CreatedByUserId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:output>
+                        <core:output required="true" name="enactor.inventoryManagement.RaisedAtLocationId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:output>
+                    </core:outputs>
+                </core:metaData>
+                <core:jobType>Bulk Purchase Orders</core:jobType>
+                <core:jobHeader>Item Entry</core:jobHeader>
+                <core:displayTitleMessageBase>InventoryManagement/BulkPurchaseOrders/BulkPurchaseOrderMessages</core:displayTitleMessageBase>
+                <core:displayTitleMessageId>ENTER_ORDER_ITEMS_TITLE</core:displayTitleMessageId>
+                <core:peopleGroupEvaluator>{http://www.enactor.com/task}SimpleUserEvaluator</core:peopleGroupEvaluator>
+            </core:value>
+            <core:index>0</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:CallProcessActivity">
+                <core:activityId>GeneratePurchaseOrders</core:activityId>
+                <core:name>Generate Purchase Orders</core:name>
+                <core:description>Server process to generate purchase orders for each location / supplier combination.</core:description>
+                <core:activityTypeId>InventoryManagement/BulkPurchaseOrderGenerateActivityType</core:activityTypeId>
+                <core:activityOutcome name="Success">
+                    <core:toActivity>ReviewPurchaseOrders</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:catchAllOutcome xsi:type="core:ActivityOutcome" name="Error">
+                    <core:toActivity>GenerateOrdersError</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:catchAllOutcome>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>788</core:x>
+                        <core:y>191</core:y>
+                    </core:constraint>
+                </core:uiSettings>
+                <core:metaData>
+                    <core:inputs>
+                        <core:input required="true" name="enactor.core.WorkingCopySessionId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.core.WorkingCopyTableName">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.inventoryManagement.RaisedAtLocationId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.inventoryManagement.CreatedByUserId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                    </core:inputs>
+                    <core:outputs>
+                        <core:output name="enactor.core.ErrorDetails">
+                            <core:interfaceName>com.enactor.core.application.process.IErrorDetails</core:interfaceName>
+                        </core:output>
+                    </core:outputs>
+                </core:metaData>
+            </core:value>
+            <core:index>1</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:EndProcessActivity">
+                <core:activityId>PurchaseOrdersCancelled</core:activityId>
+                <core:name>Change Request Cancelled</core:name>
+                <core:activityTypeId>Generic/EndProcessActivityType</core:activityTypeId>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>338</core:x>
+                        <core:y>-57</core:y>
+                    </core:constraint>
+                    <tools:style>1</tools:style>
+                </core:uiSettings>
+                <core:discard>false</core:discard>
+            </core:value>
+            <core:index>2</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:EndProcessActivity">
+                <core:activityId>ApplicationClosed</core:activityId>
+                <core:name>Application Closed</core:name>
+                <core:activityTypeId>Generic/EndProcessActivityType</core:activityTypeId>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>1104</core:x>
+                        <core:y>8</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>default</tools:swimLaneId>
+                    <tools:style>1</tools:style>
+                </core:uiSettings>
+                <core:discard>false</core:discard>
+            </core:value>
+            <core:index>3</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:EndProcessActivity">
+                <core:activityId>ApplicationFailed</core:activityId>
+                <core:name>Application Failed</core:name>
+                <core:activityTypeId>Generic/EndProcessActivityType</core:activityTypeId>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>720</core:x>
+                        <core:y>7</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>default</tools:swimLaneId>
+                    <tools:style>1</tools:style>
+                </core:uiSettings>
+                <core:discard>false</core:discard>
+            </core:value>
+            <core:index>4</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:HTActivity">
+                <core:activityId>CancelNotification</core:activityId>
+                <core:name>Cancel Notification</core:name>
+                <core:description>Inform user that requested price change(s) have been rejected.</core:description>
+                <core:activityTypeId>InventoryManagement/PriceChangeRejectionNotificationActivityType</core:activityTypeId>
+                <core:activityOutcome name="Success">
+                    <core:toActivity>PurchaseOrdersCancelled</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>896</core:x>
+                        <core:y>-97</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>default</tools:swimLaneId>
+                </core:uiSettings>
+                <core:metaData>
+                    <core:inputs>
+                        <core:input required="true" name="enactor.coreUI.UserIdOfCreator">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="">
+                            <core:interfaceName></core:interfaceName>
+                        </core:input>
+                    </core:inputs>
+                </core:metaData>
+                <core:jobType>SupplierAndRetailProductCostChange</core:jobType>
+                <core:jobHeader>CancelNotification</core:jobHeader>
+                <core:displayDescriptionMessageBase>InventoryManagement/RetailAndCostPriceChangeMessages</core:displayDescriptionMessageBase>
+                <core:displayDescriptionMessageId>Cancel_Notification_Msg</core:displayDescriptionMessageId>
+                <core:displayTitleMessageBase>InventoryManagement/RetailAndCostPriceChangeMessages</core:displayTitleMessageBase>
+                <core:displayTitleMessageId>Cancel_Notification_Title</core:displayTitleMessageId>
+                <core:peopleGroupEvaluator>{http://www.enactor.com/task}SimpleUserEvaluator</core:peopleGroupEvaluator>
+                <core:peopleGroupParameters>
+                    <core:parameter name="userId">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>#{userIdOfCreator}</core:value>
+                    </core:parameter>
+                </core:peopleGroupParameters>
+            </core:value>
+            <core:index>5</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:HTActivity">
+                <core:activityId>GenerateOrdersError</core:activityId>
+                <core:name>Generate Orders Error</core:name>
+                <core:description>Allow the task to be re-run or suspended. If the purchase order is interactive only the user that created it can re-run it.  If the purchase order is automatic, any user (at the server's location) with the correct privilege can re-run it.</core:description>
+                <core:activityTypeId>InventoryManagement/ShowMessageActivityType</core:activityTypeId>
+                <core:suspendActivityOutcome name="Suspended">
+                    <core:toActivity>GenerateOrdersError</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:suspendActivityOutcome>
+                <core:activityOutcome name="Retry">
+                    <core:toActivity>GeneratePurchaseOrders</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:catchAllOutcome xsi:type="core:ActivityOutcome" name="Error">
+                    <core:toActivity></core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:catchAllOutcome>
+                <core:parameters>
+                    <core:parameter name="enactor.inventoryManagement.DisallowOK">
+                        <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                        <core:value>true</core:value>
+                    </core:parameter>
+                    <core:parameter name="enactor.coreUI.MessageBasename">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>InventoryManagement/BulkPurchaseOrders/BulkPurchaseOrderMessages</core:value>
+                    </core:parameter>
+                    <core:parameter name="enactor.coreUI.MessageId">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>GENERATE_PURCHASE_ORDERS_ERROR</core:value>
+                    </core:parameter>
+                </core:parameters>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>776</core:x>
+                        <core:y>487</core:y>
+                    </core:constraint>
+                    <tools:style>7</tools:style>
+                </core:uiSettings>
+                <core:metaData>
+                    <core:inputs>
+                        <core:input name="enactor.coreUI.MessageBasename">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input name="enactor.coreUI.MessageId">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                        <core:input name="enactor.inventoryManagement.DisallowOK">
+                            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.core.ErrorDetails">
+                            <core:interfaceName>com.enactor.core.application.process.IErrorDetails</core:interfaceName>
+                        </core:input>
+                    </core:inputs>
+                </core:metaData>
+                <core:jobType>Bulk Purchase Orders</core:jobType>
+                <core:jobHeader>Generate Purchase Orders Error</core:jobHeader>
+                <core:displayDescriptionMessageBase>InventoryManagement/BulkPurchaseOrders/BulkPurchaseOrderMessages</core:displayDescriptionMessageBase>
+                <core:displayDescriptionMessageId>#{errorDetails.messageId}</core:displayDescriptionMessageId>
+                <core:displayTitleMessageBase>InventoryManagement/BulkPurchaseOrders/BulkPurchaseOrderMessages</core:displayTitleMessageBase>
+                <core:displayTitleMessageId>GENERATE_PURCHASE_ORDERS_ERROR_TITLE</core:displayTitleMessageId>
+                <core:priority>5</core:priority>
+                <core:peopleGroupEvaluator>{http://www.enactor.com/mfc}LocationPrivilegeOrUserEvaluator</core:peopleGroupEvaluator>
+                <core:peopleGroupParameters>
+                    <core:parameter name="privilegeId">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>enactor.inventoryManagement.PurchaseOrder.Rerun</core:value>
+                    </core:parameter>
+                    <core:parameter name="fallbackToAllLocations">
+                        <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                        <core:value>true</core:value>
+                    </core:parameter>
+                    <core:parameter name="locationId">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>#{serverLocationKey.locationId}</core:value>
+                    </core:parameter>
+                    <core:parameter name="userId">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>#{userId}</core:value>
+                    </core:parameter>
+                    <core:parameter name="allPrivilegeUsers">
+                        <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                        <core:value>#{automaticMode}</core:value>
+                    </core:parameter>
+                </core:peopleGroupParameters>
+            </core:value>
+            <core:index>6</core:index>
+        </core:listElement>
+        <core:listElement>
+            <core:value xsi:type="core:HTActivity">
+                <core:activityId>ReviewPurchaseOrders</core:activityId>
+                <core:name>Review Purchase Orders</core:name>
+                <core:activityTypeId>InventoryManagement/BulkPurchaseOrderReviewActivityType</core:activityTypeId>
+                <core:suspendActivityOutcome name="Suspended">
+                    <core:toActivity>ReviewPurchaseOrders</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:suspendActivityOutcome>
+                <core:activityOutcome name="Success">
+                    <core:toActivity>ApplicationClosed</core:toActivity>
+                    <core:proceedImmediately>true</core:proceedImmediately>
+                </core:activityOutcome>
+                <core:parameters>
+                    <core:parameter name="enactor.bulkProcessing.SelectedAction">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>BULK_PROCESSING_ACTION_APPROVE</core:value>
+                    </core:parameter>
+                </core:parameters>
+                <core:uiSettings xsi:type="tools:ActivitySettings">
+                    <core:constraint xsi:type="core:UIPositionConstraint">
+                        <core:x>1056</core:x>
+                        <core:y>166</core:y>
+                    </core:constraint>
+                    <tools:swimLaneId>default</tools:swimLaneId>
+                    <tools:style>7</tools:style>
+                </core:uiSettings>
+                <core:metaData>
+                    <core:inputs>
+                        <core:input name="enactor.core.ErrorDetails">
+                            <core:interfaceName>com.enactor.core.application.process.IErrorDetails</core:interfaceName>
+                        </core:input>
+                        <core:input required="true" name="enactor.bulkProcessing.SelectedAction">
+                            <core:interfaceName>java.lang.String</core:interfaceName>
+                        </core:input>
+                    </core:inputs>
+                </core:metaData>
+                <core:jobType>Bulk Purchase Orders</core:jobType>
+                <core:jobHeader>Approve Orders</core:jobHeader>
+                <core:displayTitleMessageBase>InventoryManagement/BulkPurchaseOrders/BulkPurchaseOrderMessages</core:displayTitleMessageBase>
+                <core:displayTitleMessageId>APPROVE_PURCHASE_ORDERS_TITLE</core:displayTitleMessageId>
+                <core:priority>5</core:priority>
+                <core:peopleGroupEvaluator>{http://www.enactor.com/mfc}LocationPrivilegeEvaluator</core:peopleGroupEvaluator>
+                <core:peopleGroupParameters>
+                    <core:parameter name="privilegeId">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>enactor.inventoryManagement.AuthorisePurchaseOrder</core:value>
+                    </core:parameter>
+                    <core:parameter name="fallbackToAllLocations">
+                        <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                        <core:value>true</core:value>
+                    </core:parameter>
+                    <core:parameter name="locationId">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                        <core:value>#{raisedAtLocationId}</core:value>
+                    </core:parameter>
+                </core:peopleGroupParameters>
+            </core:value>
+            <core:index>7</core:index>
+        </core:listElement>
+        <core:listImplClass>java.util.LinkedList</core:listImplClass>
+    </core:activities>
+    <core:defaultStartActivityId>EnterOrderItems</core:defaultStartActivityId>
+    <core:defaultOutcomes/>
+</core:simpleActivityFlowBusinessProcess>

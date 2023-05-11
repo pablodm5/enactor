@@ -1,0 +1,3529 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<core:process xmlns:core="http://www.enactor.com/core" xmlns:retail="http://www.enactor.com/retail" xmlns:ns4="http://www.enactor.com/crm" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803" xmlns:ns6="http://www.apis-it.hr/fin/2012/types/f73" xmlns:ns7="http://www.w3.org/2000/09/xmldsig#" xmlns:ns8="http://www.enactor.com/retail/storedRetailTransaction/service" xmlns:ns9="http://www.fu.gov.si/" xmlns:ns10="http://www.enactor.com/addressLookup/service" xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:ns14="http://www.enactor.com/crm/customerLoyalty/service" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <core:processID>CashManagement/CashSessionTotals</core:processID>
+    <core:version>1.0</core:version>
+    <core:name>Cash Session Totals</core:name>
+    <core:defaultMessageBaseName></core:defaultMessageBaseName>
+    <core:firstStateID>ViewCashTotalsSummary</core:firstStateID>
+    <core:className>com.enactor.maintenance.processes.MaintenanceProcess</core:className>
+    <core:uiHints>
+        <entry>
+            <key>com.enactor.tools.editor.process.style</key>
+            <value>47</value>
+        </entry>
+        <entry>
+            <key>com.enactor.tools.editor.process.xloc</key>
+            <value>-37</value>
+        </entry>
+        <entry>
+            <key>com.enactor.tools.editor.process.yloc</key>
+            <value>-37</value>
+        </entry>
+    </core:uiHints>
+    <core:privileges>enactor.cmSessionOwnerMaintenance.List</core:privileges>
+    <core:privileges>enactor.cmSessionOwnerMaintenance.Run</core:privileges>
+    <core:metaData>
+        <core:inputs>
+            <core:input required="true" name="enactor.coreUI.User">
+                <core:interfaceName>com.enactor.core.signOn.ISignedOnUser</core:interfaceName>
+            </core:input>
+            <core:input required="true" name="enactor.coreUI.UserLocale">
+                <core:interfaceName>com.enactor.core.localisation.ILocale</core:interfaceName>
+            </core:input>
+            <core:input required="true" name="enactor.mfc.BaseCurrency">
+                <core:interfaceName>com.enactor.mfc.currency.ICurrency</core:interfaceName>
+            </core:input>
+            <core:input required="true" name="enactor.mfc.Location">
+                <core:interfaceName>com.enactor.mfc.location.ILocation</core:interfaceName>
+            </core:input>
+            <core:input required="true" name="enactor.mfc.Device">
+                <core:interfaceName>com.enactor.mfc.device.IDevice</core:interfaceName>
+            </core:input>
+        </core:inputs>
+        <stateDataTypes>
+            <stateDataType required="true" name="enactor.cashManagement.AbsoluteTotalDiscrepancy">
+                <core:interfaceName>java.lang.Long</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.cashManagement.CMSessionKey">
+                <core:interfaceName>com.enactor.cashManagement.entities.ICMSessionKey</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.cashManagement.CMTransaction">
+                <core:interfaceName>com.enactor.cashManagement.entities.ICMTransaction</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.cashManagement.TransactionEndDate">
+                <core:interfaceName>java.util.Date</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="false" name="enactor.coreUI.User">
+                <core:interfaceName>com.enactor.core.signOn.ISignedOnUser</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="false" name="enactor.coreUI.UserLocale">
+                <core:interfaceName>com.enactor.core.localisation.ILocale</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.mfc.BaseCurrency">
+                <core:interfaceName>com.enactor.mfc.currency.ICurrency</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.mfc.Device">
+                <core:interfaceName>com.enactor.mfc.device.IDevice</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.mfc.Location">
+                <core:interfaceName>com.enactor.mfc.location.ILocation</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.cashManagement.CMSession">
+                <core:interfaceName>com.enactor.cashManagement.entities.ICMSession</core:interfaceName>
+            </stateDataType>
+            <stateDataType required="true" name="enactor.cashManagement.SelectedSessionStatusesList">
+                <core:interfaceName>java.util.List</core:interfaceName>
+            </stateDataType>
+        </stateDataTypes>
+    </core:metaData>
+    <core:typeId>enactor.types.maintenance.MaintenanceProcess</core:typeId>
+    <core:notes>
+        <core:processNote>
+            <core:noteId>Note0</core:noteId>
+            <core:description>Simulate a spot check without allocating a transaction number, prompting for user input, or saving the transaction.</core:description>
+            <core:constraint>
+                <core:x>1332</core:x>
+                <core:y>19</core:y>
+                <core:height>97</core:height>
+                <core:width>176</core:width>
+            </core:constraint>
+        </core:processNote>
+    </core:notes>
+    <core:endProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>EndProcess</core:actionID>
+        <core:name>End Process</core:name>
+        <core:className>com.enactor.coreUI.actions.UIEndProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>255</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>-32</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData/>
+        <core:typeId>enactor.types.EndProcess</core:typeId>
+        <core:outcome>Success</core:outcome>
+        <core:defaultProcessId></core:defaultProcessId>
+    </core:endProcessAction>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>Help</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIChangeLayoutAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>255</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>110</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="/HelpDesktopLayout.jsp" required="false" name="enactor.coreUI.LayoutURL">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="false" name="enactor.coreUI.LayoutURL">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+            </core:inputs>
+        </core:metaData>
+    </core:action>
+    <core:endProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>Pause</core:actionID>
+        <core:name>Pause Process</core:name>
+        <core:className>com.enactor.coreUI.actions.UIPauseProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>255</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>40</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData/>
+        <core:typeId>enactor.types.Pause</core:typeId>
+        <core:outcome></core:outcome>
+        <core:defaultProcessId></core:defaultProcessId>
+    </core:endProcessAction>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>GetLastTransactionInSession</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.cashManagement.actions.GetLastCMTransactionAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>959</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>797</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>324</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.cashManagement.CMSessionKey">
+                    <core:interfaceName>com.enactor.cashManagement.entities.ICMSessionKey</core:interfaceName>
+                </core:input>
+                <core:input required="false" name="enactor.mfc.group.ExchangeRateGroup">
+                    <core:interfaceName>com.enactor.core.group.IGroupKey</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.cashManagement.TransactionEndDate">
+                    <core:interfaceName>java.util.Date</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output name="enactor.cashManagement.CMTransaction">
+                    <core:interfaceName>com.enactor.cashManagement.entities.ICMTransaction</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+                <core:outcome name="NoSuchRecord"/>
+            </core:outcomes>
+            <core:sessionManagementType>MAKE_NEW_SESSION</core:sessionManagementType>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID>ViewSessionSummary</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID>ViewCashTotalsSummary</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>NoSuchRecord</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>CreateCMSessionSummary</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.cashManagement.actions.CreateCMSessionSummaryAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>63</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1069</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>915</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.cashManagement.CMTransaction">
+                    <core:interfaceName>com.enactor.cashManagement.entities.ICMTransaction</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.cashManagement.TendersList">
+                    <core:interfaceName>java.util.List</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.coreUI.UserLocale">
+                    <core:interfaceName>com.enactor.core.localisation.ILocale</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="false" name="enactor.cashManagement.CMSessionSummary">
+                    <core:interfaceName>java.util.Map</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+            <core:sessionManagementType>MAKE_NEW_SESSION</core:sessionManagementType>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>CreateSessionSummaryTotals</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>CreateSessionSummaryTotals</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.cashManagement.actions.CreateCMSessionSummaryTotalsAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>63</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1069</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>1125</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.cashManagement.CMSessionSummary">
+                    <core:interfaceName>java.util.Map</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.cashManagement.CMTransaction">
+                    <core:interfaceName>com.enactor.cashManagement.entities.ICMTransaction</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.coreUI.UserLocale">
+                    <core:interfaceName>com.enactor.core.localisation.ILocale</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output name="enactor.cashManagement.CMSessionSummaryItem">
+                    <core:interfaceName>com.enactor.cashManagement.listElements.ICMSessionSummaryListElement</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+            <core:sessionManagementType>MAKE_NEW_SESSION</core:sessionManagementType>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID>ViewSessionSummary</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>ListTenders</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.cashManagement.actions.ListTendersAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>63</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1069</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>702</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.cashManagement.CMTransaction">
+                    <core:interfaceName>com.enactor.cashManagement.entities.ICMTransaction</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.coreUI.UserLocale">
+                    <core:interfaceName>com.enactor.core.localisation.ILocale</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="false" name="enactor.cashManagement.TendersList">
+                    <core:interfaceName>java.util.List</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+            <core:sessionManagementType>MAKE_NEW_SESSION</core:sessionManagementType>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>CreateCMSessionSummary</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:assignAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>SetStoreChangeAllowed</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIAssignAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>951</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>-37</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>495</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:outputs>
+                <core:output required="true" name="enactor.cashManagement.StoreChangeAllowed">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.Assign</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID>ViewCashTotalsSummary</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:dataAssignment toExpression="storeChangeAllowed" fromExpression="true"/>
+    </core:assignAction>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>CheckUserPrivileges</core:actionID>
+        <core:name>Check User Privileges</core:name>
+        <core:className>com.enactor.coreUI.actions.CheckPrivilegesAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>103</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>-37</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>324</value>
+            </entry>
+        </core:uiHints>
+        <core:privileges>enactor.cashManagement.AllowStoreChange</core:privileges>
+        <core:metaData>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+                <core:outcome name="Fail"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>SetStoreChangeAllowed</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID>ViewCashTotalsSummary</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Fail</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>LoadList</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.commonUI.list.processes.LoadPagedListAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>231</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>1181</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="http://www.enactor.com/retail" name="enactor.coreUI.EntityNamespace">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:param value="cmTransaction" name="enactor.coreUI.EntityName">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="false" name="enactor.coreUI.EntityName">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input required="false" name="enactor.coreUI.EntityNamespace">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input required="false" name="enactor.coreUI.ListCriteria">
+                    <core:interfaceName>com.enactor.core.servers.IListCriteria</core:interfaceName>
+                </core:input>
+                <core:input required="false" name="enactor.coreUI.PageSize">
+                    <core:interfaceName>java.lang.Integer</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="false" name="enactor.coreUI.List">
+                    <core:interfaceName>java.util.List</core:interfaceName>
+                </core:output>
+                <core:output required="false" name="enactor.coreUI.ListCriteria">
+                    <core:interfaceName>com.enactor.core.servers.IListCriteria</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+            <core:sessionManagementType>MAKE_NEW_SESSION</core:sessionManagementType>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID>ListTransactions</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>AddLocationIdFilter</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.commonUI.list.processes.AddListFilterAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>-37</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>942</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="LocationId" name="enactor.coreUI.FilterId">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:param value="TextValueFilter" name="enactor.coreUI.FilterType">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:param value="true" name="enactor.coreUI.ListFilterHidden">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.coreUI.DefaultValue">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.coreUI.FilterId">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.coreUI.FilterType">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.coreUI.ListFilterHidden">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="false" name="enactor.coreUI.ListCriteria">
+                    <core:interfaceName>com.enactor.core.servers.IListCriteria</core:interfaceName>
+                </core:output>
+                <core:output required="false" name="enactor.coreUI.ListFilters">
+                    <core:interfaceName>java.util.List</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>AddOwnerTypeFilter</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>AddOwnerTypeFilter</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.commonUI.list.processes.AddListFilterAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>-37</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>1009</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="OwnerType" name="enactor.coreUI.FilterId">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:param value="IntegerValueFilter" name="enactor.coreUI.FilterType">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:param value="true" name="enactor.coreUI.ListFilterHidden">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.coreUI.FilterId">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.coreUI.ListCriteria">
+                    <core:interfaceName>com.enactor.core.servers.IListCriteria</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.coreUI.FilterType">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.coreUI.DefaultValue">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.coreUI.ListFilterHidden">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.coreUI.ListFilters">
+                    <core:interfaceName>java.util.List</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="false" name="enactor.coreUI.ListCriteria">
+                    <core:interfaceName>com.enactor.core.servers.IListCriteria</core:interfaceName>
+                </core:output>
+                <core:output required="false" name="enactor.coreUI.ListFilters">
+                    <core:interfaceName>java.util.List</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>AddOwnerIdFilter</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>AddOwnerIdFilter</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.commonUI.list.processes.AddListFilterAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>-37</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>1075</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="OwnerId" name="enactor.coreUI.FilterId">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:param value="TextValueFilter" name="enactor.coreUI.FilterType">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:param value="true" name="enactor.coreUI.ListFilterHidden">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.coreUI.DefaultValue">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.coreUI.FilterId">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.coreUI.FilterType">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.coreUI.ListCriteria">
+                    <core:interfaceName>com.enactor.core.servers.IListCriteria</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.coreUI.ListFilters">
+                    <core:interfaceName>java.util.List</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.coreUI.ListFilterHidden">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="false" name="enactor.coreUI.ListCriteria">
+                    <core:interfaceName>com.enactor.core.servers.IListCriteria</core:interfaceName>
+                </core:output>
+                <core:output required="false" name="enactor.coreUI.ListFilters">
+                    <core:interfaceName>java.util.List</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>AddEffectiveDateStartFilter</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>AddEffectiveDateStartFilter</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.commonUI.list.processes.AddListFilterAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>-37</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>1141</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="EffectiveDate" name="enactor.coreUI.FilterId">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:param value="StartDateTimeValueFilter" name="enactor.coreUI.FilterType">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:param value="true" name="enactor.coreUI.ListFilterHidden">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.coreUI.DefaultValue">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.coreUI.FilterId">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.coreUI.FilterType">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.coreUI.ListCriteria">
+                    <core:interfaceName>com.enactor.core.servers.IListCriteria</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.coreUI.ListFilters">
+                    <core:interfaceName>java.util.List</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.coreUI.ListFilterHidden">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="false" name="enactor.coreUI.ListCriteria">
+                    <core:interfaceName>com.enactor.core.servers.IListCriteria</core:interfaceName>
+                </core:output>
+                <core:output required="false" name="enactor.coreUI.ListFilters">
+                    <core:interfaceName>java.util.List</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>AddEffectiveDateEndFilter</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>AddEffectiveDateEndFilter</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.commonUI.list.processes.AddListFilterAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>-37</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>1207</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="EffectiveDate2" name="enactor.coreUI.FilterId">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:param value="EndDateTimeValueFilter" name="enactor.coreUI.FilterType">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:param value="true" name="enactor.coreUI.ListFilterHidden">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.coreUI.DefaultValue">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.coreUI.FilterId">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.coreUI.FilterType">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.coreUI.ListCriteria">
+                    <core:interfaceName>com.enactor.core.servers.IListCriteria</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.coreUI.ListFilters">
+                    <core:interfaceName>java.util.List</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.coreUI.ListFilterHidden">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="false" name="enactor.coreUI.ListCriteria">
+                    <core:interfaceName>com.enactor.core.servers.IListCriteria</core:interfaceName>
+                </core:output>
+                <core:output required="false" name="enactor.coreUI.ListFilters">
+                    <core:interfaceName>java.util.List</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>AddIsVoidedFilter</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>AddIsVoidedFilter</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.commonUI.list.processes.AddListFilterAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>-37</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>1276</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="IsVoided" name="enactor.coreUI.FilterId">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:param value="BooleanValueFilter" name="enactor.coreUI.FilterType">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:param value="false" name="enactor.coreUI.DefaultValue">
+            <core:interfaceName>java.lang.Object</core:interfaceName>
+        </core:param>
+        <core:param value="true" name="enactor.coreUI.ListFilterHidden">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.coreUI.DefaultValue">
+                    <core:interfaceName>java.lang.Object</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.coreUI.FilterId">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.coreUI.FilterType">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.coreUI.ListCriteria">
+                    <core:interfaceName>com.enactor.core.servers.IListCriteria</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.coreUI.ListFilters">
+                    <core:interfaceName>java.util.List</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.coreUI.ListFilterHidden">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output name="enactor.coreUI.ListCriteria">
+                    <core:interfaceName>com.enactor.core.servers.IListCriteria</core:interfaceName>
+                </core:output>
+                <core:output name="enactor.coreUI.ListFilters">
+                    <core:interfaceName>java.util.List</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>Action</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>AddTrainingModeFilter</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>LoadSessionStore</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.commonUI.entities.processes.LoadEntityAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>-37</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>875</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.coreUI.Key">
+                    <core:interfaceName>com.enactor.core.entities.IEntityKey</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output name="enactor.coreUI.Entity">
+                    <core:interfaceName>com.enactor.core.entities.IEntity</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+            <core:sessionManagementType>MAKE_SESSION_IF_NO_CURRENT</core:sessionManagementType>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>AddLocationIdFilter</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>AddCompoundListFilterAction</core:actionID>
+        <core:name>AddCompoundListFilterAction</core:name>
+        <core:className>com.enactor.commonUI.list.processes.AddCompoundListFilterAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>959</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>-37</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>1464</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="CompoundFilter" name="enactor.coreUI.FilterId">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:param value="true" name="enactor.coreUI.ListOrFilters">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.coreUI.FilterId">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.ListCriteria">
+                    <core:interfaceName>com.enactor.core.servers.IListCriteria</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.ListOrFilters">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.coreUI.ListFilters">
+                    <core:interfaceName>java.util.List</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output name="enactor.coreUI.ListCriteria">
+                    <core:interfaceName>com.enactor.core.servers.IListCriteria</core:interfaceName>
+                </core:output>
+                <core:output name="enactor.coreUI.CompoundListFilters">
+                    <core:interfaceName>java.util.List</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:comment>Compound filter to implement ... AND (Total = 999 OR Total = -999) ...</core:comment>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>AddPositiveTotalFilterToCompound</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>AddPositiveTotalFilterToCompound</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.commonUI.list.processes.AddListFilterAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>27</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>231</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>1464</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="BaseCountedValueTotal" name="enactor.coreUI.FilterId">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:param value="MonetaryValueFilter" name="enactor.coreUI.FilterType">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:param value="CashManagement/CashSessionTotalsMessages" name="enactor.coreUI.MessageBasename">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input name="enactor.coreUI.CompoundListFilters">
+                    <core:interfaceName>java.util.List</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.coreUI.DefaultValue">
+                    <core:interfaceName>java.lang.Long</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.coreUI.FilterId">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.coreUI.FilterType">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.coreUI.MessageBasename">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="true" name="enactor.coreUI.ListFilter">
+                    <core:interfaceName>com.enactor.core.listFilters.IListFilter</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>AddNegativeTotalFilterToCompound</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>AddNegativeTotalFilterToCompound</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.commonUI.list.processes.AddListFilterAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>959</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>509</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>1464</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="BaseCountedValueTotal" name="enactor.coreUI.FilterId">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:param value="MonetaryValueFilter" name="enactor.coreUI.FilterType">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:param value="true" name="enactor.coreUI.ListFilterHidden">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input name="enactor.coreUI.CompoundListFilters">
+                    <core:interfaceName>java.util.List</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.coreUI.FilterId">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.coreUI.FilterType">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.coreUI.ListFilterHidden">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="true" name="enactor.coreUI.ListFilter">
+                    <core:interfaceName>com.enactor.core.listFilters.IListFilter</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>AssignValueToNegativeFilter</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:assignAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>AssignValueToNegativeFilter</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIAssignAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>959</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>231</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>1259</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.coreUI.NegativeTotalListFilter">
+                    <core:interfaceName>com.enactor.core.listFilters.IListFilter</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.coreUI.PositiveTotalListFilter">
+                    <core:interfaceName>com.enactor.core.listFilters.IListFilter</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="true" name="enactor.coreUI.NegativeTotalListFilter">
+                    <core:interfaceName>com.enactor.core.listFilters.IListFilter</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.Assign</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>LoadList</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:dataAssignment toExpression="negativeTotalListFilter.value" fromExpression="notEmpty(positiveTotalListFilter.value) ? -1*positiveTotalListFilter.value : null"/>
+    </core:assignAction>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>AddTrainingModeFilter</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.commonUI.list.processes.AddListFilterAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>-37</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>1343</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="TrainingMode" name="enactor.coreUI.FilterId">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:param value="BooleanValueFilter" name="enactor.coreUI.FilterType">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:param value="false" name="enactor.coreUI.DefaultValue">
+            <core:interfaceName>java.lang.Object</core:interfaceName>
+        </core:param>
+        <core:param value="true" name="enactor.coreUI.ListFilterHidden">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.coreUI.DefaultValue">
+                    <core:interfaceName>java.lang.Object</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.coreUI.FilterId">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.coreUI.FilterType">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.coreUI.ListCriteria">
+                    <core:interfaceName>com.enactor.core.servers.IListCriteria</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.coreUI.ListFilters">
+                    <core:interfaceName>java.util.List</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.coreUI.ListFilterHidden">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output name="enactor.coreUI.ListCriteria">
+                    <core:interfaceName>com.enactor.core.servers.IListCriteria</core:interfaceName>
+                </core:output>
+                <core:output name="enactor.coreUI.ListFilters">
+                    <core:interfaceName>java.util.List</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>Action</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>AddCompoundListFilterAction</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>LoadSession</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.commonUI.entities.processes.LoadEntityLenientAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>959</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>533</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>324</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input name="enactor.coreUI.Key">
+                    <core:interfaceName>com.enactor.core.entities.IEntityKey</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output name="enactor.coreUI.Entity">
+                    <core:interfaceName>com.enactor.core.entities.IEntity</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+                <core:outcome name="InputEmpty"/>
+                <core:outcome name="NoSuchRecord"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID>ViewCashTotalsSummary</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>NoSuchRecord</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID>ViewCashTotalsSummary</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>InputEmpty</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>3</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>GetLastTransactionInSession</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>4</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>CreateTerminalSpotCheckHandler</core:toActionID>
+            <core:condition>process.cMSession.status &lt; 3 &amp;&amp; process.cMSession.ownerKey.type == 1</core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>5</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>CreateSafeSpotCheckHandler</core:toActionID>
+            <core:condition>process.cMSession.status &lt; 3 &amp;&amp; process.cMSession.ownerKey.type == 4</core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>6</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>LoadStore</core:toActionID>
+            <core:condition>process.cMSession.status == 3 &amp;&amp; ( process.cMSession.ownerKey.type == 1 || process.cMSession.ownerKey.type == 4 )</core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>ApplyExpectedValues</core:actionID>
+        <core:name>Apply Expected Values</core:name>
+        <core:className>com.enactor.cashManagement.actions.ApplyExpectedSpotCheckValuesAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>63</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1331</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>721</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.cashManagement.CMTransactionHandler">
+                    <core:interfaceName>com.enactor.cashManagement.ICMTransactionHandler</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.cashManagement.TendersList">
+                    <core:interfaceName>java.util.List</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.cashManagement.ExpectedValuesList">
+                    <core:interfaceName>java.util.Map</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="false" name="enactor.cashManagement.TendersList">
+                    <core:interfaceName>java.util.List</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+            <core:sessionManagementType>NONE</core:sessionManagementType>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>ApplyTenders</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>ListTendersWithValues</core:actionID>
+        <core:name>List Tenders</core:name>
+        <core:className>com.enactor.cashManagement.actions.ListSpotCheckTendersAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>63</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1337</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>324</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.cashManagement.CMTransaction">
+                    <core:interfaceName>com.enactor.cashManagement.entities.ICMTransaction</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.coreUI.UserLocale">
+                    <core:interfaceName>com.enactor.core.localisation.ILocale</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="false" name="enactor.cashManagement.TendersList">
+                    <core:interfaceName>java.util.List</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+            <core:sessionManagementType>MAKE_NEW_SESSION</core:sessionManagementType>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>GetExpectedValues</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>GetExpectedValues</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.cashManagement.actions.GetExpectedValuesAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>959</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1340</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>530</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.cashManagement.CMTransaction">
+                    <core:interfaceName>com.enactor.cashManagement.entities.ICMTransaction</core:interfaceName>
+                </core:input>
+                <core:input required="false" name="enactor.mfc.group.ExchangeRateGroup">
+                    <core:interfaceName>com.enactor.core.group.IGroupKey</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output name="enactor.cashManagement.ExpectedValuesList">
+                    <core:interfaceName>java.util.Map</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+            <core:sessionManagementType>MAKE_NEW_SESSION</core:sessionManagementType>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>ApplyExpectedValues</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>ApplyTenders</core:actionID>
+        <core:name>Apply Tenders</core:name>
+        <core:className>com.enactor.cashManagement.actions.ApplyTendersAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>47</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1337</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>939</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="false" name="enactor.cashManagement.CMTransactionHandler">
+                    <core:interfaceName>com.enactor.cashManagement.ICMTransactionHandler</core:interfaceName>
+                </core:input>
+                <core:input required="false" name="enactor.cashManagement.TendersList">
+                    <core:interfaceName>java.util.List</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+            <core:sessionManagementType>MAKE_NEW_SESSION</core:sessionManagementType>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>SaveSummaryValues</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>SaveSummaryValues</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.cashManagement.actions.SaveSummaryValuesAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>63</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1339</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>1108</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.cashManagement.CMTransaction">
+                    <core:interfaceName>com.enactor.cashManagement.entities.ICMTransaction</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.cashManagement.TendersList">
+                    <core:interfaceName>java.util.List</core:interfaceName>
+                </core:input>
+                <core:input required="false" name="enactor.mfc.group.ExchangeRateGroup">
+                    <core:interfaceName>com.enactor.core.group.IGroupKey</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="true" name="enactor.cashManagement.CMTransaction">
+                    <core:interfaceName>com.enactor.cashManagement.entities.ICMTransaction</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+            <core:sessionManagementType>MAKE_NEW_SESSION</core:sessionManagementType>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID>ViewSessionSummary</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>CreateTerminalSpotCheckHandler</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.cashManagement.actions.BackOfficeStartCMTransactionAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>959</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>797</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>16</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="TerminalSpotCheck" name="enactor.cashManagement.TransactionType">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:param value="true" name="enactor.cashManagement.DummyTransaction">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input name="enactor.cashManagement.DummyTransaction">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.coreUI.User">
+                    <core:interfaceName>com.enactor.core.signOn.ISignedOnUser</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.cashManagement.CMSessionOwnerKey">
+                    <core:interfaceName>com.enactor.cashManagement.entities.ICMSessionOwnerKey</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.cashManagement.TransactionType">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.Device">
+                    <core:interfaceName>com.enactor.mfc.device.IDevice</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output name="enactor.cashManagement.CMTransactionHandler">
+                    <core:interfaceName>com.enactor.cashManagement.ICMTransactionHandler</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>CopySessionNumber</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>CreateSafeSpotCheckHandler</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.cashManagement.actions.BackOfficeStartCMTransactionAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>959</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1069</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>16</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="SafeSpotCheck" name="enactor.cashManagement.TransactionType">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:param value="true" name="enactor.cashManagement.DummyTransaction">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input name="enactor.cashManagement.DummyTransaction">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.coreUI.User">
+                    <core:interfaceName>com.enactor.core.signOn.ISignedOnUser</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.cashManagement.CMSessionOwnerKey">
+                    <core:interfaceName>com.enactor.cashManagement.entities.ICMSessionOwnerKey</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.cashManagement.TransactionType">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.Device">
+                    <core:interfaceName>com.enactor.mfc.device.IDevice</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output name="enactor.cashManagement.CMTransactionHandler">
+                    <core:interfaceName>com.enactor.cashManagement.ICMTransactionHandler</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>CopySessionNumber</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>CloseViewSessionSummaryPrompt</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.ClosePromptAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>255</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>184</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="ViewSessionSummary" name="enactor.coreUI.StateId">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.coreUI.StateId">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>CloseListTransactionsPrompt</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>CloseListTransactionsPrompt</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.ClosePromptAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>255</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>251</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="ListTransactions" name="enactor.coreUI.StateId">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.coreUI.StateId">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID>ViewCashTotalsSummary</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:assignAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>CopySessionNumber</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UIAssignAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>11</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1333</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>125</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.cashManagement.CMSession">
+                    <core:interfaceName>com.enactor.cashManagement.entities.ICMSession</core:interfaceName>
+                </core:input>
+                <core:input required="false" name="enactor.cashManagement.CMTransactionHandler">
+                    <core:interfaceName>com.enactor.cashManagement.ICMTransactionHandler</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="false" name="enactor.cashManagement.CMTransactionHandler">
+                    <core:interfaceName>com.enactor.cashManagement.ICMTransactionHandler</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.Assign</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>ListTendersWithValues</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:dataAssignment toExpression="cMTransactionHandler.transaction.sessionNumber" fromExpression="cMSession.sessionNumber"/>
+    </core:assignAction>
+    <core:executeProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>FinaliseTerminalSession</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UICallProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>943</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>533</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>744</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="TerminalFinalise" name="enactor.cashManagement.TransactionType">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.cashManagement.Store">
+                    <core:interfaceName>com.enactor.mfc.location.IStore</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.coreUI.User">
+                    <core:interfaceName>com.enactor.core.signOn.ISignedOnUser</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.cashManagement.CMSessionKey">
+                    <core:interfaceName>com.enactor.core.entities.IEntityKey</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.coreUI.UserLocale">
+                    <core:interfaceName>com.enactor.core.localisation.ILocale</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.cashManagement.CMSessionOwnerKey">
+                    <core:interfaceName>com.enactor.core.entities.IEntityKey</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.cashManagement.TransactionType">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.Device">
+                    <core:interfaceName>com.enactor.mfc.device.IDevice</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outcomes>
+                <core:outcome name="Fail"/>
+                <core:outcome name="Success"/>
+                <core:outcome name="Exit"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.CallProcess</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>GetLastTransactionInSession</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>3</core:linkID>
+            <core:toStateID>ViewCashTotalsSummary</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Exit</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>ViewTerminalSessionHistory</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Fail</core:outcome>
+        </core:outcomeLink>
+        <core:executeProcessId>CashManagement/FinaliseSession</core:executeProcessId>
+    </core:executeProcessAction>
+    <core:executeProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>FinaliseSafeSession</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UICallProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>943</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>797</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>744</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="SafeFinalise" name="enactor.cashManagement.TransactionType">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.cashManagement.CMSessionKey">
+                    <core:interfaceName>com.enactor.core.entities.IEntityKey</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.cashManagement.CMSessionOwnerKey">
+                    <core:interfaceName>com.enactor.core.entities.IEntityKey</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.cashManagement.TransactionType">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.coreUI.User">
+                    <core:interfaceName>com.enactor.core.signOn.ISignedOnUser</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.coreUI.UserLocale">
+                    <core:interfaceName>com.enactor.core.localisation.ILocale</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.mfc.Device">
+                    <core:interfaceName>com.enactor.mfc.device.IDevice</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.cashManagement.Store">
+                    <core:interfaceName>com.enactor.mfc.location.IStore</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outcomes>
+                <core:outcome name="Fail"/>
+                <core:outcome name="Success"/>
+                <core:outcome name="Exit"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.CallProcess</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>GetLastTransactionInSession</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>ViewSafeSessionHistory</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Fail</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>3</core:linkID>
+            <core:toStateID>ViewCashTotalsSummary</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Exit</core:outcome>
+        </core:outcomeLink>
+        <core:executeProcessId>CashManagement/FinaliseSession</core:executeProcessId>
+    </core:executeProcessAction>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>LoadStore</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.maintenance.processes.actions.LoadEntityAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>63</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>672</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>556</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input name="enactor.maintenance.Key">
+                    <core:interfaceName>com.enactor.core.entities.IEntityKey</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output name="enactor.maintenance.Entity">
+                    <core:interfaceName>com.enactor.core.entities.IEntity</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+            <core:sessionManagementType>MAKE_NEW_SESSION</core:sessionManagementType>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>FinaliseTerminalSession</core:toActionID>
+            <core:condition>process.cMSession.ownerKey.type == 1</core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>FinaliseSafeSession</core:toActionID>
+            <core:condition>process.cMSession.ownerKey.type == 4</core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:executeProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>ViewTerminalSessionHistory</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UICallProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>943</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>533</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>1037</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input name="enactor.cashManagement.CMSessionKey">
+                    <core:interfaceName>com.enactor.core.entities.IEntityKey</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.cashManagement.CMSessionOwnerKey">
+                    <core:interfaceName>com.enactor.core.entities.IEntityKey</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.mfc.Device">
+                    <core:interfaceName>com.enactor.mfc.device.IDevice</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.cashManagement.Store">
+                    <core:interfaceName>com.enactor.mfc.location.IStore</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.cashManagement.StoreKey">
+                    <core:interfaceName>com.enactor.core.entities.IEntityKey</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.User">
+                    <core:interfaceName>com.enactor.core.signOn.ISignedOnUser</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.UserLocale">
+                    <core:interfaceName>com.enactor.core.localisation.ILocale</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+                <core:outcome name="Exit"/>
+                <core:outcome name="Back"/>
+                <core:outcome name="ItemSelected"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.CallProcess</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>FinaliseTerminalSession</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Back</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>3</core:linkID>
+            <core:toStateID>ViewCashTotalsSummary</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Exit</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>4</core:linkID>
+            <core:toStateID>ViewCashTotalsSummary</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>ItemSelected</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>FinaliseTerminalSession</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:executeProcessId>CashManagement/TerminalSessionHistory</core:executeProcessId>
+    </core:executeProcessAction>
+    <core:executeProcessAction>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>ViewSafeSessionHistory</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.UICallProcessAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>943</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>797</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>1037</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <core:inputs>
+                <core:input name="enactor.cashManagement.CMSessionKey">
+                    <core:interfaceName>com.enactor.core.entities.IEntityKey</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.cashManagement.CMSessionOwnerKey">
+                    <core:interfaceName>com.enactor.core.entities.IEntityKey</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.mfc.Device">
+                    <core:interfaceName>com.enactor.mfc.device.IDevice</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.cashManagement.Store">
+                    <core:interfaceName>com.enactor.mfc.location.IStore</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.cashManagement.StoreKey">
+                    <core:interfaceName>com.enactor.core.entities.IEntityKey</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.User">
+                    <core:interfaceName>com.enactor.core.signOn.ISignedOnUser</core:interfaceName>
+                </core:input>
+                <core:input name="enactor.coreUI.UserLocale">
+                    <core:interfaceName>com.enactor.core.localisation.ILocale</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+                <core:outcome name="Exit"/>
+                <core:outcome name="Back"/>
+                <core:outcome name="ItemSelected"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.CallProcess</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>FinaliseSafeSession</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Back</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>3</core:linkID>
+            <core:toStateID>ViewCashTotalsSummary</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Exit</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>4</core:linkID>
+            <core:toStateID>ViewCashTotalsSummary</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>ItemSelected</core:outcome>
+        </core:outcomeLink>
+        <core:outcomeLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>FinaliseSafeSession</core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+        <core:executeProcessId>CashManagement/SafeSessionHistory</core:executeProcessId>
+    </core:executeProcessAction>
+    <core:action>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:actionID>CloseViewCashTotalsSummaryPrompt</core:actionID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.actions.ClosePromptAction</core:className>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>533</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>245</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="ViewCashTotalsSummary" name="enactor.coreUI.StateId">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.coreUI.StateId">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outcomes>
+                <core:outcome name="Success"/>
+            </core:outcomes>
+        </core:metaData>
+        <core:typeId>enactor.types.BasicAction</core:typeId>
+        <core:outcomeLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID>ViewCashTotalsSummary</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:outcome>Success</core:outcome>
+        </core:outcomeLink>
+    </core:action>
+    <core:eventLink>
+        <core:linkID>1</core:linkID>
+        <core:toStateID></core:toStateID>
+        <core:toActionID>Pause</core:toActionID>
+        <core:condition></core:condition>
+        <core:event>enactor.coreUI.Pause</core:event>
+    </core:eventLink>
+    <core:eventLink>
+        <core:linkID>2</core:linkID>
+        <core:toStateID></core:toStateID>
+        <core:toActionID>EndProcess</core:toActionID>
+        <core:condition></core:condition>
+        <core:event>enactor.coreUI.Exit</core:event>
+    </core:eventLink>
+    <core:eventLink>
+        <core:linkID>3</core:linkID>
+        <core:toStateID></core:toStateID>
+        <core:toActionID>CloseViewSessionSummaryPrompt</core:toActionID>
+        <core:condition></core:condition>
+        <core:event>NavigationError</core:event>
+    </core:eventLink>
+    <core:eventLink>
+        <core:linkID>4</core:linkID>
+        <core:toStateID></core:toStateID>
+        <core:toActionID>Help</core:toActionID>
+        <core:condition></core:condition>
+        <core:event>enactor.coreUI.Help</core:event>
+    </core:eventLink>
+    <core:promptState>
+        <core:url>/CashSessionTotals/CashSessionTotals</core:url>
+        <core:stateID>ViewCashTotalsSummary</core:stateID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.states.UIPromptState</core:className>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>63</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>255</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>324</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="180" name="enactor.cashManagement.OpenStartDateThresholdMins">
+            <core:interfaceName>java.lang.Integer</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.cashManagement.StoreKey">
+                    <core:interfaceName>com.enactor.mfc.location.ILocationKey</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.maintenance.Entity">
+                    <core:interfaceName>com.enactor.core.entities.IEntity</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.cashManagement.OpenStartDateThresholdMins">
+                    <core:interfaceName>java.lang.Integer</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.cashManagement.SelectedSessionStatusesList">
+                    <core:interfaceName>java.util.List</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <core:outputs>
+                <core:output required="true" name="enactor.cashManagement.CMSessionKey">
+                    <core:interfaceName>com.enactor.cashManagement.entities.ICMSessionKey</core:interfaceName>
+                </core:output>
+                <core:output required="true" name="enactor.cashManagement.CMTransaction">
+                    <core:interfaceName>com.enactor.cashManagement.entities.ICMTransaction</core:interfaceName>
+                </core:output>
+                <core:output required="true" name="enactor.cashManagement.AbsoluteTotalDiscrepancy">
+                    <core:interfaceName>java.lang.Long</core:interfaceName>
+                </core:output>
+                <core:output required="true" name="enactor.cashManagement.TransactionEndDate">
+                    <core:interfaceName>java.util.Date</core:interfaceName>
+                </core:output>
+                <core:output required="true" name="enactor.cashManagement.SelectedSessionStatusesList">
+                    <core:interfaceName>java.util.List</core:interfaceName>
+                </core:output>
+            </core:outputs>
+            <handledEvents>
+                <handledEvent name="ChangeSelectedSessionStatuses"/>
+                <handledEvent name="StateEntered"/>
+                <handledEvent name="ViewTransactions"/>
+                <handledEvent name="ViewSummary"/>
+            </handledEvents>
+            <stateDataTypes>
+                <stateDataType required="true" name="enactor.cashManagement.AbsoluteTotalDiscrepancy">
+                    <core:interfaceName>java.lang.Long</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="true" name="enactor.cashManagement.CMSessionKey">
+                    <core:interfaceName>com.enactor.cashManagement.entities.ICMSessionKey</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="true" name="enactor.cashManagement.CMTransaction">
+                    <core:interfaceName>com.enactor.cashManagement.entities.ICMTransaction</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="true" name="enactor.cashManagement.CMTransactionHandler">
+                    <core:interfaceName>com.enactor.cashManagement.ICMTransactionHandler</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="true" name="enactor.cashManagement.ExpectedValuesList">
+                    <core:interfaceName>java.util.Map</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="true" name="enactor.cashManagement.OpenStartDateThresholdMins">
+                    <core:interfaceName>java.lang.Integer</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="true" name="enactor.cashManagement.SelectedSessionStatusesList">
+                    <core:interfaceName>java.util.List</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="true" name="enactor.cashManagement.StoreChangeAllowed">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="true" name="enactor.cashManagement.StoreKey">
+                    <core:interfaceName>com.enactor.mfc.location.ILocationKey</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="true" name="enactor.cashManagement.TendersList">
+                    <core:interfaceName>java.util.List</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="true" name="enactor.cashManagement.TransactionEndDate">
+                    <core:interfaceName>java.util.Date</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="true" name="enactor.maintenance.Entity">
+                    <core:interfaceName>com.enactor.core.entities.IEntity</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="true" name="enactor.cashManagement.Store">
+                    <core:interfaceName>com.enactor.mfc.location.IStore</core:interfaceName>
+                </stateDataType>
+            </stateDataTypes>
+        </core:metaData>
+        <core:comment>Note: The Entity state data is only there to satisfy the needs of the EditPage base backing bean class.</core:comment>
+        <core:typeId>enactor.types.State</core:typeId>
+        <core:singleInstance>true</core:singleInstance>
+        <core:respondToViewEvents>false</core:respondToViewEvents>
+        <core:stateInputMappings>
+            <core:mappings>
+                <core:sourceDataType required="false" name="enactor.coreUI.User">
+                    <core:interfaceName>com.enactor.core.signOn.ISignedOnUser</core:interfaceName>
+                </core:sourceDataType>
+                <core:targetDataType name="enactor.maintenance.Entity">
+                    <core:interfaceName>com.enactor.core.entities.IEntity</core:interfaceName>
+                </core:targetDataType>
+            </core:mappings>
+            <core:mappings>
+                <core:sourceDataType required="true" name="enactor.mfc.Location">
+                    <core:interfaceName>com.enactor.mfc.location.ILocation</core:interfaceName>
+                </core:sourceDataType>
+                <core:targetDataType required="true" name="enactor.cashManagement.StoreKey">
+                    <core:interfaceName>com.enactor.mfc.location.ILocationKey</core:interfaceName>
+                </core:targetDataType>
+                <core:expression>location.key</core:expression>
+            </core:mappings>
+            <core:mappings>
+                <core:sourceDataType required="true" name="enactor.cashManagement.SelectedSessionStatusesList">
+                    <core:interfaceName>java.util.List</core:interfaceName>
+                </core:sourceDataType>
+                <core:targetDataType required="true" name="enactor.cashManagement.SelectedSessionStatusesList">
+                    <core:interfaceName>java.util.List</core:interfaceName>
+                </core:targetDataType>
+            </core:mappings>
+        </core:stateInputMappings>
+        <core:stateOutputMappings>
+            <core:mappings>
+                <core:sourceDataType required="true" name="enactor.cashManagement.CMTransaction">
+                    <core:interfaceName>com.enactor.cashManagement.entities.ICMTransaction</core:interfaceName>
+                </core:sourceDataType>
+                <core:targetDataType required="true" name="enactor.cashManagement.CMTransaction">
+                    <core:interfaceName>com.enactor.cashManagement.entities.ICMTransaction</core:interfaceName>
+                </core:targetDataType>
+            </core:mappings>
+            <core:mappings>
+                <core:sourceDataType required="true" name="enactor.cashManagement.CMSessionKey">
+                    <core:interfaceName>com.enactor.cashManagement.entities.ICMSessionKey</core:interfaceName>
+                </core:sourceDataType>
+                <core:targetDataType required="true" name="enactor.cashManagement.CMSessionKey">
+                    <core:interfaceName>com.enactor.cashManagement.entities.ICMSessionKey</core:interfaceName>
+                </core:targetDataType>
+            </core:mappings>
+            <core:mappings>
+                <core:sourceDataType required="true" name="enactor.cashManagement.TransactionEndDate">
+                    <core:interfaceName>java.util.Date</core:interfaceName>
+                </core:sourceDataType>
+                <core:targetDataType required="true" name="enactor.cashManagement.TransactionEndDate">
+                    <core:interfaceName>java.util.Date</core:interfaceName>
+                </core:targetDataType>
+            </core:mappings>
+            <core:mappings>
+                <core:sourceDataType required="true" name="enactor.cashManagement.AbsoluteTotalDiscrepancy">
+                    <core:interfaceName>java.lang.Long</core:interfaceName>
+                </core:sourceDataType>
+                <core:targetDataType required="true" name="enactor.cashManagement.AbsoluteTotalDiscrepancy">
+                    <core:interfaceName>java.lang.Long</core:interfaceName>
+                </core:targetDataType>
+            </core:mappings>
+            <core:mappings>
+                <core:sourceDataType required="true" name="enactor.cashManagement.SelectedSessionStatusesList">
+                    <core:interfaceName>java.util.List</core:interfaceName>
+                </core:sourceDataType>
+                <core:targetDataType required="true" name="enactor.cashManagement.SelectedSessionStatusesList">
+                    <core:interfaceName>java.util.List</core:interfaceName>
+                </core:targetDataType>
+            </core:mappings>
+        </core:stateOutputMappings>
+        <core:actionInputMappings>
+            <core:actionMapping>
+                <core:actionID>LoadSession</core:actionID>
+                <core:mappings>
+                    <core:processMappings/>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.cashManagement.CMSessionKey">
+<core:interfaceName>com.enactor.cashManagement.entities.ICMSessionKey</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType name="enactor.coreUI.Key">
+<core:interfaceName>com.enactor.core.entities.IEntityKey</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>CreateTerminalSpotCheckHandler</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="false" name="enactor.coreUI.User">
+<core:interfaceName>com.enactor.core.signOn.ISignedOnUser</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.coreUI.User">
+<core:interfaceName>com.enactor.core.signOn.ISignedOnUser</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.Device">
+<core:interfaceName>com.enactor.mfc.device.IDevice</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.Device">
+<core:interfaceName>com.enactor.mfc.device.IDevice</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.cashManagement.CMSessionKey">
+<core:interfaceName>com.enactor.cashManagement.entities.ICMSessionKey</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.cashManagement.CMSessionOwnerKey">
+<core:interfaceName>com.enactor.cashManagement.entities.ICMSessionOwnerKey</core:interfaceName>
+                            </core:targetDataType>
+                            <core:expression>cMSessionKey.ownerKey</core:expression>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>ListTendersWithValues</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="false" name="enactor.coreUI.UserLocale">
+<core:interfaceName>com.enactor.core.localisation.ILocale</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.coreUI.UserLocale">
+<core:interfaceName>com.enactor.core.localisation.ILocale</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.cashManagement.CMTransactionHandler">
+<core:interfaceName>com.enactor.cashManagement.ICMTransactionHandler</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.cashManagement.CMTransaction">
+<core:interfaceName>com.enactor.cashManagement.entities.ICMTransaction</core:interfaceName>
+                            </core:targetDataType>
+                            <core:expression>cMTransactionHandler.transaction</core:expression>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>GetExpectedValues</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.Location">
+<core:interfaceName>com.enactor.mfc.location.ILocation</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="false" name="enactor.mfc.group.ExchangeRateGroup">
+<core:interfaceName>com.enactor.core.group.IGroupKey</core:interfaceName>
+                            </core:targetDataType>
+                            <core:expression>location.exchangeRateGroupKey</core:expression>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.cashManagement.CMTransactionHandler">
+<core:interfaceName>com.enactor.cashManagement.ICMTransactionHandler</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.cashManagement.CMTransaction">
+<core:interfaceName>com.enactor.cashManagement.entities.ICMTransaction</core:interfaceName>
+                            </core:targetDataType>
+                            <core:expression>cMTransactionHandler.transaction</core:expression>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>SaveSummaryValues</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.Location">
+<core:interfaceName>com.enactor.mfc.location.ILocation</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="false" name="enactor.mfc.group.ExchangeRateGroup">
+<core:interfaceName>com.enactor.core.group.IGroupKey</core:interfaceName>
+                            </core:targetDataType>
+                            <core:expression>location.exchangeRateGroupKey</core:expression>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.cashManagement.TendersList">
+<core:interfaceName>java.util.List</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.cashManagement.TendersList">
+<core:interfaceName>java.util.List</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.cashManagement.CMTransactionHandler">
+<core:interfaceName>com.enactor.cashManagement.ICMTransactionHandler</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.cashManagement.CMTransaction">
+<core:interfaceName>com.enactor.cashManagement.entities.ICMTransaction</core:interfaceName>
+                            </core:targetDataType>
+                            <core:expression>cMTransactionHandler.transaction</core:expression>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>CreateSafeSpotCheckHandler</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="false" name="enactor.coreUI.User">
+<core:interfaceName>com.enactor.core.signOn.ISignedOnUser</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.coreUI.User">
+<core:interfaceName>com.enactor.core.signOn.ISignedOnUser</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.Device">
+<core:interfaceName>com.enactor.mfc.device.IDevice</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.Device">
+<core:interfaceName>com.enactor.mfc.device.IDevice</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.cashManagement.CMSessionKey">
+<core:interfaceName>com.enactor.cashManagement.entities.ICMSessionKey</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.cashManagement.CMSessionOwnerKey">
+<core:interfaceName>com.enactor.cashManagement.entities.ICMSessionOwnerKey</core:interfaceName>
+                            </core:targetDataType>
+                            <core:expression>cMSessionKey.ownerKey</core:expression>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>GetLastTransactionInSession</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.Location">
+<core:interfaceName>com.enactor.mfc.location.ILocation</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="false" name="enactor.mfc.group.ExchangeRateGroup">
+<core:interfaceName>com.enactor.core.group.IGroupKey</core:interfaceName>
+                            </core:targetDataType>
+                            <core:expression>location.exchangeRateGroupKey</core:expression>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.cashManagement.CMSessionKey">
+<core:interfaceName>com.enactor.cashManagement.entities.ICMSessionKey</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.cashManagement.CMSessionKey">
+<core:interfaceName>com.enactor.cashManagement.entities.ICMSessionKey</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.cashManagement.TransactionEndDate">
+<core:interfaceName>java.util.Date</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.cashManagement.TransactionEndDate">
+<core:interfaceName>java.util.Date</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>LoadStore</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.cashManagement.CMSession">
+<core:interfaceName>com.enactor.cashManagement.entities.ICMSession</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType name="enactor.maintenance.Key">
+<core:interfaceName>com.enactor.core.entities.IEntityKey</core:interfaceName>
+                            </core:targetDataType>
+                            <core:expression>cMSession.ownerKey.locationKey</core:expression>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings/>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>FinaliseTerminalSession</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="false" name="enactor.coreUI.UserLocale">
+<core:interfaceName>com.enactor.core.localisation.ILocale</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.coreUI.UserLocale">
+<core:interfaceName>com.enactor.core.localisation.ILocale</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.Device">
+<core:interfaceName>com.enactor.mfc.device.IDevice</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.Device">
+<core:interfaceName>com.enactor.mfc.device.IDevice</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="false" name="enactor.coreUI.User">
+<core:interfaceName>com.enactor.core.signOn.ISignedOnUser</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.coreUI.User">
+<core:interfaceName>com.enactor.core.signOn.ISignedOnUser</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.cashManagement.Store">
+<core:interfaceName>com.enactor.mfc.location.IStore</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.cashManagement.Store">
+<core:interfaceName>com.enactor.mfc.location.IStore</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.cashManagement.CMSessionKey">
+<core:interfaceName>com.enactor.cashManagement.entities.ICMSessionKey</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.cashManagement.CMSessionKey">
+<core:interfaceName>com.enactor.core.entities.IEntityKey</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.cashManagement.CMSessionKey">
+<core:interfaceName>com.enactor.cashManagement.entities.ICMSessionKey</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.cashManagement.CMSessionOwnerKey">
+<core:interfaceName>com.enactor.core.entities.IEntityKey</core:interfaceName>
+                            </core:targetDataType>
+                            <core:expression>cMSessionKey.ownerKey</core:expression>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>FinaliseSafeSession</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="false" name="enactor.coreUI.UserLocale">
+<core:interfaceName>com.enactor.core.localisation.ILocale</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.coreUI.UserLocale">
+<core:interfaceName>com.enactor.core.localisation.ILocale</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.Device">
+<core:interfaceName>com.enactor.mfc.device.IDevice</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.Device">
+<core:interfaceName>com.enactor.mfc.device.IDevice</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="false" name="enactor.coreUI.User">
+<core:interfaceName>com.enactor.core.signOn.ISignedOnUser</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.coreUI.User">
+<core:interfaceName>com.enactor.core.signOn.ISignedOnUser</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.cashManagement.Store">
+<core:interfaceName>com.enactor.mfc.location.IStore</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.cashManagement.Store">
+<core:interfaceName>com.enactor.mfc.location.IStore</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.cashManagement.CMSessionKey">
+<core:interfaceName>com.enactor.cashManagement.entities.ICMSessionKey</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.cashManagement.CMSessionKey">
+<core:interfaceName>com.enactor.core.entities.IEntityKey</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.cashManagement.CMSessionKey">
+<core:interfaceName>com.enactor.cashManagement.entities.ICMSessionKey</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.cashManagement.CMSessionOwnerKey">
+<core:interfaceName>com.enactor.core.entities.IEntityKey</core:interfaceName>
+                            </core:targetDataType>
+                            <core:expression>cMSessionKey.ownerKey</core:expression>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>ViewTerminalSessionHistory</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="false" name="enactor.coreUI.UserLocale">
+<core:interfaceName>com.enactor.core.localisation.ILocale</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType name="enactor.coreUI.UserLocale">
+<core:interfaceName>com.enactor.core.localisation.ILocale</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.Device">
+<core:interfaceName>com.enactor.mfc.device.IDevice</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType name="enactor.mfc.Device">
+<core:interfaceName>com.enactor.mfc.device.IDevice</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="false" name="enactor.coreUI.User">
+<core:interfaceName>com.enactor.core.signOn.ISignedOnUser</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType name="enactor.coreUI.User">
+<core:interfaceName>com.enactor.core.signOn.ISignedOnUser</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.cashManagement.Store">
+<core:interfaceName>com.enactor.mfc.location.IStore</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType name="enactor.cashManagement.Store">
+<core:interfaceName>com.enactor.mfc.location.IStore</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.cashManagement.StoreKey">
+<core:interfaceName>com.enactor.mfc.location.ILocationKey</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType name="enactor.cashManagement.StoreKey">
+<core:interfaceName>com.enactor.core.entities.IEntityKey</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.cashManagement.CMSessionKey">
+<core:interfaceName>com.enactor.cashManagement.entities.ICMSessionKey</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType name="enactor.cashManagement.CMSessionKey">
+<core:interfaceName>com.enactor.core.entities.IEntityKey</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.cashManagement.CMSessionKey">
+<core:interfaceName>com.enactor.cashManagement.entities.ICMSessionKey</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType name="enactor.cashManagement.CMSessionOwnerKey">
+<core:interfaceName>com.enactor.core.entities.IEntityKey</core:interfaceName>
+                            </core:targetDataType>
+                            <core:expression>cMSessionKey.ownerKey</core:expression>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>ViewSafeSessionHistory</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="false" name="enactor.coreUI.UserLocale">
+<core:interfaceName>com.enactor.core.localisation.ILocale</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType name="enactor.coreUI.UserLocale">
+<core:interfaceName>com.enactor.core.localisation.ILocale</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.mfc.Device">
+<core:interfaceName>com.enactor.mfc.device.IDevice</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType name="enactor.mfc.Device">
+<core:interfaceName>com.enactor.mfc.device.IDevice</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="false" name="enactor.coreUI.User">
+<core:interfaceName>com.enactor.core.signOn.ISignedOnUser</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType name="enactor.coreUI.User">
+<core:interfaceName>com.enactor.core.signOn.ISignedOnUser</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.cashManagement.Store">
+<core:interfaceName>com.enactor.mfc.location.IStore</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType name="enactor.cashManagement.Store">
+<core:interfaceName>com.enactor.mfc.location.IStore</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.cashManagement.StoreKey">
+<core:interfaceName>com.enactor.mfc.location.ILocationKey</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType name="enactor.cashManagement.StoreKey">
+<core:interfaceName>com.enactor.core.entities.IEntityKey</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.cashManagement.CMSessionKey">
+<core:interfaceName>com.enactor.cashManagement.entities.ICMSessionKey</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType name="enactor.cashManagement.CMSessionKey">
+<core:interfaceName>com.enactor.core.entities.IEntityKey</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.cashManagement.CMSessionKey">
+<core:interfaceName>com.enactor.cashManagement.entities.ICMSessionKey</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType name="enactor.cashManagement.CMSessionOwnerKey">
+<core:interfaceName>com.enactor.core.entities.IEntityKey</core:interfaceName>
+                            </core:targetDataType>
+                            <core:expression>cMSessionKey.ownerKey</core:expression>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+        </core:actionInputMappings>
+        <core:actionOutputMappings>
+            <core:actionMapping>
+                <core:actionID>LoadSession</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType name="enactor.coreUI.Entity">
+<core:interfaceName>com.enactor.core.entities.IEntity</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.cashManagement.CMSession">
+<core:interfaceName>com.enactor.cashManagement.entities.ICMSession</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings/>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>CreateTerminalSpotCheckHandler</core:actionID>
+                <core:mappings>
+                    <core:processMappings/>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:sourceDataType name="enactor.cashManagement.CMTransactionHandler">
+<core:interfaceName>com.enactor.cashManagement.ICMTransactionHandler</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.cashManagement.CMTransactionHandler">
+<core:interfaceName>com.enactor.cashManagement.ICMTransactionHandler</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>SaveSummaryValues</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.cashManagement.CMTransaction">
+<core:interfaceName>com.enactor.cashManagement.entities.ICMTransaction</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.cashManagement.CMTransaction">
+<core:interfaceName>com.enactor.cashManagement.entities.ICMTransaction</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.cashManagement.CMTransaction">
+<core:interfaceName>com.enactor.cashManagement.entities.ICMTransaction</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.cashManagement.CMTransaction">
+<core:interfaceName>com.enactor.cashManagement.entities.ICMTransaction</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>LoadStore</core:actionID>
+                <core:mappings>
+                    <core:processMappings/>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:sourceDataType name="enactor.maintenance.Entity">
+<core:interfaceName>com.enactor.core.entities.IEntity</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.cashManagement.Store">
+<core:interfaceName>com.enactor.mfc.location.IStore</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+        </core:actionOutputMappings>
+        <core:eventLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>CheckUserPrivileges</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>StateEntered</core:event>
+        </core:eventLink>
+        <core:eventLink>
+            <core:linkID>3</core:linkID>
+            <core:toStateID>ListTransactions</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:event>ViewTransactions</core:event>
+        </core:eventLink>
+        <core:eventLink>
+            <core:linkID>4</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>LoadSession</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>ViewSummary</core:event>
+        </core:eventLink>
+        <core:eventLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>CloseViewCashTotalsSummaryPrompt</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>ChangeSelectedSessionStatuses</core:event>
+        </core:eventLink>
+        <core:keepPromptOpen>true</core:keepPromptOpen>
+        <core:keepPreviousPromptOpen>false</core:keepPreviousPromptOpen>
+        <core:promptTimeout>0</core:promptTimeout>
+        <core:hideOpenPrompt>false</core:hideOpenPrompt>
+        <core:allowDatabasePromptLookup>false</core:allowDatabasePromptLookup>
+    </core:promptState>
+    <core:selectionState>
+        <core:url>/CashManagement/ViewCMSessionSummary</core:url>
+        <core:stateID>ViewSessionSummary</core:stateID>
+        <core:name>View Session Summary</core:name>
+        <core:className>com.enactor.coreUI.states.UIPromptState</core:className>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>47</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>1069</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>324</value>
+            </entry>
+        </core:uiHints>
+        <core:param value="true" name="enactor.maintenance.ReadOnly">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:param>
+        <core:metaData>
+            <core:inputs>
+                <core:input required="true" name="enactor.cashManagement.CMSessionKey">
+                    <core:interfaceName>com.enactor.cashManagement.entities.ICMSessionKey</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.cashManagement.CMSessionOwnerKey">
+                    <core:interfaceName>com.enactor.cashManagement.entities.ICMSessionOwnerKey</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.cashManagement.CMTransaction">
+                    <core:interfaceName>com.enactor.cashManagement.entities.ICMTransaction</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.maintenance.ReadOnly">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+                <core:input required="true" name="enactor.cashManagement.ShowCounted">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:input>
+            </core:inputs>
+            <handledEvents>
+                <handledEvent name="StateEntered"/>
+                <handledEvent name="enactor.cashManagement.Back"/>
+            </handledEvents>
+            <stateDataTypes>
+                <stateDataType required="false" name="enactor.cashManagement.CMSessionSummary">
+                    <core:interfaceName>java.util.Map</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="false" name="enactor.maintenance.ReadOnly">
+                    <core:interfaceName>boolean</core:interfaceName>
+                </stateDataType>
+                <stateDataType name="enactor.cashManagement.CMTransaction">
+                    <core:interfaceName>com.enactor.cashManagement.entities.ICMTransaction</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="true" name="enactor.cashManagement.ShowCounted">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="false" name="enactor.cashManagement.TendersList">
+                    <core:interfaceName>java.util.List</core:interfaceName>
+                </stateDataType>
+                <stateDataType name="enactor.cashManagement.CMSessionKey">
+                    <core:interfaceName>com.enactor.cashManagement.entities.ICMSessionKey</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="true" name="enactor.cashManagement.CMSessionSummaryItem">
+                    <core:interfaceName>com.enactor.cashManagement.listElements.ICMSessionSummaryListElement</core:interfaceName>
+                </stateDataType>
+                <stateDataType name="enactor.cashManagement.CMSessionOwnerKey">
+                    <core:interfaceName>com.enactor.cashManagement.entities.ICMSessionOwnerKey</core:interfaceName>
+                </stateDataType>
+            </stateDataTypes>
+        </core:metaData>
+        <core:typeId>enactor.types.SelectionState</core:typeId>
+        <core:singleInstance>false</core:singleInstance>
+        <core:respondToViewEvents>false</core:respondToViewEvents>
+        <core:stateInputMappings>
+            <core:mappings>
+                <core:sourceDataType required="false" name="enactor.cashManagement.CMSessionKey">
+                    <core:interfaceName>com.enactor.core.entities.IEntityKey</core:interfaceName>
+                </core:sourceDataType>
+                <core:targetDataType required="false" name="enactor.cashManagement.CMSessionKey">
+                    <core:interfaceName>com.enactor.core.entities.IEntityKey</core:interfaceName>
+                </core:targetDataType>
+            </core:mappings>
+            <core:mappings>
+                <core:sourceDataType required="true" name="enactor.cashManagement.CMSessionKey">
+                    <core:interfaceName>com.enactor.cashManagement.entities.ICMSessionKey</core:interfaceName>
+                </core:sourceDataType>
+                <core:targetDataType name="enactor.cashManagement.CMSessionOwnerKey">
+                    <core:interfaceName>com.enactor.cashManagement.entities.ICMSessionOwnerKey</core:interfaceName>
+                </core:targetDataType>
+                <core:expression>cMSessionKey.ownerKey</core:expression>
+            </core:mappings>
+            <core:mappings>
+                <core:sourceDataType required="true" name="enactor.cashManagement.CMTransaction">
+                    <core:interfaceName>com.enactor.cashManagement.entities.ICMTransaction</core:interfaceName>
+                </core:sourceDataType>
+                <core:targetDataType name="enactor.cashManagement.CMTransaction">
+                    <core:interfaceName>com.enactor.cashManagement.entities.ICMTransaction</core:interfaceName>
+                </core:targetDataType>
+            </core:mappings>
+            <core:mappings>
+                <core:sourceDataType required="true" name="enactor.cashManagement.CMSession">
+                    <core:interfaceName>com.enactor.cashManagement.entities.ICMSession</core:interfaceName>
+                </core:sourceDataType>
+                <core:targetDataType required="true" name="enactor.cashManagement.ShowCounted">
+                    <core:interfaceName>java.lang.Boolean</core:interfaceName>
+                </core:targetDataType>
+                <core:expression>(cMSession.status &gt;= 3)</core:expression>
+            </core:mappings>
+        </core:stateInputMappings>
+        <core:actionInputMappings/>
+        <core:actionOutputMappings/>
+        <core:eventLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>ListTenders</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>StateEntered</core:event>
+        </core:eventLink>
+        <core:eventLink>
+            <core:linkID>2</core:linkID>
+            <core:toStateID>ViewCashTotalsSummary</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:event>enactor.cashManagement.Back</core:event>
+        </core:eventLink>
+        <core:keepPromptOpen>false</core:keepPromptOpen>
+        <core:keepPreviousPromptOpen>true</core:keepPreviousPromptOpen>
+        <core:promptTimeout>0</core:promptTimeout>
+        <core:hideOpenPrompt>false</core:hideOpenPrompt>
+        <core:allowDatabasePromptLookup>false</core:allowDatabasePromptLookup>
+    </core:selectionState>
+    <core:promptState>
+        <core:url>/CashSessionTotals/CashSessionTransactions</core:url>
+        <core:stateID>ListTransactions</core:stateID>
+        <core:name></core:name>
+        <core:className>com.enactor.coreUI.states.UIPromptState</core:className>
+        <core:defaultNextStateID></core:defaultNextStateID>
+        <core:uiHints>
+            <entry>
+                <key>com.enactor.tools.editor.process.style</key>
+                <value>39</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.xloc</key>
+                <value>231</value>
+            </entry>
+            <entry>
+                <key>com.enactor.tools.editor.process.yloc</key>
+                <value>875</value>
+            </entry>
+        </core:uiHints>
+        <core:metaData>
+            <handledEvents>
+                <handledEvent name="StateEntered"/>
+                <handledEvent name="enactor.maintenance.RefreshList"/>
+                <handledEvent name="enactor.maintenance.Cancel"/>
+            </handledEvents>
+            <stateDataTypes>
+                <stateDataType required="false" name="enactor.UISelectionState.SelectedKey">
+                    <core:interfaceName>java.lang.String</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="true" name="enactor.coreUI.CompoundListFilters">
+                    <core:interfaceName>java.util.List</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="false" name="enactor.coreUI.List">
+                    <core:interfaceName>java.util.List</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="false" name="enactor.coreUI.ListCriteria">
+                    <core:interfaceName>com.enactor.core.servers.IListCriteria</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="false" name="enactor.coreUI.ListFilters">
+                    <core:interfaceName>java.util.List</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="true" name="enactor.coreUI.NegativeTotalListFilter">
+                    <core:interfaceName>com.enactor.core.listFilters.IListFilter</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="false" name="enactor.coreUI.PageSize">
+                    <core:interfaceName>java.lang.Integer</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="true" name="enactor.coreUI.PositiveTotalListFilter">
+                    <core:interfaceName>com.enactor.core.listFilters.IListFilter</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="false" name="enactor.maintenance.Key">
+                    <core:interfaceName>com.enactor.core.entities.IEntityKey</core:interfaceName>
+                </stateDataType>
+                <stateDataType required="true" name="enactor.mfc.Store">
+                    <core:interfaceName>com.enactor.mfc.location.ILocation</core:interfaceName>
+                </stateDataType>
+            </stateDataTypes>
+        </core:metaData>
+        <core:typeId>enactor.types.State</core:typeId>
+        <core:singleInstance>false</core:singleInstance>
+        <core:respondToViewEvents>false</core:respondToViewEvents>
+        <core:actionInputMappings>
+            <core:actionMapping>
+                <core:actionID>AddLocationIdFilter</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.cashManagement.CMSessionKey">
+<core:interfaceName>com.enactor.cashManagement.entities.ICMSessionKey</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.coreUI.DefaultValue">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:targetDataType>
+                            <core:expression>cMSessionKey.ownerKey.locationKey.locationId</core:expression>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings/>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>AddOwnerTypeFilter</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.cashManagement.CMSessionKey">
+<core:interfaceName>com.enactor.cashManagement.entities.ICMSessionKey</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.coreUI.DefaultValue">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:targetDataType>
+                            <core:expression>cMSessionKey.ownerKey.type</core:expression>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="false" name="enactor.coreUI.ListCriteria">
+<core:interfaceName>com.enactor.core.servers.IListCriteria</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="false" name="enactor.coreUI.ListCriteria">
+<core:interfaceName>com.enactor.core.servers.IListCriteria</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="false" name="enactor.coreUI.ListFilters">
+<core:interfaceName>java.util.List</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="false" name="enactor.coreUI.ListFilters">
+<core:interfaceName>java.util.List</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>AddOwnerIdFilter</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.cashManagement.CMSessionKey">
+<core:interfaceName>com.enactor.cashManagement.entities.ICMSessionKey</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.coreUI.DefaultValue">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:targetDataType>
+                            <core:expression>cMSessionKey.ownerKey.ownerId</core:expression>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="false" name="enactor.coreUI.ListCriteria">
+<core:interfaceName>com.enactor.core.servers.IListCriteria</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="false" name="enactor.coreUI.ListCriteria">
+<core:interfaceName>com.enactor.core.servers.IListCriteria</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="false" name="enactor.coreUI.ListFilters">
+<core:interfaceName>java.util.List</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="false" name="enactor.coreUI.ListFilters">
+<core:interfaceName>java.util.List</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>AddEffectiveDateStartFilter</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.cashManagement.CMSessionKey">
+<core:interfaceName>com.enactor.cashManagement.entities.ICMSessionKey</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.coreUI.DefaultValue">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:targetDataType>
+                            <core:expression>cMSessionKey.startDate</core:expression>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="false" name="enactor.coreUI.ListCriteria">
+<core:interfaceName>com.enactor.core.servers.IListCriteria</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="false" name="enactor.coreUI.ListCriteria">
+<core:interfaceName>com.enactor.core.servers.IListCriteria</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="false" name="enactor.coreUI.ListFilters">
+<core:interfaceName>java.util.List</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="false" name="enactor.coreUI.ListFilters">
+<core:interfaceName>java.util.List</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>AddEffectiveDateEndFilter</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.cashManagement.TransactionEndDate">
+<core:interfaceName>java.util.Date</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.coreUI.DefaultValue">
+<core:interfaceName>java.lang.String</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="false" name="enactor.coreUI.ListCriteria">
+<core:interfaceName>com.enactor.core.servers.IListCriteria</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.coreUI.ListCriteria">
+<core:interfaceName>com.enactor.core.servers.IListCriteria</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                        <core:mappings>
+                            <core:sourceDataType required="false" name="enactor.coreUI.ListFilters">
+<core:interfaceName>java.util.List</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.coreUI.ListFilters">
+<core:interfaceName>java.util.List</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>LoadSessionStore</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.cashManagement.CMSessionKey">
+<core:interfaceName>com.enactor.cashManagement.entities.ICMSessionKey</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.coreUI.Key">
+<core:interfaceName>com.enactor.core.entities.IEntityKey</core:interfaceName>
+                            </core:targetDataType>
+                            <core:expression>cMSessionKey.ownerKey.locationKey</core:expression>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings/>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>AddPositiveTotalFilterToCompound</core:actionID>
+                <core:mappings>
+                    <core:processMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.cashManagement.AbsoluteTotalDiscrepancy">
+<core:interfaceName>java.lang.Long</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.coreUI.DefaultValue">
+<core:interfaceName>java.lang.Long</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:processMappings>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.coreUI.CompoundListFilters">
+<core:interfaceName>java.util.List</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType name="enactor.coreUI.CompoundListFilters">
+<core:interfaceName>java.util.List</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>AddNegativeTotalFilterToCompound</core:actionID>
+                <core:mappings>
+                    <core:processMappings/>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.coreUI.CompoundListFilters">
+<core:interfaceName>java.util.List</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType name="enactor.coreUI.CompoundListFilters">
+<core:interfaceName>java.util.List</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+        </core:actionInputMappings>
+        <core:actionOutputMappings>
+            <core:actionMapping>
+                <core:actionID>LoadSessionStore</core:actionID>
+                <core:mappings>
+                    <core:processMappings/>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:sourceDataType name="enactor.coreUI.Entity">
+<core:interfaceName>com.enactor.core.entities.IEntity</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.mfc.Store">
+<core:interfaceName>com.enactor.mfc.location.ILocation</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>AddPositiveTotalFilterToCompound</core:actionID>
+                <core:mappings>
+                    <core:processMappings/>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.coreUI.ListFilter">
+<core:interfaceName>com.enactor.core.listFilters.IListFilter</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.coreUI.PositiveTotalListFilter">
+<core:interfaceName>com.enactor.core.listFilters.IListFilter</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+            <core:actionMapping>
+                <core:actionID>AddNegativeTotalFilterToCompound</core:actionID>
+                <core:mappings>
+                    <core:processMappings/>
+                    <core:stateMappings>
+                        <core:mappings>
+                            <core:sourceDataType required="true" name="enactor.coreUI.ListFilter">
+<core:interfaceName>com.enactor.core.listFilters.IListFilter</core:interfaceName>
+                            </core:sourceDataType>
+                            <core:targetDataType required="true" name="enactor.coreUI.NegativeTotalListFilter">
+<core:interfaceName>com.enactor.core.listFilters.IListFilter</core:interfaceName>
+                            </core:targetDataType>
+                        </core:mappings>
+                    </core:stateMappings>
+                </core:mappings>
+            </core:actionMapping>
+        </core:actionOutputMappings>
+        <core:eventLink>
+            <core:linkID>6</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>AssignValueToNegativeFilter</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>enactor.maintenance.RefreshList</core:event>
+        </core:eventLink>
+        <core:eventLink>
+            <core:linkID>9</core:linkID>
+            <core:toStateID></core:toStateID>
+            <core:toActionID>LoadSessionStore</core:toActionID>
+            <core:condition></core:condition>
+            <core:event>StateEntered</core:event>
+        </core:eventLink>
+        <core:eventLink>
+            <core:linkID>1</core:linkID>
+            <core:toStateID>ViewCashTotalsSummary</core:toStateID>
+            <core:toActionID></core:toActionID>
+            <core:condition></core:condition>
+            <core:event>enactor.maintenance.Cancel</core:event>
+        </core:eventLink>
+        <core:keepPromptOpen>false</core:keepPromptOpen>
+        <core:keepPreviousPromptOpen>false</core:keepPreviousPromptOpen>
+        <core:promptTimeout>0</core:promptTimeout>
+        <core:hideOpenPrompt>false</core:hideOpenPrompt>
+        <core:allowDatabasePromptLookup>false</core:allowDatabasePromptLookup>
+    </core:promptState>
+    <core:stateTransitions/>
+</core:process>

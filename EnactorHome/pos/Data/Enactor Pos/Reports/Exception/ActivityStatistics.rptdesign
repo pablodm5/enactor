@@ -1,0 +1,1627 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.23" id="1">
+    <property name="author">David Bull</property>
+    <property name="comments">Copyright (c) 2015 Enactor Ltd.</property>
+    <property name="createdBy">Eclipse BIRT Designer Version 4.6.0.v201606072122</property>
+    <text-property name="title">Activity Statistics</text-property>
+    <simple-property-list name="includeResource">
+        <value>Messages/Exception/ActivityStatisticsMessages</value>
+    </simple-property-list>
+    <list-property name="propertyBindings">
+        <structure>
+            <property name="name">queryText</property>
+            <property name="id">1273</property>
+        </structure>
+        <structure>
+            <property name="name">queryTimeOut</property>
+            <property name="id">1273</property>
+        </structure>
+        <structure>
+            <property name="name">rowFetchSize</property>
+            <property name="id">1273</property>
+        </structure>
+        <structure>
+            <property name="name">queryText</property>
+            <property name="id">1251</property>
+            <expression name="value" type="javascript">sql = "select ActSt.Day_Number as DAY_NUMBER, "
+sql += "       ActSt.Hour_Number as HOUR_NUMBER, "
+sql += "       ActSt.Device_Id as DEVICE_ID, "
+sql += "       D.Device_Name as DEVICE_DESCRIPTION, "
+sql += "       ActSt.Location_Id as LOCATION_ID, "
+sql += "       L.Description as LOCATION_DESCRIPTION, "
+sql += "       ActSt.User_Id as USER_ID, "
+sql += "       U.Surname as SURNAME, "
+sql += "       U.Forename as FORENAME, "
+sql += "       ActSt.Activity_Statistic_Type_Id as ACTIVITY_STATISTIC_TYPE_ID, "
+sql += "       ActSt.Activity_Sub_Type_Id as ACTIVITY_SUB_TYPE_ID, "
+sql += "       AST.Activity_Description as ACTIVITY_DESCRIPTION, "
+sql += "       ActSt.Activity_Data as ACTIVITY_DATA, "
+sql += "       ActSt.OccurrenceCount as OCCURRENCE_COUNT, "
+sql += "       ActSt.Last_Occurrence_Date as LAST_OCCURRENCE_DATE, "
+sql += "       ActSt.Archived as ARCHIVED "
+sql += "from activitystatistics ActSt "
+sql += "left outer join Locations L on ActSt.Location_Id = L.Location_Id "
+sql += "left outer join Devices D on ActSt.Device_Id = D.Device_Id "
+sql += "left outer join Users U on ActSt.User_Id = U.User_Id "
+sql += "left outer join ActivityStatisticTypes AST on AST.Activity_Statistic_Type_Id = ActSt.Activity_Statistic_Type_Id "
+sql += " where 1 = 1 "
+if (params["locationId"].value != null &amp;&amp; params["locationId"].value.length > 0) { 
+	sql += " and ActSt.Location_Id = '" + params["locationId"].value + "'" 
+}
+if (params["deviceId"].value != null &amp;&amp; params["deviceId"].value.length > 0) { 
+	sql += " and ActSt.Device_Id = '" + params["deviceId"].value + "'" 
+}
+if (params["userId"].value != null &amp;&amp; params["userId"].value.length > 0) { 
+	sql += " and ActSt.User_Id = '" + params["userId"].value + "'" 
+}
+if (params["minOccurrences"].value != null) { 
+	sql += " and ActSt.OccurrenceCount >= " + params["minOccurrences"].value 
+}
+if (params["maxOccurrences"].value != null) { 
+	sql += " and ActSt.OccurrenceCount &lt;= " + params["maxOccurrences"].value
+}
+if (params["activityStatisticTypeId"].value != null &amp;&amp; params["activityStatisticTypeId"].value.length > 0) { 
+	sql += " and ActSt.Activity_Statistic_Type_Id = '" + params["activityStatisticTypeId"].value + "'" 
+}
+sql += " and ActSt.Last_Occurrence_Date >= ?"
+sql += " and ActSt.Last_Occurrence_Date &lt;= ?"
+sql += " order by ActSt.Last_Occurrence_Date desc"
+sql;</expression>
+        </structure>
+    </list-property>
+    <property name="units">in</property>
+    <method name="initialize"><![CDATA[globalDataFormatter = Packages.com.enactor.coreUI.factories.DataFormatterFactory.getInstance().getFormatter(reportContext.getLocale());
+baseCurrencyId = globalDataFormatter.getBaseCurrencyId();
+
+startDateStr = "";
+
+if(params["startDate"].value != null){
+	startDateStr = globalDataFormatter.formatDate(params["startDate"].value);
+}
+else {
+	params["startDate"].value = Packages.com.enactor.core.utilities.DateUtils.beginningOfTime();
+	startDateStr = reportContext.getMessage("BLANK", reportContext.getLocale());
+}
+
+endDateStr = "";
+
+if(params["endDate"].value != null){
+	endDateStr = globalDataFormatter.formatDate(params["endDate"].value);
+}
+else {
+	params["endDate"].value = Packages.com.enactor.core.utilities.DateUtils.endOfTime();
+	endDateStr = reportContext.getMessage("BLANK", reportContext.getLocale());
+}]]></method>
+    <property name="theme">ReportLibrary.BasicReportTheme</property>
+    <text-property name="displayName">Activity Statistics</text-property>
+    <property name="layoutPreference">auto layout</property>
+    <property name="imageDPI">96</property>
+    <list-property name="libraries">
+        <structure>
+            <property name="fileName">ReportLibrary.rptlibrary</property>
+            <property name="namespace">ReportLibrary</property>
+        </structure>
+    </list-property>
+    <parameters>
+        <scalar-parameter name="userName" id="462" extends="ReportLibrary.userName">
+            <text-property name="promptText">Displayable User Name</text-property>
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant"></value>
+            </simple-property-list>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="odaJndiName" id="367">
+            <text-property name="promptText">ODA JNDI Name</text-property>
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant"></value>
+            </simple-property-list>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="locationId" id="553">
+            <text-property name="promptText">Location Id</text-property>
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="deviceId" id="1000">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="userId" id="556">
+            <text-property name="promptText">User Id</text-property>
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="startDate" id="558">
+            <text-property name="promptText">Start Date</text-property>
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">dateTime</property>
+            <property name="distinct">true</property>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="endDate" id="559">
+            <text-property name="promptText">End Date</text-property>
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">dateTime</property>
+            <property name="distinct">true</property>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="activityStatisticTypeId" id="1243">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant"></value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="minOccurrences" id="1245">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">integer</property>
+            <property name="distinct">true</property>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="maxOccurrences" id="1246">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">integer</property>
+            <property name="distinct">true</property>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+    </parameters>
+    <data-sources>
+        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="Data Source" id="374"
+ extends="ReportLibrary.Data Source">
+            <property name="odaDriverClass">com.mysql.jdbc.Driver</property>
+            <property name="odaURL">jdbc:mysql://localhost/enactor_trunk</property>
+            <property name="odaUser">enactor</property>
+            <encrypted-property name="odaPassword" encryptionID="base64">ZW5hY3Rvcg==</encrypted-property>
+        </oda-data-source>
+    </data-sources>
+    <data-sets>
+        <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="LocationDescription" id="999"
+ extends="ReportLibrary.LocationDescription"/>
+        <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="UserDescription" id="1005"
+ extends="ReportLibrary.UserDescription"/>
+        <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="TerminalDescription" id="1249"
+ extends="ReportLibrary.TerminalDescription"/>
+        <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="MainQuery" id="1251">
+            <property name="nullsOrdering">nulls lowest</property>
+            <list-property name="computedColumns">
+                <structure>
+                    <property name="name">LOCATION</property>
+                    <expression name="expression">if (row["Description"] != null &amp;&amp; row["Description"].length > 0)
+    row["Description"];
+else
+    row["Location_Id"];</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">TERMINAL</property>
+                    <expression name="expression">if (row["Device_Name"] != null &amp;&amp; row["Device_Name"].length > 0)
+    row["Device_Name"];
+else
+    row["Device_Id"];</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">USER</property>
+                    <expression name="expression">if (row["Surname"] != null &amp;&amp; row["Surname"].length > 0 &amp;&amp; row["Forename"] != null &amp;&amp; row["Forename"].length > 0)
+    row["Forename"] + ' ' + row["Surname"];
+ else
+    row["User_Id"];</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">LAST_OCCURENCE_DATE_STR</property>
+                    <expression name="expression">if(row["Last_Occurrence_Date"] != null)
+	globalDataFormatter.formatDate(row["Last_Occurrence_Date"]);
+else
+    row["Last_Occurrence_Date"];</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">HOUR</property>
+                    <expression name="expression">if (row["Hour_Number"] &lt; 0)
+   '-';
+else
+   row["Hour_Number"];</expression>
+                    <property name="dataType">string</property>
+                </structure>
+            </list-property>
+            <list-property name="columnHints">
+                <structure>
+                    <property name="columnName">Day_Number</property>
+                    <property name="alias">DAY_NUMBER</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">DAY_NUMBER</text-property>
+                    <text-property name="heading">DAY_NUMBER</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">Hour_Number</property>
+                    <property name="alias">HOUR_NUMBER</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">HOUR_NUMBER</text-property>
+                    <text-property name="heading">HOUR_NUMBER</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">Device_Id</property>
+                    <property name="alias">DEVICE_ID</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">DEVICE_ID</text-property>
+                    <text-property name="heading">DEVICE_ID</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">Device_Name</property>
+                    <property name="alias">DEVICE_DESCRIPTION</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">DEVICE_DESCRIPTION</text-property>
+                    <text-property name="heading">DEVICE_DESCRIPTION</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">Location_Id</property>
+                    <property name="alias">LOCATION_ID</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">LOCATION_ID</text-property>
+                    <text-property name="heading">LOCATION_ID</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">Description</property>
+                    <property name="alias">LOCATION_DESCRIPTION</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">LOCATION_DESCRIPTION</text-property>
+                    <text-property name="heading">LOCATION_DESCRIPTION</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">User_Id</property>
+                    <property name="alias">USER_ID</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">USER_ID</text-property>
+                    <text-property name="heading">USER_ID</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">Surname</property>
+                    <property name="alias">SURNAME</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">SURNAME</text-property>
+                    <text-property name="heading">SURNAME</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">Forename</property>
+                    <property name="alias">FORENAME</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">FORENAME</text-property>
+                    <text-property name="heading">FORENAME</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">Activity_Statistic_Type_Id</property>
+                    <property name="alias">ACTIVITY_STATISTIC_TYPE_ID</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">ACTIVITY_STATISTIC_TYPE_ID</text-property>
+                    <text-property name="heading">ACTIVITY_STATISTIC_TYPE_ID</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">Activity_Sub_Type_Id</property>
+                    <property name="alias">ACTIVITY_SUB_TYPE_ID</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">ACTIVITY_SUB_TYPE_ID</text-property>
+                    <text-property name="heading">ACTIVITY_SUB_TYPE_ID</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">Activity_Description</property>
+                    <property name="alias">ACTIVITY_DESCRIPTION</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">ACTIVITY_DESCRIPTION</text-property>
+                    <text-property name="heading">ACTIVITY_DESCRIPTION</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">Activity_Data</property>
+                    <property name="alias">ACTIVITY_DATA</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">ACTIVITY_DATA</text-property>
+                    <text-property name="heading">ACTIVITY_DATA</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">OccurrenceCount</property>
+                    <property name="alias">OCCURRENCE_COUNT</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">OCCURRENCE_COUNT</text-property>
+                    <text-property name="heading">OCCURRENCE_COUNT</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">Last_Occurrence_Date</property>
+                    <property name="alias">LAST_OCCURRENCE_DATE</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">LAST_OCCURRENCE_DATE</text-property>
+                    <text-property name="heading">LAST_OCCURRENCE_DATE</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">Archived</property>
+                    <property name="alias">ARCHIVED</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">ARCHIVED</text-property>
+                    <text-property name="heading">ARCHIVED</text-property>
+                </structure>
+            </list-property>
+            <list-property name="parameters">
+                <structure>
+                    <property name="name">startDate</property>
+                    <property name="paramName">startDate</property>
+                    <property name="dataType">dateTime</property>
+                    <property name="position">1</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">endDate</property>
+                    <property name="paramName">endDate</property>
+                    <property name="dataType">dateTime</property>
+                    <property name="position">2</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+            </list-property>
+            <structure name="cachedMetaData">
+                <list-property name="resultSet">
+                    <structure>
+                        <property name="position">1</property>
+                        <property name="name">DAY_NUMBER</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                    <structure>
+                        <property name="position">2</property>
+                        <property name="name">HOUR_NUMBER</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                    <structure>
+                        <property name="position">3</property>
+                        <property name="name">DEVICE_ID</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">4</property>
+                        <property name="name">DEVICE_DESCRIPTION</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">5</property>
+                        <property name="name">LOCATION_ID</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">6</property>
+                        <property name="name">LOCATION_DESCRIPTION</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">7</property>
+                        <property name="name">USER_ID</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">8</property>
+                        <property name="name">SURNAME</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">9</property>
+                        <property name="name">FORENAME</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">10</property>
+                        <property name="name">ACTIVITY_STATISTIC_TYPE_ID</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">11</property>
+                        <property name="name">ACTIVITY_SUB_TYPE_ID</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">12</property>
+                        <property name="name">ACTIVITY_DESCRIPTION</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">13</property>
+                        <property name="name">ACTIVITY_DATA</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">14</property>
+                        <property name="name">OCCURRENCE_COUNT</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                    <structure>
+                        <property name="position">15</property>
+                        <property name="name">LAST_OCCURRENCE_DATE</property>
+                        <property name="dataType">date-time</property>
+                    </structure>
+                    <structure>
+                        <property name="position">16</property>
+                        <property name="name">ARCHIVED</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                    <structure>
+                        <property name="position">17</property>
+                        <property name="name">LOCATION</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">18</property>
+                        <property name="name">TERMINAL</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">19</property>
+                        <property name="name">USER</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">20</property>
+                        <property name="name">LAST_OCCURENCE_DATE_STR</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">21</property>
+                        <property name="name">HOUR</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                </list-property>
+            </structure>
+            <property name="dataSource">Data Source</property>
+            <list-property name="resultSet">
+                <structure>
+                    <property name="position">1</property>
+                    <property name="name">Day_Number</property>
+                    <property name="nativeName">Day_Number</property>
+                    <property name="dataType">integer</property>
+                    <property name="nativeDataType">4</property>
+                </structure>
+                <structure>
+                    <property name="position">2</property>
+                    <property name="name">Hour_Number</property>
+                    <property name="nativeName">Hour_Number</property>
+                    <property name="dataType">integer</property>
+                    <property name="nativeDataType">4</property>
+                </structure>
+                <structure>
+                    <property name="position">3</property>
+                    <property name="name">Device_Id</property>
+                    <property name="nativeName">Device_Id</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">4</property>
+                    <property name="name">Device_Name</property>
+                    <property name="nativeName">Device_Name</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">5</property>
+                    <property name="name">Location_Id</property>
+                    <property name="nativeName">Location_Id</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">6</property>
+                    <property name="name">Description</property>
+                    <property name="nativeName">Description</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">7</property>
+                    <property name="name">User_Id</property>
+                    <property name="nativeName">User_Id</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">8</property>
+                    <property name="name">Surname</property>
+                    <property name="nativeName">Surname</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">9</property>
+                    <property name="name">Forename</property>
+                    <property name="nativeName">Forename</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">10</property>
+                    <property name="name">Activity_Statistic_Type_Id</property>
+                    <property name="nativeName">Activity_Statistic_Type_Id</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">11</property>
+                    <property name="name">Activity_Sub_Type_Id</property>
+                    <property name="nativeName">Activity_Sub_Type_Id</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">12</property>
+                    <property name="name">Activity_Description</property>
+                    <property name="nativeName">Activity_Description</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">13</property>
+                    <property name="name">Activity_Data</property>
+                    <property name="nativeName">Activity_Data</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">14</property>
+                    <property name="name">OccurrenceCount</property>
+                    <property name="nativeName">OccurrenceCount</property>
+                    <property name="dataType">integer</property>
+                    <property name="nativeDataType">4</property>
+                </structure>
+                <structure>
+                    <property name="position">15</property>
+                    <property name="name">Last_Occurrence_Date</property>
+                    <property name="nativeName">Last_Occurrence_Date</property>
+                    <property name="dataType">date-time</property>
+                    <property name="nativeDataType">93</property>
+                </structure>
+                <structure>
+                    <property name="position">16</property>
+                    <property name="name">Archived</property>
+                    <property name="nativeName">Archived</property>
+                    <property name="dataType">integer</property>
+                    <property name="nativeDataType">-7</property>
+                </structure>
+            </list-property>
+            <xml-property name="queryText"><![CDATA[select ActSt.Day_Number as DAY_NUMBER,
+       ActSt.Hour_Number as HOUR_NUMBER,
+       ActSt.Device_Id as DEVICE_ID,
+       D.Device_Name as DEVICE_DESCRIPTION,
+       ActSt.Location_Id as LOCATION_ID,
+       L.Description as LOCATION_DESCRIPTION,
+       ActSt.User_Id as USER_ID,
+       U.Surname as SURNAME,
+       U.Forename as FORENAME,
+       ActSt.Activity_Statistic_Type_Id as ACTIVITY_STATISTIC_TYPE_ID,
+       ActSt.Activity_Sub_Type_Id as ACTIVITY_SUB_TYPE_ID,
+       AST.Activity_Description as ACTIVITY_DESCRIPTION,
+       ActSt.Activity_Data as ACTIVITY_DATA,
+       ActSt.OccurrenceCount as OCCURRENCE_COUNT,
+       ActSt.Last_Occurrence_Date as LAST_OCCURRENCE_DATE,
+       ActSt.Archived as ARCHIVED
+from activitystatistics ActSt
+left outer join Locations L on ActSt.Location_Id = L.Location_Id
+left outer join Devices D on ActSt.Device_Id = D.Device_Id
+left outer join Users U on ActSt.User_Id = U.User_Id
+left outer join ActivityStatisticTypes AST on AST.Activity_Statistic_Type_Id = ActSt.Activity_Statistic_Type_Id
+where 1=1
+order by ActSt.Last_Occurrence_Date desc
+]]></xml-property>
+            <xml-property name="designerValues"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<model:DesignValues xmlns:design="http://www.eclipse.org/datatools/connectivity/oda/design" xmlns:model="http://www.eclipse.org/birt/report/model/adapter/odaModel">
+  <Version>2.0</Version>
+  <design:ResultSets derivedMetaData="true">
+    <design:resultSetDefinitions>
+      <design:resultSetColumns>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>Day_Number</design:name>
+              <design:position>1</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>4</design:nativeDataTypeCode>
+            <design:precision>11</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>NotNullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>DAY_NUMBER</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>DAY_NUMBER</design:label>
+            <design:formattingHints>
+              <design:displaySize>11</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>Hour_Number</design:name>
+              <design:position>2</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>4</design:nativeDataTypeCode>
+            <design:precision>11</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>NotNullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>HOUR_NUMBER</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>HOUR_NUMBER</design:label>
+            <design:formattingHints>
+              <design:displaySize>11</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>Device_Id</design:name>
+              <design:position>3</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+            <design:precision>20</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>NotNullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>DEVICE_ID</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>DEVICE_ID</design:label>
+            <design:formattingHints>
+              <design:displaySize>20</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>Location_Id</design:name>
+              <design:position>4</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+            <design:precision>20</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>NotNullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>LOCATION_ID</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>LOCATION_ID</design:label>
+            <design:formattingHints>
+              <design:displaySize>20</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>User_Id</design:name>
+              <design:position>5</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+            <design:precision>20</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>NotNullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>USER_ID</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>USER_ID</design:label>
+            <design:formattingHints>
+              <design:displaySize>20</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>Activity_Type_Id</design:name>
+              <design:position>6</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+            <design:precision>100</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>NotNullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>ACTIVITY_TYPE_ID</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>ACTIVITY_TYPE_ID</design:label>
+            <design:formattingHints>
+              <design:displaySize>100</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>Activity_Sub_Type_Id</design:name>
+              <design:position>7</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+            <design:precision>20</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>ACTIVITY_SUB_TYPE_ID</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>ACTIVITY_SUB_TYPE_ID</design:label>
+            <design:formattingHints>
+              <design:displaySize>20</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>Activity_Description</design:name>
+              <design:position>8</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+            <design:precision>256</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>ACTIVITY_DESCRIPTION</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>ACTIVITY_DESCRIPTION</design:label>
+            <design:formattingHints>
+              <design:displaySize>256</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>Activity_Data</design:name>
+              <design:position>9</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+            <design:precision>256</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>ACTIVITY_DATA</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>ACTIVITY_DATA</design:label>
+            <design:formattingHints>
+              <design:displaySize>256</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>OccurrenceCount</design:name>
+              <design:position>10</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>4</design:nativeDataTypeCode>
+            <design:precision>11</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>OCCURRENCE_COUNT</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>OCCURRENCE_COUNT</design:label>
+            <design:formattingHints>
+              <design:displaySize>11</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>Last_Occurrence_Date</design:name>
+              <design:position>11</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>93</design:nativeDataTypeCode>
+            <design:precision>19</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>LAST_OCCURRENCE_DATE</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>LAST_OCCURRENCE_DATE</design:label>
+            <design:formattingHints>
+              <design:displaySize>19</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>Archived</design:name>
+              <design:position>12</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>-7</design:nativeDataTypeCode>
+            <design:precision>1</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>ARCHIVED</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>ARCHIVED</design:label>
+            <design:formattingHints>
+              <design:displaySize>1</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+      </design:resultSetColumns>
+      <design:criteria/>
+    </design:resultSetDefinitions>
+  </design:ResultSets>
+</model:DesignValues>]]></xml-property>
+        </oda-data-set>
+        <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="ActivityStatisticTypeDescription" id="1273"
+ extends="ReportLibrary.LocationDescription">
+            <property name="nullsOrdering">nulls lowest</property>
+            <list-property name="columnHints">
+                <structure>
+                    <property name="columnName">Activity_Description</property>
+                    <property name="alias">ACTIVITY_DESCRIPTION</property>
+                    <text-property name="displayName">ACTIVITY_DESCRIPTION</text-property>
+                </structure>
+            </list-property>
+            <list-property name="parameters">
+                <structure>
+                    <property name="name">ActivityStatisticTypeId</property>
+                    <property name="paramName">activityStatisticTypeId</property>
+                    <property name="dataType">string</property>
+                    <property name="position">1</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+            </list-property>
+            <structure name="cachedMetaData">
+                <list-property name="resultSet">
+                    <structure>
+                        <property name="position">1</property>
+                        <property name="name">ACTIVITY_DESCRIPTION</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                </list-property>
+            </structure>
+            <list-property name="resultSet">
+                <structure>
+                    <property name="position">1</property>
+                    <property name="name">Activity_Description</property>
+                    <property name="nativeName">Activity_Description</property>
+                    <property name="dataType">string</property>
+                </structure>
+            </list-property>
+            <xml-property name="queryText"><![CDATA[select Activity_Description as ACTIVITY_DESCRIPTION
+from ActivityStatisticTypes
+where Activity_Statistic_Type_Id = ?]]></xml-property>
+        </oda-data-set>
+    </data-sets>
+    <page-setup>
+        <simple-master-page name="Simple MasterPage" id="2">
+            <property name="type">a4</property>
+            <property name="orientation">landscape</property>
+            <property name="topMargin">0.75in</property>
+            <property name="leftMargin">0.75in</property>
+            <property name="bottomMargin">0.75in</property>
+            <property name="rightMargin">0.75in</property>
+            <page-header>
+                <grid name="ReportHeader" id="396" extends="ReportLibrary.ReportHeader">
+                    <overridden-values>
+                        <ref-entry baseId="316" id="316"/>
+                        <ref-entry baseId="317" id="317"/>
+                        <ref-entry baseId="318" id="318"/>
+                        <ref-entry baseId="319" id="319"/>
+                        <ref-entry baseId="327" name="CompanyLogoWide" id="327"/>
+                        <ref-entry baseId="380" name="NewImage" id="380"/>
+                        <ref-entry baseId="320" id="320"/>
+                        <ref-entry baseId="481" name="PoweredBy" id="481"/>
+                        <ref-entry baseId="328" name="CompanyTitle" id="328"/>
+                    </overridden-values>
+                </grid>
+            </page-header>
+            <page-footer>
+                <grid id="522">
+                    <property name="width">100%</property>
+                    <column id="523">
+                        <property name="width">45%</property>
+                    </column>
+                    <column id="524">
+                        <property name="width">4.3020833333in</property>
+                    </column>
+                    <column id="525">
+                        <property name="width">5%</property>
+                    </column>
+                    <row id="526">
+                        <cell id="527">
+                            <text name="GeneratedOnText" id="531" extends="ReportLibrary.GeneratedOnText">
+                                <property name="style">reportFooterLeft</property>
+                                                            <property name="contentType">html</property>
+                                <text-property name="content"><![CDATA[
+<value-of>l10nParams = new Array(1); l10nParams[0] = Packages.com.enactor.core.utilities.DateUtils.formatShortDateMediumTime(reportContext.getLocale(), new Date) ; reportContext.getMessage("GENERATED_ON", reportContext.getLocale(), l10nParams);</value-of>
+]]></text-property>
+                            </text>
+                        </cell>
+                        <cell id="528">
+                            <text name="GeneratedByText" id="530" extends="ReportLibrary.GeneratedByText">
+                                <property name="style">reportFooterLeft</property>
+                                <property name="paddingTop">1pt</property>
+                                                            <property name="contentType">html</property>
+                                <text-property name="content"><![CDATA[
+<value-of>l10nParams = new Array(1); l10nParams[0] = params["userName"] ; reportContext.getMessage("GENERATED_BY", reportContext.getLocale(), l10nParams);</value-of>
+]]></text-property>
+                            </text>
+                        </cell>
+                        <cell id="529">
+                            <grid id="532">
+                                <property name="width">100%</property>
+                                <column id="533"/>
+                                <column id="534"/>
+                                <column id="535"/>
+                                <row id="536">
+                                    <cell id="537">
+                                        <auto-text id="538">
+                                            <property name="style">reportFooterRight</property>
+                                            <property name="type">page-number</property>
+                                        </auto-text>
+                                    </cell>
+                                    <cell id="539">
+                                        <text id="540">
+                                            <property name="style">reportFooterCentre</property>
+                                            <property name="contentType">plain</property>
+                                            <text-property name="content"><![CDATA[/]]></text-property>
+                                        </text>
+                                    </cell>
+                                    <cell id="541">
+                                        <auto-text id="542">
+                                            <property name="style">reportFooterRight</property>
+                                            <property name="type">total-page</property>
+                                        </auto-text>
+                                    </cell>
+                                </row>
+                            </grid>
+                        </cell>
+                    </row>
+                </grid>
+            </page-footer>
+        </simple-master-page>
+    </page-setup>
+    <body>
+        <grid name="ReportTitleGrid" id="362">
+            <property name="width">100%</property>
+            <column id="363"/>
+            <row id="364">
+                <cell id="365">
+                    <property name="paddingTop">1pt</property>
+                    <label name="ReportTitleLabel" id="521">
+                        <property name="style">reportTitle</property>
+                        <property name="fontFamily">sans-serif</property>
+                        <property name="fontSize">larger</property>
+                        <property name="paddingTop">1pt</property>
+                        <property name="textAlign">center</property>
+                        <text-property name="text" key="TITLE"></text-property>
+                    </label>
+                </cell>
+            </row>
+        </grid>
+        <grid name="CriteriaGrid" id="376">
+            <property name="marginTop">0pt</property>
+            <property name="width">100%</property>
+            <list-property name="visibility">
+                <structure>
+                    <property name="format">all</property>
+                    <expression name="valueExpr">if (pageNumber > 1) {
+ true;
+} else {
+ false;
+}</expression>
+                </structure>
+            </list-property>
+            <column id="377">
+                <property name="width">11%</property>
+            </column>
+            <column id="567">
+                <property name="width">39%</property>
+            </column>
+            <column id="393">
+                <property name="width">11%</property>
+            </column>
+            <column id="578">
+                <property name="width">39%</property>
+            </column>
+            <row id="382">
+                <cell id="383">
+                    <property name="colSpan">4</property>
+                    <property name="rowSpan">1</property>
+                    <label id="394">
+                        <property name="style">subReportHeader</property>
+                        <property name="marginTop">0pt</property>
+                        <property name="paddingTop">1pt</property>
+                        <property name="textAlign">center</property>
+                        <text-property name="text" key="REPORT_CRITERIA">The Report Criteria</text-property>
+                    </label>
+                </cell>
+            </row>
+            <row id="389">
+                <cell id="390">
+                    <property name="paddingTop">1pt</property>
+                    <label id="1240">
+                        <property name="style">criteriaLabel</property>
+                        <text-property name="text" key="CRITERIA_1"></text-property>
+                    </label>
+                </cell>
+                <cell id="562">
+                    <property name="paddingTop">1pt</property>
+                    <data id="1241">
+                        <property name="style">reportCriteria</property>
+                        <property name="fontWeight">normal</property>
+                        <list-property name="mapRules">
+                            <structure>
+                                <expression name="testExpr">row["USER_FULL_NAME"]</expression>
+                                <property name="operator">is-null</property>
+                                <text-property name="display" key="BLANK"></text-property>
+                            </structure>
+                        </list-property>
+                        <property name="dataSet">UserDescription</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">USER_FULL_NAME</property>
+                                <expression name="expression">dataSetRow["USER_FULL_NAME"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                        </list-property>
+                        <property name="resultSetColumn">USER_FULL_NAME</property>
+                    </data>
+                </cell>
+                <cell id="392">
+                    <label id="437">
+                        <property name="style">criteriaLabel</property>
+                        <text-property name="text" key="CRITERIA_2"></text-property>
+                    </label>
+                </cell>
+                <cell id="573">
+                    <data id="584">
+                        <property name="style">criteriaLabel</property>
+                        <list-property name="mapRules">
+                            <structure>
+                                <expression name="testExpr">row["LOCATION_DESCRIPTION"]</expression>
+                                <property name="operator">is-null</property>
+                                <text-property name="display" key="BLANK"></text-property>
+                            </structure>
+                        </list-property>
+                        <property name="dataSet">LocationDescription</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">LOCATION_DESCRIPTION</property>
+                                <expression name="expression">dataSetRow["LOCATION_DESCRIPTION"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                        </list-property>
+                        <property name="resultSetColumn">LOCATION_DESCRIPTION</property>
+                    </data>
+                </cell>
+            </row>
+            <row id="400">
+                <cell id="401">
+                    <label id="438">
+                        <property name="style">criteriaLabel</property>
+                        <text-property name="text" key="CRITERIA_3"></text-property>
+                    </label>
+                </cell>
+                <cell id="563">
+                    <data id="1250">
+                        <property name="style">criteriaLabel</property>
+                        <property name="dataSet">TerminalDescription</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">TERMINAL_DESCRIPTION</property>
+                                <text-property name="displayName">TERMINAL_DESCRIPTION</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["TERMINAL_DESCRIPTION"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                        </list-property>
+                        <property name="resultSetColumn">TERMINAL_DESCRIPTION</property>
+                    </data>
+                </cell>
+                <cell id="402">
+                    <label id="439">
+                        <property name="style">criteriaLabel</property>
+                        <text-property name="text" key="CRITERIA_4"></text-property>
+                    </label>
+                </cell>
+                <cell id="574">
+                    <data id="1274">
+                        <property name="style">criteriaLabel</property>
+                        <property name="dataSet">ActivityStatisticTypeDescription</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">Activity_Description</property>
+                                <text-property name="displayName">Activity_Description</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["Activity_Description"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                        </list-property>
+                        <property name="resultSetColumn">Activity_Description</property>
+                    </data>
+                </cell>
+            </row>
+            <row id="403">
+                <cell id="404">
+                    <label id="440">
+                        <property name="style">criteriaLabel</property>
+                        <text-property name="text" key="CRITERIA_5"></text-property>
+                    </label>
+                </cell>
+                <cell id="564">
+                    <text-data id="1216">
+                        <property name="style">criteriaLabel</property>
+                        <expression name="valueExpr">startDateStr;</expression>
+                        <property name="contentType">html</property>
+                    </text-data>
+                </cell>
+                <cell id="405">
+                    <label id="441">
+                        <property name="style">criteriaLabel</property>
+                        <text-property name="text" key="CRITERIA_6"></text-property>
+                    </label>
+                </cell>
+                <cell id="575">
+                    <text-data id="1217">
+                        <property name="style">criteriaLabel</property>
+                        <expression name="valueExpr">endDateStr;</expression>
+                        <property name="contentType">html</property>
+                    </text-data>
+                </cell>
+            </row>
+            <row id="406">
+                <cell id="407">
+                    <label id="442">
+                        <property name="style">criteriaLabel</property>
+                        <text-property name="text" key="CRITERIA_7"></text-property>
+                    </label>
+                </cell>
+                <cell id="565">
+                    <data id="1248">
+                        <property name="style">criteriaLabel</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">minOccurrences</property>
+                                <expression name="expression" type="javascript">params["minOccurrences"]</expression>
+                                <property name="dataType">integer</property>
+                            </structure>
+                        </list-property>
+                        <property name="resultSetColumn">minOccurrences</property>
+                    </data>
+                </cell>
+                <cell id="408">
+                    <label id="1221">
+                        <property name="style">criteriaLabel</property>
+                        <text-property name="text" key="CRITERIA_8"></text-property>
+                    </label>
+                </cell>
+                <cell id="576">
+                    <data id="1247">
+                        <property name="style">criteriaLabel</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">maxOccurrences</property>
+                                <expression name="expression" type="javascript">params["maxOccurrences"]</expression>
+                                <property name="dataType">integer</property>
+                            </structure>
+                        </list-property>
+                        <property name="resultSetColumn">maxOccurrences</property>
+                    </data>
+                </cell>
+            </row>
+            <row id="420">
+                <cell id="421">
+                    <label id="1015">
+                        <property name="style">reportCriteria</property>
+                        <property name="fontWeight">normal</property>
+                        <text-property name="text" key="CRITERIA_9"></text-property>
+                    </label>
+                </cell>
+                <cell id="566"/>
+                <cell id="422">
+                    <label id="1016">
+                        <property name="style">reportCriteria</property>
+                        <property name="fontWeight">normal</property>
+                        <text-property name="text" key="CRITERIA_10"></text-property>
+                    </label>
+                </cell>
+                <cell id="577"/>
+            </row>
+        </grid>
+        <grid name="ResultsGrid" id="384">
+            <property name="width">100%</property>
+            <column id="385"/>
+            <row id="386">
+                <cell id="387"/>
+            </row>
+            <row id="425">
+                <cell id="426">
+                    <table name="ResultsTable" id="445">
+                        <property name="marginTop">0pt</property>
+                        <property name="width">100%</property>
+                        <property name="dataSet">MainQuery</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">Day_Number</property>
+                                <text-property name="displayName">Day_Number</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["Day_Number"]</expression>
+                                <property name="dataType">integer</property>
+                            </structure>
+                            <structure>
+                                <property name="name">Device_Id</property>
+                                <text-property name="displayName">Device_Id</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["Device_Id"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">Device_Name</property>
+                                <text-property name="displayName">Device_Name</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["Device_Name"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">Location_Id</property>
+                                <text-property name="displayName">Location_Id</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["Location_Id"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">Description</property>
+                                <text-property name="displayName">Description</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["Description"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">User_Id</property>
+                                <text-property name="displayName">User_Id</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["User_Id"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">Surname</property>
+                                <text-property name="displayName">Surname</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["Surname"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">Forename</property>
+                                <text-property name="displayName">Forename</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["Forename"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">Activity_Statistic_Type_Id</property>
+                                <text-property name="displayName">Activity_Statistic_Type_Id</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["Activity_Statistic_Type_Id"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">Activity_Sub_Type_Id</property>
+                                <text-property name="displayName">Activity_Sub_Type_Id</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["Activity_Sub_Type_Id"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">Activity_Description</property>
+                                <text-property name="displayName">Activity_Description</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["Activity_Description"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">Activity_Data</property>
+                                <text-property name="displayName">Activity_Data</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["Activity_Data"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">OccurrenceCount</property>
+                                <text-property name="displayName">OccurrenceCount</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["OccurrenceCount"]</expression>
+                                <property name="dataType">integer</property>
+                            </structure>
+                            <structure>
+                                <property name="name">Last_Occurrence_Date</property>
+                                <text-property name="displayName">Last_Occurrence_Date</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["Last_Occurrence_Date"]</expression>
+                                <property name="dataType">date-time</property>
+                            </structure>
+                            <structure>
+                                <property name="name">Archived</property>
+                                <text-property name="displayName">Archived</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["Archived"]</expression>
+                                <property name="dataType">integer</property>
+                            </structure>
+                            <structure>
+                                <property name="name">LOCATION</property>
+                                <text-property name="displayName">LOCATION</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["LOCATION"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">TERMINAL</property>
+                                <text-property name="displayName">TERMINAL</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["TERMINAL"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">USER</property>
+                                <text-property name="displayName">USER</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["USER"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">LAST_OCCURENCE_DATE_STR</property>
+                                <text-property name="displayName">LAST_OCCURENCE_DATE_STR</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["LAST_OCCURENCE_DATE_STR"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">Hour_Number</property>
+                                <text-property name="displayName">HOUR_NUMBER</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["Hour_Number"]</expression>
+                                <property name="dataType">integer</property>
+                            </structure>
+                            <structure>
+                                <property name="name">HOUR</property>
+                                <text-property name="displayName">HOUR</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["HOUR"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                        </list-property>
+                        <property name="pageBreakInterval">50</property>
+                        <column id="455"/>
+                        <column id="473">
+                            <property name="whiteSpace">nowrap</property>
+                        </column>
+                        <column id="456"/>
+                        <column id="1026"/>
+                        <column id="1030"/>
+                        <column id="1034"/>
+                        <column id="1038"/>
+                        <column id="1281"/>
+                        <column id="1139"/>
+                        <header>
+                            <row id="446">
+                                <list-property name="visibility">
+                                    <structure>
+                                        <property name="format">all</property>
+                                        <expression name="valueExpr">Total.count() == 0</expression>
+                                    </structure>
+                                </list-property>
+                                <cell id="447">
+                                    <label id="457">
+                                        <property name="style">columnHeader</property>
+                                        <text-property name="text" key="LOCATION"></text-property>
+                                        <text-property name="helpText" key="TOOLTIP_LOCATION"></text-property>
+                                    </label>
+                                </cell>
+                                <cell id="470">
+                                    <label id="474">
+                                        <property name="style">columnHeader</property>
+                                        <property name="overflow">auto</property>
+                                        <text-property name="text" key="USER"></text-property>
+                                        <text-property name="helpText" key="TOOLTIP_USER"></text-property>
+                                    </label>
+                                </cell>
+                                <cell id="448">
+                                    <label id="458">
+                                        <property name="style">columnHeader</property>
+                                        <text-property name="text" key="DEVICE"></text-property>
+                                        <text-property name="helpText" key="TOOLTIP_AUTH_USER"></text-property>
+                                    </label>
+                                </cell>
+                                <cell id="1023">
+                                    <label id="1071">
+                                        <property name="style">columnHeader</property>
+                                        <text-property name="text" key="ACTIVITY_TYPE"></text-property>
+                                        <text-property name="helpText" key="TOOLTIP_EXCEPTION_TYPE"></text-property>
+                                    </label>
+                                </cell>
+                                <cell id="1027">
+                                    <label id="1072">
+                                        <property name="style">columnHeader</property>
+                                        <text-property name="text" key="ACTIVITY_SUB_TYPE"></text-property>
+                                        <text-property name="helpText" key="TOOLTIP_EXCEPTION_REASON"></text-property>
+                                    </label>
+                                </cell>
+                                <cell id="1031">
+                                    <label id="1073">
+                                        <property name="style">columnHeaderRight</property>
+                                        <text-property name="text" key="ACTIVITY_DATA"></text-property>
+                                        <text-property name="helpText" key="TOOLTIP_TERMINAL_NUMBER"></text-property>
+                                    </label>
+                                </cell>
+                                <cell id="1035">
+                                    <label id="1074">
+                                        <property name="style">columnHeaderRight</property>
+                                        <text-property name="text" key="OCCURRENCE_COUNT"></text-property>
+                                        <text-property name="helpText" key="TOOLTIP_TRANSACTION_NUMBER"></text-property>
+                                    </label>
+                                </cell>
+                                <cell id="1278">
+                                    <label id="1152">
+                                        <property name="style">columnHeader</property>
+                                        <text-property name="text" key="LAST_OCCURRENCE"></text-property>
+                                        <text-property name="helpText" key="TOOLTIP_DATE_TIME"></text-property>
+                                    </label>
+                                </cell>
+                                <cell id="1134">
+                                    <label id="1282">
+                                        <property name="style">columnHeader</property>
+                                        <text-property name="text" key="HOUR"></text-property>
+                                        <text-property name="helpText" key="TOOLTIP_DATE_TIME"></text-property>
+                                    </label>
+                                </cell>
+                            </row>
+                        </header>
+                        <detail>
+                            <row id="449">
+                                <property name="whiteSpace">nowrap</property>
+                                <cell id="450">
+                                    <data id="1265">
+                                        <property name="style">reportColumn</property>
+                                        <property name="resultSetColumn">LOCATION</property>
+                                    </data>
+                                </cell>
+                                <cell id="471">
+                                    <data id="1268">
+                                        <property name="style">reportColumn</property>
+                                        <property name="resultSetColumn">USER</property>
+                                    </data>
+                                </cell>
+                                <cell id="451">
+                                    <data id="1266">
+                                        <property name="style">reportColumn</property>
+                                        <property name="resultSetColumn">TERMINAL</property>
+                                    </data>
+                                </cell>
+                                <cell id="1024">
+                                    <data id="1277">
+                                        <property name="style">reportColumn</property>
+                                        <property name="resultSetColumn">Activity_Description</property>
+                                    </data>
+                                </cell>
+                                <cell id="1028">
+                                    <data id="1261">
+                                        <property name="style">reportColumn</property>
+                                        <property name="resultSetColumn">Activity_Sub_Type_Id</property>
+                                    </data>
+                                </cell>
+                                <cell id="1032">
+                                    <data id="1262">
+                                        <property name="style">reportColumn</property>
+                                        <property name="resultSetColumn">Activity_Data</property>
+                                    </data>
+                                </cell>
+                                <cell id="1036">
+                                    <data id="1263">
+                                        <property name="style">reportColumnRight</property>
+                                        <property name="resultSetColumn">OccurrenceCount</property>
+                                    </data>
+                                </cell>
+                                <cell id="1279">
+                                    <data id="1269">
+                                        <property name="style">reportColumn</property>
+                                        <property name="resultSetColumn">LAST_OCCURENCE_DATE_STR</property>
+                                    </data>
+                                </cell>
+                                <cell id="1136">
+                                    <data id="1291">
+                                        <property name="style">reportColumn</property>
+                                        <property name="resultSetColumn">HOUR</property>
+                                    </data>
+                                </cell>
+                            </row>
+                        </detail>
+                        <footer>
+                            <row id="1184">
+                                <list-property name="visibility">
+                                    <structure>
+                                        <property name="format">all</property>
+                                        <expression name="valueExpr">Total.count() > 0</expression>
+                                    </structure>
+                                </list-property>
+                                <cell id="1185">
+                                    <property name="colSpan">9</property>
+                                    <property name="rowSpan">1</property>
+                                    <label id="1205">
+                                        <property name="style">reportColumnCentre</property>
+                                        <property name="textAlign">center</property>
+                                        <text-property name="text" key="NO_ROWS"></text-property>
+                                    </label>
+                                </cell>
+                            </row>
+                        </footer>
+                    </table>
+                </cell>
+            </row>
+        </grid>
+    </body>
+</report>

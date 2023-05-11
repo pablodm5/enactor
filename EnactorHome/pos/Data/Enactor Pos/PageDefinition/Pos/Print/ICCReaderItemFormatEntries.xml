@@ -1,0 +1,337 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<core:documentTemplate xmlns:core="http://www.enactor.com/core" xmlns:retail="http://www.enactor.com/retail" xmlns:ns4="http://www.enactor.com/crm" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803" xmlns:ns6="http://www.apis-it.hr/fin/2012/types/f73" xmlns:ns7="http://www.w3.org/2000/09/xmldsig#" xmlns:ns8="http://www.enactor.com/retail/storedRetailTransaction/service" xmlns:ns9="http://www.fu.gov.si/" xmlns:ns10="http://www.enactor.com/addressLookup/service" xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:ns14="http://www.enactor.com/crm/customerLoyalty/service" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" paginated="false" width="320" messageBase="Pos/Print/ReceiptMessages" title="ICC Reader Item Format Entries" url="Pos/Print/ICCReaderItemFormatEntries">
+    <core:elements/>
+    <core:formatEntry id="basketItem">
+        <core:elements>
+            <core:row styleClass="line-wrapper">
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" styleClass="#{concat('item-name-col', (item.isReturn &amp;&amp; item.voided ? ' return void' : (item.isReturn ? ' return' : (item.voided ? ' void' : ''))))}" id="0">
+                            <core:elements>
+<core:text styleClass="#{concat('item-name', (item.isReturn &amp;&amp; item.voided ? ' return void' : (item.isReturn ? ' return' : (item.voided ? ' void' : ''))))}">
+    <core:text>#{item.description}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" styleClass="#{concat('item-price-no-qty-col', (item.isReturn &amp;&amp; item.voided ? ' return void' : (item.isReturn ? ' return' : (item.voided ? ' void' : ''))))}" id="2">
+                            <core:elements>
+<core:text styleClass="#{concat('item-price-no-qty', (item.isReturn &amp;&amp; item.voided ? ' return void' : (item.isReturn ? ' return' : (item.voided ? ' void' : ''))))}">
+    <core:formatters>
+        <core:formatCurrencyAmount/>
+    </core:formatters>
+    <core:text>#{item.value}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+            <core:formatElement formatId="incrementIndex"/>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="merchandiseItem">
+        <core:elements>
+            <core:assign to="itemModifiersValue" value="0"/>
+            <core:formatElement formatId="itemModifiersValue"/>
+            <core:row styleClass="line-wrapper">
+                <core:rowLine visibility="#{item.isReturn}">
+                    <core:elements>
+                        <core:column maxLines="0" styleClass="#{concat('return-title-col', (item.isReturn &amp;&amp; item.voided ? ' return void' : (item.isReturn ? ' return' : (item.voided ? ' void' : ''))))}" id="0">
+                            <core:elements>
+<core:text messageId="RETURN" styleClass="#{concat('return-title', (item.isReturn &amp;&amp; item.voided ? ' return void' : (item.isReturn ? ' return' : (item.voided ? ' void' : ''))))}"/>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+            <core:row styleClass="line-wrapper">
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" styleClass="#{concat('item-name-col', (item.isReturn &amp;&amp; item.voided ? ' return void' : (item.isReturn ? ' return' : (item.voided ? ' void' : ''))))}" id="0">
+                            <core:elements>
+<core:text styleClass="#{concat('item-name', (item.isReturn &amp;&amp; item.voided ? ' return void' : (item.isReturn ? ' return' : (item.voided ? ' void' : ''))))}">
+    <core:text>#{instanceOf(item, 'com.enactor.mfc.basket.items.IUnknownItem') ? (empty(item.MMGroupDescription) ? item.MMGroupId : item.MMGroupDescription) : item.description}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" styleClass="#{concat('item-qty-col', (item.isReturn &amp;&amp; item.voided ? ' return void' : (item.isReturn ? ' return' : (item.voided ? ' void' : ''))))}" visibility="#{!(abs(item.quantity) == 1 || (item.unitType != null &amp;&amp; !enumEquals(item.unitType, 'UNIT')))}" id="3">
+                            <core:elements>
+<core:text styleClass="#{concat('item-qty', (item.isReturn &amp;&amp; item.voided ? ' return void' : (item.isReturn ? ' return' : (item.voided ? ' void' : ''))))}">
+    <core:formatters>
+        <core:formatNumber/>
+    </core:formatters>
+    <core:text>#{item.quantity}</core:text>
+</core:text>
+<core:text styleClass="#{concat('item-qty', (item.isReturn &amp;&amp; item.voided ? ' return void' : (item.isReturn ? ' return' : (item.voided ? ' void' : ''))))}" visibility="#{notEmpty(item.unitOfMeasureDescription)}">
+    <core:text>#{item.unitOfMeasureDescription}</core:text>
+</core:text>
+<core:text styleClass="#{concat('item-qty', (item.isReturn &amp;&amp; item.voided ? ' return void' : (item.isReturn ? ' return' : (item.voided ? ' void' : ''))))}">
+    <core:text> @ </core:text>
+</core:text>
+<core:text styleClass="#{concat('item-qty', (item.isReturn &amp;&amp; item.voided ? ' return void' : (item.isReturn ? ' return' : (item.voided ? ' void' : ''))))}">
+    <core:formatters>
+        <core:formatCurrencyAmount/>
+    </core:formatters>
+    <core:text>#{item.unitPrice}</core:text>
+</core:text>
+<core:text styleClass="#{concat('item-qty', (item.isReturn &amp;&amp; item.voided ? ' return void' : (item.isReturn ? ' return' : (item.voided ? ' void' : ''))))}" visibility="#{notEmpty(item.unitOfMeasureDescription)}">
+    <core:text>/#{item.unitOfMeasureDescription}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" styleClass="#{concat('item-price-col', (item.isReturn &amp;&amp; item.voided ? ' return void' : (item.isReturn ? ' return' : (item.voided ? ' void' : ''))))}" visibility="#{!(abs(item.quantity) == 1 || (item.unitType != null &amp;&amp; !enumEquals(item.unitType, 'UNIT')))}" id="2">
+                            <core:elements>
+<core:text styleClass="#{concat('item-price', (item.isReturn &amp;&amp; item.voided ? ' return void' : (item.isReturn ? ' return' : (item.voided ? ' void' : ''))))}">
+    <core:formatters>
+        <core:formatCurrencyAmount/>
+    </core:formatters>
+    <core:text>#{item.value}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" styleClass="#{concat('item-price-no-qty-col', (item.isReturn &amp;&amp; item.voided ? ' return void' : (item.isReturn ? ' return' : (item.voided ? ' void' : ''))))}" visibility="#{(abs(item.quantity) == 1 || (item.unitType != null &amp;&amp; !enumEquals(item.unitType, 'UNIT')))}" id="2b">
+                            <core:elements>
+<core:text styleClass="#{concat('item-price-no-qty', (item.isReturn &amp;&amp; item.voided ? ' return void' : (item.isReturn ? ' return' : (item.voided ? ' void' : ''))))}">
+    <core:formatters>
+        <core:formatCurrencyAmount/>
+    </core:formatters>
+    <core:text>#{item.value + itemModifiersValue}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+            <core:formatElement formatId="itemModifiers"/>
+            <core:formatElement formatId="seperator"/>
+            <core:formatElement formatId="incrementIndex"/>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="giftCardItem">
+        <core:elements>
+            <core:row styleClass="line-wrapper">
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" styleClass="#{concat('item-name-col', (item.isReturn &amp;&amp; item.voided ? ' return void' : (item.isReturn ? ' return' : (item.voided ? ' void' : ''))))}" id="description">
+                            <core:elements>
+<core:text styleClass="#{concat('item-name', (item.isReturn &amp;&amp; item.voided ? ' return void' : (item.isReturn ? ' return' : (item.voided ? ' void' : ''))))}">
+    <core:text>#{item.description}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" styleClass="#{concat('item-price-col', (item.isReturn &amp;&amp; item.voided ? ' return void' : (item.isReturn ? ' return' : (item.voided ? ' void' : ''))))}" id="value">
+                            <core:elements>
+<core:text styleClass="#{concat('item-price', (item.isReturn &amp;&amp; item.voided ? ' return void' : (item.isReturn ? ' return' : (item.voided ? ' void' : ''))))}">
+    <core:formatters>
+        <core:formatCurrencyAmount/>
+    </core:formatters>
+    <core:text>#{item.value}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" styleClass="#{concat('item-name-col', (item.isReturn &amp;&amp; item.voided ? ' return void' : (item.isReturn ? ' return' : (item.voided ? ' void' : ''))))}" id="serialNumber">
+                            <core:elements>
+<core:text styleClass="#{concat('item-name', (item.isReturn &amp;&amp; item.voided ? ' return void' : (item.isReturn ? ' return' : (item.voided ? ' void' : ''))))}">
+    <core:text>#{concatenate('(', strings:mangleString(item.giftCardDetails.accountId, 0, 4), ')')}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+            <core:formatElement formatId="seperator"/>
+            <core:formatElement formatId="incrementIndex"/>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="tenderItem">
+        <core:elements>
+            <core:row styleClass="line-wrapper">
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" styleClass="#{concat('tender-title-col', (item.voided ? ' void' : ''))}" id="0">
+                            <core:elements>
+<core:text messageId="TENDER" styleClass="#{concat('tender-title', (item.voided ? ' void' : ''))}"/>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+            <core:row styleClass="line-wrapper">
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" styleClass="#{concat('tender-name-col', (item.voided ? ' void' : ''))}" id="1">
+                            <core:elements>
+<core:text styleClass="#{concat('tender-name', (item.voided ? ' void' : ''))}">
+    <core:text>#{item.description}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" styleClass="#{concat('tender-price-col', (item.voided ? ' void' : ''))}" id="2">
+                            <core:elements>
+<core:text styleClass="#{concat('tender-price', (item.voided ? ' void' : ''))}">
+    <core:formatters>
+        <core:formatCurrencyAmount/>
+    </core:formatters>
+    <core:text>#{abs(item.value)}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+            <core:row styleClass="line-wrapper">
+                <core:rowLine visibility="#{item.foreignAmount != 0}">
+                    <core:elements>
+                        <core:column maxLines="0" styleClass="#{concat('tender-currency-col', (item.voided ? ' void' : ''))}" id="0">
+                            <core:elements>
+<core:text styleClass="#{concat('tender-currency', (item.voided ? ' void' : ''))}">
+    <core:text>#{item.currencyId}</core:text>
+</core:text>
+<core:text styleClass="#{concat('tender-currency', (item.voided ? ' void' : ''))}">
+    <core:text> </core:text>
+</core:text>
+<core:text styleClass="#{concat('tender-currency', (item.voided ? ' void' : ''))}">
+    <core:text>#{item.exchangeRate}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+            <core:formatElement formatId="seperator"/>
+            <core:formatElement formatId="incrementIndex"/>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="itemModifiersValue">
+        <core:elements>
+            <core:tableTemplate listVariableName="modifier" list="#{item.modifiers}" id="Modifiers">
+                <core:formatElement applicability="#{modifier.voided}"/>
+                <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IPricingMethodModifier" formatId="pricingMethodModifier"/>
+                <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IEmployeeDiscountModifier"/>
+                <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IDiscountModifier"/>
+                <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IPromotionModifier"/>
+                <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IPriceOverrideModifier"/>
+                <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IProductWastageModifier"/>
+                <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IEmployeeSaleTransactionDiscountItem"/>
+                <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IReceiptReturnValueModifier"/>
+                <core:formatElement applicability="#{instanceOf(modifier.modifierItem, 'com.enactor.mfc.basket.items.IBasketOptionValuesItem') &amp;&amp; !item.isReturn}"/>
+                <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IProductPreparationOption"/>
+                <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IProductOptionModifier" formatId="productOption"/>
+                <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IAlterationModifier"/>
+                <core:formatElement applicableClassName="com.enactor.mfc.basket.items.ICollectModifier"/>
+                <core:formatElement applicableClassName="com.enactor.mfc.basket.items.ITaxGroupOverrideModifier"/>
+                <core:formatElement/>
+            </core:tableTemplate>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="itemModifiers">
+        <core:elements>
+            <core:assign to="rewardValue" value="0"/>
+            <core:assign to="rewardPoints" value="0"/>
+            <core:assign to="discountValue" value="0"/>
+            <core:tableTemplate listVariableName="modifier" list="#{item.modifiers}" id="Modifiers">
+                <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IPromotionModifier" applicability="#{!modifier.voided}"/>
+                <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IEmployeeDiscountModifier" formatId="employeeDiscountModifier"/>
+                <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IDiscountModifier" applicability="#{enumEquals(modifier.discountType, 'ITEM')}" formatId="discountModifier"/>
+                <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IEmployeeSaleTransactionDiscountItem"/>
+                <core:formatElement/>
+            </core:tableTemplate>
+            <core:row styleClass="line-wrapper" visibility="#{discountValue != 0}">
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" styleClass="item-saving-name-col" id="0">
+                            <core:elements>
+<core:text messageId="ITEM_SAVING" styleClass="item-saving-name"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" styleClass="item-saving-price-col" id="0">
+                            <core:elements>
+<core:text styleClass="item-saving-price">
+    <core:formatters>
+        <core:formatCurrencyAmount/>
+    </core:formatters>
+    <core:text>#{-discountValue}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+            <core:row styleClass="line-wrapper" visibility="#{rewardPoints &gt; 0}">
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" styleClass="item-promotion-name-col" id="0">
+                            <core:elements>
+<core:text messageId="ITEM_SAVING" styleClass="item-promotion-name"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" styleClass="item-promotion-price-col" id="0">
+                            <core:elements>
+<core:text styleClass="item-promotion-price">
+    <core:formatters>
+        <core:formatNumber/>
+    </core:formatters>
+    <core:text>#{rewardPoints}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="promotionModifier">
+        <core:elements>
+            <core:tableTemplate listVariableName="trigger" list="#{modifier.finalTriggers}" id="PromotionTriggers">
+                <core:formatElement applicableClassName="com.enactor.mfc.promotion.calculation.IPromotionSavingItemTrigger" formatId="promotionSavingItemTrigger"/>
+                <core:formatElement applicableClassName="com.enactor.mfc.promotion.calculation.IPromotionPointsItemTrigger" formatId="promotionPointsItemTrigger"/>
+            </core:tableTemplate>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="promotionSavingItemTrigger">
+        <core:elements>
+            <core:assign to="rewardValue" value="#{rewardValue + trigger.rewardValue}"/>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="promotionPointsItemTrigger">
+        <core:elements>
+            <core:assign to="rewardPoints" value="#{rewardPoints + trigger.rewardPoints}"/>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="employeeDiscountModifier">
+        <core:elements>
+            <core:assign to="discountValue" value="#{discountValue + modifier.value}"/>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="discountModifier">
+        <core:elements>
+            <core:assign to="discountValue" value="#{discountValue + modifier.value}"/>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="transactionDiscountItem">
+        <core:elements>
+            <core:assign to="totalTransactionSavingsValue" value="totalTransactionSavingsValue + item.value"/>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="productOption">
+        <core:elements>
+            <core:assign to="itemModifiersValue" value="itemModifiersValue + modifier.modifierItem.value"/>
+        </core:elements>
+    </core:formatEntry>
+</core:documentTemplate>

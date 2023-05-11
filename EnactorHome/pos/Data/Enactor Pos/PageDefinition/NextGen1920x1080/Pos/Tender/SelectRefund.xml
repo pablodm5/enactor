@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<retail:posPromptPage xmlns:core="http://www.enactor.com/core" xmlns:retail="http://www.enactor.com/retail" xmlns:ns4="http://www.enactor.com/crm" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803" xmlns:ns6="http://www.apis-it.hr/fin/2012/types/f73" xmlns:ns7="http://www.w3.org/2000/09/xmldsig#" xmlns:ns8="http://www.enactor.com/retail/storedRetailTransaction/service" xmlns:ns9="http://www.fu.gov.si/" xmlns:ns10="http://www.enactor.com/addressLookup/service" xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:ns14="http://www.enactor.com/crm/customerLoyalty/service" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" allowResize="true" allowMove="true" allowClose="true" height="768" width="1024" messageBase="Pos/Tender/TenderMessages" titleId="SELECT_REFUND_TENDER_TITLE" url="NextGen1920x1080/Pos/Tender/SelectRefund">
+    <core:elements>
+        <core:text messageId="SELECT_REFUND_TENDER" id="Prompt"/>
+        <core:inputText type="textField" focusOrder="1" id="InputBox">
+            <core:text>${enactor.pos.EnteredTenderAmount}</core:text>
+            <core:textElementEvents enterEvent="OKPressed"/>
+        </core:inputText>
+        <core:listBox lazyLoad="false" listSelectionMethod="DEFAULT" documentTemplateUrl="#{view.itemsFormatter}" styleClass="#{notEmpty(view.currentlyInTrainingMode) &amp;&amp; view.currentlyInTrainingMode ? 'receiptTraining' : ((instanceOf(view.transactionHandler.transaction, 'com.enactor.mfc.retail.transaction.IRetailSaleTransaction') &amp;&amp; view.transactionHandler.transaction.isTransactionReversal) ? 'receiptReversal' : 'receipt')}" id="Receipt">
+            <core:templateConstraints allowRemoval="true"/>
+            <core:elements/>
+            <core:listingElementEvents>
+                <core:selectionEvent>DisplayModifyItemFunctions</core:selectionEvent>
+            </core:listingElementEvents>
+        </core:listBox>
+        <retail:menuPageElement menuExpression="#{menu}" id="Tender">
+            <retail:menu menuCatagory="RETAIL" menuType="TREE">
+                <retail:menuSetId></retail:menuSetId>
+                <retail:roleId>
+                    <retail:roleId></retail:roleId>
+                    <retail:regionId groupTypeId="region"></retail:regionId>
+                </retail:roleId>
+                <retail:menuGroupId groupTypeId="menuGroup"></retail:menuGroupId>
+                <retail:menuDefaultGroupId groupTypeId="menuGroup"/>
+                <retail:localeId></retail:localeId>
+                <retail:buttonMenuItem event="CashRefund" position="1" visibility="#{priv:checkPrivilege('enactor.pos.CashRefundAllowed') &amp;&amp; basket:testTenderApplicable('CASH')}" messageId="CASH" label="" id="">
+                    <retail:data>
+                        <core:expression value="CASH" javaInterfaceName="java.lang.String" name="enactor.mfc.TenderId"/>
+                    </retail:data>
+                </retail:buttonMenuItem>
+                <retail:buttonMenuItem event="CardRefund" position="2" visibility="#{priv:checkPrivilege('enactor.pos.CardRefundAllowed') &amp;&amp; basket:testTenderApplicable('CARD')}" messageId="CARD" label="" id="">
+                    <retail:data>
+                        <core:expression value="CARD" javaInterfaceName="java.lang.String" name="enactor.mfc.TenderId"/>
+                        <core:expression value="#{true}" javaInterfaceName="java.lang.Boolean" name="enactor.pos.EnableDualCardTypeSelection"/>
+                    </retail:data>
+                </retail:buttonMenuItem>
+                <retail:menuFolderItem position="3" visibility="#{priv:checkPrivilege('enactor.pos.CashRefundAllowed')}" messageId="FOREIGN_TENDER" label="" id="SubMenuForeign">
+                    <retail:buttonMenuItem event="CashRefund" position="1" visibility="#{priv:checkPrivilege('enactor.pos.CashRefundAllowed') &amp;&amp; basket:testTenderApplicable('CASH_EUR')}" messageId="EURO" label="" id="CashEUR">
+                        <retail:data>
+                            <core:expression value="CASH_EUR" javaInterfaceName="java.lang.String" name="enactor.mfc.TenderId"/>
+                        </retail:data>
+                    </retail:buttonMenuItem>
+                    <retail:buttonMenuItem event="CashRefund" position="2" visibility="#{priv:checkPrivilege('enactor.pos.CashRefundAllowed') &amp;&amp; basket:testTenderApplicable('CASH_USD')}" messageId="USD" label="" id="CashUSD">
+                        <retail:data>
+                            <core:expression value="CASH_USD" javaInterfaceName="java.lang.String" name="enactor.mfc.TenderId"/>
+                        </retail:data>
+                    </retail:buttonMenuItem>
+                    <retail:buttonMenuItem event="CashRefund" position="3" visibility="#{priv:checkPrivilege('enactor.pos.CashRefundAllowed') &amp;&amp; basket:testTenderApplicable('CASH_KWD')}" messageId="KUWAIT_DINAR" label="" id="CashKWD">
+                        <retail:data>
+                            <core:expression value="CASH_KWD" javaInterfaceName="java.lang.String" name="enactor.mfc.TenderId"/>
+                        </retail:data>
+                    </retail:buttonMenuItem>
+                    <retail:buttonMenuItem event="enactor.coreUI.MenuBack" position="8" messageBase="Pos/General/PosMessages" messageId="BUTTON_BACK" label="" id=""/>
+                </retail:menuFolderItem>
+                <retail:buttonMenuItem event="VoidTenderItem" position="4" visibility="#{priv:checkPrivilege('enactor.pos.VoidTenderItemAllowed') &amp;&amp; basket:hasItemClass(basket:getTransactionBasket(), 'com.enactor.mfc.basket.items.ITenderItem')}" messageId="VOID_TENDER_BUTTON" label="" id=""/>
+                <retail:buttonMenuItem event="GiftCardRefund" position="5" visibility="#{priv:checkPrivilege('enactor.pos.GiftCardRefundAllowed') &amp;&amp; basket:testTenderApplicable('GIFT_CARD')}" messageId="GIFT_CARD" label="" id=""/>
+                <retail:menuFolderItem position="6" messageId="CREDIT_NOTE" label="" id="CreditNoteMenu">
+                    <retail:buttonMenuItem event="CreditNoteRefund" position="1" visibility="#{priv:checkPrivilege('enactor.pos.CreditNoteRefundAllowed') &amp;&amp; basket:testTenderApplicable('CREDIT_NOTE')}" messageId="CREDIT_NOTE" label="" id="">
+                        <retail:data>
+                            <core:expression value="CREDIT_NOTE" javaInterfaceName="java.lang.String" name="enactor.mfc.TenderId"/>
+                            <core:expression value="CNT1" javaInterfaceName="java.lang.String" name="enactor.mfc.CreditNoteTypeId"/>
+                        </retail:data>
+                    </retail:buttonMenuItem>
+                    <retail:buttonMenuItem event="CreditNoteRefund" position="2" visibility="#{priv:checkPrivilege('enactor.pos.CreditNoteRefundAllowed') &amp;&amp; basket:testTenderApplicable('CREDIT_NOTE')}" label="Not Fixed Tender" id="">
+                        <retail:data>
+                            <core:expression value="CNT1" javaInterfaceName="java.lang.String" name="enactor.mfc.CreditNoteTypeId"/>
+                        </retail:data>
+                    </retail:buttonMenuItem>
+                    <retail:buttonMenuItem event="enactor.coreUI.MenuBack" position="8" messageBase="Pos/General/PosMessages" messageId="BUTTON_BACK" label="" id=""/>
+                </retail:menuFolderItem>
+                <retail:menuFolderItem position="7" messageId="MORE_TENDERS" label="" id="SubMenuMore1">
+                    <retail:buttonMenuItem event="VoucherRefund" position="1" visibility="#{priv:checkPrivilege('enactor.pos.VoucherRefundAllowed') &amp;&amp; basket:testTenderApplicable('VOUCHER')}" messageId="VOUCHER" label="" id=""/>
+                    <retail:buttonMenuItem event="CardRefund" position="2" visibility="#{priv:checkPrivilege('enactor.pos.CardRefundAllowed') &amp;&amp; basket:testTenderApplicable('CARD')}" messageId="CARD_CNP" label="" id="">
+                        <retail:data>
+                            <core:expression value="true" javaInterfaceName="java.lang.String" name="enactor.pos.CardholderNotPresentStr"/>
+                        </retail:data>
+                    </retail:buttonMenuItem>
+                    <retail:menuFolderItem position="3" messageId="CUSTOMER_ACCOUNT" label="" id="CustomerAccountMenu">
+                        <retail:buttonMenuItem event="CustomerCreditAccountRefund" position="1" visibility="#{priv:checkPrivilege('enactor.pos.CustomerAccountRefundAllowed') &amp;&amp; basket:testTenderApplicable('CUSTOMER_CREDIT')}" messageId="CUSTOMER_CREDIT_ACCOUNT" label="" id="">
+                            <retail:data>
+<core:expression value="CUSTOMER_CREDIT" javaInterfaceName="java.lang.String" name="enactor.mfc.TenderId"/>
+                            </retail:data>
+                        </retail:buttonMenuItem>
+                        <retail:buttonMenuItem event="CustomerDepositAccountRefund" position="2" visibility="#{priv:checkPrivilege('enactor.pos.CustomerAccountRefundAllowed') &amp;&amp; basket:testTenderApplicable('CUSTOMER_DEPOSIT')}" messageId="CUSTOMER_DEPOSIT_ACCOUNT" label="" id="">
+                            <retail:data>
+<core:expression value="CUSTOMER_DEPOSIT" javaInterfaceName="java.lang.String" name="enactor.mfc.TenderId"/>
+                            </retail:data>
+                        </retail:buttonMenuItem>
+                        <retail:buttonMenuItem event="enactor.coreUI.MenuBack" position="8" messageBase="Pos/General/PosMessages" messageId="BUTTON_BACK" label="" id=""/>
+                    </retail:menuFolderItem>
+                    <retail:menuFolderItem position="4" messageId="STORE_FUNCTIONS_BUTTON" label="" id="StoreFunctionsMenu">
+                        <retail:buttonMenuItem event="StoreTransactionByTransactionId" position="1" visibility="priv:checkPrivilege('enactor.pos.StoreByTransactionIdAllowed')" messageBase="Pos/Sale/SaleMessages" messageId="STORE_TRANSACTION_BUTTON" label="" id=""/>
+                        <retail:buttonMenuItem event="StoreTransactionByUser" position="2" visibility="priv:checkPrivilege('enactor.pos.StoreByUserIdAllowed')" messageBase="Pos/Sale/SaleMessages" messageId="STORE_BY_USER_BUTTON" label="" id=""/>
+                        <retail:buttonMenuItem event="StoreTransactionByStorageId" position="3" visibility="priv:checkPrivilege('enactor.pos.StoreByStorageIdAllowed')" messageBase="Pos/Sale/SaleMessages" messageId="STORE_BY_STORAGE_ID_BUTTON" label="" id=""/>
+                        <retail:buttonMenuItem event="StoreTransactionByTable" position="4" visibility="priv:checkPrivilege('enactor.pos.StoreByTableAllowed')" messageBase="Pos/Sale/SaleMessages" messageId="STORE_BY_TABLE_BUTTON" label="" id=""/>
+                        <retail:buttonMenuItem event="StoreTransactionByCustomerId" position="5" visibility="priv:checkPrivilege('enactor.pos.StoreByCustomerIdAllowed')" messageBase="Pos/Sale/SaleMessages" messageId="STORE_BY_CUSTOMER_ID_BUTTON" label="" id=""/>
+                        <retail:buttonMenuItem event="enactor.coreUI.MenuBack" position="8" messageBase="Pos/General/PosMessages" messageId="BUTTON_BACK" label="" id=""/>
+                    </retail:menuFolderItem>
+                    <retail:menuFolderItem position="5" messageId="FORCED_OFFLINE_TENDERS" label="" id="ForcedOfflineTendersMenu">
+                        <retail:buttonMenuItem event="CardRefundOffline" position="1" visibility="#{priv:checkPrivilege('enactor.pos.CardRefundAllowed') &amp;&amp; basket:testTenderApplicable('CARD')}" messageId="CARD_OFFLINE" label="" id="">
+                            <retail:data>
+<core:expression value="CARD" javaInterfaceName="java.lang.String" name="enactor.mfc.TenderId"/>
+                            </retail:data>
+                        </retail:buttonMenuItem>
+                        <retail:buttonMenuItem event="CardRefundOffline" position="2" visibility="#{priv:checkPrivilege('enactor.pos.CardRefundAllowed') &amp;&amp; basket:testTenderApplicable('CARD')}" messageId="CARD_CNP_OFFLINE" label="" id="">
+                            <retail:data>
+<core:expression value="true" javaInterfaceName="java.lang.String" name="enactor.pos.CardholderNotPresentStr"/>
+                            </retail:data>
+                        </retail:buttonMenuItem>
+                        <retail:buttonMenuItem event="GiftCardRefundOffline" position="3" visibility="#{priv:checkPrivilege('enactor.pos.GiftCardRefundAllowed') &amp;&amp; basket:testTenderApplicable('GIFT_CARD')}" messageId="GIFT_CARD_OFFLINE" label="" id=""/>
+                        <retail:buttonMenuItem event="enactor.coreUI.MenuBack" position="8" messageBase="Pos/General/PosMessages" messageId="BUTTON_BACK" label="" id=""/>
+                    </retail:menuFolderItem>
+                    <retail:menuFolderItem position="7" messageId="MORE_TENDERS" label="" id="SubMenuMore2">
+                        <retail:buttonMenuItem event="PaymentServiceRefund" position="1" visibility="#{priv:checkPrivilege('enactor.pos.PaymentServiceRefundAllowed') &amp;&amp; basket:testTenderApplicable('PAYMENTSERVICE')}" messageBase="Pos/PaymentService/PaymentServiceMessages" messageId="BUTTON_PAYMENT_SERVICE_REFUND" label="" id="1">
+                            <retail:data>
+<core:expression value="PAYMENT_SERVICE" javaInterfaceName="java.lang.String" name="enactor.mfc.TenderId"/>
+                            </retail:data>
+                        </retail:buttonMenuItem>
+                        <retail:buttonMenuItem event="PayPalRefund" position="2" visibility="#{priv:checkPrivilege('enactor.pos.PayPalRefundAllowed') &amp;&amp; basket:testTenderApplicable('PAYPAL')}" messageBase="Pos/PayPal/PayPalMessages" messageId="BUTTON_PAYPAL_REFUND" label="" id="">
+                            <retail:data>
+<core:expression value="PAYPAL" javaInterfaceName="java.lang.String" name="enactor.mfc.TenderId"/>
+                            </retail:data>
+                        </retail:buttonMenuItem>
+                        <retail:buttonMenuItem event="PayPalRefund" position="3" visibility="#{priv:checkPrivilege('enactor.pos.PayPalWebRefundAllowed') &amp;&amp; basket:testTenderApplicable('PAYPAL')}" messageBase="Pos/PayPal/PayPalMessages" messageId="BUTTON_PAYPAL_WEB_REFUND" label="" id="">
+                            <retail:data>
+<core:expression value="PAYPAL" javaInterfaceName="java.lang.String" name="enactor.mfc.TenderId"/>
+<core:expression value="true" javaInterfaceName="java.lang.String" name="enactor.pos.TargetOtherAccountStr"/>
+                            </retail:data>
+                        </retail:buttonMenuItem>
+                        <retail:buttonMenuItem event="enactor.coreUI.MenuBack" position="8" messageBase="Pos/General/PosMessages" messageId="BUTTON_BACK" label="" id=""/>
+                    </retail:menuFolderItem>
+                    <retail:buttonMenuItem event="enactor.coreUI.MenuBack" position="8" messageBase="Pos/General/PosMessages" messageId="BUTTON_BACK" label="" id=""/>
+                </retail:menuFolderItem>
+                <retail:buttonMenuItem event="ReturnToSales" position="8" visibility="#{empty(disallowSalesAfterTender) || !disallowSalesAfterTender}" messageId="RETURN_TO_SALES_BUTTON" label="" id=""/>
+            </retail:menu>
+            <retail:renderElement>Button1</retail:renderElement>
+            <retail:renderElement>Button2</retail:renderElement>
+            <retail:renderElement>Button3</retail:renderElement>
+            <retail:renderElement>Button4</retail:renderElement>
+            <retail:renderElement>Button5</retail:renderElement>
+            <retail:renderElement>Button6</retail:renderElement>
+            <retail:renderElement>Button7</retail:renderElement>
+            <retail:renderElement>Button8</retail:renderElement>
+        </retail:menuPageElement>
+        <core:button id="Button1"/>
+        <core:button id="Button2"/>
+        <core:button id="Button3"/>
+        <core:button id="Button4"/>
+        <core:button id="Button5"/>
+        <core:button id="Button6"/>
+        <core:button id="Button7"/>
+        <core:button id="Button8"/>
+    </core:elements>
+    <core:templateURL>NextGen1920x1080/Pos/FullScreenTraditionalPosTemplate</core:templateURL>
+    <core:scannerEnabled>false</core:scannerEnabled>
+    <core:scannerDataName></core:scannerDataName>
+    <core:mSREnabled>true</core:mSREnabled>
+    <core:mSRDataName>enactor.pos.CardTrack2</core:mSRDataName>
+</retail:posPromptPage>

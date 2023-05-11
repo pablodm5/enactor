@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<retail:posPromptPage xmlns:core="http://www.enactor.com/core" xmlns:retail="http://www.enactor.com/retail" xmlns:ns4="http://www.enactor.com/crm" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803" xmlns:ns6="http://www.apis-it.hr/fin/2012/types/f73" xmlns:ns7="http://www.w3.org/2000/09/xmldsig#" xmlns:ns8="http://www.enactor.com/retail/storedRetailTransaction/service" xmlns:ns9="http://www.fu.gov.si/" xmlns:ns10="http://www.enactor.com/addressLookup/service" xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:ns14="http://www.enactor.com/crm/customerLoyalty/service" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" hasBorders="FALSE" windowtype="view-panel" height="800" width="480" messageBase="NextGen/PosMessages" url="NextGen480x800/Pos/Modifier/ModifyItemOptionsPrompt">
+    <core:elements>
+        <retail:menuPageElement menuExpression="#{menu}" id="MODIFIER_ITEM">
+            <retail:menu menuCatagory="RETAIL" menuType="TREE">
+                <retail:menuSetId></retail:menuSetId>
+                <retail:roleId>
+                    <retail:roleId></retail:roleId>
+                    <retail:regionId groupTypeId="region"></retail:regionId>
+                </retail:roleId>
+                <retail:menuGroupId groupTypeId="menuGroup"></retail:menuGroupId>
+                <retail:menuDefaultGroupId groupTypeId="menuGroup"/>
+                <retail:localeId></retail:localeId>
+                <retail:buttonMenuItem event="ItemDiscount" position="1" visibility="#{instanceOf(selectedItem, 'com.enactor.mfc.basket.items.IModifiableItem') &amp;&amp; basket:testItemDiscount() &amp;&amp; priv:checkPrivilege('enactor.pos.DiscountItemAllowed') &amp;&amp; (isEmpty(selectedItem) || !instanceOf(selectedItem, 'com.enactor.customerOrders.retail.basket.items.ICustomerOrderPaymentBasketItem'))}" messageBase="Pos/Sale/SaleMessages" messageId="ITEM_DISCOUNT_BUTTON" label="" id="ItemDiscount"/>
+                <retail:buttonMenuItem event="PriceOverride" position="2" visibility="#{instanceOf(selectedItem, 'com.enactor.mfc.basket.items.IModifiableItem') &amp;&amp; basket:testPriceOverride() &amp;&amp; priv:checkPrivilege('enactor.pos.PriceOverrideAllowed')}" messageBase="Pos/Sale/SaleMessages" messageId="PRICE_OVERRIDE_BUTTON" label="" id="PriceOverride"/>
+                <retail:buttonMenuItem event="DisplayRichProductDetails" position="3" visibility="#{instanceOf(selectedItem, 'com.enactor.mfc.basket.items.ISalesItem') &amp;&amp; !instanceOf(selectedItem, 'com.enactor.mfc.basket.items.IUnknownItem')}" messageBase="NextGen/PosMessages" messageId="PRODUCT_INFO_BUTTON" label="" id="DisplayRichProductDetails">
+                    <retail:data>
+                        <core:expression value="#{instanceOf(selectedItem, 'com.enactor.mfc.basket.items.ISalesItem') ? selectedItem.productID : ''}" javaInterfaceName="java.lang.String" name="com.enactor.productCode"/>
+                    </retail:data>
+                </retail:buttonMenuItem>
+                <retail:buttonMenuItem event="SelectedItemVoid" position="4" visibility="#{instanceOf(selectedItem, 'com.enactor.mfc.basket.items.IVoidableItem')}" messageBase="Pos/Sale/SaleMessages" messageId="ITEM_VOID_BUTTON" label="" id="SelectedItemVoid">
+                    <retail:data>
+                        <core:expression value="true" javaInterfaceName="java.lang.Boolean" name="enactor.pos.ConfirmRequired"/>
+                    </retail:data>
+                </retail:buttonMenuItem>
+            </retail:menu>
+            <retail:renderElement>ModifierButton1</retail:renderElement>
+            <retail:renderElement>ModifierButton2</retail:renderElement>
+            <retail:renderElement>ModifierButton3</retail:renderElement>
+            <retail:renderElement>ModifierButton4</retail:renderElement>
+        </retail:menuPageElement>
+        <core:hidden id="NumericInputPanel"/>
+        <core:hidden id="OverflowButton"/>
+        <core:hidden id="InputBox"/>
+        <core:hidden id="InputBoxBorderPanel"/>
+        <core:label messageId="SHOPPING_BAG" id="TitleLabel"/>
+        <core:panel adjustImagesToSize="false" styleClass="overflowButton" transparentBackground="true" style="ImageStyle=Centered" id="OverflowPanel">
+            <core:boundsConstraint height="76" width="57" y="0" x="423"/>
+            <core:elements/>
+        </core:panel>
+        <core:panel namingContainer="false" styleClass="receiptPanel" visible="true" id="ReceiptPanel">
+            <core:boundsConstraint height="724" width="480" y="76" x="0"/>
+            <core:elements>
+                <core:listBox lazyLoad="false" listSelectionMethod="DEFAULT" documentTemplateUrl="#{view.itemsFormatter}" styleClass="receipt" backgroundColour="#ffffff" id="Receipt">
+                    <core:elements/>
+                </core:listBox>
+                <core:button visible="false" id="TotalButton"/>
+                <core:panel styleClass="bottomSpanButton" visibility="#{basket:testTransactionStarted() &amp;&amp; (!basket:hasItemClass(view.transactionHandler.model.basket, 'com.enactor.mfc.basket.items.IOrderDetailsItem') || !riBasket:testOrderNotReserved())}" id="TotalPanel">
+                    <core:boundsConstraint height="71" width="480" y="566" x="0"/>
+                    <core:elements>
+                        <core:label messageId="MAKE_PAYMENT_BUTTON" styleClass="bottomSpanButton" id="TotalLabel">
+                            <core:boundsConstraint height="71" width="480" y="0" x="0"/>
+                            <core:alignment>CENTRE</core:alignment>
+                            <core:verticalAlignment>CENTRE</core:verticalAlignment>
+                        </core:label>
+                    </core:elements>
+                </core:panel>
+            </core:elements>
+        </core:panel>
+        <core:panel namingContainer="false" id="FooterPanel">
+            <core:boundsConstraint height="87" width="480" y="713" x="0"/>
+            <core:elements>
+                <core:pageElementRef pageDefinitionURL="Pos/FooterButtons" elementIdRef="FooterRefPanelDisabled" transparentBackground="true" id="FOOTER_BUTTONS_PAGE_REFERENCE">
+                    <core:boundsConstraint height="87" width="480" y="0" x="0"/>
+                    <core:elements/>
+                    <core:parameter value="BAG" name="enactor.pos.DisplayHint">
+                        <core:interfaceName>java.lang.String</core:interfaceName>
+                    </core:parameter>
+                </core:pageElementRef>
+            </core:elements>
+        </core:panel>
+        <core:panel namingContainer="false" styleClass="greyedOutPanel" style="ImageStyle=Tiled" id="GreyedOutPanel">
+            <core:boundsConstraint height="724" width="480" y="76" x="0"/>
+            <core:elements>
+                <core:panel namingContainer="false" styleClass="backGroundPanel" id="BackGroundPanel">
+                    <core:boundsConstraint height="312" width="452" y="168" x="14"/>
+                    <core:elements>
+                        <core:panel vAlign="CENTRE" styleClass="modifyProductTitle" transparentBackground="true" id="TitlePanel">
+                            <core:boundsConstraint height="25" width="388" y="19" x="20"/>
+                            <core:elements>
+<core:label messageBase="NextGen/PosMessages" messageId="EDIT_PRODUCT" styleClass="modifyProductTitle" id="EditProductLabel">
+    <core:flowConstraint/>
+    <core:elementPadding right="10"/>
+</core:label>
+<core:label styleClass="modifyProductTitle" id="ProductNumber">
+    <core:flowConstraint/>
+    <core:text>#{selectedItem.productID}</core:text>
+</core:label>
+                            </core:elements>
+                        </core:panel>
+                        <core:button adjustImagesToSize="false" styleClass="modifyProductExitButton" id="CancelButton">
+                            <core:boundsConstraint height="48" width="48" y="4" x="400"/>
+                            <core:text>CancelPressed</core:text>
+                            <core:data>
+<core:expression value="BAG" javaInterfaceName="java.lang.String" name="enactor.pos.DisplayHint"/>
+                            </core:data>
+                        </core:button>
+                        <core:button styleClass="modifyProductButton" id="ModifierButton1">
+                            <core:boundsConstraint height="50" width="412" y="58" x="20"/>
+                        </core:button>
+                        <core:button styleClass="modifyProductButton" id="ModifierButton2">
+                            <core:boundsConstraint height="50" width="412" y="118" x="20"/>
+                        </core:button>
+                        <core:button styleClass="modifyProductButton" id="ModifierButton3">
+                            <core:boundsConstraint height="50" width="412" y="178" x="20"/>
+                        </core:button>
+                        <core:button styleClass="modifyProductVoidButton" id="ModifierButton4">
+                            <core:boundsConstraint height="50" width="412" y="238" x="20"/>
+                            <core:data>
+<core:expression value="#{true}" javaInterfaceName="java.lang.Boolean" name="enactor.pos.ConfirmRequired"/>
+                            </core:data>
+                        </core:button>
+                    </core:elements>
+                </core:panel>
+            </core:elements>
+        </core:panel>
+        <core:hidden id="Button1"/>
+        <core:hidden id="Button2"/>
+        <core:hidden id="Button3"/>
+        <core:hidden id="Button4"/>
+        <core:hidden id="Button5"/>
+        <core:hidden id="Button6"/>
+        <core:hidden id="Button7"/>
+        <core:hidden id="Button8"/>
+    </core:elements>
+    <core:variables>
+        <core:variable name="enactor.coreUI.SelectedItem">
+            <core:interfaceName>java.lang.Object</core:interfaceName>
+        </core:variable>
+    </core:variables>
+</retail:posPromptPage>

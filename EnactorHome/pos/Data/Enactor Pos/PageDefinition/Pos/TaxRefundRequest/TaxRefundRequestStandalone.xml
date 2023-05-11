@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<retail:posPromptPage xmlns:core="http://www.enactor.com/core" xmlns:retail="http://www.enactor.com/retail" xmlns:ns4="http://www.enactor.com/crm" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803" xmlns:ns6="http://www.apis-it.hr/fin/2012/types/f73" xmlns:ns7="http://www.w3.org/2000/09/xmldsig#" xmlns:ns8="http://www.enactor.com/retail/storedRetailTransaction/service" xmlns:ns9="http://www.fu.gov.si/" xmlns:ns10="http://www.enactor.com/addressLookup/service" xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:ns14="http://www.enactor.com/crm/customerLoyalty/service" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" allowResize="true" allowMove="true" allowClose="true" windowtype="view-panel" updateMode="UPDATE_ELEMENTS" messageBase="Pos/Sale/SaleMessages" title="Tax Refund Request Standalone" url="Pos/TaxRefundRequest/TaxRefundRequestStandalone">
+    <core:elements>
+        <core:inputText clearExistingValue="false" type="textField" focusOrder="1" visibility="#{priv:checkPrivilege('enactor.pos.SellItemWithinTaxRefundAllowed')}" id="InputBox">
+            <core:text>${enactor.mfc.ProductCode}</core:text>
+            <core:textElementEvents enterEvent="OKPressed"/>
+        </core:inputText>
+        <retail:menuPageElement menuExpression="#{menu}" id="TaxRefundRequestStandalone">
+            <retail:menu menuCatagory="RETAIL" menuType="TREE">
+                <retail:menuSetId></retail:menuSetId>
+                <retail:roleId>
+                    <retail:roleId></retail:roleId>
+                    <retail:regionId groupTypeId="region"></retail:regionId>
+                </retail:roleId>
+                <retail:menuGroupId groupTypeId="menuGroup"></retail:menuGroupId>
+                <retail:menuDefaultGroupId groupTypeId="menuGroup"/>
+                <retail:localeId></retail:localeId>
+                <retail:buttonMenuFolderItemElement position="1" visibility="#{basket:testTransactionStarted() &amp;&amp; priv:checkPrivilege('enactor.pos.SellWithinTaxRefundStandaloneAllowed')}" messageId="SELL_ITEM_BUTTON" label="" id="Sell">
+                    <retail:buttonMenuItem event="SellProduct" position="1" messageId="SELL_ITEM_BUTTON" label="" id=""/>
+                    <retail:buttonMenuItem event="QuantitySellProduct" position="2" messageId="QUANTITY_SELL_ITEM_BUTTON" label="" id=""/>
+                    <retail:buttonMenuItem event="ProductSearch" position="3" visibility="#{priv:checkPrivilege('enactor.pos.AllowProductSearch')}" messageId="PRODUCT_SEARCH_BUTTON" label="" id="ProductSearch"/>
+                    <retail:buttonMenuItem event="RichProductSearch" position="4" messageId="RICH_PRODUCT_SEARCH" label="" id="RichProductSearch"/>
+                    <retail:buttonMenuItem event="ModifyQuantity" position="5" visibility="#{basket:testTransactionStarted() &amp;&amp; priv:checkPrivilege('enactor.pos.ModifyQuantityAllowed')}" messageId="MODIFY_QUANTITY_BUTTON" label="" id=""/>
+                    <retail:buttonMenuItem event="SellFromProductList" position="6" messageId="SELL_FROM_PRODUCT_LIST_BUTTON" label="" id="">
+                        <retail:data>
+                            <core:expression value="VAS" javaInterfaceName="java.lang.String" name="enactor.mfc.ProductListId"/>
+                        </retail:data>
+                    </retail:buttonMenuItem>
+                    <retail:buttonMenuItem event="SellProductSelectionOptionSet" position="7" visibility="#{priv:checkPrivilege('enactor.pos.SellProductSelectionOptionSetAllowed')}" messageId="SELL_PRODUCT_SELECTION_OPTION_SET_BUTTON" label="" id=""/>
+                    <retail:buttonMenuItem event="enactor.coreUI.MenuBack" position="8" messageBase="Pos/General/PosMessages" messageId="BUTTON_BACK" label="" id=""/>
+                    <retail:button/>
+                </retail:buttonMenuFolderItemElement>
+                <retail:buttonMenuFolderItemElement position="2" visibility="#{basket:testTransactionStarted() &amp;&amp; priv:checkPrivilege('enactor.pos.DiscountsWithinTaxRefundStandaloneAllowed')}" messageId="DISCOUNTS_BUTTON" label="" id="Discounts">
+                    <retail:buttonMenuItemElement event="" position="1" visibility="#{basket:testPriceOverride() &amp;&amp; priv:checkPrivilege('enactor.pos.PriceOverrideAllowed')}" messageId="PRICE_OVERRIDE_BUTTON" label="" id="">
+                        <retail:button>
+                            <core:text>PriceOverride</core:text>
+                        </retail:button>
+                    </retail:buttonMenuItemElement>
+                    <retail:buttonMenuItemElement event="" position="2" visibility="#{basket:testItemDiscount() &amp;&amp; priv:checkPrivilege('enactor.pos.DiscountItemAllowed')}" messageId="ITEM_DISCOUNT_BUTTON" label="" id="">
+                        <retail:button id="Button2">
+                            <core:text>ItemDiscount</core:text>
+                        </retail:button>
+                    </retail:buttonMenuItemElement>
+                    <retail:buttonMenuItemElement event="" position="3" visibility="#{basket:testTransactionDiscount() &amp;&amp; priv:checkPrivilege('enactor.pos.TransactionDiscountAllowed')}" messageId="TRANSACTION_DISCOUNT_BUTTON" label="" id="">
+                        <retail:button>
+                            <core:text>TransactionDiscount</core:text>
+                        </retail:button>
+                    </retail:buttonMenuItemElement>
+                    <retail:menuFolderItem position="4" messageBase="Pos/Promotion/PromotionMessages" messageId="BUTTON_PROMOTIONS" label="" id="Promotions">
+                        <retail:buttonMenuItem event="EnablePromotion" position="1" visibility="#{priv:checkPrivilege('enactor.pos.EnablePromotionAllowed')}" messageBase="Pos/Promotion/PromotionMessages" messageId="ENABLE_PROMOTION_BUTTON" label="" id="EnablePromotion"/>
+                        <retail:buttonMenuItem event="DisablePromotion" position="2" visibility="#{priv:checkPrivilege('enactor.pos.DisablePromotionAllowed')}" messageBase="Pos/Promotion/PromotionMessages" messageId="DISABLE_PROMOTION_BUTTON" label="" id="DisablePromotion"/>
+                        <retail:buttonMenuItem event="RemovePromotion" position="3" visibility="#{priv:checkPrivilege('enactor.pos.RemovePromotionAllowed') &amp;&amp; !basket:getTransactionBasket().currentTargetItemsPromotionsEmpty}" messageBase="Pos/Promotion/PromotionMessages" messageId="REMOVE_PROMOTION_BUTTON" label="" id="RemovePromotion"/>
+                        <retail:buttonMenuItem event="DisableAllAutomaticPromotions" position="4" visibility="#{priv:checkPrivilege('enactor.pos.DisableAllAutomaticPromotionsAllowed')}" messageBase="Pos/Promotion/PromotionMessages" messageId="BUTTON_DISABLE_AUTOMATIC_PROMOTIONS" label="" id="DisableAllAutomaticPromotions"/>
+                        <retail:buttonMenuItem event="EnableAllAutomaticPromotions" position="5" visibility="#{priv:checkPrivilege('enactor.pos.EnableAllAutomaticPromotionsAllowed')}" messageBase="Pos/Promotion/PromotionMessages" messageId="BUTTON_ENABLE_AUTOMATIC_PROMOTIONS" label="" id="EnableAllAutomaticPromotions"/>
+                        <retail:buttonMenuItem event="enactor.coreUI.MenuBack" position="8" messageBase="Pos/General/PosMessages" messageId="BUTTON_BACK" label="" id=""/>
+                    </retail:menuFolderItem>
+                    <retail:buttonMenuItemElement event="" position="8" messageBase="Pos/General/PosMessages" messageId="BUTTON_BACK" label="" id="">
+                        <retail:button>
+                            <core:text>enactor.coreUI.MenuBack</core:text>
+                        </retail:button>
+                    </retail:buttonMenuItemElement>
+                    <retail:button/>
+                </retail:buttonMenuFolderItemElement>
+                <retail:buttonMenuFolderItemElement position="3" visibility="#{basket:testAnyVoidFunctionValid()}" messageId="VOIDS_BUTTON" label="" id="Voids">
+                    <retail:buttonMenuItemElement event="" position="1" visibility="#{basket:testVoidItemValid() &amp;&amp; priv:checkPrivilege('enactor.pos.VoidItemAllowed')}" messageId="ITEM_VOID_BUTTON" label="" id="">
+                        <retail:button>
+                            <core:text>ItemVoid</core:text>
+                        </retail:button>
+                    </retail:buttonMenuItemElement>
+                    <retail:buttonMenuItemElement event="" position="2" visibility="#{basket:testVoidItemValid() &amp;&amp; priv:checkPrivilege('enactor.pos.ScanVoidItemAllowed')}" messageId="SCAN_ITEM_VOID_BUTTON" label="" id="">
+                        <retail:button>
+                            <core:text>ScanItemVoid</core:text>
+                        </retail:button>
+                    </retail:buttonMenuItemElement>
+                    <retail:buttonMenuItemElement event="" position="8" messageBase="Pos/General/PosMessages" messageId="BUTTON_BACK" label="" id="">
+                        <retail:button>
+                            <core:text>enactor.coreUI.MenuBack</core:text>
+                        </retail:button>
+                    </retail:buttonMenuItemElement>
+                    <retail:button/>
+                </retail:buttonMenuFolderItemElement>
+                <retail:buttonMenuItem event="AddTransactionPressed" position="4" messageBase="Pos/TaxRefundRequest/TaxRefundRequestMessages" messageId="BUTTON_ADD_TRANSACTION" label="" id=""/>
+                <retail:buttonMenuItem event="AddVoucherPressed" position="5" messageBase="Pos/TaxRefundRequest/TaxRefundRequestMessages" messageId="BUTTON_ADD_VOUCHER" label="" id=""/>
+                <retail:buttonMenuItem event="CancelPressed" position="6" messageBase="Pos/TaxRefundRequest/TaxRefundRequestMessages" messageId="BUTTON_CANCEL_TRANSACTION" label="" id=""/>
+                <retail:buttonMenuFolderItemElement position="7" messageId="TRANSACTION_FUNCTIONS_BUTTON" label="" id="TransactionFunctions">
+                    <retail:buttonMenuItem event="TaxRefundRequestPostVoid" position="1" visibility="#{transactionHandler.model.isEmpty &amp;&amp; priv:checkPrivilege('enactor.pos.TaxRefundRequestTransactionPostVoidAllowed')}" messageBase="Pos/Sale/SaleMessages" messageId="TAX_REFUND_FROM_REQUEST_POST_VOID_BUTTON" label="" id=""/>
+                    <retail:buttonMenuItem event="TaxRefundRequestFromFile" position="2" visibility="#{transactionHandler.model.isEmpty &amp;&amp; priv:checkPrivilege('enactor.pos.TaxRefundRequestFromFileAllowed')}" messageBase="Pos/Sale/SaleMessages" messageId="TAX_REFUND_FROM_FILE_BUTTON" label="" id=""/>
+                    <retail:buttonMenuItem event="TaxRefundRequestFromArchive" position="3" visibility="#{transactionHandler.model.isEmpty &amp;&amp; priv:checkPrivilege('enactor.pos.TaxRefundRequestFromArchiveAllowed')}" messageBase="Pos/Sale/SaleMessages" messageId="TAX_REFUND_FROM_ARCHIVE_BUTTON" label="" id=""/>
+                    <retail:buttonMenuItem event="enactor.coreUI.MenuBack" position="8" messageBase="Pos/General/PosMessages" messageId="BUTTON_BACK" label="" id=""/>
+                    <retail:button/>
+                </retail:buttonMenuFolderItemElement>
+                <retail:buttonMenuItemElement event="" position="8" visibility="#{basket:testTransactionStarted()}" messageBase="Pos/General/PosMessages" messageId="BUTTON_COMPLETE" label="" id="">
+                    <retail:button>
+                        <core:text>Complete</core:text>
+                    </retail:button>
+                </retail:buttonMenuItemElement>
+            </retail:menu>
+            <retail:renderElement>Button1</retail:renderElement>
+            <retail:renderElement>Button2</retail:renderElement>
+            <retail:renderElement>Button3</retail:renderElement>
+            <retail:renderElement>Button4</retail:renderElement>
+            <retail:renderElement>Button5</retail:renderElement>
+            <retail:renderElement>Button6</retail:renderElement>
+            <retail:renderElement>Button7</retail:renderElement>
+            <retail:renderElement>Button8</retail:renderElement>
+        </retail:menuPageElement>
+        <core:button id="Button1"/>
+        <core:button id="Button2"/>
+        <core:button id="Button3"/>
+        <core:button id="Button4"/>
+        <core:button id="Button5"/>
+        <core:button id="Button6"/>
+        <core:button id="Button7"/>
+        <core:button id="Button8"/>
+        <core:text visible="false" id="Prompt"/>
+    </core:elements>
+    <core:templateURL>Pos/StandardPosTemplate</core:templateURL>
+    <core:variables>
+        <core:variable name="operatorMessage">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.mfc.TransactionHandler">
+            <core:interfaceName>com.enactor.mfc.retail.transaction.IRetailTransactionHandler</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.coreUI.User">
+            <core:interfaceName>com.enactor.core.signOn.ISignedOnUser</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.coreUI.List">
+            <core:interfaceName>java.util.List</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.coreUI.ListHeader">
+            <core:interfaceName>java.lang.Object</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.coreUI.ListFooter">
+            <core:interfaceName>java.lang.Object</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.pos.ItemsFormatter">
+            <core:interfaceName>com.enactor.coreUI.print.IDocumentFormatter</core:interfaceName>
+        </core:variable>
+    </core:variables>
+    <core:scannerEnabled>#{priv:checkPrivilege('enactor.pos.SellWithinTaxRefundStandaloneAllowed')}</core:scannerEnabled>
+    <core:scannerDataName>enactor.pos.ProductCodeScanned
+	</core:scannerDataName>
+    <core:mSREnabled>true</core:mSREnabled>
+    <core:mSRDataName>enactor.pos.CardTrack2</core:mSRDataName>
+</retail:posPromptPage>

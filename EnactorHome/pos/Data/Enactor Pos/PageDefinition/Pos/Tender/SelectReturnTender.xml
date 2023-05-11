@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<retail:posPromptPage xmlns:core="http://www.enactor.com/core" xmlns:retail="http://www.enactor.com/retail" xmlns:ns4="http://www.enactor.com/crm" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803" xmlns:ns6="http://www.apis-it.hr/fin/2012/types/f73" xmlns:ns7="http://www.w3.org/2000/09/xmldsig#" xmlns:ns8="http://www.enactor.com/retail/storedRetailTransaction/service" xmlns:ns9="http://www.fu.gov.si/" xmlns:ns10="http://www.enactor.com/addressLookup/service" xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:ns14="http://www.enactor.com/crm/customerLoyalty/service" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" allowResize="true" allowMove="true" allowClose="true" height="625" width="801" messageBase="Pos/Tender/TenderMessages" titleId="SELECT_REFUND_TENDER_TITLE" url="Pos/Tender/SelectReturnTender">
+    <core:elements>
+        <core:text messageId="SELECT_RETURN_TENDER" id="Prompt">
+            <core:uiMessage messageId="SELECT_RETURN_TENDER_CARD" applicability="returnOriginalTenderDetail.tenderType == 'cardTender'"/>
+        </core:text>
+        <core:button messageId="BUTTON_OK" id="Button1">
+            <core:text>OKPressed</core:text>
+        </core:button>
+        <core:button messageId="BUTTON_SKIP_ONE_ORIGINAL_TENDER" visibility="#{priv:checkPrivilege('enactor.pos.SkipOneReturnOriginalTenderAllowed')}" id="Button7">
+            <core:text>SkipPressed</core:text>
+        </core:button>
+        <core:button messageId="BUTTON_SKIP_ALL_ORIGINAL_TENDERS" visibility="#{priv:checkPrivilege('enactor.pos.SkipAllReturnOriginalTenderAllowed')}" id="Button8">
+            <core:text>CancelPressed</core:text>
+        </core:button>
+        <core:listBox lazyLoad="false" listSelectionMethod="DEFAULT" documentTemplateUrl="Pos/Tender/TenderEntityListTemplate" styleClass="tenderSelectionList" id="SelectionList">
+            <core:boundsConstraint/>
+            <core:elements/>
+            <core:listExpression>#{list}</core:listExpression>
+            <core:listingElementEvents>
+                <core:selectionEvent>page.SelectionList.changed</core:selectionEvent>
+            </core:listingElementEvents>
+            <core:selectableExpression>#{basket:testCreditTenderAvailable(selectedItem.tenderId, posTerminal)}</core:selectableExpression>
+            <core:startWithFirstItemExpression>#{true}</core:startWithFirstItemExpression>
+        </core:listBox>
+        <core:button messageId="BUTTON_UP" styleClass="navigation-up" visibility="#{page['SelectionList'].visible &amp;&amp; page['SelectionList'].moveUp}" id="Button2">
+            <core:updateTriggers>
+                <core:element>SelectionList</core:element>
+            </core:updateTriggers>
+            <core:text>page.SelectionList.up</core:text>
+        </core:button>
+        <core:button messageId="BUTTON_DOWN" styleClass="navigation-down" visibility="#{page['SelectionList'].visible &amp;&amp; page['SelectionList'].moveDown}" id="Button6">
+            <core:updateTriggers>
+                <core:element>SelectionList</core:element>
+            </core:updateTriggers>
+            <core:text>page.SelectionList.down</core:text>
+        </core:button>
+        <core:hidden id="InputBox"/>
+        <core:hidden id="Receipt"/>
+    </core:elements>
+    <core:templateURL>Pos/StandardPosTemplate</core:templateURL>
+    <core:events>
+        <core:event destination="enactor.Prompt" event="key.EnterPressed">OKPressed</core:event>
+        <core:event destination="SelectionList" event="key.UpPressed">up</core:event>
+        <core:event destination="SelectionList" event="key.DownPressed">down</core:event>
+    </core:events>
+    <core:variables>
+        <core:variable required="true" name="enactor.coreUI.List">
+            <core:interfaceName>java.util.List</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.mfc.ReturnOriginalTenderDetail">
+            <core:interfaceName>com.enactor.mfc.basket.items.IReturnOriginalTenderDetail</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.mfc.PosTerminal">
+            <core:interfaceName>com.enactor.mfc.posTerminal.IPOSTerminal</core:interfaceName>
+        </core:variable>
+    </core:variables>
+    <core:scannerEnabled>false</core:scannerEnabled>
+    <core:scannerDataName></core:scannerDataName>
+</retail:posPromptPage>

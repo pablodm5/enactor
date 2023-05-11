@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<core:documentTemplate xmlns:core="http://www.enactor.com/core" xmlns:retail="http://www.enactor.com/retail" xmlns:ns4="http://www.enactor.com/crm" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803" xmlns:ns6="http://www.apis-it.hr/fin/2012/types/f73" xmlns:ns7="http://www.w3.org/2000/09/xmldsig#" xmlns:ns8="http://www.enactor.com/retail/storedRetailTransaction/service" xmlns:ns9="http://www.fu.gov.si/" xmlns:ns10="http://www.enactor.com/addressLookup/service" xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:ns14="http://www.enactor.com/crm/customerLoyalty/service" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" paginated="false" messageBase="Pos/Tender/TenderMessages" title="Split Bill Select Items" url="Pos/SplitBill/SelectItemsTemplate">
+    <core:elements>
+        <core:tableTemplate list="#{basket.itemIterator}" id="SelectItemsList">
+            <core:formatElement applicableEntityName="listHeader" formatId="listHeader"/>
+            <core:formatElement applicableEntityName="listFooter" formatId="emptyRow"/>
+            <core:formatElement applicability="#{!((item.splitNumber == selectedSplitNumber) || (item.splitNumber == 0 &amp;&amp; selectedSplitNumber == 1))}" formatId="emptyRow"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IMerchandiseItem" applicability="#{abs(item.quantity) &lt;= 1 &amp;&amp; !item.voided}" formatId="merchandiseItem"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.IMerchandiseItem" applicability="#{abs(item.quantity) &gt; 1 &amp;&amp; !item.voided}" formatId="merchandiseItemMultiple"/>
+            <core:formatElement applicableClassName="com.enactor.mfc.basket.items.ISalesItem" applicability="#{!item.voided}" formatId="basketItem"/>
+            <core:formatElement formatId="emptyRow"/>
+        </core:tableTemplate>
+    </core:elements>
+    <core:includedTemplateUrl>Pos/Print/StandardDisplayTemplate</core:includedTemplateUrl>
+    <core:formatEntry id="listHeader">
+        <core:elements>
+            <core:row styleClass="basketHeader" colour="blue" style="DOUBLE_HIGH;DOUBLE_WIDE">
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" align="CENTRE" columnDefId="0">
+                            <core:elements>
+<core:text messageId="SPLIT_ITEMS_HEADER"/>
+<core:text>
+    <core:text> </core:text>
+</core:text>
+<core:text>
+    <core:text>#{selectedSplitNumber}</core:text>
+</core:text>
+<core:text>
+    <core:text> </core:text>
+</core:text>
+<core:text>
+    <core:formatters>
+        <core:formatCurrencyAmount/>
+    </core:formatters>
+    <core:text>#{billSplit.tenderAmount}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="emptyRow">
+        <core:elements>
+            <core:row visible="false">
+                <core:rowLine>
+                    <core:elements/>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+</core:documentTemplate>

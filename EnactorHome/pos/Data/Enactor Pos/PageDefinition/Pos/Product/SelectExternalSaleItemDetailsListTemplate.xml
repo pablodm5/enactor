@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<core:documentTemplate xmlns:core="http://www.enactor.com/core" xmlns:retail="http://www.enactor.com/retail" xmlns:ns4="http://www.enactor.com/crm" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803" xmlns:ns6="http://www.apis-it.hr/fin/2012/types/f73" xmlns:ns7="http://www.w3.org/2000/09/xmldsig#" xmlns:ns8="http://www.enactor.com/retail/storedRetailTransaction/service" xmlns:ns9="http://www.fu.gov.si/" xmlns:ns10="http://www.enactor.com/addressLookup/service" xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:ns14="http://www.enactor.com/crm/customerLoyalty/service" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" paginated="false" messageBase="Pos/Product/ExternalSaleMessages" title="SELECT_EXTERNAL_SALE_ITEM_TITLE" url="Pos/Product/SelectExternalSaleItemDetailsListTemplate">
+    <core:elements>
+        <core:tableTemplate id="List">
+            <core:formatElement applicableClassName="java.util.Map" applicability="#{!contains(selectedItems,item)}" formatId="unselectedProductItem"/>
+            <core:formatElement applicableClassName="java.util.Map" applicability="#{contains(selectedItems,item)}" formatId="selectedProductItem"/>
+            <core:formatElement applicableEntityName="listHeader" formatId="listHeader"/>
+            <core:formatElement applicableEntityName="listFooter"/>
+        </core:tableTemplate>
+    </core:elements>
+    <core:columnDefs>
+        <core:columnDef id="1" start="0" end="20"/>
+        <core:columnDef id="2" start="20" end="75"/>
+        <core:columnDef id="3" start="75" end="80"/>
+        <core:columnDef id="4" start="80" end="95" align="RIGHT"/>
+        <core:columnDef id="5" start="5" end="34"/>
+        <core:columnDef id="6" start="36" end="64"/>
+        <core:columnDef id="7" start="66" end="95"/>
+    </core:columnDefs>
+    <core:formatEntry id="unselectedProductItem">
+        <core:elements>
+            <core:row styleClass="recallListItem">
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="1" id="1">
+                            <core:elements>
+<core:text>
+    <core:text>#{item['productId']}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="2" id="2">
+                            <core:elements>
+<core:text>
+    <core:text>#{item['productDescription']}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="3" id="3">
+                            <core:elements>
+<core:text>
+    <core:text>#{item['quantity']}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="4" id="4">
+                            <core:elements>
+<core:text>
+    <core:formatters>
+        <core:formatCurrencyAmount/>
+    </core:formatters>
+    <core:text>#{item['unitPrice']}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine visibility="#{!empty(item['SP:sizeKey.sizeId']) || !empty(item['SP:colourKey.colourId']) || !empty(item['SP:styleId'])}">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="5" id="5">
+                            <core:elements>
+<core:text messageId="SELECT_EXTERNAL_SALE_ITEM_STYLE"/>
+<core:text>
+    <core:text> #{empty(item['SP:styleId']) ? '-' : item['SP:styleId']}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="6" id="6">
+                            <core:elements>
+<core:text messageId="SELECT_EXTERNAL_SALE_ITEM_COLOUR"/>
+<core:text visibility="#{!empty(item['SP:colourKey.colourId']) &amp;&amp; !empty(item['SP:colourKey.colourRangeId'])}">
+    <core:text> #{empty(productColour) || empty(productColour.description) ? item['colourKey.colourId'] : getLocalisedString(productColour.localisedDescription, userLocale.locale)}</core:text>
+</core:text>
+<core:text visibility="#{empty(item['SP:colourKey.colourId']) || empty(item['SP:colourKey.colourRangeId'])}">
+    <core:text> #{empty(item['SP:colourKey.colourId']) ? '-' : item['SP:colourKey.colourId']}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="7" id="7">
+                            <core:elements>
+<core:text messageId="SELECT_EXTERNAL_SALE_ITEM_SIZE"/>
+<core:text visibility="#{!empty(item['SP:sizeKey.sizeId']) &amp;&amp; !empty(item['SP:sizeKey.sizeRangeId'])}">
+    <core:text> #{empty(productSize) || empty(productSize.description) ? item['SP:sizeKey.sizeId'] : getLocalisedString(productSize.localisedDescription, userLocale.locale)}</core:text>
+</core:text>
+<core:text visibility="#{empty(item['SP:sizeKey.sizeId']) || empty(item['SP:sizeKey.sizeRangeId'])}">
+    <core:text> #{empty(item['SP:sizeKey.sizeId']) ? '-' : item['SP:sizeKey.sizeId']}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+        <core:entityReferences>
+            <core:entityReference name="productSize" entityName="size" entityNamespace="http://www.enactor.com/mfc">
+                <core:keyProperty name="sizeId" value="#{item['SP:sizeKey.sizeId']}"/>
+                <core:keyProperty name="sizeRangeId" value="#{item['SP:sizeKey.sizeRangeId']}"/>
+            </core:entityReference>
+            <core:entityReference name="productColour" entityName="colour" entityNamespace="http://www.enactor.com/mfc">
+                <core:keyProperty name="colourId" value="#{item['SP:colourKey.colourId']}"/>
+                <core:keyProperty name="colourRangeId" value="#{item['SP:colourKey.colourRangeId']}"/>
+            </core:entityReference>
+        </core:entityReferences>
+    </core:formatEntry>
+    <core:formatEntry id="selectedProductItem">
+        <core:elements>
+            <core:row styleClass="recallListItemSelected" backgroundColour="#33CC33" style="SOLID_BACKGROUND">
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="1" id="1">
+                            <core:elements>
+<core:text>
+    <core:text>#{item['productId']}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="2" id="2">
+                            <core:elements>
+<core:text>
+    <core:text>#{item['productDescription']}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="3" id="3">
+                            <core:elements>
+<core:text>
+    <core:text>#{item['quantity']}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="4" id="4">
+                            <core:elements>
+<core:text>
+    <core:formatters>
+        <core:formatCurrencyAmount/>
+    </core:formatters>
+    <core:text>#{item['unitPrice']}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine visibility="#{!empty(item['SP:sizeKey.sizeId']) || !empty(item['SP:colourKey.colourId']) || !empty(item['SP:styleId'])}">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="5" id="5">
+                            <core:elements>
+<core:text messageId="SELECT_EXTERNAL_SALE_ITEM_STYLE"/>
+<core:text>
+    <core:text> #{empty(item['SP:styleId']) ? '-' : item['SP:styleId']}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="6" id="6">
+                            <core:elements>
+<core:text messageId="SELECT_EXTERNAL_SALE_ITEM_COLOUR"/>
+<core:text visibility="#{!empty(item['SP:colourKey.colourId']) &amp;&amp; !empty(item['SP:colourKey.colourRangeId'])}">
+    <core:text> #{empty(productColour) || empty(productColour.description) ? item['colourKey.colourId'] : getLocalisedString(productColour.localisedDescription, userLocale.locale)}</core:text>
+</core:text>
+<core:text visibility="#{empty(item['SP:colourKey.colourId']) || empty(item['SP:colourKey.colourRangeId'])}">
+    <core:text> #{empty(item['SP:colourKey.colourId']) ? '-' : item['SP:colourKey.colourId']}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="7" id="7">
+                            <core:elements>
+<core:text messageId="SELECT_EXTERNAL_SALE_ITEM_SIZE"/>
+<core:text visibility="#{!empty(item['SP:sizeKey.sizeId']) &amp;&amp; !empty(item['SP:sizeKey.sizeRangeId'])}">
+    <core:text> #{empty(productSize) || empty(productSize.description) ? item['SP:sizeKey.sizeId'] : getLocalisedString(productSize.localisedDescription, userLocale.locale)}</core:text>
+</core:text>
+<core:text visibility="#{empty(item['SP:sizeKey.sizeId']) || empty(item['SP:sizeKey.sizeRangeId'])}">
+    <core:text> #{empty(item['SP:sizeKey.sizeId']) ? '-' : item['SP:sizeKey.sizeId']}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+        <core:entityReferences>
+            <core:entityReference name="productSize" entityName="size" entityNamespace="http://www.enactor.com/mfc">
+                <core:keyProperty name="sizeId" value="#{item['SP:sizeKey.sizeId']}"/>
+                <core:keyProperty name="sizeRangeId" value="#{item['SP:sizeKey.sizeRangeId']}"/>
+            </core:entityReference>
+            <core:entityReference name="productColour" entityName="colour" entityNamespace="http://www.enactor.com/mfc">
+                <core:keyProperty name="colourId" value="#{item['SP:colourKey.colourId']}"/>
+                <core:keyProperty name="colourRangeId" value="#{item['SP:colourKey.colourRangeId']}"/>
+            </core:entityReference>
+        </core:entityReferences>
+    </core:formatEntry>
+    <core:formatEntry id="listHeader">
+        <core:elements>
+            <core:row styleClass="listHeader" style="ITALIC">
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="1" id="1">
+                            <core:elements>
+<core:text messageId="SELECT_EXTERNAL_SALE_ITEM_PRODUCT_ID"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="2" id="2">
+                            <core:elements>
+<core:text messageId="SELECT_EXTERNAL_SALE_ITEM_DESCRIPTION"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="3" id="3">
+                            <core:elements>
+<core:text messageId="SELECT_EXTERNAL_SALE_ITEM_QUANTITY"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="4" id="4">
+                            <core:elements>
+<core:text messageId="SELECT_EXTERNAL_SALE_ITEM_PRICE"/>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+</core:documentTemplate>

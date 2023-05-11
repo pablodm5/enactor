@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<retail:posPromptPage xmlns:core="http://www.enactor.com/core" xmlns:retail="http://www.enactor.com/retail" xmlns:ns4="http://www.enactor.com/crm" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803" xmlns:ns6="http://www.apis-it.hr/fin/2012/types/f73" xmlns:ns7="http://www.w3.org/2000/09/xmldsig#" xmlns:ns8="http://www.enactor.com/retail/storedRetailTransaction/service" xmlns:ns9="http://www.fu.gov.si/" xmlns:ns10="http://www.enactor.com/addressLookup/service" xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:ns14="http://www.enactor.com/crm/customerLoyalty/service" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" height="768" width="1006" messageBase="POSInventoryManagement/RaiseSOROrder/RaiseSOROrderMessages" url="POSInventoryManagement/RaiseSOROrder/RaiseSOROrderSummary">
+    <core:elements>
+        <core:hidden id="Receipt"/>
+        <core:hidden id="SelectionList"/>
+        <core:hidden id="InputBox"/>
+        <core:text id="Prompt">
+            <core:uiMessage messageId="ABOUT_TO_SUBMIT" applicability="!historyFlag"/>
+            <core:uiMessage messageId="VIEW_BRANCH_COPY" applicability="historyFlag"/>
+        </core:text>
+        <core:button messageBase="POSInventoryManagement/Common/GeneralMessages" id="Button1">
+            <core:uiMessage messageId="CONFIRM_BUTTON_LABEL" messageBase="POSInventoryManagement/Common/GeneralMessages" applicability="isEmpty(historyFlag)||historyFlag==false"/>
+            <core:uiMessage messageId="REPRINT_BUTTON" messageBase="POSInventoryManagement/RaiseSOROrder/RaiseSOROrderMessages" applicability="historyFlag"/>
+            <core:text>ConfirmPressed</core:text>
+        </core:button>
+        <core:button messageBase="POSInventoryManagement/Common/GeneralMessages" messageId="CANCEL_BUTTON_LABEL" id="Button8">
+            <core:text>CancelPressed</core:text>
+        </core:button>
+        <core:button messageBase="POSInventoryManagement/Common/GeneralMessages" messageId="BACK_BUTTON_LABEL" id="Button7">
+            <core:text>BackPressed</core:text>
+        </core:button>
+        <core:button messageId="VIEW_BRANCH_COPY_BUTTON" visibility="historyFlag" id="Button2">
+            <core:text>ViewPressed</core:text>
+        </core:button>
+        <core:button messageBase="POSInventoryManagement/Common/GeneralMessages" messageId="SUSPEND_BUTTON_LABEL" visibility="!historyFlag" id="Button3">
+            <core:text>SuspendPressed</core:text>
+        </core:button>
+        <core:panel id="PagingSelectionListPanel">
+            <core:elements>
+                <core:listBox lazyLoad="false" listSelectionMethod="DEFAULT" documentTemplateUrl="POSInventoryManagement/RaiseSOROrder/RaiseSOROrderSummaryListTemplate" selectedIndex="0" styleClass="dataListBox" id="PagingSelectionListBoxNarrow">
+                    <core:boundsConstraint height="197" width="821" y="165" x="0"/>
+                    <core:elements/>
+                    <core:listExpression>#{raiseSOROrderItemsList}</core:listExpression>
+                    <core:dataExpression>item</core:dataExpression>
+                    <core:selectedIndices>
+                        <item>0</item>
+                    </core:selectedIndices>
+                </core:listBox>
+                <core:panel id="PagingSelectionHeaderPanelExtraLarge">
+                    <core:boundsConstraint height="165" width="821" y="0" x="0"/>
+                    <core:elements>
+                        <core:label messageId="SOR_ORDER_ID_LABEL" styleClass="formFieldLabel" id="SOR_ORDER_ID_LABEL">
+                            <core:boundsConstraint height="22" width="191" y="10" x="25"/>
+                        </core:label>
+                        <core:label messageId="SUPPLIER_LABEL" styleClass="formFieldLabel" id="SUPPLIER_LABEL">
+                            <core:boundsConstraint height="22" width="148" y="46" x="25"/>
+                        </core:label>
+                        <core:label messageId="TOTAL_COST_LABEL" styleClass="formFieldLabel" id="TOTAL_COST_LABEL">
+                            <core:boundsConstraint height="22" width="148" y="120" x="25"/>
+                        </core:label>
+                        <core:label messageId="TOTAL_RETAIL_LABEL" styleClass="formFieldLabel" id="TOTAL_RETAIL_LABEL">
+                            <core:boundsConstraint height="22" width="148" y="120" x="440"/>
+                        </core:label>
+                        <core:inputText editable="false" styleClass="formInputText" transparentBackground="true" id="DISPATCH_ID">
+                            <core:boundsConstraint height="28" width="145" y="7" x="280"/>
+                            <core:text>#{raiseSOROrderHeader.raiseSOROrderHeaderId}</core:text>
+                        </core:inputText>
+                        <core:inputText editable="false" styleClass="formInputText" transparentBackground="true" id="TOTAL_COST">
+                            <core:boundsConstraint height="28" width="145" y="120" x="280"/>
+                            <core:text>#{format:formatAmount(totalCost)}</core:text>
+                        </core:inputText>
+                        <core:inputText editable="false" styleClass="formInputText" transparentBackground="true" id="TOTAL_RETAIL">
+                            <core:boundsConstraint height="28" width="116" y="120" x="612"/>
+                            <core:text>#{format:formatAmount(totalRetail)}</core:text>
+                        </core:inputText>
+                        <core:inputText editable="false" styleClass="formInputText" transparentBackground="true" enabled="true" id="SUPPLIER_ID">
+                            <core:boundsConstraint height="28" width="145" y="44" x="280"/>
+                            <core:text>#{raiseSOROrderHeader.retailSupplierDetails.supplierId}</core:text>
+                            <core:validationData>
+<core:stringFieldValidationData>
+    <core:type>String</core:type>
+    <core:inputMask></core:inputMask>
+    <core:validationClassname></core:validationClassname>
+</core:stringFieldValidationData>
+                            </core:validationData>
+                        </core:inputText>
+                        <core:inputText editable="false" styleClass="formInputText" transparentBackground="true" enabled="true" id="SUPPLIER_NAME">
+                            <core:boundsConstraint height="28" width="258" y="44" x="437"/>
+                            <core:text>#{raiseSOROrderHeader.retailSupplierDetails.name}</core:text>
+                        </core:inputText>
+                        <core:label messageId="EXPECTED_DELIVERY_DATE_LABEL" styleClass="formFieldLabel" id="EXPECTED_DELIVERY_DATE_LABEL">
+                            <core:boundsConstraint height="22" width="224" y="86" x="25"/>
+                        </core:label>
+                        <core:inputText editable="false" styleClass="formInputText" transparentBackground="true" enabled="true" id="EXPECTED_DELIVERY_DATE">
+                            <core:boundsConstraint height="28" width="145" y="83" x="280"/>
+                            <core:text>#{format:formatDate(raiseSOROrderHeader.expectedDeliveryDate.localDateTime)}</core:text>
+                            <core:validationData>
+<core:dateFieldValidationData>
+    <core:type>Date</core:type>
+    <core:allowNulls>true</core:allowNulls>
+    <core:inputMask></core:inputMask>
+    <core:validationClassname></core:validationClassname>
+    <core:inputFormat>shortDate</core:inputFormat>
+</core:dateFieldValidationData>
+                            </core:validationData>
+                        </core:inputText>
+                    </core:elements>
+                </core:panel>
+                <core:panel id="PagingSelectionPageControlsPanel">
+                    <core:elements>
+                        <core:panel hAlign="CENTRE" id="PagingSelectionPageControlsReferencePanel">
+                            <core:flowConstraint width="100%" height="100%"/>
+                            <core:elements>
+<core:pageElementRef pageDefinitionURL="POSInventoryManagement/Common/POSInventoryManagementPagedListPageControl" id="PAGE_CONTROLS">
+    <core:flowConstraint/>
+    <core:elements/>
+    <core:parameter value="#{raiseSOROrderItemsList}" name="enactor.coreUI.List">
+        <core:interfaceName>com.enactor.core.database.list.IPagedList</core:interfaceName>
+    </core:parameter>
+    <core:parameter value="#{pageSize}" name="enactor.coreUI.PageSize">
+        <core:interfaceName>java.lang.Integer</core:interfaceName>
+    </core:parameter>
+</core:pageElementRef>
+                            </core:elements>
+                        </core:panel>
+                    </core:elements>
+                </core:panel>
+            </core:elements>
+        </core:panel>
+    </core:elements>
+    <core:templateURL>Standard1024x768/Pos/FullScreenTraditionalPosTemplate</core:templateURL>
+    <core:variables>
+        <core:variable name="enactor.mfc.RaiseSOROrderHeader">
+            <core:interfaceName>com.enactor.storeInventoryManagement.local.raiseSOROrder.RaiseSOROrderHeader</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.mfc.RaiseSOROrderItemsList">
+            <core:interfaceName>java.util.List</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.inventoryManagement.local.TotalItemQuantity">
+            <core:interfaceName>java.lang.Integer</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.inventoryManagement.local.ItemCount">
+            <core:interfaceName>java.lang.Integer</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.inventoryManagement.InventoryLevelsMap">
+            <core:interfaceName>java.util.Map</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.coreUI.UserLocale">
+            <core:interfaceName>com.enactor.core.localisation.ILocale</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.inventoryManagement.HistoryFlag">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.mfc.RetailSupplier">
+            <core:interfaceName>com.enactor.mfc.supplier.IRetailSupplier</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.inventoryManagement.local.TotalCost">
+            <core:interfaceName>java.lang.Integer</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.inventoryManagement.local.TotalRetail">
+            <core:interfaceName>java.lang.Integer</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.mfc.BaseCurrency">
+            <core:interfaceName>com.enactor.mfc.currency.ICurrency</core:interfaceName>
+        </core:variable>
+    </core:variables>
+</retail:posPromptPage>

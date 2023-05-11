@@ -1,0 +1,9 @@
+CREATE DATABASE enactorEM;
+GO 
+USE [enactorEM];
+GO 
+CREATE LOGIN enactor WITH PASSWORD = 'En4ct0r1664';
+CREATE USER enactor FOR LOGIN enactor;
+ALTER SERVER ROLE [sysadmin] ADD MEMBER [enactor]; 
+GRANT ALL TO enactor WITH GRANT OPTION;
+GO 

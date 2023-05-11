@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<retail:posPromptPage xmlns:core="http://www.enactor.com/core" xmlns:retail="http://www.enactor.com/retail" xmlns:ns4="http://www.enactor.com/crm" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803" xmlns:ns6="http://www.apis-it.hr/fin/2012/types/f73" xmlns:ns7="http://www.w3.org/2000/09/xmldsig#" xmlns:ns8="http://www.enactor.com/retail/storedRetailTransaction/service" xmlns:ns9="http://www.fu.gov.si/" xmlns:ns10="http://www.enactor.com/addressLookup/service" xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:ns14="http://www.enactor.com/crm/customerLoyalty/service" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" allowResize="true" allowMove="true" allowClose="true" windowtype="view-panel" height="0" width="0" messageBase="Pos/Product/ProductMessages" titleId="SELECT_PRODUCT_TITLE" url="NextGen640x1136/Pos/ProductEnquiry/SelectProduct">
+    <core:elements>
+        <core:button lineHeight="0" messageId="#{notEmpty(viewButtonMessageId) ? viewButtonMessageId : 'BUTTON_VIEW'}" visibility="#{notEmpty(page['SelectionList'].selectedItem)}" id="Button1">
+            <core:updateTriggers>
+                <core:element>SelectionList</core:element>
+            </core:updateTriggers>
+            <core:text>ViewPressed</core:text>
+        </core:button>
+        <core:button messageBase="#{notEmpty(confirmMessageBase) ? confirmMessageBase : ''}" messageId="#{notEmpty(confirmMessageIdOK) ? confirmMessageIdOK : notEmpty(confirmMessageIdSell) ? confirmMessageIdSell : 'BUTTON_OK'}" visibility="#{(isEmpty(searchFromSignOn) || !searchFromSignOn) &amp;&amp; notEmpty(page['SelectionList'].selectedItem)}" id="Button2">
+            <core:updateTriggers>
+                <core:element>SelectionList</core:element>
+            </core:updateTriggers>
+            <core:text>#{notEmpty(confirmMessageIdOK) &amp;&amp; strings:compareStrings(confirmMessageIdOK, 'BUTTON_SELL') ? 'SellPressed' : 'OKPressed'}</core:text>
+        </core:button>
+        <core:button lineHeight="0" messageBase="" messageId="BUTTON_QTY_SELL" visibility="#{notEmpty(page['SelectionList'].selectedItem) &amp;&amp; (notEmpty(quantitySale) &amp;&amp; quantitySale)}" id="Button3">
+            <core:updateTriggers>
+                <core:element>SelectionList</core:element>
+            </core:updateTriggers>
+            <core:text>QtySellPressed</core:text>
+        </core:button>
+        <core:button lineHeight="0" messageId="BUTTON_ADDITIONAL_FILTERS" visibility="#{notEmpty(showAdditionalFilters) &amp;&amp; showAdditionalFilters}" id="Button4">
+            <core:text>AdditionalFilters</core:text>
+        </core:button>
+        <core:button lineHeight="0" messageId="BUTTON_BACK" id="Button8">
+            <core:text>CancelPressed</core:text>
+        </core:button>
+        <core:button lineHeight="0" messageId="BUTTON_UP" styleClass="navigation-up" transparentBackground="true" visibility="#{page.SelectionList.visible &amp;&amp; page.SelectionList.moveUp}" id="Button5">
+            <core:boundsConstraint height="80" width="141" y="297" x="862"/>
+            <core:templateConstraints allowChangeBounds="false"/>
+            <core:updateTriggers>
+                <core:element>SelectionList</core:element>
+            </core:updateTriggers>
+            <core:text>page.SelectionList.Up</core:text>
+        </core:button>
+        <core:button lineHeight="0" messageId="BUTTON_DOWN" styleClass="navigation-down" visibility="#{page.SelectionList.visible &amp;&amp; page.SelectionList.moveDown}" id="Button6">
+            <core:boundsConstraint height="80" width="141" y="483" x="862"/>
+            <core:templateConstraints allowChangeBounds="false"/>
+            <core:updateTriggers>
+                <core:element>SelectionList</core:element>
+            </core:updateTriggers>
+            <core:text>page.SelectionList.Down</core:text>
+        </core:button>
+        <core:inputText valueChangedDelay="600" lineHeight="0" id="InputBox">
+            <core:text>#{textEntry}</core:text>
+            <core:textElementEvents valueChangedEvent="ValueChangedEvent"/>
+        </core:inputText>
+        <core:text lineHeight="0" messageBase="#{messageBase}" messageId="#{messageId}" styleClass="promptLabel" id="Prompt"/>
+        <core:listBox lazyLoad="false" listSelectionMethod="DEFAULT" documentTemplateUrl="Pos/ProductEnquiry/SelectProductListTemplate" value="${enactor.coreUI.SelectedItem}" styleClass="productSearchSelectionList" id="SelectionListWithInput">
+            <core:updateTriggers>
+                <core:element>InputBox</core:element>
+            </core:updateTriggers>
+            <core:elements/>
+            <core:listExpression>#{view.transactionSessionViewData.productDetailsList}</core:listExpression>
+            <core:listingElementEvents>
+                <core:selectionEvent>page.SelectionList.changed</core:selectionEvent>
+            </core:listingElementEvents>
+        </core:listBox>
+        <core:hidden id="DialogPanel">
+            <core:boundsConstraint height="394" width="821" y="77" x="20"/>
+        </core:hidden>
+        <core:hidden id="Receipt"/>
+        <core:hidden id="PagingSelectionListPanel"/>
+        <core:hidden id="BackgroundPanel"/>
+        <core:hidden id="TotalLabel"/>
+        <core:hidden id="FullHeightDialogPanel"/>
+        <core:hidden id="NumericInputPanel"/>
+        <core:hidden id="ReceiptPanel"/>
+        <core:hidden id="OverflowPopup"/>
+        <core:label lineHeight="0" messageId="RESOURCE_FRIENDLY_NAME" id="TitleLabel"/>
+        <core:button adjustImagesToSize="false" lineHeight="0" id="BackButton">
+            <core:text>BackPressed</core:text>
+        </core:button>
+    </core:elements>
+    <core:templateURL>NextGen640x1136/Pos/FullScreenTraditionalPosTemplate</core:templateURL>
+    <core:events>
+        <core:event destination="enactor.Prompt" event="key.EnterPressed">ViewPressed</core:event>
+        <core:event destination="SelectionList" event="enactor.pos.SearchProductsSuccess">update</core:event>
+        <core:event destination="SelectionList" event="view.enactor.pos.SearchProductsSuccess">update</core:event>
+        <core:event destination="SelectionList" event="page.SelectionList.changed">updateSelection</core:event>
+        <core:event destination="SelectionList" event="key.UpPressed">up</core:event>
+        <core:event destination="SelectionList" event="key.DownPressed">down</core:event>
+    </core:events>
+    <core:variables>
+        <core:variable required="true" name="messageId">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="messageBase">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="viewButtonMessageId">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.pos.TextEntry">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.mfc.ProductDetailsList">
+            <core:interfaceName>java.util.List</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.pos.ShowAdditionalFilters">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.pos.LoadingProducts">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="ConfirmMessageBase">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="ConfirmMessageId">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="ConfirmMessageIdOK">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="ConfirmMessageIdSell">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.pos.SearchFromSignOn">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.pos.QuantitySale">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.coreUI.SelectedItem">
+            <core:interfaceName>java.lang.Object</core:interfaceName>
+        </core:variable>
+    </core:variables>
+    <core:functionLibraries>
+        <core:functionLibrary name="productEnquiryBean" path="com.enactor.pos.productEnquiry.ProductEnquiryBean">
+            <core:type>CLASS</core:type>
+        </core:functionLibrary>
+    </core:functionLibraries>
+    <core:scannerEnabled>true</core:scannerEnabled>
+    <core:scannerDataName>enactor.pos.ProductCodeScanned</core:scannerDataName>
+    <core:mSREnabled>false</core:mSREnabled>
+    <core:mSRDataName></core:mSRDataName>
+</retail:posPromptPage>

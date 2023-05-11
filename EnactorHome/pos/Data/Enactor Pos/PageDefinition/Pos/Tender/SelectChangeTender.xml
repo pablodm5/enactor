@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<retail:posPromptPage xmlns:core="http://www.enactor.com/core" xmlns:retail="http://www.enactor.com/retail" xmlns:ns4="http://www.enactor.com/crm" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803" xmlns:ns6="http://www.apis-it.hr/fin/2012/types/f73" xmlns:ns7="http://www.w3.org/2000/09/xmldsig#" xmlns:ns8="http://www.enactor.com/retail/storedRetailTransaction/service" xmlns:ns9="http://www.fu.gov.si/" xmlns:ns10="http://www.enactor.com/addressLookup/service" xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:ns14="http://www.enactor.com/crm/customerLoyalty/service" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" allowResize="true" allowMove="true" allowClose="true" url="Pos/Tender/SelectChangeTender">
+    <core:elements>
+        <core:text lineHeight="0" messageBase="#{messageBase}" messageId="#{messageId}" id="Prompt">
+            <core:text>#{message}</core:text>
+        </core:text>
+        <core:button messageBase="#{isEmpty(messageBaseOK) ? '' : messageBaseOK}" messageId="#{isEmpty(messageIdOK) ? 'BUTTON_OK' : messageIdOK}" visibility="#{size(list) &gt; 0}" id="Button1">
+            <core:text>OKPressed</core:text>
+        </core:button>
+        <core:button messageBase="#{isEmpty(messageBaseBack) ? '' : messageBaseBack}" messageId="#{isEmpty(messageIdBack) ? 'BUTTON_BACK' : messageIdBack}" visibility="#{showBackButton == true}" id="Button7">
+            <core:text>BackPressed</core:text>
+        </core:button>
+        <core:button messageBase="#{isEmpty(messageBaseCancel) ? '' : messageBaseCancel}" messageId="#{isEmpty(messageIdCancel) ? 'BUTTON_CANCEL' : messageIdCancel}" visibility="#{hideCancelButton != true}" id="Button8">
+            <core:boundsConstraint height="60" width="177" y="490" x="605"/>
+            <core:text>CancelPressed</core:text>
+        </core:button>
+        <core:listBox lazyLoad="false" listSelectionMethod="DEFAULT" documentTemplateUrl="#{listTemplateUrl}" styleClass="#{notEmpty(view.currentlyInTrainingMode) &amp;&amp; view.currentlyInTrainingMode ? 'selectionPromptListTraining' : 'selectionPromptList' }" id="SelectionList">
+            <core:boundsConstraint/>
+            <core:elements/>
+            <core:listExpression>#{list}</core:listExpression>
+            <core:listingElementEvents>
+                <core:selectionEvent>page.SelectionList.changed</core:selectionEvent>
+            </core:listingElementEvents>
+            <core:selectableExpression>#{!instanceOf(selectedItem, 'com.enactor.coreUI.views.ListHeader') &amp;&amp; !instanceOf(selectedItem, 'com.enactor.coreUI.views.ListFooter') &amp;&amp; selectedItem.available}</core:selectableExpression>
+            <core:startWithFirstItemExpression>#{true}</core:startWithFirstItemExpression>
+        </core:listBox>
+        <core:button messageBase="Pos/General/PosMessages" messageId="BUTTON_UP" styleClass="navigation-up" visibility="#{page['SelectionList'].visible &amp;&amp; page['SelectionList'].moveUp}" id="Button2">
+            <core:updateTriggers>
+                <core:element>SelectionList</core:element>
+            </core:updateTriggers>
+            <core:text>page.SelectionList.up</core:text>
+        </core:button>
+        <core:button messageBase="Pos/General/PosMessages" messageId="BUTTON_DOWN" styleClass="navigation-down" visibility="#{page['SelectionList'].visible &amp;&amp; page['SelectionList'].moveDown}" id="Button6">
+            <core:updateTriggers>
+                <core:element>SelectionList</core:element>
+            </core:updateTriggers>
+            <core:text>page.SelectionList.down</core:text>
+        </core:button>
+        <core:hidden id="InputBox"/>
+        <core:hidden id="Receipt"/>
+    </core:elements>
+    <core:templateURL>Pos/StandardPosTemplate</core:templateURL>
+    <core:events>
+        <core:event destination="enactor.Prompt" event="key.EnterPressed">OKPressed</core:event>
+        <core:event destination="SelectionList" event="key.UpPressed">up</core:event>
+        <core:event destination="SelectionList" event="key.DownPressed">down</core:event>
+    </core:events>
+    <core:variables>
+        <core:variable required="true" name="enactor.coreUI.List">
+            <core:interfaceName>java.util.List</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="listTemplateUrl">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="messageBase">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="messageId">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:variable>
+        <core:variable name="message">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:variable>
+        <core:variable name="messageBaseOK">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:variable>
+        <core:variable name="messageBaseCancel">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:variable>
+        <core:variable name="messageBaseBack">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:variable>
+        <core:variable name="messageIdOK">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:variable>
+        <core:variable name="messageIdCancel">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:variable>
+        <core:variable name="messageIdBack">
+            <core:interfaceName>java.lang.String</core:interfaceName>
+        </core:variable>
+        <core:variable name="showBackButton">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.pos.HideCancelButton">
+            <core:interfaceName>java.lang.Boolean</core:interfaceName>
+        </core:variable>
+    </core:variables>
+</retail:posPromptPage>

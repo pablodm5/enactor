@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<core:documentTemplate xmlns:core="http://www.enactor.com/core" xmlns:retail="http://www.enactor.com/retail" xmlns:ns4="http://www.enactor.com/crm" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803" xmlns:ns6="http://www.apis-it.hr/fin/2012/types/f73" xmlns:ns7="http://www.w3.org/2000/09/xmldsig#" xmlns:ns8="http://www.enactor.com/retail/storedRetailTransaction/service" xmlns:ns9="http://www.fu.gov.si/" xmlns:ns10="http://www.enactor.com/addressLookup/service" xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:ns14="http://www.enactor.com/crm/customerLoyalty/service" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" paginated="false" messageBase="Pos/Product/ProductMessages" title="Product Details" url="Pos/Product/ProductDetailsTemplate">
+    <core:elements>
+        <core:formatElement formatId="productDetails"/>
+    </core:elements>
+    <core:formatEntry id="productDetails">
+        <core:elements>
+            <core:row>
+                <core:rowLine visibility="#{product.notForSale}">
+                    <core:elements>
+                        <core:column maxLines="0">
+                            <core:elements>
+<core:text messageId="PD_NOT_FOR_SALE"/>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0">
+                            <core:elements>
+<core:text messageId="PD_PRODUCT_ID"/>
+<core:text>
+    <core:text> #{product.productId}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0">
+                            <core:elements>
+<core:text messageId="PD_DESCRIPTION"/>
+<core:text>
+    <core:text> #{getLocalisedString(product.productDescription, userLocale.locale)}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0">
+                            <core:elements>
+<core:text messageId="PD_PRICE"/>
+<core:text>
+    <core:text> </core:text>
+</core:text>
+<core:text>
+    <core:formatters>
+        <core:formatCurrencyAmount/>
+    </core:formatters>
+    <core:text>#{price}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine visibility="#{instanceOf(product, 'com.enactor.mfc.product.IMerchandiseProduct') &amp;&amp; !empty(product.MMGroupKey) &amp;&amp; !empty(product.MMGroupKey.groupId)}">
+                    <core:elements>
+                        <core:column maxLines="0">
+                            <core:elements>
+<core:text messageId="PD_MMGROUP"/>
+<core:text>
+    <core:text> #{empty(mmGroup) || empty(mmGroup.name) ? '-' : mmGroup.name}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine visibility="#{instanceOf(product, 'com.enactor.mfc.product.ISKUProduct')}">
+                    <core:elements>
+                        <core:column maxLines="0">
+                            <core:elements>
+<core:text messageId="PD_COLOUR"/>
+<core:text visibility="#{!empty(product.colourKey) &amp;&amp; !empty(product.colourKey.colourId) &amp;&amp; !empty(product.colourKey.colourRangeId)}">
+    <core:text>#{empty(productColour) || empty(productColour.description) ? product.colourKey.colourId : getLocalisedString(productColour.localisedDescription, userLocale.locale)}</core:text>
+</core:text>
+<core:text visibility="#{empty(product.colourKey) || empty(product.colourKey.colourId) || empty(product.colourKey.colourRangeId)}">
+    <core:text>#{empty(product.colourKey) || empty(product.colourKey.colourId) ? '-' : product.colourKey.colourId}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine visibility="#{instanceOf(product, 'com.enactor.mfc.product.ISKUProduct')}">
+                    <core:elements>
+                        <core:column maxLines="0">
+                            <core:elements>
+<core:text messageId="PD_SIZE"/>
+<core:text visibility="#{!empty(product.sizeKey) &amp;&amp; !empty(product.sizeKey.sizeId) &amp;&amp; !empty(product.sizeKey.sizeRangeId)}">
+    <core:text> #{empty(productSize) || empty(productSize.description) ? product.sizeKey.sizeId : getLocalisedString(productSize.localisedDescription, userLocale.locale)}</core:text>
+</core:text>
+<core:text visibility="#{empty(product.sizeKey) || empty(product.sizeKey.sizeId) || empty(product.sizeKey.sizeRangeId)}">
+    <core:text> #{empty(product.sizeKey) || empty(product.sizeKey.sizeId) ? '-' : product.sizeKey.sizeId}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+            <core:formatElement applicability="#{!empty(product.alternativeProductId)}" formatId="alternativeCodes"/>
+            <core:row>
+                <core:rowLine visibility="#{!empty(product.productInfo)}">
+                    <core:elements>
+                        <core:column maxLines="0">
+                            <core:elements>
+<core:text messageId="PD_PRODUCT_INFO"/>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine visibility="#{!empty(product.productInfo)}">
+                    <core:elements>
+                        <core:column maxLines="0" wrap="true">
+                            <core:elements>
+<core:text>
+    <core:text> #{product.productInfo}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+            <core:formatElement applicability="#{!empty(sellingCodesList) &amp;&amp; size(sellingCodesList) &gt; 0}" formatId="sellingCodes"/>
+        </core:elements>
+        <core:entityReferences>
+            <core:entityReference name="mmGroup" keyValue="#{product.MMGroupKey}" entityName="group" entityNamespace="http://www.enactor.com/core"/>
+            <core:entityReference name="productSize" keyValue="#{product.sizeKey}" entityName="size" entityNamespace="http://www.enactor.com/mfc"/>
+            <core:entityReference name="productColour" keyValue="#{product.colourKey}" entityName="colour" entityNamespace="http://www.enactor.com/mfc"/>
+        </core:entityReferences>
+    </core:formatEntry>
+    <core:formatEntry id="alternativeCodes">
+        <core:elements>
+            <core:row>
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0">
+                            <core:elements>
+<core:text messageId="PD_ALTERNATIVE_CODES"/>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+            <core:tableTemplate listVariableName="alternativeId" list="#{product.alternativeProductId}" id="AlternativeProductList">
+                <core:formatElement formatId="alternativeProductItem"/>
+            </core:tableTemplate>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="alternativeProductItem">
+        <core:elements>
+            <core:row>
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0">
+                            <core:elements>
+<core:text>
+    <core:text>   #{alternativeId}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="sellingCodes">
+        <core:elements>
+            <core:row>
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0">
+                            <core:elements>
+<core:text messageId="PD_SELLING_CODES"/>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+            <core:tableTemplate listVariableName="item" list="#{sellingCodesList}" id="SellingCodesList">
+                <core:formatElement formatId="sellingCode"/>
+            </core:tableTemplate>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="sellingCode">
+        <core:elements>
+            <core:row>
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0">
+                            <core:elements>
+<core:text>
+    <core:text>   #{item.data['sellingCode']}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+</core:documentTemplate>

@@ -1,0 +1,635 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<core:documentTemplate xmlns:core="http://www.enactor.com/core" xmlns:retail="http://www.enactor.com/retail" xmlns:ns4="http://www.enactor.com/crm" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803" xmlns:ns6="http://www.apis-it.hr/fin/2012/types/f73" xmlns:ns7="http://www.w3.org/2000/09/xmldsig#" xmlns:ns8="http://www.enactor.com/retail/storedRetailTransaction/service" xmlns:ns9="http://www.fu.gov.si/" xmlns:ns10="http://www.enactor.com/addressLookup/service" xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:ns14="http://www.enactor.com/crm/customerLoyalty/service" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" paginated="false" width="75" messageBase="Pos/ProductDetail/ProductDetailMessages" title="Product Details" url="Pos/ProductDetail/ProductDetailsTemplate">
+    <core:elements>
+        <core:formatElement formatId="productHeader"/>
+        <core:formatElement applicability="#{selectedEventName == 'ProductDetailsPressed'}" formatId="productDetails"/>
+        <core:formatElement applicability="#{selectedEventName == 'AlternativeProductsPressed'}" formatId="alternativeCodes"/>
+        <core:formatElement applicability="#{selectedEventName == 'InventoryLevelsPressed'}" formatId="inventoryLevels"/>
+        <core:formatElement applicability="#{selectedEventName == 'PromotionsPressed'}" formatId="promotions"/>
+        <core:formatElement applicability="#{selectedEventName == 'PriceHistoryPressed'}" formatId="productPrices"/>
+        <core:formatElement applicability="#{selectedEventName == 'SalesPressed'}" formatId="sales"/>
+    </core:elements>
+    <core:columnDefs>
+        <core:columnDef id="1" startPos="0" endPos="25"/>
+        <core:columnDef id="2" startPos="25" endPos="50"/>
+        <core:columnDef id="3" startPos="50" endPos="75"/>
+        <core:columnDef id="4" startPos="5" endPos="35"/>
+        <core:columnDef id="5" startPos="35" endPos="60"/>
+        <core:columnDef id="6" startPos="0" endPos="12"/>
+        <core:columnDef id="7" startPos="13" endPos="25"/>
+    </core:columnDefs>
+    <core:formatEntry id="productHeader">
+        <core:elements>
+            <core:row>
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0">
+                            <core:elements>
+<core:text messageId="STATUS"/>
+<core:text>
+    <core:text> </core:text>
+</core:text>
+<core:text messageId="#{productActive ? 'Status.ACTIVE' : 'Status.NOT_FOR_SALE'}"/>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0">
+                            <core:elements>
+<core:text messageId="PRODUCT_ID"/>
+<core:text>
+    <core:text> #{product.productId}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+            <core:formatElement applicability="#{instanceOf(product, 'com.enactor.mfc.product.IStyleSizeProduct')}" formatId="styleColourSize"/>
+            <core:row>
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0">
+                            <core:elements>
+<core:text messageId="DESCRIPTION"/>
+<core:text>
+    <core:text> #{getLocalisedString(product.productDescription, userLocale.locale)}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="productDetails">
+        <core:elements>
+            <core:assign to="sellingCodeLineNumber" type="long" value="0"/>
+            <core:row>
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0">
+                            <core:elements>
+<core:text messageId="CURRENT_PRICE"/>
+<core:text>
+    <core:text> </core:text>
+</core:text>
+<core:text visibility="#{!empty(price)}">
+    <core:formatters>
+        <core:formatCurrencyAmount/>
+    </core:formatters>
+    <core:text>#{price}</core:text>
+</core:text>
+<core:text visibility="#{empty(price)}">
+    <core:text>-</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine visibility="#{instanceOf(product, 'com.enactor.mfc.product.IMerchandiseProduct')}">
+                    <core:elements>
+                        <core:column maxLines="0">
+                            <core:elements>
+<core:text messageId="MM_GROUP"/>
+<core:text visibility="#{!empty(product.MMGroupKey)}">
+    <core:text> #{mmGroup.name}</core:text>
+</core:text>
+<core:text visibility="#{empty(product.MMGroupKey)}">
+    <core:text> -</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+            <core:tableTemplate listVariableName="sellingCode" list="#{sellingCodeList}" id="SellingCodeList">
+                <core:formatElement formatId="sellingCodeItem"/>
+            </core:tableTemplate>
+        </core:elements>
+        <core:entityReferences>
+            <core:entityReference name="mmGroup" keyValue="#{product.MMGroupKey}" entityName="group" entityNamespace="http://www.enactor.com/core"/>
+        </core:entityReferences>
+    </core:formatEntry>
+    <core:formatEntry id="sellingCodeItem">
+        <core:elements>
+            <core:row>
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="1" visibility="#{sellingCodeLineNumber == 0}">
+                            <core:elements>
+<core:text messageId="SELLING_CODES"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="2">
+                            <core:elements>
+<core:text>
+    <core:text>#{sellingCode.data['sellingCode']}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+            <core:assign to="sellingCodeLineNumber" type="long" value="#{sellingCodeLineNumber + 1}"/>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="alternativeCodes">
+        <core:elements>
+            <core:row>
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="0">
+                            <core:elements>
+<core:text messageId="ALTERNATIVE_PRODUCT_CODES"/>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+            <core:row>
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="1">
+                            <core:elements>
+<core:text messageId="HD_PRODUCT_ID"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="2">
+                            <core:elements>
+<core:text messageId="HD_DESCRIPTION"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" align="RIGHT" columnDefId="3">
+                            <core:elements>
+<core:text messageId="HD_QUANTITY"/>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+            <core:tableTemplate listVariableName="alternativeProductData" list="#{alternativeProductList}" id="AlternativeProductList">
+                <core:formatElement formatId="alternativeProductItem"/>
+            </core:tableTemplate>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="alternativeProductItem">
+        <core:elements>
+            <core:row>
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="1">
+                            <core:elements>
+<core:text>
+    <core:text>#{alternativeProductData.data['productId']}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="2">
+                            <core:elements>
+<core:text>
+    <core:text>#{alternativeProductData.data['description']}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" align="RIGHT" columnDefId="3">
+                            <core:elements>
+<core:text>
+    <core:formatters>
+        <core:formatNumber/>
+    </core:formatters>
+    <core:text>#{alternativeProductData.data['quantity']}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="inventoryLevels">
+        <core:elements>
+            <core:row>
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0">
+                            <core:elements>
+<core:text messageId="INVENTORY_LEVELS"/>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+            <core:tableTemplate listVariableName="inventoryLevel" list="#{inventoryLevelList}" id="InventoryLevelList">
+                <core:formatElement formatId="inventoryLevelItem"/>
+            </core:tableTemplate>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="inventoryLevelItem">
+        <core:elements>
+            <core:row>
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="4">
+                            <core:elements>
+<core:text>
+    <core:formatters>
+        <core:formatLocaleString/>
+    </core:formatters>
+    <core:text>#{inventoryType.description}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" align="RIGHT" columnDefId="5">
+                            <core:elements>
+<core:text>
+    <core:formatters>
+        <core:formatNumber/>
+    </core:formatters>
+    <core:text>#{inventoryLevel.data['value']}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+        <core:entityReferences>
+            <core:entityReference name="inventoryType" keyValue="#{inventoryLevel.key.inventoryTypeKey}" entityName="inventoryType" entityNamespace="http://www.enactor.com/mfc"/>
+        </core:entityReferences>
+    </core:formatEntry>
+    <core:formatEntry id="styleColourSize">
+        <core:elements>
+            <core:row>
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="1">
+                            <core:elements>
+<core:text messageId="COLOUR"/>
+<core:text>
+    <core:text> #{getLocalisedString(colour.localisedDescription, userLocale.locale)}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="2">
+                            <core:elements>
+<core:text messageId="SIZE"/>
+<core:text>
+    <core:text> #{getLocalisedString(size.localisedDescription, userLocale.locale)}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+        <core:entityReferences>
+            <core:entityReference name="size" keyValue="#{product.sizeKey}" entityName="size" entityNamespace="http://www.enactor.com/mfc"/>
+            <core:entityReference name="colour" keyValue="#{product.colourKey}" entityName="colour" entityNamespace="http://www.enactor.com/mfc"/>
+        </core:entityReferences>
+    </core:formatEntry>
+    <core:formatEntry id="promotions">
+        <core:elements>
+            <core:row>
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0">
+                            <core:elements>
+<core:text messageId="PROMOTIONS"/>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="6">
+                            <core:elements>
+<core:text messageId="HD_PROMOTION_START_DATE"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="7">
+                            <core:elements>
+<core:text messageId="HD_PROMOTION_END_DATE"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="2">
+                            <core:elements>
+<core:text messageId="HD_PROMOTION_ID"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="3">
+                            <core:elements>
+<core:text messageId="HD_PROMOTION_NAME"/>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+            <core:tableTemplate listVariableName="promotionKey" list="#{promotionList}" id="PromotionList">
+                <core:formatElement formatId="promotionItem"/>
+            </core:tableTemplate>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="promotionItem">
+        <core:elements>
+            <core:row>
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="6">
+                            <core:elements>
+<core:text visibility="#{!empty(promotion.timetableTrigger)}">
+    <core:formatters>
+        <core:formatDate pattern="shortDate"/>
+    </core:formatters>
+    <core:text>#{promotion.timetableTrigger.startDate}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="7">
+                            <core:elements>
+<core:text visibility="#{!empty(promotion.timetableTrigger)}">
+    <core:formatters>
+        <core:formatDate pattern="shortDate"/>
+    </core:formatters>
+    <core:text>#{promotion.timetableTrigger.endDate}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="2">
+                            <core:elements>
+<core:text>
+    <core:text>#{promotionKey.promotionId}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="3">
+                            <core:elements>
+<core:text>
+    <core:text>#{promotion.description}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+        <core:entityReferences>
+            <core:entityReference name="promotion" keyValue="#{promotionKey}" entityName="promotion" entityNamespace="http://www.enactor.com/mfc"/>
+        </core:entityReferences>
+    </core:formatEntry>
+    <core:formatEntry id="productPrices">
+        <core:elements>
+            <core:row>
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0">
+                            <core:elements>
+<core:text messageId="PRODUCT_PRICES"/>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="6">
+                            <core:elements>
+<core:text messageId="HD_PRICE_START_DATE"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="7">
+                            <core:elements>
+<core:text messageId="HD_PRICE_END_DATE"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="2">
+                            <core:elements>
+<core:text messageId="HD_PRICE_APPLICABILITY"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" align="RIGHT" columnDefId="3">
+                            <core:elements>
+<core:text messageId="HD_PRICE_PRIEC"/>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+            <core:tableTemplate listVariableName="productPrice" list="#{productPriceList}" id="ProductPriceList">
+                <core:formatElement formatId="productPriceItem"/>
+            </core:tableTemplate>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="productPriceItem">
+        <core:elements>
+            <core:row>
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="6">
+                            <core:elements>
+<core:text visibility="#{!empty(productPrice.data['startDate'])}">
+    <core:formatters>
+        <core:formatDate pattern="shortDate"/>
+    </core:formatters>
+    <core:text>#{productPrice.data['startDate']}</core:text>
+</core:text>
+<core:text visibility="#{empty(productPrice.data['startDate'])}">
+    <core:text>-</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="7">
+                            <core:elements>
+<core:text visibility="#{!empty(productPrice.data['endDate'])}">
+    <core:formatters>
+        <core:formatDate pattern="shortDate"/>
+    </core:formatters>
+    <core:text>#{productPrice.data['endDate']}</core:text>
+</core:text>
+<core:text visibility="#{empty(productPrice.data['endDate'])}">
+    <core:text>-</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="2">
+                            <core:elements>
+<core:text visibility="#{!empty(productPrice.data['locationKey.locationId'])}">
+    <core:text>#{location.description}</core:text>
+</core:text>
+<core:text visibility="#{empty(productPrice.data['locationKey.locationId'])}">
+    <core:text>#{priceGroup.name}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" align="RIGHT" columnDefId="3">
+                            <core:elements>
+<core:text>
+    <core:formatters>
+        <core:formatCurrencyAmount/>
+    </core:formatters>
+    <core:text>#{productPrice.data['price']}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+        <core:entityReferences>
+            <core:entityReference name="priceGroup" entityName="group" entityNamespace="http://www.enactor.com/core">
+                <core:keyProperty name="groupId" value="#{productPrice.data['priceGroupKey.groupId']}"/>
+                <core:keyProperty name="groupTypeId" value="#{productPrice.data['priceGroupKey.groupTypeId']}"/>
+                <core:keyProperty name="groupHierarchyId" value="#{productPrice.data['priceGroupKey.groupHierarchyId']}"/>
+                <core:keyProperty name="variantGroupId" value="#{productPrice.data['priceGroupKey.variantGroupId']}"/>
+                <core:keyProperty name="variantGroupTypeId" value="#{productPrice.data['priceGroupKey.variantGroupTypeId']}"/>
+                <core:keyProperty name="variantGroupHierarchyId" value="#{productPrice.data['priceGroupKey.variantGroupHierarchyId']}"/>
+            </core:entityReference>
+            <core:entityReference name="location" entityName="location" entityNamespace="http://www.enactor.com/mfc">
+                <core:keyProperty name="locationId" value="#{productPrice.data['locationKey.locationId']}"/>
+            </core:entityReference>
+        </core:entityReferences>
+    </core:formatEntry>
+    <core:formatEntry id="sales">
+        <core:elements>
+            <core:formatElement formatId="salesLastEntries"/>
+            <core:formatElement formatId="salesSalesData"/>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="salesLastEntries">
+        <core:elements>
+            <core:row>
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0">
+                            <core:elements>
+<core:text messageId="SALES"/>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" align="RIGHT" columnDefId="2">
+                            <core:elements>
+<core:text messageId="HD_SALES_DATE"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" align="RIGHT" columnDefId="3">
+                            <core:elements>
+<core:text messageId="HD_SALES_QUANTITY"/>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+            <core:tableTemplate listVariableName="lastEntry" list="#{lastEntryList}" id="LastEntryList">
+                <core:formatElement formatId="lastEntryItem"/>
+            </core:tableTemplate>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="lastEntryItem">
+        <core:elements>
+            <core:row>
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="1">
+                            <core:elements>
+<core:text messageId="RH_LAST_SOLD" visibility="#{lastEntry.key == 'Sales'}"/>
+<core:text messageId="RH_LAST_COUNT" visibility="#{lastEntry.key == 'StocktakeAdjustment'}"/>
+<core:text messageId="RH_LAST_MOVEMENT_IN" visibility="#{lastEntry.key == 'IBTIn'}"/>
+<core:text messageId="RH_LAST_MOVEMENT_OUT" visibility="#{lastEntry.key == 'IBTOut'}"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" align="RIGHT" columnDefId="2">
+                            <core:elements>
+<core:text visibility="#{!empty(lastEntry.data['date'])}">
+    <core:formatters>
+        <core:formatDate pattern="shortDate"/>
+    </core:formatters>
+    <core:text>#{lastEntry.data['date']}</core:text>
+</core:text>
+<core:text visibility="#{empty(lastEntry.data['date'])}">
+    <core:text>-</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" align="RIGHT" columnDefId="3">
+                            <core:elements>
+<core:text>
+    <core:formatters>
+        <core:formatNumber/>
+    </core:formatters>
+    <core:text>#{lastEntry.data['quantity']}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="salesSalesData">
+        <core:elements>
+            <core:row>
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" align="RIGHT" columnDefId="2">
+                            <core:elements>
+<core:text messageId="HD_SALES_VALUE"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" align="RIGHT" columnDefId="3">
+                            <core:elements>
+<core:text messageId="HD_SALES_QUANTITY"/>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+            <core:tableTemplate listVariableName="salesData" list="#{salesDataList}" id="SalesDataList">
+                <core:formatElement formatId="salesDataItem"/>
+            </core:tableTemplate>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="salesDataItem">
+        <core:elements>
+            <core:row>
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="1">
+                            <core:elements>
+<core:text messageId="RH_TODAY" visibility="#{salesData.key == 'today'}"/>
+<core:text messageId="RH_THIS_WEEK" visibility="#{salesData.key == 'thisWeek'}"/>
+<core:text messageId="RH_THIS_WEEK_LAST_YEAR" visibility="#{salesData.key == 'weekLastYear'}"/>
+<core:text messageId="RH_THIS_MONTH" visibility="#{salesData.key == 'thisMonth'}"/>
+<core:text messageId="RH_THIS_MONTH_LAST_YEAR" visibility="#{salesData.key == 'monthLastYear'}"/>
+<core:text messageId="RH_YEAR_TO_DATE" visibility="#{salesData.key == 'yearToDate'}"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" align="RIGHT" columnDefId="2">
+                            <core:elements>
+<core:text>
+    <core:formatters>
+        <core:formatCurrencyAmount/>
+    </core:formatters>
+    <core:text>#{salesData.data['retailNet']}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" align="RIGHT" columnDefId="3">
+                            <core:elements>
+<core:text>
+    <core:formatters>
+        <core:formatNumber/>
+    </core:formatters>
+    <core:text>#{salesData.data['quantity']}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+</core:documentTemplate>

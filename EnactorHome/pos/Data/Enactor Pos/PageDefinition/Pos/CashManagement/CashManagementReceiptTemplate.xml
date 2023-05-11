@@ -1,0 +1,708 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<core:documentTemplate xmlns:core="http://www.enactor.com/core" xmlns:retail="http://www.enactor.com/retail" xmlns:ns4="http://www.enactor.com/crm" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803" xmlns:ns6="http://www.apis-it.hr/fin/2012/types/f73" xmlns:ns7="http://www.w3.org/2000/09/xmldsig#" xmlns:ns8="http://www.enactor.com/retail/storedRetailTransaction/service" xmlns:ns9="http://www.fu.gov.si/" xmlns:ns10="http://www.enactor.com/addressLookup/service" xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:ns14="http://www.enactor.com/crm/customerLoyalty/service" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" paginated="false" width="44" messageBase="Pos/CashManagement/CashManagementMessages" title="Cash Management Receipt" url="Pos/CashManagement/CashManagementReceiptTemplate">
+    <core:elements/>
+    <core:variables>
+        <core:variable required="true" name="enactor.cashManagement.CMTransaction">
+            <core:interfaceName>com.enactor.cashManagement.entities.ICMTransaction</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.mfc.Location">
+            <core:interfaceName>com.enactor.mfc.location.IStore</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.mfc.PosTerminal">
+            <core:interfaceName>com.enactor.mfc.posTerminal.IPOSTerminal</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="item">
+            <core:interfaceName>com.enactor.cashManagement.listElements.ITenderListElement</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.cashManagement.TendersList">
+            <core:interfaceName>java.util.List</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="denominationItem">
+            <core:interfaceName>com.enactor.cashManagement.entities.IDenominationItem</core:interfaceName>
+        </core:variable>
+    </core:variables>
+    <core:includedTemplateUrl>Pos/CashManagement/Catalog/CashManagementFormatEntryCatalog</core:includedTemplateUrl>
+    <core:formatEntry id="lineBreak">
+        <core:elements>
+            <core:lineElement id="LineBreakLine"/>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="pageBreak">
+        <core:elements>
+            <core:page number="0" id="PageBreakPage"/>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="tenderItemsList">
+        <core:elements>
+            <core:tableTemplate list="#{tendersList}" visibility="#{cMTransaction.transactionType != 'SafeBagCollection'}" id="Items">
+                <core:formatElement formatId="tenderItem"/>
+            </core:tableTemplate>
+            <core:tableTemplate list="#{tendersList}" visibility="#{cMTransaction.transactionType == 'SafeBagCollection'}" id="Items">
+                <core:formatElement formatId="bagCollectionItem"/>
+            </core:tableTemplate>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="bagCollectionItem">
+        <core:elements>
+            <core:row id="BagCollectionItemRow">
+                <core:rowLine id="BagCollectionItemRowLine">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="Description" id="BagCollectionItemDescriptionLabel">
+                            <core:elements>
+<core:text id="BagCollectionItemDescriptionText">
+    <core:text>#{item.tenderBagNumber}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="Amount" id="BagCollectionItemTotalAmount">
+                            <core:elements>
+<core:text id="BagCollectionItemTotalAmountText">
+    <core:formatters>
+        <core:formatCurrencyAmount currencyId="#{item.currencyKey.currencyId}"/>
+    </core:formatters>
+    <core:text>#{-item.total}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="tenderItem">
+        <core:elements>
+            <core:row id="TenderItemRow">
+                <core:rowLine id="TenderItemRowLine">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="Description" id="TenderItemDescriptionLabel">
+                            <core:elements>
+<core:text id="TenderItemDescription">
+    <core:text>#{item.description}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="Amount" id="TenderItemAmount">
+                            <core:elements>
+<core:text visibility="#{item.enterByQuantity}" id="TenderItemQuantity">
+    <core:text>#{item.quantity}</core:text>
+</core:text>
+<core:text visibility="#{!item.enterByQuantity &amp;&amp; item.trackedIdType != 'CARD_PAN'}" id="TenderItemTotal">
+    <core:formatters>
+        <core:formatCurrencyAmount currencyId="#{item.currencyKey.currencyId}"/>
+    </core:formatters>
+    <core:text>#{item.total}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+            <core:formatElement applicability="#{item.enterByDenomination &amp;&amp; cMTransaction.countedItemMapNew[item.tenderId] != null}" formatId="denominationItemsList"/>
+            <core:formatElement applicableClassName="com.enactor.cashManagement.entities.ITrackedItem" applicability="#{item.isTrackedItem &amp;&amp; item.trackedIdType == 'FREE_TEXT' &amp;&amp; cMTransaction.countedItemMapNew[item.tenderId] != null}" formatId="trackedItemsList"/>
+            <core:formatElement applicableClassName="com.enactor.cashManagement.entities.ITrackedItem" applicability="#{item.isTrackedItem &amp;&amp; item.trackedIdType != 'FREE_TEXT' &amp;&amp; cMTransaction.countedItemMapNew[item.tenderId] != null}" formatId="trackedItemRangesList"/>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="denominationItemsList">
+        <core:elements>
+            <core:tableTemplate listVariableName="denominationItem" list="#{cMTransaction.countedItemMapNew[item.tenderId].denominationItemsList}" id="DenominationItems">
+                <core:formatElement formatId="denominationItem"/>
+            </core:tableTemplate>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="denominationItem">
+        <core:elements>
+            <core:row visibility="#{denominationItem.value != 0}" id="DenominationItemRow">
+                <core:rowLine id="DenominationItemRowLine">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="SubDescription" id="DenominationItemDescriptionColumn">
+                            <core:elements>
+<core:text id="DenominationItemDescriptionText">
+    <core:text>#{denominationItem.description}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="SubAmount" id="DenominationItemSubAmountColumn">
+                            <core:elements>
+<core:text id="DenominationItemSubAmountText">
+    <core:formatters>
+        <core:formatCurrencyAmount currencyId="#{item.currencyKey.currencyId}"/>
+    </core:formatters>
+    <core:text>#{denominationItem.value}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="trackedItemsList">
+        <core:elements>
+            <core:tableTemplate listVariableName="trackedItem" list="#{cMTransaction.countedItemMapNew[item.tenderId].trackedItemsList}" id="TrackedItems">
+                <core:formatElement formatId="trackedItem"/>
+            </core:tableTemplate>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="trackedItem">
+        <core:elements>
+            <core:row id="TrackedItemRow">
+                <core:rowLine id="TrackedItemRowLine">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="SubDescription" id="TrackedItemReferenceColumn">
+                            <core:elements>
+<core:text id="TrackedItemReferenceText">
+    <core:text>#{trackedItem.reference}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="SubAmount" id="TrackedItemValueColumn">
+                            <core:elements>
+<core:text id="TrackedItemValueText">
+    <core:formatters>
+        <core:formatCurrencyAmount currencyId="#{item.currencyKey.currencyId}"/>
+    </core:formatters>
+    <core:text>#{trackedItem.value}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="trackedItemRangesList">
+        <core:elements>
+            <core:tableTemplate listVariableName="trackedItemRange" list="#{cMTransaction.countedItemMapNew[item.tenderId].trackedItemRangesList}" id="TrackedItemRanges">
+                <core:formatElement formatId="trackedItemRange"/>
+            </core:tableTemplate>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="trackedItemRange">
+        <core:elements>
+            <core:row id="TrackedItemRangeRow">
+                <core:rowLine id="TrackedItemRangeRowLine1">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="SubDescription" id="TrackedItemRangeCountLabel">
+                            <core:elements>
+<core:text id="TrackedItemRangeCountLabelText">
+    <core:text>Count</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="PAN" id="TrackedItemRangeCountColumn">
+                            <core:elements>
+<core:text id="TrackedItemRangeCountText">
+    <core:text>#{trackedItemRange.count}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine id="TrackedItemRangeRowLine2">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="SubDescription" id="TrackedItemRangeSerialFromLabel">
+                            <core:elements>
+<core:text id="TrackedItemRangeSerialFromLabelText">
+    <core:text>Serial From</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="PAN" id="TrackedItemRangeFirstReferenceColumn">
+                            <core:elements>
+<core:text id="TrackedItemRangeFirstReferenceText">
+    <core:text>#{trackedItemRange.firstReference}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine id="TrackedItemRangeRowLine3">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="SubDescription" id="TrackedItemRangeSerialToLabel">
+                            <core:elements>
+<core:text id="TrackedItemRangeSerialToLabelText">
+    <core:text>Serial To</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="PAN" id="TrackedItemRangeLastReferenceColumn">
+                            <core:elements>
+<core:text id="TrackedItemRangeLastReferenceText">
+    <core:text>#{trackedItemRange.lastReference}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="cashManagementHeader">
+        <core:elements>
+            <core:formatElement formatId="headerLogo" visible="false"/>
+            <core:formatElement applicability="#{cMTransaction.trainingMode}" formatId="cashManagementTrainingModeHeader"/>
+            <core:formatElement applicability="#{cMTransaction.isVoided}" formatId="cashManagementVoidedHeader"/>
+            <core:formatElement formatId="cashManagementTransactionHeader"/>
+            <core:formatElement formatId="cashManagementOwner"/>
+            <core:formatElement applicability="#{cMTransaction.transactionType == 'TerminalTransferIn' || cMTransaction.transactionType == 'SafeTransferIn'}" formatId="cashManagementLedgerIn"/>
+            <core:formatElement applicability="#{cMTransaction.transactionType == 'TerminalTransferOut' || cMTransaction.transactionType == 'SafeTransferOut'}" formatId="cashManagementLedgerOut"/>
+            <core:formatElement applicability="#{cMTransaction.transactionType == 'TerminalTransferIn' || cMTransaction.transactionType == 'TerminalTransferOut' || cMTransaction.transactionType == 'SafeTransferIn' || cMTransaction.transactionType == 'SafeTransferOut'}" formatId="cashManagementDocket"/>
+            <core:formatElement applicability="#{(cMTransaction.transactionType == 'TerminalExpense' || cMTransaction.transactionType == 'TerminalIncome') &amp;&amp; notEmpty(cMTransaction.reasonKey.reasonId)}" formatId="reason"/>
+            <core:formatElement applicability="#{(instanceOf(cMTransaction, 'com.enactor.cashManagement.entities.ITerminalReasonTransaction') || instanceOf(cMTransaction, 'com.enactor.cashManagement.entities.ISafeReasonTransaction')) &amp;&amp; notEmpty(cMTransaction.reference)}" formatId="cashManagementReference"/>
+            <core:formatElement applicability="#{cMTransaction.transactionType == 'SafeBanking'}" formatId="cashManagementBankingSlipReference" visible="false"/>
+            <core:formatElement applicability="#{cMTransaction.transactionType == 'SafeBanking'}" formatId="cashManagementBankingBagReference" visible="false"/>
+            <core:formatElement applicability="#{notEmpty(cMTransaction.referenceUserKey) &amp;&amp; notEmpty(cMTransaction.referenceUserKey.userId)}" formatId="cashManagementReferenceUser"/>
+            <core:formatElement applicability="#{cMTransaction.transactionType == 'TerminalOutlayReturn' || cMTransaction.transactionType == 'SafeOutlayReturn'}" formatId="outlayReturnTransaction"/>
+            <core:formatElement applicability="#{cMTransaction.transactionType == 'TerminalUncountedPickup'}" formatId="uncountedPickupReference"/>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="cashManagementTrainingModeHeader">
+        <core:elements>
+            <core:line id="CashManagementTrainingModeHeaderLine">
+                <core:elements>
+                    <core:column maxLines="0" columnDefId="FullCentre" id="TrainingModeHeaderLabel">
+                        <core:elements>
+                            <core:text messageId="TRAINING_MODE_HEADING"/>
+                        </core:elements>
+                    </core:column>
+                </core:elements>
+            </core:line>
+            <core:formatElement formatId="separator"/>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="cashManagementVoidedHeader">
+        <core:elements>
+            <core:line id="CashManagementVoidedHeaderLine">
+                <core:elements>
+                    <core:column maxLines="0" columnDefId="FullCentre" id="VoidedHeaderLabel">
+                        <core:elements>
+                            <core:text messageId="VOIDED_HEADING" id="VoidedHeaderText"/>
+                        </core:elements>
+                    </core:column>
+                </core:elements>
+            </core:line>
+            <core:formatElement formatId="separator"/>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="cashManagementTransactionHeader">
+        <core:elements>
+            <core:line id="CashManagementTransactionHeaderLine">
+                <core:elements>
+                    <core:column maxLines="0" columnDefId="FullCentre" id="CashManagementTransactionHeadings">
+                        <core:elements>
+                            <core:text messageId="SAFE_ADJUSTMENT_HEADING" visibility="#{cMTransaction.transactionType == 'SafeAdjustment'}" id="SafeAdjustmentHeadingText"/>
+                            <core:text messageId="SAFE_BAG_COLLECTION_HEADING" visibility="#{cMTransaction.transactionType == 'SafeBagCollection'}" id="SafeBagCollectionHeadingText"/>
+                            <core:text messageId="SAFE_BAG_HEADING" visibility="#{cMTransaction.transactionType == 'SafeBag'}" id="SafeBagHeadingText"/>
+                            <core:text messageId="SAFE_BANKING_HEADING" visibility="#{cMTransaction.transactionType == 'SafeBanking'}" id="SafeBankingHeadingTextText"/>
+                            <core:text messageId="SAFE_CASHUP_HEADING" visibility="#{cMTransaction.transactionType == 'SafeCashup'}" id="SafeCashupHeadingText"/>
+                            <core:text messageId="SAFE_CLOSE_HEADING" visibility="#{cMTransaction.transactionType == 'SafeClose'}" id="SafeCloseHeadingText"/>
+                            <core:text messageId="SAFE_CURRENCY_PURCHASE_HEADING" visibility="#{cMTransaction.transactionType == 'SafeCurrencyPurchase'}" id="SafeCurrencyPurchaseHeadingText"/>
+                            <core:text messageId="SAFE_EXPENSE_HEADING" visibility="#{cMTransaction.transactionType == 'SafeExpense'}" id="SafeExpenseHeadingText"/>
+                            <core:text messageId="SAFE_INCOME_HEADING" visibility="#{cMTransaction.transactionType == 'SafeIncome'}" id="SafeIncomeHeadingText"/>
+                            <core:text messageId="SAFE_OUTLAY_HEADING" visibility="#{cMTransaction.transactionType == 'SafeOutlay'}" id="SafeOutlayHeadingText"/>
+                            <core:text messageId="SAFE_OUTLAY_RETURN_HEADING" visibility="#{cMTransaction.transactionType == 'SafeOutlayReturn'}" id="SafeOutlayReturnHeadingText"/>
+                            <core:text messageId="SAFE_TRANSFER_IN_HEADING" visibility="#{cMTransaction.transactionType == 'SafeTransferIn'}" id="SafeTransferInHeadingText"/>
+                            <core:text messageId="SAFE_TRANSFER_OUT_HEADING" visibility="#{cMTransaction.transactionType == 'SafeTransferOut'}" id="SafeTransferOutHeadingText"/>
+                            <core:text messageId="SAFE_UNBAG_HEADING" visibility="#{cMTransaction.transactionType == 'SafeUnbag'}" id="SafeUnbagHeadingText"/>
+                            <core:text messageId="TERMINAL_BAG_HEADING" visibility="#{cMTransaction.transactionType == 'TerminalBag'}" id="TerminalBagHeadingText"/>
+                            <core:text messageId="TERMINAL_BLIND_SPOT_CHECK_HEADING" visibility="#{cMTransaction.transactionType == 'TerminalBlindSpotCheck'}" id="TerminalBlindSpotCheckHeadingText"/>
+                            <core:text messageId="TERMINAL_CASHUP_AND_EMPTY_HEADING" visibility="#{cMTransaction.transactionType == 'TerminalCashupAndEmpty'}" id="TerminalCashupAndEmptyHeadingText"/>
+                            <core:text messageId="TERMINAL_CASHUP_AND_LEAVE_HEADING" visibility="#{cMTransaction.transactionType == 'TerminalCashupAndLeave'}" id="TerminalCashupAndLeaveHeadingText"/>
+                            <core:text messageId="TERMINAL_CLOSE_HEADING" visibility="#{cMTransaction.transactionType == 'TerminalClose'}" id="TerminalCloseHeadingText"/>
+                            <core:text messageId="TERMINAL_CLOSING_FLOAT_HEADING" visibility="#{cMTransaction.transactionType == 'TerminalClosingFloat'}" id="TerminalClosingFloatHeadingText"/>
+                            <core:text messageId="TERMINAL_EXCHANGE_IN_HEADING" visibility="#{cMTransaction.transactionType == 'TerminalExchangeIn'}" id="TerminalExchangeInHeadingText"/>
+                            <core:text messageId="TERMINAL_EXCHANGE_OUT_HEADING" visibility="#{cMTransaction.transactionType == 'TerminalExchangeOut'}" id="TerminalExchangeOutHeadingText"/>
+                            <core:text messageId="TERMINAL_EXCHANGE_IN_REQUEST_HEADING" visibility="#{cMTransaction.transactionType == 'TerminalExchangeInRequest'}" id="TerminalExchangeInRequestHeadingText"/>
+                            <core:text messageId="TERMINAL_EXCHANGE_OUT_REQUEST_HEADING" visibility="#{cMTransaction.transactionType == 'TerminalExchangeOutRequest'}" id="TerminalExchangeOutRequestHeadingText"/>
+                            <core:text messageId="TERMINAL_EXPENSE_HEADING" visibility="#{cMTransaction.transactionType == 'TerminalExpense'}" id="TerminalExpenseHeadingText"/>
+                            <core:text messageId="TERMINAL_OPENING_FLOAT_HEADING" visibility="#{cMTransaction.transactionType == 'TerminalOpeningFloat'}" id="TerminalOpeningFloatHeadingText"/>
+                            <core:text messageId="TERMINAL_FLOAT_HEADING" visibility="#{cMTransaction.transactionType == 'TerminalFloat'}" id="TerminalFloatHeadingText"/>
+                            <core:text messageId="TERMINAL_FLOAT_REQUEST_HEADING" visibility="#{cMTransaction.transactionType == 'TerminalFloatRequest'}" id="TerminalFloatRequestHeadingText"/>
+                            <core:text messageId="TERMINAL_INCOME_HEADING" visibility="#{cMTransaction.transactionType == 'TerminalIncome'}" id="TerminalIncomeHeadingText"/>
+                            <core:text messageId="TERMINAL_OUTLAY_HEADING" visibility="#{cMTransaction.transactionType == 'TerminalOutlay'}" id="TerminalOutlayHeadingText"/>
+                            <core:text messageId="TERMINAL_OUTLAY_RETURN_HEADING" visibility="#{cMTransaction.transactionType == 'TerminalOutlayReturn'}" id="TerminalOutlayReturnHeadingText"/>
+                            <core:text messageId="TERMINAL_PICKUP_HEADING" visibility="#{cMTransaction.transactionType == 'TerminalPickup'}" id="TerminalPickupHeadingText"/>
+                            <core:text messageId="TERMINAL_REJECT_EXCHANGE_HEADING" visibility="#{cMTransaction.transactionType == 'TerminalRejectExchange'}" id="TerminalRejectExchangeHeadingText"/>
+                            <core:text messageId="TERMINAL_REJECT_EXCHANGE_IN_HEADING" visibility="#{cMTransaction.transactionType == 'TerminalRejectExchangeIn'}" id="TerminalRejectExchangeInHeadingText"/>
+                            <core:text messageId="TERMINAL_REJECT_EXCHANGE_OUT_HEADING" visibility="#{cMTransaction.transactionType == 'TerminalRejectExchangeOut'}" id="TerminalRejectExchangeOutHeadingText"/>
+                            <core:text messageId="TERMINAL_TRANSFER_IN_HEADING" visibility="#{cMTransaction.transactionType == 'TerminalTransferIn'}" id="TerminalTransferInHeadingText"/>
+                            <core:text messageId="TERMINAL_TRANSFER_OUT_HEADING" visibility="#{cMTransaction.transactionType == 'TerminalTransferOut'}" id="TerminalTransferOutHeadingText"/>
+                            <core:text messageId="TERMINAL_UNBAG_HEADING" visibility="#{cMTransaction.transactionType == 'TerminalUnbag'}" id="TerminalUnbagHeadingText"/>
+                            <core:text messageId="TERMINAL_UNCOUNTED_PICKUP_HEADING" visibility="#{cMTransaction.transactionType == 'TerminalUncountedPickup'}" id="TerminalUncountedPickupHeadingText"/>
+                        </core:elements>
+                    </core:column>
+                </core:elements>
+            </core:line>
+            <core:formatElement formatId="separator"/>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="cashManagementOwner">
+        <core:elements>
+            <core:line id="CashManagementOwnerLine">
+                <core:elements>
+                    <core:column maxLines="0" columnDefId="FullCentre" id="CashManagementOwnerColumn">
+                        <core:elements>
+                            <core:text messageId="#{cMTransaction.ownerKey.type == 2 ? 'CASHIER' : cMTransaction.ownerKey.type == 4 ? 'SAFE' : cMTransaction.ownerKey.type == 5 ? 'PAY_POINT' : 'TERMINAL'}"/>
+                            <core:text id="CashManagementOwnerEmptySpaceText">
+<core:text> </core:text>
+                            </core:text>
+                            <core:text id="CashManagementOwnerId">
+<core:text>#{cMTransaction.ownerKey.ownerId}</core:text>
+                            </core:text>
+                        </core:elements>
+                    </core:column>
+                </core:elements>
+            </core:line>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="cashManagementLedgerIn">
+        <core:elements>
+            <core:line id="CashManagementLedgerInLine">
+                <core:elements>
+                    <core:column maxLines="0" columnDefId="FullCentre" id="CashManagementLedgerInColumn">
+                        <core:elements>
+                            <core:text messageId="#{notEmpty(cMTransaction.generalLedgerCodeKey) &amp;&amp; notEmpty(cMTransaction.generalLedgerCodeKey.generalLedgerCode) ? 'GENERAL_LEDGER_CODE' : 'SOURCE_LOCATION'}" id="CashManagementLedgerInLabelText"/>
+                            <core:text id="CashManagementLedgerInEmptySpaceText">
+<core:text> </core:text>
+                            </core:text>
+                            <core:text id="CashManagementLedgerInText">
+<core:text>#{notEmpty(cMTransaction.generalLedgerCodeKey) &amp;&amp; notEmpty(cMTransaction.generalLedgerCodeKey.generalLedgerCode) ? cMTransaction.generalLedgerCodeKey.generalLedgerCode : cMTransaction.sourceLocationKey.locationId}</core:text>
+                            </core:text>
+                        </core:elements>
+                    </core:column>
+                </core:elements>
+            </core:line>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="cashManagementLedgerOut">
+        <core:elements>
+            <core:line id="CashManagementLedgerOutLine">
+                <core:elements>
+                    <core:column maxLines="0" columnDefId="FullCentre" id="CashManagementLedgerOutColumn">
+                        <core:elements>
+                            <core:text messageId="#{notEmpty(cMTransaction.generalLedgerCodeKey) &amp;&amp; notEmpty(cMTransaction.generalLedgerCodeKey.generalLedgerCode) ? 'GENERAL_LEDGER_CODE' : 'DESTINATION_LOCATION'}" id="CashManagementLedgerOutLabelText"/>
+                            <core:text id="CashManagementLedgerOutEmptySpaceText">
+<core:text> </core:text>
+                            </core:text>
+                            <core:text id="CashManagementLedgerOutText">
+<core:text>#{notEmpty(cMTransaction.generalLedgerCodeKey) &amp;&amp; notEmpty(cMTransaction.generalLedgerCodeKey.generalLedgerCode) ? cMTransaction.generalLedgerCodeKey.generalLedgerCode : cMTransaction.destinationLocationKey.locationId}</core:text>
+                            </core:text>
+                        </core:elements>
+                    </core:column>
+                </core:elements>
+            </core:line>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="cashManagementDocket">
+        <core:elements>
+            <core:line>
+                <core:elements>
+                    <core:column maxLines="0" columnDefId="FullCentre" id="CashManagementDocketColumn">
+                        <core:elements>
+                            <core:text messageId="DOCKET_ID" id="CashManagementDocketIdLabel"/>
+                            <core:text id="CashManagementDocketEmptySpaceText">
+<core:text> </core:text>
+                            </core:text>
+                            <core:text id="CashManagementDocketText">
+<core:text>#{cMTransaction.transactionType == 'TerminalTransferOut' || cMTransaction.transactionType == 'SafeTransferOut' ? concat(cMTransaction.ownerKey.locationKey.locationId,cMTransaction.transactionNumber) : cMTransaction.referenceTransactionId}</core:text>
+                            </core:text>
+                        </core:elements>
+                    </core:column>
+                </core:elements>
+            </core:line>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="cashManagementReference">
+        <core:elements>
+            <core:line id="CashManagementReferenceLine">
+                <core:elements>
+                    <core:column maxLines="0" columnDefId="FullCentre" id="CashManagementReferenceColumn">
+                        <core:elements>
+                            <core:text messageId="PRINT_REFERENCE" id="CashManagementReferenceLabelText"/>
+                            <core:text id="CashManagementReferenceText">
+<core:text>#{cMTransaction.reference}</core:text>
+                            </core:text>
+                        </core:elements>
+                    </core:column>
+                </core:elements>
+            </core:line>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="cashManagementBankingSlipReference">
+        <core:elements>
+            <core:line visibility="#{notEmpty(cMTransaction.bankingSlipReference)}">
+                <core:elements>
+                    <core:column maxLines="0" columnDefId="FullCentre">
+                        <core:elements>
+                            <core:text messageId="PRINT_BANKING_SLIP_REFERENCE"/>
+                            <core:formatElement formatId="textSeparator"/>
+                            <core:text>
+<core:text>#{cMTransaction.bankingSlipReference}</core:text>
+                            </core:text>
+                        </core:elements>
+                    </core:column>
+                </core:elements>
+            </core:line>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="cashManagementBankingBagReference">
+        <core:elements>
+            <core:line visibility="#{notEmpty(cMTransaction.bankingBagReference)}">
+                <core:elements>
+                    <core:column maxLines="0" columnDefId="FullCentre">
+                        <core:elements>
+                            <core:text messageId="PRINT_BANKING_BAG_REFERENCE"/>
+                            <core:formatElement formatId="textSeparator"/>
+                            <core:text>
+<core:text>#{cMTransaction.bankingBagReference}</core:text>
+                            </core:text>
+                        </core:elements>
+                    </core:column>
+                </core:elements>
+            </core:line>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="cashManagementReferenceUser">
+        <core:elements>
+            <core:line id="CashManagementReferenceUserLine">
+                <core:elements>
+                    <core:column maxLines="0" columnDefId="FullCentre" id="CashManagementReferenceUserColumn">
+                        <core:elements>
+                            <core:text messageId="PRINT_REFERENCE_USER" id="CashManagementReferenceUserLabelText"/>
+                            <core:text id="CashManagementReferenceUserId">
+<core:text>#{cMTransaction.referenceUserKey.userId}</core:text>
+                            </core:text>
+                        </core:elements>
+                    </core:column>
+                </core:elements>
+            </core:line>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="uncountedPickupReference">
+        <core:elements>
+            <core:line visibility="#{!cMTransaction.isVoided}" id="UncountedPickupReferenceLine">
+                <core:elements>
+                    <core:column maxLines="0" columnDefId="FullCentre" id="UncountedPickupReferenceColumn">
+                        <core:elements>
+                            <core:text messageId="SEAL_NUMBER" id="UncountedPickupReferenceLabelText"/>
+                            <core:text id="UncountedPickupReferenceEmptySpaceText">
+<core:text> </core:text>
+                            </core:text>
+                            <core:text id="UncountedPickupReferenceText">
+<core:text>#{cMTransaction.uncountedPickupReference}</core:text>
+                            </core:text>
+                        </core:elements>
+                    </core:column>
+                </core:elements>
+            </core:line>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="cashManagementBody">
+        <core:elements>
+            <core:formatElement applicability="#{!empty tendersList}" formatId="tenderItemsList"/>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="cashManagementFooter">
+        <core:elements>
+            <core:formatElement applicability="#{notEmpty(cMTransaction.notes)}" formatId="cashManagementNotes"/>
+            <core:formatElement applicability="#{cMTransaction.transactionType == 'TerminalOutlay' || cMTransaction.transactionType == 'TerminalOutlayReturn' || cMTransaction.transactionType == 'SafeOutlay' || cMTransaction.transactionType == 'SafeOutlayReturn'}" formatId="signature"/>
+            <core:formatElement formatId="separator"/>
+            <core:formatElement formatId="cashManagementTrailerLine"/>
+            <core:formatElement formatId="pageBreak"/>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="cashManagementNotes">
+        <core:elements>
+            <core:formatElement formatId="separator"/>
+            <core:line id="CashManagementNotesLine">
+                <core:elements>
+                    <core:column maxLines="0" wrap="true" align="LEFT" columnDefId="SubDescription" id="CashManagementNotesColumn">
+                        <core:elements>
+                            <core:text id="CashManagementNotesText">
+<core:text>#{cMTransaction.notes}</core:text>
+                            </core:text>
+                        </core:elements>
+                    </core:column>
+                </core:elements>
+            </core:line>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="cashManagementTrailerLine">
+        <core:elements>
+            <core:line id="CashManagementTrailerLine">
+                <core:elements>
+                    <core:column maxLines="0" columnDefId="FullLeft" id="CashManagementTrailerCreatedDateColumn">
+                        <core:elements>
+                            <core:text id="CashManagementTrailerCreatedDateText">
+<core:formatters>
+    <core:formatDate pattern="shortDateTime"/>
+</core:formatters>
+<core:text>#{cMTransaction.dateCreated}</core:text>
+                            </core:text>
+                        </core:elements>
+                    </core:column>
+                    <core:column maxLines="0" columnDefId="FullCentre" id="CashManagementTrailerAuthorisingUserKeyColumn">
+                        <core:elements>
+                            <core:text id="CashManagementTrailerAuthorisingUserKeyText">
+<core:text>#{(notEmpty(cMTransaction.authorisingUserKey)  &amp;&amp; notEmpty(cMTransaction.authorisingUserKey.userId)) ? cMTransaction.authorisingUserKey.userId : user.userId}</core:text>
+                            </core:text>
+                        </core:elements>
+                    </core:column>
+                    <core:column maxLines="0" columnDefId="FullRight" id="CashManagementTrailerDetailsColumns">
+                        <core:elements>
+                            <core:text id="CashManagementTrailerBranchNumberText">
+<core:text>#{location.branchNumber}</core:text>
+                            </core:text>
+                            <core:text id="CashManagementTrailerEmptySpace1">
+<core:text> </core:text>
+                            </core:text>
+                            <core:text id="CashManagementTrailerTerminalNumber">
+<core:text>#{posTerminal.terminalNumber}</core:text>
+                            </core:text>
+                            <core:text id="CashManagementTrailerEmptySpace2">
+<core:text> </core:text>
+                            </core:text>
+                            <core:text id="CashManagementTrailerTransactionNumber">
+<core:text>#{cMTransaction.transactionNumber}</core:text>
+                            </core:text>
+                        </core:elements>
+                    </core:column>
+                </core:elements>
+            </core:line>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="Reason">
+        <core:elements>
+            <core:formatElement formatId="reason"/>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="reason">
+        <core:elements>
+            <core:column maxLines="0" columnDefId="FullCentre" id="PrintReasonLabel">
+                <core:elements>
+                    <core:text messageId="PRINT_REASON" id="PrintReasonLabelText"/>
+                    <core:text visibility="#{notEmpty(loadedReason.description)}" id="PrintReasonDescription">
+                        <core:formatters>
+                            <core:formatLocaleString/>
+                        </core:formatters>
+                        <core:text>#{loadedReason.description}</core:text>
+                    </core:text>
+                    <core:text visibility="#{isEmpty(loadedReason.description)}" id="PrintReasonId">
+                        <core:text>#{cMTransaction.reasonKey.reasonId}</core:text>
+                    </core:text>
+                    <core:lineElement id="PrintReasonTrailerLine"/>
+                </core:elements>
+            </core:column>
+        </core:elements>
+        <core:entityReferences>
+            <core:entityReference name="loadedReason" keyValue="#{cMTransaction.reasonKey}"/>
+        </core:entityReferences>
+    </core:formatEntry>
+    <core:formatEntry id="ReasonFromReasonTransaction">
+        <core:elements>
+            <core:column maxLines="0" columnDefId="Description" id="ReasonFromReasonTransactionColumn">
+                <core:elements>
+                    <core:text visibility="#{notEmpty(reasonTransactionReason.description)}" id="ReasonFromReasonTransactionDescription">
+                        <core:formatters>
+                            <core:formatLocaleString/>
+                        </core:formatters>
+                        <core:text>#{reasonTransactionReason.description}</core:text>
+                    </core:text>
+                    <core:text visibility="#{isEmpty(reasonTransactionReason.description)}" id="ReasonFromReasonTransactionReasonId">
+                        <core:text>#{reasonTransaction.reasonKey.reasonId}</core:text>
+                    </core:text>
+                </core:elements>
+            </core:column>
+        </core:elements>
+        <core:entityReferences>
+            <core:entityReference name="reasonTransactionReason" keyValue="#{reasonTransaction.reasonKey}"/>
+        </core:entityReferences>
+    </core:formatEntry>
+    <core:formatEntry id="OutlayReturnTransaction">
+        <core:elements>
+            <core:formatElement formatId="outlayReturnTransaction"/>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="outlayReturnTransaction">
+        <core:elements>
+            <core:assign to="tendersList" value="#{null}" id="ClearOutlayReturnTendersList"/>
+            <core:assign to="reasonTransaction" value="cMTransaction" id="SetOutlayReturnAsReasonTransaction"/>
+            <core:line id="OutlayReturnTransactionLine">
+                <core:elements>
+                    <core:formatElement formatId="ReasonFromReasonTransaction"/>
+                    <core:column maxLines="0" columnDefId="Amount" id="OutlayReturnTransactionColumn">
+                        <core:elements>
+                            <core:formatElement formatId="OutlayReturnTransactionValue"/>
+                        </core:elements>
+                    </core:column>
+                </core:elements>
+            </core:line>
+            <core:tableTemplate listVariableName="outlayExpenseTransaction" list="cMTransaction.expenseTransactions" visibility="#{notEmpty(cMTransaction.expenseTransactions)}" id="OutlayExpenseTransactionLoop">
+                <core:formatElement formatId="OutlayExpenseTransactionItem"/>
+            </core:tableTemplate>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="OutlayReturnTransactionValue">
+        <core:elements>
+            <core:text id="OutlayReturnBaseCountedValueTotal">
+                <core:formatters>
+                    <core:formatCurrencyAmount currencyId="#{cMTransaction.baseCurrencyKey.currencyId}"/>
+                </core:formatters>
+                <core:text>#{cMTransaction.baseCountedValueTotal}</core:text>
+            </core:text>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="OutlayExpenseTransactionItem">
+        <core:elements>
+            <core:assign to="reasonTransaction" value="#{null}" id="SetOutlayExpenseAsReasonTransaction1"/>
+            <core:assign to="reasonTransaction" value="outlayExpenseTransaction" id="SetOutlayExpenseAsReasonTransaction"/>
+            <core:line id="OutlayExpenseTransactionItemLine">
+                <core:elements>
+                    <core:formatElement formatId="ReasonFromReasonTransaction"/>
+                    <core:column maxLines="0" columnDefId="Amount" id="OutlayExpenseTransactionItemColumn">
+                        <core:elements>
+                            <core:formatElement formatId="OutlayExpenseTransactionItemValue"/>
+                        </core:elements>
+                    </core:column>
+                </core:elements>
+            </core:line>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="OutlayExpenseTransactionItemValue">
+        <core:elements>
+            <core:text id="OutlayExpenseBaseCountedValueTotal">
+                <core:formatters>
+                    <core:formatCurrencyAmount currencyId="#{outlayExpenseTransaction.baseCurrencyKey.currencyId}"/>
+                </core:formatters>
+                <core:text>#{-outlayExpenseTransaction.baseCountedValueTotal}</core:text>
+            </core:text>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="headerLogo">
+        <core:elements>
+            <core:column maxLines="0" columnDefId="FullCentre" id="HeaderLogo">
+                <core:elements>
+                    <core:imageElement visibility="#{location.receiptHeaderImageKey != null}" id="HeaderImage">
+                        <core:imageKey type="#{location.receiptHeaderImageKey.type}" category="#{location.receiptHeaderImageKey.category}">#{location.receiptHeaderImageKey.imageId}</core:imageKey>
+                    </core:imageElement>
+                </core:elements>
+            </core:column>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="cashierSignatureExpanded">
+        <core:elements>
+            <core:line id="CashierSignatureLine">
+                <core:elements>
+                    <core:column maxLines="0" columnDefId="Description" id="CashierSignatureColumn">
+                        <core:elements>
+                            <core:text messageId="CASHIER_SIGNATURE" id="CashierSignatureLabelText"/>
+                        </core:elements>
+                    </core:column>
+                </core:elements>
+            </core:line>
+            <core:formatElement formatId="blankLine"/>
+            <core:formatElement formatId="signatureLine"/>
+            <core:formatElement formatId="blankLine"/>
+        </core:elements>
+    </core:formatEntry>
+</core:documentTemplate>

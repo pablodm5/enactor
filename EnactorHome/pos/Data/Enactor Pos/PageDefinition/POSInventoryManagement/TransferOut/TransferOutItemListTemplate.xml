@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<core:documentTemplate xmlns:core="http://www.enactor.com/core" xmlns:retail="http://www.enactor.com/retail" xmlns:ns4="http://www.enactor.com/crm" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803" xmlns:ns6="http://www.apis-it.hr/fin/2012/types/f73" xmlns:ns7="http://www.w3.org/2000/09/xmldsig#" xmlns:ns8="http://www.enactor.com/retail/storedRetailTransaction/service" xmlns:ns9="http://www.fu.gov.si/" xmlns:ns10="http://www.enactor.com/addressLookup/service" xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:ns14="http://www.enactor.com/crm/customerLoyalty/service" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" paginated="false" width="100" title="Transfer Out Item List Template" url="POSInventoryManagement/TransferOut/TransferOutItemListTemplate">
+    <core:elements>
+        <core:tableTemplate listVariableName="item" list="transferOutItemsList" id="TRANSFER_OUT_ITEMS_LIST">
+            <core:formatElement applicableEntityName="listHeader" formatId="TransferOutSummaryHeader"/>
+            <core:formatElement applicableEntityName="listFooter"/>
+            <core:formatElement applicableClassName="com.enactor.storeInventoryManagement.local.inventoryContainer.ILocalInventoryContainer" formatId="TransferOutContainerRow"/>
+            <core:formatElement applicableClassName="com.enactor.storeInventoryManagement.local.transferOut.ITransferOutItem" formatId="TransferOutItemRow"/>
+        </core:tableTemplate>
+    </core:elements>
+    <core:variables>
+        <core:variable name="enactor.inventoryManagement.local.TransferOutItemsList">
+            <core:interfaceName>java.util.List</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.inventoryManagement.local.ContainerSizeMap">
+            <core:interfaceName>java.util.Map</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.inventoryManagement.SizeMap">
+            <core:interfaceName>java.util.Map</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.inventoryManagement.StyleMap">
+            <core:interfaceName>java.util.Map</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.inventoryManagement.ColourMap">
+            <core:interfaceName>java.util.Map</core:interfaceName>
+        </core:variable>
+        <core:variable name="enactor.coreUI.ItemCountMap">
+            <core:interfaceName>java.util.Map</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.coreui.LocationKeyMap">
+            <core:interfaceName>java.util.Map</core:interfaceName>
+        </core:variable>
+    </core:variables>
+    <core:columnDefs>
+        <core:columnDef id="Column1" end="55" startPos="0" endPos="0"/>
+        <core:columnDef id="Column3" start="15" end="30" startPos="0" endPos="0"/>
+        <core:columnDef id="Column4" start="30" end="63" startPos="0" endPos="0"/>
+        <core:columnDef id="Column6" start="63" end="68" startPos="0" endPos="0" align="CENTRE"/>
+        <core:columnDef id="Column7" start="68" end="80" startPos="0" endPos="0" align="CENTRE"/>
+        <core:columnDef id="Column8" start="80" end="92" startPos="0" endPos="0" align="CENTRE"/>
+        <core:columnDef id="ColumnStyleColorSize" start="15" end="100" startPos="2" endPos="0"/>
+    </core:columnDefs>
+    <core:formatEntry id="TransferOutContainerRow">
+        <core:elements>
+            <core:row>
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="Column1">
+                            <core:elements>
+<core:text styleClass="inventoryItemLabel" colour="#354859" style="ITALIC">
+    <core:text>#{ concat(isEmpty(item.name) ? '-' : concat(strings:substring(item.name, 0, 12), (length(item.name) &gt; 12 ? '...' : '')) , item.inventoryContainerId == 'NA' ? '' : concat(' (' , concat( item.inventoryContainerId , ') ') ) )  }</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="Column6">
+                            <core:elements>
+<core:text styleClass="inventoryItemLabel" colour="#354859">
+    <core:text>#{containerSizeMap[item.inventoryContainerId]}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="TransferOutItemRow">
+        <core:elements>
+            <core:row>
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="Column3">
+                            <core:elements>
+<core:text styleClass="inventoryItemLabel" colour="#354859">
+    <core:text>#{item.productKey.productId}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="Column4">
+                            <core:elements>
+<core:text styleClass="inventoryItemLabel" colour="#354859">
+    <core:text>#{concat(strings:substring(item.description, 0, 30), (length(item.description) &gt; 30 ? '...' : ''))}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="Column7">
+                            <core:elements>
+<core:text styleClass="inventoryItemLabel" colour="#354859">
+    <core:text>#{item.requestedQuantity}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="Column8">
+                            <core:elements>
+<core:text styleClass="inventoryItemLabel" colour="#354859">
+    <core:text>#{item.quantity}</core:text>
+</core:text>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+                <core:rowLine visibility="#{instanceOf(productMap[item.productKey.productId],'com.enactor.mfc.product.ISKUProduct')}">
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="ColumnStyleColorSize">
+                            <core:elements>
+<core:text messageBase="POSInventoryManagement/TransferOut/TransferOutMessages" messageId="TRANSFER_ITEMS_PRODUCT_DETAILS_LABEL" styleClass="inventoryItemLabel"/>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="TransferOutSummaryHeader">
+        <core:elements>
+            <core:row backgroundColour="#e5e5e5" style="SOLID_BACKGROUND">
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="Column1">
+                            <core:elements>
+<core:text textTransform="UPPERCASE" messageBase="POSInventoryManagement/TransferOut/TransferOutMessages" messageId="TRANSFER_ITEMS_CONTAINER_NAME_AND_ID_HEADER_LABEL" styleClass="inventoryHeaderItemLabel" style="BOLD"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="Column3">
+                            <core:elements>
+<core:text textTransform="UPPERCASE" messageBase="POSInventoryManagement/TransferOut/TransferOutMessages" messageId="PRODUCT_ID_LABEL" styleClass="inventoryHeaderItemLabel" style="BOLD"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="Column4">
+                            <core:elements>
+<core:text textTransform="UPPERCASE" messageBase="POSInventoryManagement/TransferOut/TransferOutMessages" messageId="DESC_LABEL" styleClass="inventoryHeaderItemLabel" style="BOLD"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="Column6">
+                            <core:elements>
+<core:text textTransform="UPPERCASE" messageBase="POSInventoryManagement/TransferOut/TransferOutMessages" messageId="SIZE_LABEL" styleClass="inventoryHeaderItemLabel" style="BOLD"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="Column7">
+                            <core:elements>
+<core:text textTransform="UPPERCASE" messageBase="POSInventoryManagement/TransferOut/TransferOutMessages" messageId="REQUESTED_QTY_HEADER_LABEL" styleClass="inventoryHeaderItemLabel" style="BOLD"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="Column8">
+                            <core:elements>
+<core:text textTransform="UPPERCASE" messageBase="POSInventoryManagement/TransferOut/TransferOutMessages" messageId="DISPATCH_QTY_HEADER_LABEL" styleClass="inventoryHeaderItemLabel" style="BOLD"/>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+    <core:formatEntry id="TransferOutItemHeader">
+        <core:elements>
+            <core:row backgroundColour="#e5e5e5" style="SOLID_BACKGROUND">
+                <core:rowLine>
+                    <core:elements>
+                        <core:column maxLines="0" columnDefId="Column1">
+                            <core:elements>
+<core:text textTransform="UPPERCASE" messageBase="POSInventoryManagement/TransferOut/TransferOutMessages" messageId="CONTAINER_NAME_HEADER_LABEL" styleClass="inventoryHeaderItemLabel" style="BOLD"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="Column3">
+                            <core:elements>
+<core:text textTransform="UPPERCASE" messageBase="POSInventoryManagement/TransferOut/TransferOutMessages" messageId="PRODUCT_ID_LABEL" styleClass="inventoryHeaderItemLabel" style="BOLD"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="Column2">
+                            <core:elements>
+<core:text textTransform="UPPERCASE" messageBase="POSInventoryManagement/TransferOut/TransferOutMessages" messageId="CONTAINER_ID_HEADER_LABEL" styleClass="inventoryHeaderItemLabel" style="BOLD"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="Column4">
+                            <core:elements>
+<core:text textTransform="UPPERCASE" messageBase="POSInventoryManagement/TransferOut/TransferOutMessages" messageId="DESC_LABEL" styleClass="inventoryHeaderItemLabel" style="BOLD"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="Column6">
+                            <core:elements>
+<core:text textTransform="UPPERCASE" messageBase="POSInventoryManagement/TransferOut/TransferOutMessages" messageId="SIZE_LABEL" styleClass="inventoryHeaderItemLabel" style="BOLD"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="Column7">
+                            <core:elements>
+<core:text textTransform="UPPERCASE" messageBase="POSInventoryManagement/TransferOut/TransferOutMessages" messageId="REQUESTED_QTY_HEADER_LABEL" styleClass="inventoryHeaderItemLabel" style="BOLD"/>
+                            </core:elements>
+                        </core:column>
+                        <core:column maxLines="0" columnDefId="Column8">
+                            <core:elements>
+<core:text textTransform="UPPERCASE" messageBase="POSInventoryManagement/TransferOut/TransferOutMessages" messageId="DISPATCH_QTY_HEADER_LABEL" styleClass="inventoryHeaderItemLabel" style="BOLD"/>
+                            </core:elements>
+                        </core:column>
+                    </core:elements>
+                </core:rowLine>
+            </core:row>
+        </core:elements>
+    </core:formatEntry>
+</core:documentTemplate>

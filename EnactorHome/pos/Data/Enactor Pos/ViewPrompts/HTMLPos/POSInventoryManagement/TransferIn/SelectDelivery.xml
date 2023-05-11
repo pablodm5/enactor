@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<core:viewPrompts xmlns:core="http://www.enactor.com/core" xmlns:retail="http://www.enactor.com/retail" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:tools="http://www.enactor.com/tools" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <core:viewId>HTMLPos</core:viewId>
+    <core:processId>POSInventoryManagement/TransferIn/SelectDelivery</core:processId>
+
+    <core:jsonPromptMapping>
+        <core:url>POSInventoryManagement/TransferIn/SelectDelivery</core:url>
+        <core:contentUrl>${ReactPos.contentUrl}</core:contentUrl>
+        <core:pageDefinitionUrl>HTMLPos/FullScreenBrowser</core:pageDefinitionUrl>
+        <core:isContentUrlExternal>false</core:isContentUrlExternal>
+        <core:processors>
+            <core:processor name="retail:selectedTransferInDeliveryHeaderDataProcessor"/>
+            <core:configurableProcessor name="retail:dynamicMapDataProcessor">
+                <core:dynamicMapDataProcessorConfig>
+                    <core:configs>
+                        <core:config
+                                mapName="enactor.dynamicMap.LocationsDynamicMap"
+                                listName="enactor.inventoryManagement.ExpectedDeliverysPagedList"
+                                keyDataName="#{item.sourceLocationKey.locationId}"
+                                valueExpression="#{locationsDynamicMap[item.destinationLocationKey.locationId].description}"
+                                targetMapName="locationsMap"/>
+                        <core:config
+                                mapName="enactor.dynamicMap.SuppliersDynamicMap"
+                                listName="enactor.inventoryManagement.ExpectedDeliverysPagedList"
+                                keyDataName="#{item.supplierKey.supplierId}"
+                                valueExpression="#{suppliersDynamicMap[item.supplierKey.supplierId].description}"
+                                targetMapName="suppliersMap"/>
+                    </core:configs>
+                </core:dynamicMapDataProcessorConfig>
+            </core:configurableProcessor>
+            <core:processor name="retail:defaultDataProcessor"/>
+            <core:configurableProcessor name="retail:entityDataProcessor">
+                <core:entityDataProcessorConfig>
+                    <core:entityKeyListDataName>enactor.inventoryManagement.ExpectedDeliverysPagedList</core:entityKeyListDataName>
+                    <core:entityKeyListExpression>#{item.reasonKey}</core:entityKeyListExpression>
+                    <core:entityDataName>reason</core:entityDataName>
+                    <core:dataMapKeyExpression>#{reason.reasonId}</core:dataMapKeyExpression>
+                    <core:dataMapName>reasonMap</core:dataMapName>
+                </core:entityDataProcessorConfig>
+            </core:configurableProcessor>
+        </core:processors>
+    </core:jsonPromptMapping>
+</core:viewPrompts>

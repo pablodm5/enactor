@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<core:peripheralSupportWindow xmlns:core="http://www.enactor.com/core" xmlns:retail="http://www.enactor.com/retail" xmlns:ns4="http://www.enactor.com/crm" xmlns:hta="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/api/200803" xmlns:ns6="http://www.apis-it.hr/fin/2012/types/f73" xmlns:ns7="http://www.w3.org/2000/09/xmldsig#" xmlns:ns8="http://www.enactor.com/retail/storedRetailTransaction/service" xmlns:ns9="http://www.fu.gov.si/" xmlns:ns10="http://www.enactor.com/addressLookup/service" xmlns:htd="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/200803" xmlns:htt="http://docs.oasis-open.org/ns/bpel4people/ws-humantask/types/200803" xmlns:sref="http://docs.oasis-open.org/wsbpel/2.0/serviceref" xmlns:ns14="http://www.enactor.com/crm/customerLoyalty/service" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" hasBorders="FALSE" height="320" width="320" messageBase="HHT/ProductEnquiry/ProductEnquiryMessages" titleId="PRODUCT_SEARCH_PAGE_TITLE" url="WM65/HHT/ProductEnquiryDetails/ProductEnquiryGeneral">
+    <core:elements>
+        <core:panel styleClass="mainPanel" id="MAIN_PANEL">
+            <core:boundsConstraint height="230" width="320" y="35" x="0"/>
+            <core:elements>
+                <core:label messageId="PRODUCT_ID_LABEL" styleClass="fieldLabel" id="PRODUCT_ID_LABEL">
+                    <core:boundsConstraint height="15" width="100" y="0" x="5"/>
+                </core:label>
+                <core:label messageId="CURRENT_PRICE_LABEL" styleClass="fieldLabelLeft" id="CURRENT_PRICE_LABEL">
+                    <core:boundsConstraint height="15" width="100" y="140" x="5"/>
+                </core:label>
+                <core:label messageId="HISTORY_LABEL" styleClass="fieldLabelLeft" id="HISTORY_LABEL">
+                    <core:boundsConstraint height="15" width="84" y="165" x="5"/>
+                </core:label>
+                <core:label messageId="PROMOTION_LABEL" styleClass="fieldLabelLeft" id="PROMOTION_LABEL">
+                    <core:boundsConstraint height="15" width="84" y="190" x="5"/>
+                </core:label>
+                <core:text styleClass="message" id="PRODUCT_ID">
+                    <core:boundsConstraint height="17" width="80" y="0" x="89"/>
+                    <core:text>#{ length(productDetail.productId) &gt; 15 ? concat(strings:substring(productDetail.productId,0,15),'...') : productDetail.productId}</core:text>
+                </core:text>
+                <core:text styleClass="message" id="CURRENT_PRICE_VALUE">
+                    <core:boundsConstraint height="17" width="65" y="140" x="90"/>
+                    <core:text>#{format:formatCurrency(productDetail.currentPrice)}</core:text>
+                </core:text>
+                <core:button messageId="VIEW_ALL_BUTTON" styleClass="button" enable="#{size(productDetail.productPriceHistory.history)&gt;1}" id="VIEW_ALL_PRICES_BUTTON">
+                    <core:boundsConstraint height="20" width="30" y="162" x="264"/>
+                    <core:text>ViewAllPricesPressed</core:text>
+                </core:button>
+                <core:text styleClass="message" visibility="#{size(productDetail.productPromotions.promotions)&gt;1}" id="PROMOTION_1">
+                    <core:boundsConstraint height="15" width="161" y="190" x="88"/>
+                    <core:text>#{length(productDetail.productPromotions.promotions[0].description) &gt; 20 ? concat(strings:substring(productDetail.productPromotions.promotions[0].description,0,20),'...') : productDetail.productPromotions.promotions[0].description}</core:text>
+                </core:text>
+                <core:button messageId="VIEW_ALL_BUTTON" styleClass="button" enable="#{size(productDetail.productPromotions.promotions)&gt;1}" id="VIEW_ALL_PROMOS">
+                    <core:boundsConstraint height="20" width="30" y="187" x="264"/>
+                    <core:text>ViewAllPromosPressed</core:text>
+                </core:button>
+                <core:text allowWrap="true" styleClass="message" id="PRODUCT_DESCRIPTION">
+                    <core:boundsConstraint height="43" width="164" y="25" x="5"/>
+                    <core:text>#{length(productDetail.description) &gt; 40 ? concat(strings:substring(productDetail.description,0,40),'...') : productDetail.description}</core:text>
+                </core:text>
+                <core:text styleClass="fieldValue" visibility="#{size(productDetail.productPriceHistory.history)&gt;1}" id="HISTORY_PRICE_2">
+                    <core:boundsConstraint height="15" width="65" y="165" x="90"/>
+                    <core:text>#{format:formatCurrency(productDetail.productPriceHistory.history[1].price)}</core:text>
+                </core:text>
+                <core:text styleClass="fieldValue" visibility="#{size(productDetail.productPriceHistory.history)&gt;1}" id="HISTORY_PRICE_DATE">
+                    <core:boundsConstraint height="15" width="97" y="165" x="157"/>
+                    <core:text>#{productDetail.productPriceHistory.history[1].startDate}</core:text>
+                </core:text>
+                <core:text styleClass="fieldValue" id="CURRENT_PRICE_DATE">
+                    <core:boundsConstraint height="17" width="98" y="140" x="157"/>
+                    <core:text>#{productDetail.productPriceHistory.currentPriceStartDate}</core:text>
+                </core:text>
+                <core:panel borderStyle="None" transparentBackground="true" backgroundImageURL="#{productEnquiryBean:getProductThumbNail(productDetail.productMediaSet)}" id="IMAGE">
+                    <core:boundsConstraint height="130" width="105" y="4" x="175"/>
+                    <core:elements/>
+                </core:panel>
+            </core:elements>
+        </core:panel>
+    </core:elements>
+    <core:templateURL>HHT/HHTPage</core:templateURL>
+    <core:events>
+        <core:event destination="AMEND" event="key.KeyCode27Pressed"></core:event>
+    </core:events>
+    <core:preferredConstraintType>BOUNDS</core:preferredConstraintType>
+    <core:variables>
+        <core:variable required="true" name="enactor.productCatalogue.ProductDetail">
+            <core:interfaceName>com.enactor.productCatalogueSearchMessages.productCatalogueSearch.IProductSearchDetail</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.hht.SelectedSize">
+            <core:interfaceName>com.enactor.mfc.product.ISKUProduct</core:interfaceName>
+        </core:variable>
+        <core:variable required="true" name="enactor.mfc.Product">
+            <core:interfaceName>com.enactor.mfc.product.IProduct</core:interfaceName>
+        </core:variable>
+    </core:variables>
+    <core:previewStyleSheets>
+        <core:path>WM65/hhtstyles.css</core:path>
+    </core:previewStyleSheets>
+    <core:functionLibraries>
+        <core:functionLibrary name="productEnquiryBean" path="com.enactor.storeInventoryManagement.productEnquiry.ProductEnquiryBean">
+            <core:type>CLASS</core:type>
+        </core:functionLibrary>
+    </core:functionLibraries>
+    <core:scannerEnabled>false</core:scannerEnabled>
+    <core:scannerDataName></core:scannerDataName>
+</core:peripheralSupportWindow>
